@@ -1,12 +1,15 @@
 #+PROPERTY: header-args :mkdirp yes
 
 * Table of Contents                                                     :TOC:
- - [[#terminfo][=~/.terminfo=]]
+ - [[#24bit-terminfo][24bit terminfo]]
    - [[#process-with-tic][Process with =tic=]]
 
-* =~/.terminfo=
+* 24bit terminfo
 
-  #+begin_src text :tangle artifacts/terminfo-24bit.src
+  - This terminfo definiton is from
+    https://www.gnu.org/software/emacs/manual/html_mono/efaq.html#Colors-on-a-TTY
+
+  #+begin_src text :tangle .artifacts/terminfo-24bit.src
     # Use colon separators.
     xterm-24bit|xterm with 24-bit direct color mode,
       use=xterm-256color,
@@ -22,5 +25,5 @@
 ** Process with =tic=
 
    #+begin_src sh :noweb tangle :eval yes :exports code :results silent output
-     tic -x -o ~/.terminfo artifacts/terminfo-24bit.src
+     tic -x -o ~/.terminfo .artifacts/terminfo-24bit.src
    #+end_src

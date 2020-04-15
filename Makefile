@@ -79,6 +79,7 @@ clean-removed-files:  ## rm files removed since last make tangle
 			test -f $$removed && rm -i $$removed
 		done
 	done
+	exit 0
 
 # Rule to convert a *.org file to a .cache/*.out
 $(CACHEDIR)/%.out: %.org
