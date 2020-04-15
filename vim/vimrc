@@ -1,0 +1,147 @@
+" disable old vi compatibility
+set nocompatible
+
+execute pathogen#infect()
+
+" use bash for !commands and make/dispatch
+set shell=bash
+
+" enable 256 colors in the terminal (use 'tmux -2' to enable 256 colors in tmux)
+set t_Co=256
+" enable truecolor terminal mode
+set termguicolors
+
+set background=dark
+" let g:airline_theme='behelit'
+" let g:airline_theme='aludin'
+
+" let g:one_allow_italics = 1
+" colorscheme one
+" colorscheme distinguished
+" colorscheme ir_black-256
+" colorscheme molokai
+colorscheme atomic
+
+set noswapfile
+set nobackup  " do not keep a backup file (file~), use versions instead
+
+set cursorline
+set hlsearch
+set autoindent
+set number          " line numbering
+set relativenumber  " relative line numbering
+
+set wildmode=list:longest " specifies how command line completion works
+set incsearch  " do incremental searching
+set ignorecase
+set smartcase
+set diffopt+=iwhite  " Ignore whitespace in vimdiff
+
+set mouse=a  " Enable the mouse
+
+set expandtab  " use spaces for tabs
+" Clear trailing whitespace and retab (remove tab characters) before saving
+autocmd BufWritePre * :%s/\s\+$//e | retab
+
+" h/l stay in default colemak locations
+" n/e remapped to down up
+nnoremap n gj|xnoremap n gj|onoremap n gj|
+nnoremap e gk|xnoremap e gk|onoremap e gk|
+" Use k/K for next/previous search hits
+nnoremap k n|xnoremap k n|onoremap k n|
+nnoremap K N|xnoremap K N|onoremap K N|
+" Bubble single lines
+nmap <C-e> [e
+nmap <C-n> ]e
+" Bubble multiple lines
+vmap <C-e> [egv
+vmap <C-n> ]egv
+
+" Ctrl-S to save
+" run 'stty -ixon' so C-s doesn't freeze the terminal, C-q unfreezes
+nnoremap <c-s> :w<cr>
+inoremap <c-s> <esc>:w<cr>
+vnoremap <c-s> <esc>:w<cr>
+
+" Hit ; to do the same thing as :
+nnoremap ; :|xnoremap ; :|
+nnoremap q; q:|xnoremap q; q:|
+
+" Hit <CR> to do the same thing as :
+nnoremap <CR> :|xnoremap <CR> :|
+nnoremap g<CR> <CR>|xnoremap g<CR> <CR>|
+
+" file browser (netrw) options
+" start it by:
+" - opening a directory
+" - running :Ex
+" <leader>d binding
+let g:netrw_browse_split = 2 " open new files in vertical split
+
+" Leader key maps ------------------------------------------------------------
+let mapleader = ","
+
+" edit ~/.vimrc with ,v
+nnoremap <leader>v :e $MYVIMRC<CR>
+
+" set paste toggle
+nnoremap <leader>sp :set paste!<cr>
+" set truncate (nowrap) toggle
+nnoremap <leader>st :set wrap!<cr>
+" set line numbering toggles
+nnoremap <leader>sn :set number! relativenumber!<cr>
+nnoremap <leader>sN :set number!<cr>
+nnoremap <leader>sR :set relativenumber!<cr>
+
+" set :make command to rake
+" let &makeprg = "cd ~/project/ && make "
+
+" Run a commands asyncronously in a tmux split
+" when done open a buffer with the results
+nnoremap <leader>t :Dispatch -compiler=pytest -dir=~/project rake test<CR>
+" nnoremap <leader>t :!bash -c 'cd ~/kadc-on-call/ && rake test'<CR>
+
+" Run make using Dispatch
+nnoremap <leader>rr :Make<cr>
+nnoremap <leader>rc :Make<space>
+" Run current file
+nnoremap <leader>rf :Dispatch ./%<CR>
+
+" open directory browser with ,d
+nnoremap <leader>d :Ex<cr>
+
+" jump to the next/prev quickfix errors
+nnoremap <leader>n :cnext<cr>
+nnoremap <leader>p :cprevious<cr>
+
+nnoremap <leader>u :UndotreeToggle<cr>
+nnoremap <leader>g :Gstatus<cr>
+nnoremap <leader>b :CtrlPBuffer<cr>
+nnoremap <leader>m :CtrlPBufTagAll<cr>
+nnoremap <leader>o :silent !ctags -R *.py kadc tests<cr>:CtrlPTag<cr>
+
+" Error Checking with Syntastic
+let g:syntastic_python_checkers = ['flake8', 'python']
+
+" ignore some file types in ctrlp
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/](\.git|\.hg|\.svn)$',
+  \ 'file': '\v\.(pyc|exe|so|dll)$',
+  \ 'link': 'some_bad_symbolic_links',
+  \ }
+let g:ctrlp_extensions = ['tag', 'buffertag', 'quickfix'] " , 'dir', 'rtscript', 'undo', 'line', 'changes', 'mixed', 'bookmarkdir']
+
+" flagship
+set laststatus=2
+set showtabline=2
+set guioptions=-e
+set guifont=PragmataPro\ Mono\ 16
+
+" autocmd User Flags call Hoist("buffer", "fugitive#statusline")
+
+let g:tmux_navigator_no_mappings = 1
+nnoremap <silent> <m-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <m-n> :TmuxNavigateDown<cr>
+nnoremap <silent> <m-e> :TmuxNavigateUp<cr>
+nnoremap <silent> <m-l> :TmuxNavigateRight<cr>
+

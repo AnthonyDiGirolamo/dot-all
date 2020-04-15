@@ -22,8 +22,15 @@ clean:  ## delete .cache
 mkdirs:
 	@mkdir -p $(CACHEDIR)
 
-all: clean tangle  ## clean and tangle all
+all: clean tangle symlinks ## clean and tangle all
 tangle: mkdirs $(ORG_OUT_FILES)  ## tangle all dotfiles
+
+.PHONY: symlinks
+.ONESHELL:
+symlinks:  ## symlink folders
+	@ln -snvf $(abspath ./vim) $(HOME)/.vim
+
+# @ln -snvf $(abspath ./emacs.d) $(HOME)/.emacs.d
 
 .PHONY: install-fish
 .ONESHELL:
