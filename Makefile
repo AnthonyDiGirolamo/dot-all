@@ -56,7 +56,8 @@ install-emacs:  ## download, compile and install emacs
 # Rule to convert a *.org file to a .cache/*.out
 $(CACHEDIR)/%.out: %.org $(CACHEDIR)/
 	@echo "[TANGLE] $<"
-	@emacs -Q --batch --eval "(progn (require 'org) (require 'ob-shell) (setq org-confirm-babel-evaluate nil) (org-babel-tangle-file \"$<\"))"
+	@grep -i -E '#\+begin_src.*:tangle "[^"]+"' -o $< | sed -e 's/.*:tangle //' -e 's/"/  -> /' -e 's/"//'
+	@emacs -Q --batch --eval "(progn (require 'org) (require 'ob-shell) (setq org-confirm-babel-evaluate nil) (org-babel-tangle-file \"$<\"))" 2>/dev/null
 	@touch $@
 
 # rule to make a directory
