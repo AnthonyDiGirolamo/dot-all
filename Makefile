@@ -31,7 +31,7 @@ install-fish:  ## download, compile and install fish
 	@mkdir -p $(CACHEDIR)/fish
 	cd $(abspath $(CACHEDIR)/fish)
 	F=`basename $(FISH_URL)`
-	! test -f $$F && curl -L -O $(FISH_URL)
+	! test -f $$F && echo [CURL] $(FISH_URL) && curl -L -O $(FISH_URL) 2>/dev/null
 	! test -f $$F && exit 1
 	echo [DOWNLOADED] $$F
 	D=`tar tf $$F | head -n 1`
@@ -41,6 +41,8 @@ install-fish:  ## download, compile and install fish
 	cmake -DCMAKE_INSTALL_PREFIX=~/apps/fish ..
 	make -j 4
 	make install
+	cd $(abspath $(CACHEDIR)/fish)
+	rm -rf $$D
 
 .PHONY: install-emacs
 .ONESHELL:
@@ -48,7 +50,7 @@ install-emacs:  ## download, compile and install emacs
 	@mkdir -p $(CACHEDIR)/emacs
 	cd $(abspath $(CACHEDIR)/emacs)
 	F=`basename $(EMACS_URL)`
-	! test -f $$F && curl -L -O $(EMACS_URL)
+	! test -f $$F && echo [CURL] $(EMACS_URL) && curl -L -O $(EMACS_URL) 2>/dev/null
 	! test -f $$F && exit 1
 	echo [DOWNLOADED] $$F
 	D=`tar tf $$F | head -n 1`
@@ -57,6 +59,8 @@ install-emacs:  ## download, compile and install emacs
 	./configure --prefix=$$HOME/apps/emacs
 	make -j 4
 	make install
+	cd $(abspath $(CACHEDIR)/emacs)
+	rm -rf $$D
 
 # Rule to convert a *.org file to a .cache/*.out
 $(CACHEDIR)/%.out: %.org
