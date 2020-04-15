@@ -29,6 +29,7 @@ tangle: mkdirs $(ORG_OUT_FILES)  ## tangle all dotfiles
 .ONESHELL:
 symlinks:  ## symlink folders
 	@ln -snvf $(abspath ./vim) $(HOME)/.vim
+	@ln -snvf $(abspath ./emacs.d) $(HOME)/.emacs.d
 
 # @ln -snvf $(abspath ./emacs.d) $(HOME)/.emacs.d
 

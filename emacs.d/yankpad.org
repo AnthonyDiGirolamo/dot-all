@@ -1,0 +1,76 @@
+* org-mode
+** s: src-block
+   #+BEGIN_SRC $1
+   $0
+   #+END_SRC
+** se: src-block emacs-lisp
+   #+BEGIN_SRC emacs-lisp
+   $0
+   #+END_SRC
+** t: org-mode table
+   | $0 |  |
+   |--+--|
+   |  |  |
+
+* python-mode
+** commandline.docopt boilerplate
+   #!/usr/bin/env python3
+   # coding=utf-8
+
+   """mkscript
+
+   Usage:
+     mkscript [--directory NAME]
+     mkscript (-h | --help)
+     mkscript --version
+
+   Options:
+     -d NAME --directory=NAME  Directory name [default: build]
+     -h --help                 Show this screen.
+     --version                 Show version.
+   """
+
+   import os
+   import pprint
+   import re
+   import string
+   import sys
+   from docopt import docopt
+
+   pp = pprint.PrettyPrinter(indent=4, width=110).pprint
+
+   def main():
+       # Parse command line with docopt
+       arguments = docopt(__doc__, version=1)
+       pp(arguments)
+       os.system("pwd")        # Run command with no interaction
+       pp(os.environ["HOME"])  # Environment variable
+       pp(__file__)            # This script location
+       pp(os.getcwd())         # Current working directory
+       os.chdir(os.path.dirname(__file__))  # Change directory
+       exit(0)
+
+
+   if __name__ == '__main__':
+       main()
+
+
+** file.readlines boilerplate
+   #!/usr/bin/env python3
+   # coding=utf-8
+
+   import pprint
+   import re
+   import sys
+   from datetime import datetime, date, time
+   pp = pprint.PrettyPrinter(indent=4).pprint
+
+   def main():
+     some_regex = re.compile(r'\n\n')
+
+     with open(sys.argv[1], "r") as somefile:
+       for index, line in enumerate(somefile.readlines()):
+         pass
+
+   if __name__ == '__main__':
+     main()

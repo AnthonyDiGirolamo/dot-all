@@ -1,0 +1,3 @@
+[submodule "emacs.d/airline-themes"]
+	path = emacs.d/airline-themes
+	url = git@github.com:AnthonyDiGirolamo/airline-themes.git

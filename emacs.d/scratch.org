@@ -1,0 +1,145 @@
+
+* ATX Spec
+
+| ! |               | in           | mm               | final              |
+|---+---------------+--------------+------------------+--------------------|
+|   | Width         | 9.6          | 243.84           |                    |
+|   | Height        | 12           | 304.8            |                    |
+|   | Hole Diameter | 0.156        | 3.9624           |                    |
+| _ |               |              | offset           |                    |
+|   | Hole offset   | [0.554, .4]  | [14.0716, 10.16] |                    |
+|---+---------------+--------------+------------------+--------------------|
+| # | Hole 1        | [0,     0]   | [0, 0]           | [14.0716, 10.16]   |
+| # | Hole 2        | [3.1,   0]   | [78.74, 0]       | [92.8116, 10.16]   |
+| # | Hole 3        | [4.9,   0]   | [124.46, 0]      | [138.5316, 10.16]  |
+| # | Hole 4        | [11.1, .9]   | [281.94, 22.86]  | [296.0116, 33.02]  |
+|---+---------------+--------------+------------------+--------------------|
+| # | Hole 5        | [0,    6.1]  | [0, 154.94]      | [14.0716, 165.1]   |
+| # | Hole 6        | [4.9,  6.1]  | [124.46, 154.94] | [138.5316, 165.1]  |
+| # | Hole 7        | [11.1, 6.1]  | [281.94, 154.94] | [296.0116, 165.1]  |
+|---+---------------+--------------+------------------+--------------------|
+| # | Hole 8        | [0,    8.95] | [0, 227.33]      | [14.0716, 237.49]  |
+| # | Hole 9        | [4.9,  8.95] | [124.46, 227.33] | [138.5316, 237.49] |
+| # | Hole 10       | [11.1, 8.95] | [281.94, 227.33] | [296.0116, 237.49] |
+#+TBLFM: $4=usimplify($in*in/mm)::$5=$mm+$offset
+
+- Functions usable in formulas: [[info:calc#Function%20Index][info:calc#Function Index]]
+
+* OpenSCAD
+
+#+BEGIN_SRC scad :tangle "~/atx.scad"
+  // LetterBlock.scad - Basic usage of text() and linear_extrude()
+  // Module instantiation
+  LetterBlock("M");
+  // Module definition.
+  // size=30 defines an optional parameter with a default value.
+  module LetterBlock(letter, size=30) {
+      difference() {
+          translate([0,0,size/4]) cube([size,size,size/2], center=true);
+          translate([0,0,size/6]) {
+              // convexity is needed for correct preview
+              // since characters can be highly concave
+              linear_extrude(height=size, convexity=4)
+                  text(letter,
+                       size=size*22/30,
+                       font="Bitstream Vera Sans",
+                       halign="center",
+                       valign="center");
+          }
+      }
+  }
+  echo(version=version());
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(calc-alg-entry "9.6")
+(calc-convert-units "9.6 in" "mm")
+#+END_SRC
+
+#+BEGIN_SRC sh :results output
+PATH="${HOME}/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="${HOME}/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="${HOME}/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"${HOME}/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=${HOME}/perl5"; export PERL_MM_OPT;
+graph-easy <<EOF
+graph { textwrap: auto; }
+
+[ Long Node Label left right center ]
+  -- A long edge label --> { text-wrap: 10; }
+[ B ]
+EOF
+#+END_SRC
+
+#+RESULTS:
+: +--------+           +---+
+: |  Long  |           |   |
+: |  Node  |           |   |
+: | Label  |  A long   | B |
+: |  left  |  edge     |   |
+: | right  |  label    |   |
+: | center | --------> |   |
+: +--------+           +---+
+
+
+* Gnuplot
+
+#+begin_src gnuplot :exports code :file file.png
+reset
+
+set title "Putting it All Together"
+
+set xlabel "X"
+set xrange [-8:8]
+set xtics -8,2,8
+
+
+set ylabel "Y"
+set yrange [-20:70]
+set ytics -20,10,70
+
+f(x) = x**2
+g(x) = x**3
+h(x) = 10*sqrt(abs(x))
+
+plot f(x) w lp lw 1, g(x) w p lw 2, h(x) w l lw 3
+#+end_src
+
+#+RESULTS:
+[[file:file.png]]
+
+#+tblname: basic-plot
+|   x |         y1 |         y2 |
+|-----+------------+------------|
+| 0.1 |      0.425 |      0.375 |
+| 0.2 |     0.3125 |     0.3375 |
+| 0.3 | 0.24999993 | 0.28333338 |
+| 0.4 |      0.275 |    0.28125 |
+| 0.5 |       0.26 |       0.27 |
+| 0.6 | 0.25833338 | 0.24999993 |
+| 0.7 | 0.24642845 | 0.23928553 |
+| 0.8 |    0.23125 |     0.2375 |
+| 0.9 | 0.23333323 |  0.2333332 |
+|   1 |     0.2225 |       0.22 |
+
+#+begin_src gnuplot :var data=basic-plot :exports code :file file2.png
+set title "Putting it All Together"
+
+set xlabel "X"
+set xrange [0:1]
+set xtics 0,0.1,1
+
+
+set ylabel "Y"
+set yrange [0.2:0.5]
+set ytics 0.2,0.05,0.5
+
+
+plot data u 1:2 w p lw 2 title 'x vs. y1', \
+     data u 1:3 w lp lw 1 title 'x vx. y2'
+#+end_src
+
+#+RESULTS:
+[[file:file2.png]]
+
+
