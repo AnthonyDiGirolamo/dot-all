@@ -79,6 +79,7 @@ $(CACHEDIR)/%.out: %.org
 (require 'org) \
 (require 'ob-shell) \
 (setq make-backup-files nil) \
+(defalias 'yes-or-no-p 'y-or-n-p) \
 (setq org-confirm-babel-evaluate nil) \
 (defun amd/post-tangle () \
 (let ((tangled-output-file (buffer-file-name)) \
@@ -92,7 +93,9 @@ $(CACHEDIR)/%.out: %.org
 (princ (format \"    %s\n\" tangled-output-file) t)) \
 ) \
 (add-hook 'org-babel-post-tangle-hook 'amd/post-tangle) \
-(org-babel-tangle-file \"$<\"))" $(abspath $@) 2>/dev/null
+(org-babel-tangle-file \"$<\") \
+(org-babel-map-src-blocks \"$<\" (when (string-match-p \":eval yes\" header-args) (org-babel-execute-src-block))) \
+)" $(abspath $@) # 2>/dev/null
 	@touch $@
 
 # rule to make a directory
