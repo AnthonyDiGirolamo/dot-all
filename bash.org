@@ -1,0 +1,501 @@
+#+PROPERTY: header-args :mkdirp yes
+
+* Table of Contents                                                     :TOC:
+ - [[#bashrc][=~/.bashrc=]]
+ - [[#bash_profile][=~/.bash_profile=]]
+ - [[#aliases][=~/.aliases=]]
+ - [[#pocketchip-aliases-local][pocketchip =~/.aliases-local=]]
+
+* =~/.bashrc=
+
+  #+begin_src sh :tangle ~/.bashrc
+    source ~/.aliases
+    export EDITOR='vim'
+    export PS1='\w $ '
+    export TERM='xterm-256color'
+  #+end_src
+
+* =~/.bash_profile=
+
+  #+begin_src sh :tangle ~/.bash_profile
+    source ~/.bashrc
+  #+end_src
+
+* =~/.aliases=
+
+  #+begin_src sh :tangle ~/.aliases
+    #!/bin/bash
+    if [ -z "$PS1" ]; then
+      return;
+    fi
+
+    if [[ "$TERM" == "dumb" ]]
+    then
+        PS1='$ '
+        if [[ -n ${ZSH_VERSION-} ]]; then
+            unsetopt zle
+            unsetopt prompt_cr
+            unsetopt prompt_subst
+            # unfunction precmd
+            # unfunction preexec
+        fi
+        return;
+    fi
+
+    export LC=en_US.UTF-8
+    export LC_CTYPE=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+
+    export PATH=$HOME/apps/fish/bin:$PATH
+    export PATH=$HOME/apps/zsh/bin:$PATH
+    export PATH=$HOME/apps/bash/bin:$PATH
+    export PATH=$HOME/apps/tmux/bin:$PATH
+    export PATH=$HOME/apps/ack/bin:$PATH
+
+    export LS_COLORS='no=00:fi=00:di=00;34:ln=00;36:pi=00;33:so=00;35:do=00;35:bd=00;33:cd=00;33:or=00;31:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=00;32:*.xz=00;31:*.tar=00;31:*.tgz=00;31:*.svgz=00;31:*.arj=00;31:*.taz=00;31:*.lzh=00;31:*.lzma=00;31:*.zip=00;31:*.z=00;31:*.Z=00;31:*.dz=00;31:*.gz=00;31:*.bz2=00;31:*.bz=00;31:*.tbz2=00;31:*.tz=00;31:*.deb=00;31:*.rpm=00;31:*.jar=00;31:*.rar=00;31:*.ace=00;31:*.zoo=00;31:*.cpio=00;31:*.7z=00;31:*.rz=00;31:*.jpg=00;35:*.jpeg=00;35:*.gif=00;35:*.bmp=00;35:*.pbm=00;35:*.pgm=00;35:*.ppm=00;35:*.tga=00;35:*.xbm=00;35:*.xpm=00;35:*.tif=00;35:*.tiff=00;35:*.png=00;35:*.svg=00;35:*.mng=00;35:*.pcx=00;35:*.mov=00;35:*.mpg=00;35:*.mpeg=00;35:*.m2v=00;35:*.mkv=00;35:*.ogm=00;35:*.mp4=00;35:*.m4v=00;35:*.mp4v=00;35:*.vob=00;35:*.qt=00;35:*.nuv=00;35:*.wmv=00;35:*.asf=00;35:*.rm=00;35:*.rmvb=00;35:*.flc=00;35:*.avi=00;35:*.fli=00;35:*.gl=00;35:*.dl=00;35:*.xcf=00;35:*.xwd=00;35:*.yuv=00;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:';
+
+    function fixp_olcf {
+      chmod -Rv g+w $@
+      chgrp -Rv ccsstaff $@
+    }
+
+    function fixp_noaa {
+      chmod -Rv g+w $@
+      chgrp -Rv ncrcstaff $@
+    }
+
+    alias base16dark='source ~/Preferences/base16-shell/base16-eighties.dark.sh'
+    alias base16light='source ~/Preferences/base16-shell/base16-eighties.light.sh'
+    alias solarizeddark='source ~/Preferences/base16-shell/base16-solarized.dark.sh'
+    alias solarizedlight='source ~/Preferences/base16-shell/base16-solarized.light.sh'
+
+    if [[ $TERM == *"eterm"* ]]
+    then
+        export TERM=xterm-256color
+    else
+        # If not in emacs load base16 shell colors
+        # base16
+        echo -n ''
+    fi
+
+
+    alias which='which -a'
+    alias b="bundle"
+    alias bi="b install --path vendor"
+    alias bu="b update"
+    alias be="b exec"
+    alias binit="bi && b package && echo 'vendor/ruby' >> .gitignore"
+
+    # Rename files recursively in the current dir and replace space with _
+    alias space2under='zmv -Q "(**/)(* *)(D)" "\$1\${2// /_}"'
+
+    alias w="w|sed -e '/^USER.*$/d'|sort|less"
+
+    alias grep='grep -i --color=auto'
+    alias randmac="head /dev/urandom | openssl md5 | sed 's/\(..\)/\1:/g' | cut -c1-17"
+
+    alias generate_self_signed_cert='openssl req -new -newkey rsa:2048 -sha1 -days 365 -nodes -x509 -keyout server.key -out server.crt'
+
+    function railsthinssl {
+      tail -n 0 -F log/development.log &
+      tailpid=`jobs -p | awk '/tail/ {print $3}'`
+      bundle exec thin start --ssl --ssl-verify --ssl-key-file server.key --ssl-cert-file server.crt
+      kill $tailpid
+    }
+
+    function linenumber () {
+      sed -n "$1p" $2
+    }
+
+    alias xdef='xrdb -load ~/.Xdefaults'
+
+    alias lltr='ll -tr'
+    alias llsr='ll -Sr'
+    alias lla='ls -lha'
+    alias ll='ls -lh'
+    alias la='ls -a'
+    alias l='ls -CF'
+
+    alias ga='git add'
+    alias gll='git l'
+    alias gs='git status'
+    alias gc='git commit'
+    alias gca='git commit -a'
+    #alias gd='git diff --no-color | vim -'
+
+    function gd {
+      git diff --no-color $@ | vim +'set bt=nowrite' -
+    }
+    alias gdc='git diff --cached'
+    alias gp='git pull'
+    alias gpp='git push'
+
+    function git_submodule_rm {
+      git rm --cached $@
+      git config -f .git/config --remove-section submodule.$@
+      git config -f .gitmodules --remove-section submodule.$@
+    }
+
+    function git_isolate_directory_history {
+      git filter-branch --subdirectory-filter $@ HEAD
+      git reset --hard
+      git remote rm origin
+      rm -rf .git/refs/original/
+      git reflog expire --expire=now --all
+      git gc --aggressive
+      git prune
+    }
+
+    alias d='dirs -v'
+    alias p='pushd'
+    alias o='popd'
+    alias u='cd ..'
+    alias c=cd
+
+    # alias h='history 1'
+
+    alias du='du -hsc'
+    alias df='df -h'
+
+    # GTD Stuff
+    # alias t='vim ~/Notes/GTD.mkd'
+    # alias tg='gvim ~/Notes/GTD.mkd'
+    # alias today='grep `date +%m/%d` ~/Notes/GTD.mkd'
+
+    alias cjob='qsub -l walltime=02:00:00 -l size=12 -N compiling -j oe -I -A STF007'
+    alias cj='checkjob -v'
+
+    # module evironment files
+    # alias m=module
+    # alias ml='m load'
+    # alias mh='m help'
+    # alias ms='m swap'
+    # alias mr='m unload'
+    # alias md='m display'
+    # alias ma='m avail'
+    # alias mk='m keyword'
+    # alias mll="module list -l 2>&1 | ruby -e 'STDIN.readlines.tap{|s|s.delete_at(1)}.sort.each{|l| puts l}'"
+
+    alias tree='tree -C'
+    alias tls='tree -L 1'
+    alias tll='treetable -L 1'
+    alias tlla='treetable -a -L 1'
+    alias tls2='tree -L 2'
+    alias tll2='treetable -L 2'
+    alias tlla2='treetable -a -L 2'
+    alias tls3='tree -L 3'
+    alias tll3='treetable -L 3'
+    alias tlla3='treetable -a -L 3'
+
+    function dotbin {
+      export PATH=`pwd`/bin:$PATH
+    }
+
+    function unzip_list {
+      unzip -l $@ | ruby -e 'STDIN.readlines.tap{|f| f.shift(3); f.pop(2) }.each{|l| puts l.sub(/^\s+\S+\s+\S+\s+\S+\s+/,"")}'
+    }
+
+    function unzip_list_trim {
+      unzip -l $@ | ruby -e 'STDIN.readlines.tap{|f| f.shift(3); f.pop(2) }.each{|l| puts l.sub(/^\s+\S+\s+\S+\s+\S+\s+[^\/]+\//,"")}'
+    }
+
+    export PATH=$HOME/apps:$PATH
+    export PATH=$HOME/apps/git/bin:$PATH
+    export PATH=$HOME/apps/ctags/bin:$PATH
+    export PATH=$HOME/apps/tree/bin:$PATH
+
+    export PATH=/usr/local/bin:$PATH
+
+    export PATH=$HOME/Preferences/bin:$PATH
+    export PATH=$HOME/Preferences/bin/els:$PATH
+
+    # alias els='els --els-icons=fontawesome'
+
+    alias wd="pwd"
+    alias sqltop="watch \"mysql -u root information_schema -e 'select * from processlist;'\""
+    alias which="which -a"
+    alias psme='ps afxu|grep -E "^$(whoami)"'
+    alias psa='ps afxu| vim +"set bt=nowrite nowrap" -'
+
+    # alias mutt='TERM=xterm-256color LD_LIBRARY_PATH=$HOME/apps/gdbm/lib:$HOME/apps/w3m/lib PATH=$HOME/apps/w3m/bin:$HOME/apps/mutt/bin:$HOME/apps/gdbm/bin:$HOME/apps/msmtp/bin:$HOME/apps/imapfilter/bin:$PATH mutt'
+    export MAILDIR=$HOME/Mail
+    alias mu_mutt_aliases='mu find t:digirolamo --fields "f"|sort|uniq|grep -v help@nccs.gov|grep -v "via RT" |grep -v "@local"|ruby -e "STDIN.readlines.each{|l| puts "alias #{$1.delete(" \",.")} #{$1.delete("\"")} <#{$2}>" if l =~ /^(.*?) <(.*?)>$/}"|uniq'
+
+    alias sshfoxy1='ssh lmd@login1.ornl.gov -L2222:uac2.ornl.gov:22'
+    alias sshfoxy2='ssh -p 2222 lmd@localhost -D localhost:8888 -L9993:mail.ornl.gov:993 -L2525:smtp.ornl.gov:25'
+
+    alias sshfsolcf='sshfs lmd@home.ccs.ornl.gov: $HOME/OLCF'
+    alias sshfsncrc1='ssh lmd@home.ccs.ornl.gov -L2222:cave.ccs.ornl.gov:22'
+    alias sshfsncrc2='ssh -p 2222 lmd@127.0.0.1 -L2223:cavern.ncrc.gov:22'
+    alias sshfsncrc3='sshfs Anthony.DiGirolamo@127.0.0.1: $HOME/NCRC -p 2223 -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+
+    alias sshhome='ssh lmd@home.ccs.ornl.gov -Y'
+    alias sshcave='ssh lmd@cave.ccs.ornl.gov -Y'
+
+    alias sshchester=" ssh -Y chester"
+    alias sshjag="ssh -Y jaguarpf"
+    alias sshcavern="ssh -Y cavern.ncrc.gov -l Anthony.DiGirolamo "
+
+    alias loadsmithy='source /sw/tools/smithy/environment.sh'
+
+    alias gem_uninstall_all='gem list | cut -d" " -f1 | xargs gem uninstall -aIx'
+
+    # export AG_IGNORES=" \
+    #  --ignore-dir 'vendor/ruby' \
+    #  --ignore-dir 'log' \
+    #  --ignore-dir '.hg' \
+    #  --ignore-dir '.svn' \
+    #  --ignore-dir '.git' \
+    #  --ignore-dir '.bzr' \
+    #  --ignore '*.eot' \
+    #  --ignore '*.woff' \
+    #  --ignore '*.ttf' \
+    #  --ignore '*.svg' \
+    #  --ignore '*.gif' \
+    #  --ignore '*.png' \
+    #  --ignore '*.jpg' \
+    #  --ignore 'tags' "
+
+    # alias ag="ag $AG_IGNORES"
+
+    function vimag {
+      vim -f $(ag -l $@)
+    }
+
+    function vimack {
+      vim -f $(ack -l $@)
+    }
+
+    # Auth your sshkey with another server
+    function authme {
+        ssh $@ 'cat >>.ssh/authorized_keys' <~/.ssh/id_rsa.pub
+    }
+
+    function setupenv {
+      pushd ~
+      rsync -avLK --delete --exclude mthesaur-vim.txt apps/bin .gitconfig .vim .vimrc .zprezto .zlogin  .zlogout  .zpreztorc  .zprofile  .zshenv  .zshrc .screenrc .tmux.conf .aliases .irbrc $@:~/
+      popd
+    }
+
+    function setupenv_full {
+      pushd ~
+      rsync -avLK --delete --exclude mthesaur-vim.txt Preferences $@:~/
+      popd
+    }
+
+    function gpgastart {
+      eval `gpg-agent --daemon --write-env-file` && \
+        cat ~/.gpg-agent-info
+    }
+
+    function gpgarestart {
+      # if test -f $HOME/.gpg-agent-info && \
+        #    kill -0 `cut -d: -f 2 $HOME/.gpg-agent-info` 2>/dev/null; then
+      #   GPG_AGENT_INFO=`cat $HOME/.gpg-agent-info`
+      #   export GPG_AGENT_INFO
+      # else
+      #   eval `gpg-agent --daemon --write-env-file`
+      # fi
+      killall -v -u $USER gpg-agent && \
+        rm -f ~/.gpg-agent-info && \
+        gpgastart
+    }
+
+    if [ -f "${HOME}/.gpg-agent-info" ]; then
+      . "${HOME}/.gpg-agent-info"
+      export GPG_AGENT_INFO
+      export SSH_AUTH_SOCK
+    fi
+
+    GPG_TTY=$(tty)
+    export GPG_TTY
+
+    # MacOS Specific Settings
+    uname -a | grep -qs Darwin
+    if [ $? -eq 0 ]; then
+      # brew install coreutils
+      # eval "`gdircolors -b`"
+      unalias gls
+      alias ls='gls --color=auto'
+      alias gvim=mvim
+      alias vim='TERM=xterm-256color /Applications/MacVim.app/Contents/MacOS/Vim'
+      export EDITOR='TERM=xterm-256color /Applications/MacVim.app/Contents/MacOS/Vim'
+      # xmodmap -e "keycode 119 = Insert"
+      alias f12insert='xmodmap -e "keycode 119 = Insert"'
+      alias mission_controll_animation_disable='defaults write com.apple.dock expose-animation-duration -float 0; killall Dock'
+      alias mission_controll_animation_enable='defaults delete com.apple.dock expose-animation-duration; killall Dock'
+      function clipboard_as_html {
+        osascript -e 'the clipboard as "HTML"' | ruby -ne 'puts([$_[10..-3]].pack("H*"))'
+      }
+
+      if [ -d "$HOME/homebrew/bin" ]; then
+        export PATH=$HOME/homebrew/bin:$PATH
+        export MANPATH=$HOME/homebrew/share/man:$MANPATH
+      fi
+
+    else
+    # Linux
+      #eval "`dircolors -b`"
+      alias ls='ls --color=auto'
+
+      alias rrm='/bin/rm'
+      alias rm='mv --verbose -i --target-directory ~/.Trash/'
+      alias empty='/bin/rm -rvf ~/.Trash/* ; /bin/rm -rvf ~/.Trash/.*'
+      alias f12insert='xmodmap -e "keycode 96 = Insert"'
+      unset LESS
+
+      # function setinputprefs {
+      #   xset r rate 200 30
+      #   xinput list --name-only | grep -qs 'anthony’s trackpad'
+      #   if [ $? -eq 0 ]; then
+      #     xinput set-prop 'anthony’s trackpad' 'Synaptics Two-Finger Scrolling' 1, 1
+      #     xinput set-prop 'anthony’s trackpad' 'Synaptics Scrolling Distance' -156, -156
+      #   fi
+      # }
+
+      # if which xset &> /dev/null &&  [ ! -z "$DISPLAY" ]; then
+      #   setinputprefs
+      # fi
+    fi
+
+    # Disable CTRL-S Freeze
+    stty -ixon
+
+    alias vims="vim -c 'colors solarized'"
+    alias v=vim
+
+    EMACSHOMEPREFIX=$HOME/apps/emacs
+    if [ -e $EMACSHOMEPREFIX ] ; then
+      export PATH="$EMACSHOMEPREFIX/bin:$PATH"
+    fi
+
+    alias ew='emacs-w32 &'
+
+    uname -a | grep -qs Darwin ; if [ $? -eq 0 ]; then
+      alias emacs=/Applications/Emacs.app/Contents/MacOS/Emacs
+    fi
+
+    alias e='TERM=xterm-256color emacs -nw'
+    alias eg='emacs &'
+    alias ed='emacs --daemon'
+    alias ec="emacsclient --alternate-editor='' -nw"
+    alias ecg="emacsclient --alternate-editor='' --no-wait --create-frame"
+
+    if [ -z ${DISPLAY+x} ];
+    then
+      # no display
+      export EDITOR="emacsclient --alternate-editor=''"
+    else
+      # display set
+      export EDITOR="emacsclient --alternate-editor='' --create-frame"
+    fi
+
+    export VISUAL=$EDITOR
+
+    alias tmux='tmux -2'
+
+    # hostname -s | grep -qs -E 'cave|yona'
+    # if [ $? -eq 0 ]; then
+    #   alias vim='/usr/bin/vim'
+    #   export EDITOR='/usr/bin/vim'
+    # fi
+
+    # For default ruby on arch linux
+    export PATH=$HOME/.gem/ruby/2.2.0/bin:$PATH
+
+    if [ -e /usr/local/var/rbenv ] ; then
+      export RBENV_ROOT=/usr/local/var/rbenv
+    fi
+    export PATH="$HOME/.rbenv/bin:$PATH"
+    which rbenv &> /dev/null && eval "$(rbenv init -)"
+
+    if [[ -n $MODULESHOME ]]; then
+      if [[ -n ${ZSH_VERSION-} ]]; then
+        . $MODULESHOME/init/zsh
+      fi
+      if [[ -n ${BASH_VERSION-} ]]; then
+        . $MODULESHOME/init/bash
+      fi
+      declare -f module &> /dev/null && module load git ruby
+    fi
+
+    function random-colors-dark {
+      FILES=( ~/Preferences/base16-shell/base16-*.dark.sh )
+      rf=$FILES[$RANDOM%$#FILES+1]
+      echo $rf
+      . $rf
+    }
+
+    function load_qwerty_xorg {
+      setxkbmap -layout us
+    }
+
+    function load_colemak_xorg {
+      setxkbmap -layout us -variant colemak
+    }
+
+    function load_colemak_console {
+      sudo loadkeys colemak
+    }
+
+    function mailfetchloop {
+      while [ 1 ]
+      do
+        mbsync -V gmail
+        date
+        sleep 120
+      done
+    }
+    alias mfl=mailfetchloop
+
+    # if [[ -n ${BASH_VERSION-} ]]; then
+    #   . ~/.shell_prompt.sh
+    # fi
+
+    function setgitauthor {
+      git config user.name "AnthonyDiGirolamo"
+      git config user.email "anthony.digirolamo@gmail.com"
+    }
+
+    export PATH="$HOME/apps/node-v8.5.0-linux-x64/bin:$PATH"
+    NPM_PACKAGES="$HOME/.npm-packages"
+    mkdir -p $NPM_PACKAGES/bin
+    export PATH="$NPM_PACKAGES/bin:$PATH"
+    # export MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
+    # NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
+    # echo "prefix = $NPM_PACKAGES" > ~/.npmrc
+    export NPM_CONFIG_PREFIX=$NPM_PACKAGES
+
+    # for python pip install --user
+    export PATH="$HOME/.local/bin:$PATH"
+    export PATH="$HOME/Library/Python/2.7/bin:$PATH"
+
+    export PATH="$HOME/.luarocks/bin:$PATH"
+    which luarocks 2>/dev/null && eval $(luarocks path)
+
+    export PATH="$HOME/.cargo/bin:$PATH"
+
+    export PATH="$HOME/apps/pebble-sdk-4.5-linux64/bin:$PATH"
+
+    if [[ -n ${ZSH_VERSION-} ]]; then
+      setopt clobber
+      prompt kylewest
+    fi
+
+    source ~/.aliases-local
+    alias dfasfx=startx
+  #+end_src
+
+* pocketchip =~/.aliases-local=
+
+  #+begin_src sh
+    xmodmap ~/.Xmodmap
+    alias stickymods="xkbset sticky -twokey -latchlock ; xkbset exp 1 '=accessx' '=sticky' '=twokey' '=latchlock'"
+
+    xset r rate 300 30
+
+    alias b0='echo 0 > /sys/class/backlight/backlight/brightness'
+    alias b1='echo 1 > /sys/class/backlight/backlight/brightness'
+    alias b2='echo 2 > /sys/class/backlight/backlight/brightness'
+    alias b3='echo 3 > /sys/class/backlight/backlight/brightness'
+  #+end_src

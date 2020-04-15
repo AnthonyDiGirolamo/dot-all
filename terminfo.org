@@ -1,5 +1,9 @@
 #+PROPERTY: header-args :mkdirp yes
 
+* Table of Contents                                                     :TOC:
+ - [[#terminfo][=~/.terminfo=]]
+   - [[#process-with-tic][Process with =tic=]]
+
 * =~/.terminfo=
 
   #+begin_src text :tangle artifacts/terminfo-24bit.src
@@ -15,6 +19,8 @@
       setf24=\E[38;2;%p1%{65536}%/%d;%p1%{256}%/%{255}%&%d;%p1%{255}%&%dm,
   #+end_src
 
-  #+begin_src sh :noweb tangle :eval yes :exports code :results silent output
-    tic -x -o ~/.terminfo artifacts/terminfo-24bit.src
-  #+end_src
+** Process with =tic=
+
+   #+begin_src sh :noweb tangle :eval yes :exports code :results silent output
+     tic -x -o ~/.terminfo artifacts/terminfo-24bit.src
+   #+end_src

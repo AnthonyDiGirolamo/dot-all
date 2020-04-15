@@ -1,0 +1,22 @@
+#+PROPERTY: header-args :mkdirp yes
+
+* Table of Contents                                                     :TOC:
+ - [[#gitconfig][=~/.gitconfig=]]
+
+* =~/.gitconfig=
+
+  #+begin_src text :tangle ~/.gitconfig
+    [color]
+      diff = auto
+      status = auto
+      branch = auto
+    [push]
+      default = current
+    [alias]
+      ribbon = tag --force _ribbon origin/master
+      catchup = log --patch --reverse --topo-order _ribbon..origin/master
+      l = log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+      hist = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    [core]
+      editor = vim
+  #+end_src

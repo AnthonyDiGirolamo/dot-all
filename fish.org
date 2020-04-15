@@ -1,294 +1,304 @@
 #+STARTUP: content
 #+PROPERTY: header-args :mkdirp yes
 
-* Fish
+* Table of Contents                                                     :TOC:
+ - [[#configfishconfigfish][=~/.config/fish/config.fish=]]
+ - [[#configfishconfdaliasesfish][=~/.config/fish/conf.d/aliases.fish=]]
+ - [[#configfishconfdfish_user_key_bindingsfish][=~/.config/fish/conf.d/fish_user_key_bindings.fish=]]
+ - [[#prompt][prompt]]
+   - [[#configfishfunctionsfish_promptfish][=~/.config/fish/functions/fish_prompt.fish~=]]
+   - [[#configfishfunctionsfish_mode_promptfish][=~/.config/fish/functions/fish_mode_prompt.fish~=]]
+ - [[#directory-navigation][directory navigation]]
+   - [[#configfishfunctionsufish][=~/.config/fish/functions/u.fish~=]]
+   - [[#configfishfunctionsdlfish][=~/.config/fish/functions/dl.fish~=]]
+ - [[#functions][functions]]
 
-** ~.config/fish/config.fish~
+* =~/.config/fish/config.fish=
 
-   #+BEGIN_SRC fish :tangle "~/.config/fish/config.fish"
-     # set tmux pane title based on currently running command
-     function fish_title
-       true
+  #+BEGIN_SRC fish :tangle "~/.config/fish/config.fish"
+    # set tmux pane title based on currently running command
+    function fish_title
+      true
+    end
+
+    if set -q INSIDE_EMACS
+      # disable vim keybindings if running fish inside emacs M-x shell
+      fish_default_key_bindings
+    else
+      fish_vi_key_bindings
+    end
+
+    function add_directory_to_path --argument-names new_dir
+      if test -d $new_dir
+        set -x PATH $new_dir $PATH
+      end
+    end
+
+    # Prepend PATH variable
+    add_directory_to_path /usr/local/go/bin
+    add_directory_to_path $HOME/.local/bin
+    add_directory_to_path $HOME/.rbenv/bin
+    add_directory_to_path $HOME/.cargo/bin
+    add_directory_to_path $HOME/.luarocks/bin
+    add_directory_to_path $HOME/.npm-packages/bin
+
+    # This breaks some scripts
+    # set -x SHELL fish
+
+    # Example of using emacsclient as EDITOR
+    # if which emacsclient 1>/dev/null
+    #   if test -z $DISPLAY
+    #       # no display
+    #       set -x EDITOR "emacsclient --alternate-editor='' -nw"
+    #   else
+    #       # display set
+    #       set -x EDITOR "emacsclient --alternate-editor='' --no-wait --create-frame"
+    #   end
+    # end
+
+    # Use Vim as $EDITOR it's faster to load
+    set -x EDITOR "vim"
+    set -x VISUAL $EDITOR
+    if not set -q INSIDE_EMACS
+        set -x TERM xterm-24bit
+    end
+
+    # if ~/.config/fish/config-local.fish exists, load it
+    set config_local $HOME/.config/fish/config-local.fish
+    test -f $config_local; and source $config_local
+  #+END_SRC
+
+* =~/.config/fish/conf.d/aliases.fish=
+
+  #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/aliases.fish"
+    alias lltr='ll -tr'
+    alias llsr='ll -Sr'
+    alias lla='ls -lha'
+    alias ll='ls -lh'
+    alias la='ls -a'
+    alias l='ls -CF'
+
+    alias gll='git log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:\'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset\''
+    alias gs='git status'
+    alias ga='git add'
+    alias gc='git commit'
+    alias gca='git commit -a'
+    alias gwd='git diff'
+    alias gwdc='git diff --cached'
+    alias gp='git pull'
+    alias gpp='git push'
+    alias gco='git checkout'
+
+    # fish specific aliases
+    alias o=prevd
+    alias pd=prevd
+    alias nd=nextd
+
+    function h --description "merge history from other sessions and display with less"
+      history --merge
+      history
+    end
+
+    function setgitauthor
+      git config user.name "AnthonyDiGirolamo"
+      git config user.email "anthony.digirolamo@gmail.com"
+    end
+
+    alias v='vim'
+    alias tmux='tmux -2'
+
+    # emacs aliases - not really using these
+    if string match -q -r 'Darwin' (uname -a)
+      alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
+    end
+
+    alias ew="emacs-w32 &"
+    alias e="emacs -nw"
+    alias eg="emacs &"
+    alias ed="emacs --daemon"
+    alias ec="emacsclient --alternate-editor='' -nw"
+    alias ecg="emacsclient --alternate-editor='' --no-wait --create-frame"
+  #+END_SRC
+
+* =~/.config/fish/conf.d/fish_user_key_bindings.fish=
+
+  #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/fish_user_key_bindings.fish"
+    # This function is auto-run by fish, use it to override keybindings
+    function fish_user_key_bindings
+      # Default Bindings
+      #   Alt+Up or Down to move through last argument history
+      #   Alt+Left or Right to move through dirhist
+
+      # Alt+Ctrl+n or e to move through last argument history
+      bind \e\cn history-token-search-forward
+      bind \e\ce history-token-search-backward
+      bind -M insert \e\cn history-token-search-forward
+      bind -M insert \e\ce history-token-search-backward
+
+      # Alt+Ctrl+h or l to move through dirhist
+      bind \e\ch prevd-or-backward-word
+      bind \e\cl nextd-or-forward-word
+      bind -M insert \e\ch prevd-or-backward-word
+      bind -M insert \e\cl nextd-or-forward-word
+
+      # Ctrl-e accept current completion
+      bind -M insert \ce forward-char
+
+      # Up arrow: sync history accross sessions before reverse history search
+      bind -M insert -k up 'history --merge; up-or-search'
+      bind -M insert \e\[A 'history --merge; up-or-search'
+
+      # Also Use Ctrl-p and Ctrl-n for reverse history search
+      bind -M insert \cp 'history --merge; up-or-search'
+      bind -M insert \cn down-or-search
+    end
+  #+END_SRC
+
+* prompt
+
+** =~/.config/fish/functions/fish_prompt.fish~=
+
+   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_prompt.fish"
+     set -x fish_color_history_current yellow
+
+     # Prompt Setup
+     set using_android 0
+     if string match -q -r 'Android' (uname -a)
+       set using_android 1
      end
 
-     if set -q INSIDE_EMACS
-       # disable vim keybindings if running fish inside emacs M-x shell
-       fish_default_key_bindings
-     else
-       fish_vi_key_bindings
+     set powerline_right_arrow ''
+     if set -q INSIDE_EMACS; or string match -q -r 'raspberrypi|chip' (uname -a)
+       set powerline_right_arrow ''
      end
 
-     function add_directory_to_path --argument-names new_dir
-       if test -d $new_dir
-         set -x PATH $new_dir $PATH
+     set powerline_insert 5f5fff
+     set powerline_blue1 5f87ff
+     set powerline_blue2 87afff
+     set powerline_blue3 dfdfff
+
+     function fish_prompt
+       if set -q INSIDE_EMACS
+         echo -n (prompt_pwd) ' $ '
+         return
        end
-     end
 
-     # Prepend PATH variable
-     add_directory_to_path /usr/local/go/bin
-     add_directory_to_path $HOME/.local/bin
-     add_directory_to_path $HOME/.rbenv/bin
-     add_directory_to_path $HOME/.cargo/bin
-     add_directory_to_path $HOME/.luarocks/bin
-     add_directory_to_path $HOME/.npm-packages/bin
+       set_color -b $powerline_blue1 black
+       if test 1 != $using_android
+         printf ' %s@%s ' (whoami) (hostname|cut -d .  -f 1)
+       else
+         echo -n ' '
+       end
 
-     # This breaks some scripts
-     # set -x SHELL fish
+       set_color -b $powerline_blue2 $powerline_blue1
+       echo -n $powerline_right_arrow
 
-     # Example of using emacsclient as EDITOR
-     # if which emacsclient 1>/dev/null
-     #   if test -z $DISPLAY
-     #       # no display
-     #       set -x EDITOR "emacsclient --alternate-editor='' -nw"
-     #   else
-     #       # display set
-     #       set -x EDITOR "emacsclient --alternate-editor='' --no-wait --create-frame"
-     #   end
-     # end
+       set_color -b $powerline_blue2 black
+       echo -n '' (prompt_pwd) ''
 
-     # Use Vim as $EDITOR it's faster to load
-     set -x EDITOR "vim"
-     set -x VISUAL $EDITOR
-     if not set -q INSIDE_EMACS
-         set -x TERM xterm-24bit
-     end
+       # if test -e .git
+       if set branch (git rev-parse --abbrev-ref HEAD 2>/dev/null)
+         set_color -b $powerline_blue3 $powerline_blue2
+         echo -n $powerline_right_arrow
 
-     # if ~/.config/fish/config-local.fish exists, load it
-     set config_local $HOME/.config/fish/config-local.fish
-     test -f $config_local; and source $config_local
-   #+END_SRC
+         set_color -b $powerline_blue3 black
+         echo -n '' $branch ''
 
-** ~.config/fish/conf.d/aliases.fish~
-
-   #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/aliases.fish"
-     alias lltr='ll -tr'
-     alias llsr='ll -Sr'
-     alias lla='ls -lha'
-     alias ll='ls -lh'
-     alias la='ls -a'
-     alias l='ls -CF'
-
-     alias gll='git log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:\'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset\''
-     alias gs='git status'
-     alias ga='git add'
-     alias gc='git commit'
-     alias gca='git commit -a'
-     alias gwd='git diff'
-     alias gwdc='git diff --cached'
-     alias gp='git pull'
-     alias gpp='git push'
-     alias gco='git checkout'
-
-     # fish specific aliases
-     alias o=prevd
-     alias pd=prevd
-     alias nd=nextd
-
-     function h --description "merge history from other sessions and display with less"
-       history --merge
-       history
-     end
-
-     function setgitauthor
-       git config user.name "AnthonyDiGirolamo"
-       git config user.email "anthony.digirolamo@gmail.com"
-     end
-
-     alias v='vim'
-     alias tmux='tmux -2'
-
-     # emacs aliases - not really using these
-     if string match -q -r 'Darwin' (uname -a)
-       alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
-     end
-
-     alias ew="emacs-w32 &"
-     alias e="emacs -nw"
-     alias eg="emacs &"
-     alias ed="emacs --daemon"
-     alias ec="emacsclient --alternate-editor='' -nw"
-     alias ecg="emacsclient --alternate-editor='' --no-wait --create-frame"
-   #+END_SRC
-
-** ~.config/fish/conf.d/fish_user_key_bindings.fish~
-
-   #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/fish_user_key_bindings.fish"
-     # This function is auto-run by fish, use it to override keybindings
-     function fish_user_key_bindings
-       # Default Bindings
-       #   Alt+Up or Down to move through last argument history
-       #   Alt+Left or Right to move through dirhist
-
-       # Alt+Ctrl+n or e to move through last argument history
-       bind \e\cn history-token-search-forward
-       bind \e\ce history-token-search-backward
-       bind -M insert \e\cn history-token-search-forward
-       bind -M insert \e\ce history-token-search-backward
-
-       # Alt+Ctrl+h or l to move through dirhist
-       bind \e\ch prevd-or-backward-word
-       bind \e\cl nextd-or-forward-word
-       bind -M insert \e\ch prevd-or-backward-word
-       bind -M insert \e\cl nextd-or-forward-word
-
-       # Ctrl-e accept current completion
-       bind -M insert \ce forward-char
-
-       # Up arrow: sync history accross sessions before reverse history search
-       bind -M insert -k up 'history --merge; up-or-search'
-       bind -M insert \e\[A 'history --merge; up-or-search'
-
-       # Also Use Ctrl-p and Ctrl-n for reverse history search
-       bind -M insert \cp 'history --merge; up-or-search'
-       bind -M insert \cn down-or-search
-     end
-   #+END_SRC
-
-** prompt
-
-*** ~.config/fish/functions/fish_prompt.fish~
-
-    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_prompt.fish"
-      set -x fish_color_history_current yellow
-
-      # Prompt Setup
-      set using_android 0
-      if string match -q -r 'Android' (uname -a)
-        set using_android 1
-      end
-
-      set powerline_right_arrow ''
-      if set -q INSIDE_EMACS; or string match -q -r 'raspberrypi|chip' (uname -a)
-        set powerline_right_arrow ''
-      end
-
-      set powerline_insert 5f5fff
-      set powerline_blue1 5f87ff
-      set powerline_blue2 87afff
-      set powerline_blue3 dfdfff
-
-      function fish_prompt
-        if set -q INSIDE_EMACS
-          echo -n (prompt_pwd) ' $ '
-          return
-        end
-
-        set_color -b $powerline_blue1 black
-        if test 1 != $using_android
-          printf ' %s@%s ' (whoami) (hostname|cut -d .  -f 1)
-        else
-          echo -n ' '
-        end
-
-        set_color -b $powerline_blue2 $powerline_blue1
-        echo -n $powerline_right_arrow
-
-        set_color -b $powerline_blue2 black
-        echo -n '' (prompt_pwd) ''
-
-        # if test -e .git
-        if set branch (git rev-parse --abbrev-ref HEAD 2>/dev/null)
-          set_color -b $powerline_blue3 $powerline_blue2
-          echo -n $powerline_right_arrow
-
-          set_color -b $powerline_blue3 black
-          echo -n '' $branch ''
-
-          set_color -b normal $powerline_blue3
-          echo -n $powerline_right_arrow
-        else
-          set_color -b normal $powerline_blue2
-          echo -n $powerline_right_arrow
-        end
-
-        echo -n ' '
-        set_color normal
-      end
-    #+END_SRC
-
-*** ~.config/fish/functions/fish_mode_prompt.fish~
-
-    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_mode_prompt.fish"
-      # The fish_mode_prompt function is prepended to the prompt
-      function fish_mode_prompt --description "Displays the current mode"
-        # Do nothing if not in vi mode
-        if test "$fish_key_bindings" = "fish_vi_key_bindings"
-          switch $fish_bind_mode
-            case default
-              set_color --bold --background red white
-              echo ' N '
-              set_color --background $powerline_blue1 red
-            case insert
-              set_color --bold --background $powerline_insert white
-              echo ' I '
-              set_color --background $powerline_blue1 $powerline_insert
-            case replace-one
-              set_color --bold --background green white
-              echo ' R '
-              set_color --background $powerline_blue1 green
-            case visual
-              set_color --bold --background magenta white
-              echo ' V '
-              set_color --background $powerline_blue1 magenta
-          end
-          echo $powerline_right_arrow
-        end
-        set_color normal
-      end
-    #+END_SRC
-
-** directory navigation
-
-*** ~.config/fish/functions/u.fish~
-
-    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/u.fish"
-      function u --description "cd .. or up to a given directory"
-        if test (count $argv) = 0
-          cd ..
-          return 0
-        end
-
-        set dir_name $argv[1]
-        set d (string split "/$dir_name/" (pwd))
-        if test (count $d) = 2
-          cd "$d[1]/$dir_name"
-          return 0
-        else
-          return 1
-        end
-      end
-
-    #+END_SRC
-
-*** ~.config/fish/functions/dl.fish~
-
-    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/dl.fish"
-      function dl --description "always vertical dirh"
-        for dir in $dirprev
-          echo $dir
-        end
-        set_color cyan
-        echo (pwd)
-        set_color normal
-        for dir in $dirnext
-          echo $dir
-        end
-      end
-    #+END_SRC
-
-** functions
-
-   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/source-bash-aliases.fish"
-     # WIP: not all aliases work
-     function source-bash-aliases --description "Try to source bash aliases"
-       bash -i -c 'alias' > ~/.active_aliases
-       for line in (cat ~/.active_aliases) # | grep 'vim\|emacs'
+         set_color -b normal $powerline_blue3
+         echo -n $powerline_right_arrow
+       else
          set_color -b normal $powerline_blue2
-         echo $line
-         set_color -b normal normal
-         eval "$line"
+         echo -n $powerline_right_arrow
        end
-       rm -f ~/.active_aliases
+
+       echo -n ' '
+       set_color normal
      end
    #+END_SRC
+
+** =~/.config/fish/functions/fish_mode_prompt.fish~=
+
+   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_mode_prompt.fish"
+     # The fish_mode_prompt function is prepended to the prompt
+     function fish_mode_prompt --description "Displays the current mode"
+       # Do nothing if not in vi mode
+       if test "$fish_key_bindings" = "fish_vi_key_bindings"
+         switch $fish_bind_mode
+           case default
+             set_color --bold --background red white
+             echo ' N '
+             set_color --background $powerline_blue1 red
+           case insert
+             set_color --bold --background $powerline_insert white
+             echo ' I '
+             set_color --background $powerline_blue1 $powerline_insert
+           case replace-one
+             set_color --bold --background green white
+             echo ' R '
+             set_color --background $powerline_blue1 green
+           case visual
+             set_color --bold --background magenta white
+             echo ' V '
+             set_color --background $powerline_blue1 magenta
+         end
+         echo $powerline_right_arrow
+       end
+       set_color normal
+     end
+   #+END_SRC
+
+* directory navigation
+
+** =~/.config/fish/functions/u.fish~=
+
+   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/u.fish"
+     function u --description "cd .. or up to a given directory"
+       if test (count $argv) = 0
+         cd ..
+         return 0
+       end
+
+       set dir_name $argv[1]
+       set d (string split "/$dir_name/" (pwd))
+       if test (count $d) = 2
+         cd "$d[1]/$dir_name"
+         return 0
+       else
+         return 1
+       end
+     end
+
+   #+END_SRC
+
+** =~/.config/fish/functions/dl.fish~=
+
+   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/dl.fish"
+     function dl --description "always vertical dirh"
+       for dir in $dirprev
+         echo $dir
+       end
+       set_color cyan
+       echo (pwd)
+       set_color normal
+       for dir in $dirnext
+         echo $dir
+       end
+     end
+   #+END_SRC
+
+* functions
+
+  #+BEGIN_SRC fish :tangle "~/.config/fish/functions/source-bash-aliases.fish"
+    # WIP: not all aliases work
+    function source-bash-aliases --description "Try to source bash aliases"
+      bash -i -c 'alias' > ~/.active_aliases
+      for line in (cat ~/.active_aliases) # | grep 'vim\|emacs'
+        set_color -b normal $powerline_blue2
+        echo $line
+        set_color -b normal normal
+        eval "$line"
+      end
+      rm -f ~/.active_aliases
+    end
+  #+END_SRC
 

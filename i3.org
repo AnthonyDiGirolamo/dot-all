@@ -1,13 +1,18 @@
 #+STARTUP: content
 #+PROPERTY: header-args :mkdirp yes
 
+* Table of Contents                                                     :TOC:
+ - [[#i3][i3]]
+   - [[#links][Links]]
+   - [[#main-config][Main Config]]
+   - [[#i3status][i3status]]
+
 * i3
 
 ** Links
 
   [[http://i3wm.org/docs/userguide.html][i3 User's Guide]]
   [[http://i3wm.org/docs/userguide.html#command_chaining][i3 Command Chaining]]
-
 
 ** Main Config
 
@@ -423,7 +428,6 @@
      # exec --no-startup-id xinput set-prop "anthony’s trackpad" "Synaptics Two-Finger Scrolling" 1, 1
      # exec --no-startup-id xinput set-prop "anthony’s trackpad" "Synaptics Scrolling Distance" -156, -156
    #+END_SRC
-
 
 ** i3status
 
