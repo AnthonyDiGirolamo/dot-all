@@ -15,10 +15,15 @@ ORG_FILES := $(wildcard *.org)
 ORG_OUT_FILES := $(foreach f, $(ORG_FILES),$(CACHEDIR)/$(basename $(f)).out)
 
 .PHONY: clean
-clean:
+clean:  ## delete .cache
 	rm -rf $(CACHEDIR)
 
-tangle: $(ORG_OUT_FILES)  ## tangle all dotfiles
+.PHONY: mkdirs
+mkdirs:
+	@mkdir -p $(CACHEDIR)
+
+all: clean tangle  ## clean and tangle all
+tangle: mkdirs $(ORG_OUT_FILES)  ## tangle all dotfiles
 
 .PHONY: install-fish
 .ONESHELL:
@@ -54,22 +59,25 @@ install-emacs:  ## download, compile and install emacs
 	make install
 
 # Rule to convert a *.org file to a .cache/*.out
-$(CACHEDIR)/%.out: %.org $(CACHEDIR)/
+$(CACHEDIR)/%.out: %.org
 	@echo "[TANGLE] $<"
+	@test -f $@ && cp $@ $@.last
+	@rm -f $@
 	@emacs -Q --batch --eval "(progn \
 (require 'org) \
 (require 'ob-shell) \
 (setq make-backup-files nil) \
 (setq org-confirm-babel-evaluate nil) \
 (defun amd/post-tangle () \
-  (let ((tangled-output-file (buffer-file-name)) \
-        (dot-out-file (car command-line-args-left))) \
-    (save-excursion \
-      (find-file dot-out-file) \
-      (goto-char (point-max)) \
-	  (insert (format \"%s\n\" tangled-output-file)) \
-      (save-buffer)) \
-    (princ (format \"    %s\n\" tangled-output-file) t)) \
+(let ((tangled-output-file (buffer-file-name)) \
+(dot-out-file (car command-line-args-left))) \
+(save-excursion \
+(find-file dot-out-file) \
+(goto-char (point-max)) \
+(insert (format \"%s\n\" tangled-output-file)) \
+(sort-lines nil (point-min) (point-max)) \
+(save-buffer)) \
+(princ (format \"    %s\n\" tangled-output-file) t)) \
 ) \
 (add-hook 'org-babel-post-tangle-hook 'amd/post-tangle) \
 (org-babel-tangle-file \"$<\"))" $(abspath $@) 2>/dev/null
