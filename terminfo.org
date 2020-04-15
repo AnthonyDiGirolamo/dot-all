@@ -2,7 +2,7 @@
 
 * =~/.terminfo=
 
-  #+begin_src text :tangle artifacts/terminfo-24bit.src :noweb tangle
+  #+begin_src text :tangle artifacts/terminfo-24bit.src
     # Use colon separators.
     xterm-24bit|xterm with 24-bit direct color mode,
       use=xterm-256color,

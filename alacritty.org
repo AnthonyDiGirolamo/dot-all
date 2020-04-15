@@ -1,10 +1,11 @@
 #+STARTUP: content
+#+PROPERTY: header-args :mkdirp yes
 
 * Alacritty
 
   https://github.com/jwilm/alacritty
 
-  #+BEGIN_SRC yaml :tangle "~/.config/alacritty/alacritty.yml" :mkdirp yes
+  #+BEGIN_SRC yaml :tangle "~/.config/alacritty/alacritty.yml"
     # Configuration for Alacritty, the GPU enhanced terminal emulator
 
 

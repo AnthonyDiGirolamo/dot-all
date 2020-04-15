@@ -1,10 +1,11 @@
 #+STARTUP: content
+#+PROPERTY: header-args :mkdirp yes
 
 * Fish
 
 ** ~.config/fish/config.fish~
 
-   #+BEGIN_SRC fish :tangle "~/.config/fish/config.fish" :mkdirp yes
+   #+BEGIN_SRC fish :tangle "~/.config/fish/config.fish"
      # set tmux pane title based on currently running command
      function fish_title
        true
@@ -59,7 +60,7 @@
 
 ** ~.config/fish/conf.d/aliases.fish~
 
-   #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/aliases.fish" :mkdirp yes
+   #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/aliases.fish"
      alias lltr='ll -tr'
      alias llsr='ll -Sr'
      alias lla='ls -lha'
@@ -111,7 +112,7 @@
 
 ** ~.config/fish/conf.d/fish_user_key_bindings.fish~
 
-   #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/fish_user_key_bindings.fish" :mkdirp yes
+   #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/fish_user_key_bindings.fish"
      # This function is auto-run by fish, use it to override keybindings
      function fish_user_key_bindings
        # Default Bindings
@@ -147,7 +148,7 @@
 
 *** ~.config/fish/functions/fish_prompt.fish~
 
-    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_prompt.fish" :mkdirp yes
+    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_prompt.fish"
       set -x fish_color_history_current yellow
 
       # Prompt Setup
@@ -207,7 +208,7 @@
 
 *** ~.config/fish/functions/fish_mode_prompt.fish~
 
-    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_mode_prompt.fish" :mkdirp yes
+    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_mode_prompt.fish"
       # The fish_mode_prompt function is prepended to the prompt
       function fish_mode_prompt --description "Displays the current mode"
         # Do nothing if not in vi mode
@@ -240,7 +241,7 @@
 
 *** ~.config/fish/functions/u.fish~
 
-    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/u.fish" :mkdirp yes
+    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/u.fish"
       function u --description "cd .. or up to a given directory"
         if test (count $argv) = 0
           cd ..
@@ -261,7 +262,7 @@
 
 *** ~.config/fish/functions/dl.fish~
 
-    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/dl.fish" :mkdirp yes
+    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/dl.fish"
       function dl --description "always vertical dirh"
         for dir in $dirprev
           echo $dir
@@ -277,7 +278,7 @@
 
 ** functions
 
-   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/source-bash-aliases.fish" :mkdirp yes
+   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/source-bash-aliases.fish"
      # WIP: not all aliases work
      function source-bash-aliases --description "Try to source bash aliases"
        bash -i -c 'alias' > ~/.active_aliases

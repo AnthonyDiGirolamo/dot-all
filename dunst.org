@@ -1,8 +1,9 @@
 #+STARTUP: content
+#+PROPERTY: header-args :mkdirp yes
 
 * Dunst
 
-  #+BEGIN_SRC conf :tangle "~/.config/dunst/dunstrc" :mkdirp yes
+  #+BEGIN_SRC conf :tangle "~/.config/dunst/dunstrc"
     [global]
         ### Display ###
 
