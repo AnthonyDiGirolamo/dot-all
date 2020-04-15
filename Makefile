@@ -101,12 +101,12 @@ $(CACHEDIR)/%.out: %.org
 (insert (format \"%s\n\" tangled-output-file)) \
 (sort-lines nil (point-min) (point-max)) \
 (save-buffer)) \
-(princ (format \"    %s\n\" tangled-output-file) t)) \
+(princ (format \"  %s\n\" tangled-output-file) t)) \
 ) \
 (add-hook 'org-babel-post-tangle-hook 'amd/post-tangle) \
 (org-babel-tangle-file \"$<\") \
-(org-babel-map-src-blocks \"$<\" (when (string-match-p \":eval yes\" header-args) (org-babel-execute-src-block))) \
-)" $(abspath $@) # 2>/dev/null
+(org-babel-map-src-blocks \"$<\" (when (string-match-p \":eval yes\" header-args) (princ (format \"%s\" (org-babel-execute-src-block))))) \
+)" $(abspath $@) 2>/dev/null
 	@touch $@
 
 # rule to make a directory

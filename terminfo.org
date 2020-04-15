@@ -25,5 +25,6 @@
 ** Process with =tic=
 
    #+begin_src sh :noweb tangle :eval yes :exports code :results silent output
+     echo '  [PROCESS tic]'
      tic -x -o ~/.terminfo .artifacts/terminfo-24bit.src
    #+end_src
