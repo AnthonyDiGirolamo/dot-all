@@ -2,18 +2,18 @@
 #+PROPERTY: header-args :mkdirp yes
 
 * Table of Contents                                                     :TOC:
- - [[#configfishconfigfish][=~/.config/fish/config.fish=]]
- - [[#configfishconfdaliasesfish][=~/.config/fish/conf.d/aliases.fish=]]
- - [[#configfishconfdfish_user_key_bindingsfish][=~/.config/fish/conf.d/fish_user_key_bindings.fish=]]
+ - [[#configfishconfigfish][~/.config/fish/config.fish]]
+ - [[#configfishconfdaliasesfish][~/.config/fish/conf.d/aliases.fish]]
+ - [[#configfishconfdfish_user_key_bindingsfish][~/.config/fish/conf.d/fish_user_key_bindings.fish]]
  - [[#prompt][prompt]]
-   - [[#configfishfunctionsfish_promptfish][=~/.config/fish/functions/fish_prompt.fish~=]]
-   - [[#configfishfunctionsfish_mode_promptfish][=~/.config/fish/functions/fish_mode_prompt.fish~=]]
+   - [[#configfishfunctionsfish_promptfish][~/.config/fish/functions/fish_prompt.fish]]
+   - [[#configfishfunctionsfish_mode_promptfish][~/.config/fish/functions/fish_mode_prompt.fish]]
  - [[#directory-navigation][directory navigation]]
-   - [[#configfishfunctionsufish][=~/.config/fish/functions/u.fish~=]]
-   - [[#configfishfunctionsdlfish][=~/.config/fish/functions/dl.fish~=]]
+   - [[#configfishfunctionsufish][~/.config/fish/functions/u.fish]]
+   - [[#configfishfunctionsdlfish][~/.config/fish/functions/dl.fish]]
  - [[#functions][functions]]
 
-* =~/.config/fish/config.fish=
+* ~/.config/fish/config.fish
 
   #+BEGIN_SRC fish :tangle "~/.config/fish/config.fish"
     # set tmux pane title based on currently running command
@@ -68,7 +68,7 @@
     test -f $config_local; and source $config_local
   #+END_SRC
 
-* =~/.config/fish/conf.d/aliases.fish=
+* ~/.config/fish/conf.d/aliases.fish
 
   #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/aliases.fish"
     alias lltr='ll -tr'
@@ -120,7 +120,7 @@
     alias ecg="emacsclient --alternate-editor='' --no-wait --create-frame"
   #+END_SRC
 
-* =~/.config/fish/conf.d/fish_user_key_bindings.fish=
+* ~/.config/fish/conf.d/fish_user_key_bindings.fish
 
   #+BEGIN_SRC fish :tangle "~/.config/fish/conf.d/fish_user_key_bindings.fish"
     # This function is auto-run by fish, use it to override keybindings
@@ -156,7 +156,7 @@
 
 * prompt
 
-** =~/.config/fish/functions/fish_prompt.fish~=
+** ~/.config/fish/functions/fish_prompt.fish
 
    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_prompt.fish"
      set -x fish_color_history_current yellow
@@ -216,7 +216,7 @@
      end
    #+END_SRC
 
-** =~/.config/fish/functions/fish_mode_prompt.fish~=
+** ~/.config/fish/functions/fish_mode_prompt.fish
 
    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_mode_prompt.fish"
      # The fish_mode_prompt function is prepended to the prompt
@@ -249,7 +249,7 @@
 
 * directory navigation
 
-** =~/.config/fish/functions/u.fish~=
+** ~/.config/fish/functions/u.fish
 
    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/u.fish"
      function u --description "cd .. or up to a given directory"
@@ -270,7 +270,7 @@
 
    #+END_SRC
 
-** =~/.config/fish/functions/dl.fish~=
+** ~/.config/fish/functions/dl.fish
 
    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/dl.fish"
      function dl --description "always vertical dirh"
