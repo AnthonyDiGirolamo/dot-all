@@ -22,8 +22,8 @@ clean:  ## delete .cache
 mkdirs:
 	@mkdir -p $(CACHEDIR)
 
-all: clean tangle symlinks ## clean and tangle all
-tangle: mkdirs $(ORG_OUT_FILES)  ## tangle all dotfiles
+all: clean tangle symlinks  ## clean and tangle all
+tangle: mkdirs $(ORG_OUT_FILES) clean-removed-files  ## tangle all dotfiles
 
 .PHONY: symlinks
 .ONESHELL:
@@ -69,6 +69,16 @@ install-emacs:  ## download, compile and install emacs
 	make install
 	cd $(abspath $(CACHEDIR)/emacs)
 	rm -rf $$D
+
+.PHONY: clean-removed-files
+.ONESHELL:
+clean-removed-files:  ## rm files removed since last make tangle
+	@for f in $(ORG_OUT_FILES); do
+		! test -f $$f.last && continue
+		for removed in $$(diff -u $$f.last $$f | grep -E '^-[^-].*' | sed -e 's/^-\(.*\)/\1/'); do
+			test -f $$removed && rm -i $$removed
+		done
+	done
 
 # Rule to convert a *.org file to a .cache/*.out
 $(CACHEDIR)/%.out: %.org
