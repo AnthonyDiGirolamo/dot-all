@@ -56,8 +56,23 @@ install-emacs:  ## download, compile and install emacs
 # Rule to convert a *.org file to a .cache/*.out
 $(CACHEDIR)/%.out: %.org $(CACHEDIR)/
 	@echo "[TANGLE] $<"
-	@grep -i -E '#\+begin_src.*:tangle "[^"]+"' -o $< | sed -e 's/.*:tangle //' -e 's/"/  -> /' -e 's/"//'
-	@emacs -Q --batch --eval "(progn (require 'org) (require 'ob-shell) (setq org-confirm-babel-evaluate nil) (org-babel-tangle-file \"$<\"))" 2>/dev/null
+	@emacs -Q --batch --eval "(progn \
+(require 'org) \
+(require 'ob-shell) \
+(setq make-backup-files nil) \
+(setq org-confirm-babel-evaluate nil) \
+(defun amd/post-tangle () \
+  (let ((tangled-output-file (buffer-file-name)) \
+        (dot-out-file (car command-line-args-left))) \
+    (save-excursion \
+      (find-file dot-out-file) \
+      (goto-char (point-max)) \
+	  (insert (format \"%s\n\" tangled-output-file)) \
+      (save-buffer)) \
+    (princ (format \"    %s\n\" tangled-output-file) t)) \
+) \
+(add-hook 'org-babel-post-tangle-hook 'amd/post-tangle) \
+(org-babel-tangle-file \"$<\"))" $(abspath $@) 2>/dev/null
 	@touch $@
 
 # rule to make a directory
