@@ -118,19 +118,21 @@ $(CACHEDIR)/%.out: %.org
 	(defalias 'yes-or-no-p 'y-or-n-p) \
 	(setq org-confirm-babel-evaluate nil) \
 	(defun amd/post-tangle () \
-	(let ((tangled-output-file (buffer-file-name)) \
-	(dot-out-file (car command-line-args-left))) \
-	(save-excursion \
-	(find-file dot-out-file) \
-	(goto-char (point-max)) \
-	(insert (format \"%s\n\" tangled-output-file)) \
-	(sort-lines nil (point-min) (point-max)) \
-	(save-buffer)) \
-	(princ (format \"  %s\n\" tangled-output-file) t)) \
+	  (let ((tangled-output-file (buffer-file-name)) \
+	        (dot-out-file (car command-line-args-left))) \
+	      (save-excursion \
+	        (find-file dot-out-file) \
+	        (goto-char (point-max)) \
+	        (insert (format \"%s\n\" tangled-output-file)) \
+	        (sort-lines nil (point-min) (point-max)) \
+	        (save-buffer)) \
+	      (princ (format \"  %s\n\" tangled-output-file) t)) \
 	) \
 	(add-hook 'org-babel-post-tangle-hook 'amd/post-tangle) \
 	(org-babel-tangle-file \"$<\") \
-	(org-babel-map-src-blocks \"$<\" (when (string-match-p \":eval yes\" header-args) (princ (format \"%s\" (org-babel-execute-src-block))))) \
+	(org-babel-map-src-blocks \"$<\" \
+	  (when (string-match-p \":eval yes\" header-args)
+	    (princ (format \"%s\" (org-babel-execute-src-block))))) \
 	)" $(abspath $@) 2>/dev/null
 	@touch $@
 
