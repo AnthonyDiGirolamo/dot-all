@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# keyboard
+xset r rate 200 30
+
+DEVICE_NAME='anthony’s trackpad'
+if [ $? -eq 0 ]
+then
+    xinput list-props "${DEVICE_NAME}"
+    xinput set-prop "${DEVICE_NAME}" 'libinput Tapping Enabled' 1
+    xinput set-prop "${DEVICE_NAME}" 'libinput Natural Scrolling Enabled' 1
+    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' 0.7
+fi
+# xinput list-props "${DEVICE_NAME}"
+
+DEVICE_NAME='DLL07BF:01 06CB:7A13 Touchpad'
+xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
+if [ $? -eq 0 ]
+then
+    xinput list-props "${DEVICE_NAME}"
+    xinput set-prop "${DEVICE_NAME}" 'libinput Tapping Enabled' 1
+    xinput set-prop "${DEVICE_NAME}" 'libinput Natural Scrolling Enabled' 1
+    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' 1.0
+fi
+
+
+
+# xinput list-props "${DEVICE_NAME}"

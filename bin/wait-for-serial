@@ -1,0 +1,16 @@
+#!/usr/bin/env fish
+set port /dev/ttyACM0
+
+set -q $argv[1]
+if test $status -gt 0
+    set port $argv[1]
+end
+echo 'Waiting for' $port
+
+while true
+    sleep .5
+    ls $port 2>/dev/null ; and break
+end
+
+miniterm.py $port 115200
+

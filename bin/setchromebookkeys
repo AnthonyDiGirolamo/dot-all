@@ -1,0 +1,13 @@
+#!/bin/bash
+# Use files under ~/.xkb
+# xkbcomp -I$HOME/.xkb ~/.xkb/keymap/mykbd $DISPLAY
+
+# View Layout
+# setxkbmap -print -verbose 10
+killall xcape
+# ctrl:swap_lwin_lctl is defined in /usr/share/X11/xkb/symbols/ctrl
+setxkbmap -layout us -variant colemak -option ctrl:swap_lwin_lctl
+# setxkbmap -layout us -variant colemak -option ctrl:swap_lwin_lctl -option lv3:switch
+xcape -e 'Control_L=Escape'
+# xcape -e "ISO_Level3_Shift=space"
+

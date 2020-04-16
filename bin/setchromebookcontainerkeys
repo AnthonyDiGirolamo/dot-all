@@ -1,0 +1,5 @@
+#!/bin/bash
+xset r rate 200 30
+killall xcape
+xcape -e 'Control_R=Escape'
+

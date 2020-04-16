@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+"""mkramdisk
+
+Usage:
+  mkramdisk mount [--tmp-path PATH] [--size SIZE] [DIRNAME]
+  mkramdisk umount [DIRNAME]
+  mkramdisk status
+  mkramdisk (-h | --help)
+  mkramdisk --version
+
+Arguments:
+  DIRNAME                   Directory name [default: build]
+
+Options:
+  -s SIZE --size=SIZE       Ramdisk size [default: 200m]
+  --tmp-path=PATH           tmp directory PATH [default: /tmp/$USER]
+  -h --help                 Show this screen.
+  --version                 Show version.
+"""
+
+import os
+import pprint
+import re
+import subprocess
+from docopt import docopt
+
+
+pp = pprint.PrettyPrinter(indent=4, width=110).pprint
+
+
+def generate_ramdisk_path(user_dirname, user_tmp_path):
+    # Make a nice dirname for the ram disk
+    # $HOME/esp/arduino-project -> esp-arduino-project-build
+
+    tmp_dirname = os.getcwd().replace(os.environ["HOME"] + "/", "", 1)
+    tmp_dirname = tmp_dirname.replace(" ", "_")
+    tmp_dirname = tmp_dirname.replace("/", "-")
+    tmp_dirname = "mkramdisk--{}--{}".format(tmp_dirname, user_dirname)
+
+    tmp_path = user_tmp_path
+    tmp_path = os.path.expandvars(tmp_path)
+    tmp_path = os.path.expanduser(tmp_path)
+    tmp_path = os.path.realpath(tmp_path)
+
+    return os.path.join(tmp_path,tmp_dirname)
+
+
+def ramdisk_is_mounted(ramdisk_path, mounted_ramdisks):
+    if os.path.exists(ramdisk_path) and ramdisk_path in [m['mountpoint'] for m in mounted_ramdisks]:
+        return True
+    else:
+        return False
+
+
+def get_mounted_ramdisks():
+    mount_output = subprocess.getoutput("mount")
+    matches = re.finditer(
+        r'^tmpfs on (?P<mountpoint>[^ ]+mkramdisk--(?P<folder>[^ ]+)--(?P<dirname>[^ ]+)) type tmpfs.*?size=(?P<size>[^,) ]+).*?$',
+        mount_output,
+        re.MULTILINE)
+    mounted_ramdisks = [m.groupdict() for m in matches]
+    return mounted_ramdisks
+
+
+def command_status(mounted_ramdisks):
+    if not mounted_ramdisks:
+        print("No ramdisks mounted")
+    else:
+        print("Mounted ramdisks:")
+        for disk in mounted_ramdisks:
+            print("  {}".format(disk["mountpoint"]))
+
+
+def umount(mountpoint, dirname):
+    print("umount {}".format(mountpoint))
+    os.system("sudo umount {}".format(mountpoint))
+    if os.path.isdir(mountpoint):
+        os.rmdir(mountpoint)
+    if os.path.islink(dirname):
+        os.remove(dirname)
+
+
+def main():
+    # Parse command line with docopt
+    arguments = docopt(__doc__, version=1)
+
+    dirname = "build"
+    if arguments["DIRNAME"]:
+        dirname = arguments["DIRNAME"]
+
+    ramdisk_path = generate_ramdisk_path(dirname, arguments["--tmp-path"])
+
+    if arguments["status"]:
+        command_status(get_mounted_ramdisks())
+
+    elif arguments["mount"]:
+        if ramdisk_is_mounted(ramdisk_path, get_mounted_ramdisks()):
+            print("Already mounted:")
+            print("  {}".format(ramdisk_path))
+        else:
+            os.makedirs(ramdisk_path, exist_ok=True)
+            os.system("sudo chown -R {}:{} {}".format(
+                os.environ["USER"],
+                os.environ["USER"],
+                ramdisk_path))
+            os.system("sudo mount -t tmpfs -o size={} tmpfs {}".format(
+                arguments["--size"],
+                ramdisk_path))
+            if not os.path.islink(dirname):
+                os.system("ln -snf {} ./{}".format(ramdisk_path, dirname))
+            command_status(get_mounted_ramdisks())
+
+    elif arguments["umount"]:
+        umount_all = False
+        if not arguments["DIRNAME"]:
+            umount_all = True
+        if umount_all:
+            for mount in get_mounted_ramdisks():
+                umount(mount["mountpoint"], mount["dirname"])
+        else:
+            umount(ramdisk_path, dirname)
+        command_status(get_mounted_ramdisks())
+
+    exit(0)
+
+
+if __name__ == '__main__':
+    main()

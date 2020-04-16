@@ -206,6 +206,7 @@
 
     export PATH=/usr/local/bin:$PATH
 
+    export PATH=$HOME/dot-all/bin:$PATH
     export PATH=$HOME/Preferences/bin:$PATH
     export PATH=$HOME/Preferences/bin/els:$PATH
 

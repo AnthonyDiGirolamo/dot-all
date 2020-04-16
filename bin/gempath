@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+gemhome = ENV['GEM_HOME']
+gempath = ENV['GEM_PATH']
+
+puts "GEM_HOME: "
+puts "  "+gemhome
+puts
+puts "GEM_PATH: "
+gempath.split(":").each{|path| puts "  "+path}
+puts
+
+gempath.split(':').each do |path|
+  ENV['GEM_HOME'] = path
+  ENV['GEM_PATH'] = path
+  puts path
+  gems = `gem list`
+  puts gems.gsub(/^/, "  ")
+  puts
+end
+
+ENV['GEM_HOME'] = gemhome
+ENV['GEM_PATH'] = gempath
+

@@ -1,0 +1,6 @@
+#!/bin/bash
+ACTIVE_PANE=$(tmux list-panes | awk '/(active)/ { print substr($1,0,1)}')
+tmux split-window -v "dmesg -w"
+tmux split-window -h "watch fastboot devices -l"
+tmux split-window -v "watch adb devices -l"
+tmux select-pane -t $ACTIVE_PANE

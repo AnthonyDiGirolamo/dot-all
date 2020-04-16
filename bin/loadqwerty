@@ -1,0 +1,4 @@
+#!/bin/bash
+
+setxkbmap -model pc105 -layout us
+killall xcape

@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require 'terminal-table'
+
+output = `tree -C -pugsD #{ARGV.join(' ')}`
+newoutput = ''
+
+@table = Terminal::Table.new :style => {:border_x => "", :border_y => "", :border_i => " "}
+
+output.lines.each do |line|
+  if line =~ /(.*?)\s+(\[.*?\])\s+(.*)/
+    tree = $1
+    info = $2
+    name = $3
+    @table << ["#{tree} #{name}", info]
+  else
+    newoutput << line
+  end
+end
+puts @table
+puts newoutput
