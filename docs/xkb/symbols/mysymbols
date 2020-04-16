@@ -1,0 +1,10 @@
+//    key.type = "THREE_LEVEL";
+//    key <AC06> { [ h, H,  Left ] };
+//    key <AC07> { [ j, J,  Down ] };
+//    key <AC08> { [ k, K,    Up ] };
+//    key <AC09> { [ l, L, Right ] };
+
+// xkb_symbols "basic" {
+//     key <LWIN> { [ISO_Level3_Shift ] };
+//     modifier_map Mod5 { ISO_Level3_Shift };
+// }

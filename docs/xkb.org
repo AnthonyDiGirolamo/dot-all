@@ -1,0 +1,79 @@
+* Getting Current Keymap
+
+  #+BEGIN_SRC sh :results verbatim drawer replace output
+    setxkbmap -print -verbose 10
+  #+END_SRC
+
+  #+RESULTS:
+  :RESULTS:
+  Setting verbose level to 10
+  locale is C
+  Trying to load rules file ./rules/evdev...
+  Trying to load rules file /usr/share/X11/xkb/rules/evdev...
+  Success.
+  Applied rules from evdev:
+  rules:      evdev
+  model:      chromebook_m_ralt
+  layout:     us,us
+  variant:    ,colemak
+  Trying to build keymap using the following components:
+  keycodes:   evdev+chromebook_m(media)+aliases(qwerty)
+  types:      complete
+  compat:     complete+chromebook
+  symbols:    pc+us+inet(evdev)+chromebook_m_ralt(overlay)+us(colemak):2
+  geometry:   pc(pc104)
+  xkb_keymap {
+    xkb_keycodes  { include "evdev+chromebook_m(media)+aliases(qwerty)"	};
+    xkb_types     { include "complete"	};
+    xkb_compat    { include "complete+chromebook"	};
+    xkb_symbols   { include "pc+us+inet(evdev)+chromebook_m_ralt(overlay)+us(colemak):2"	};
+    xkb_geometry  { include "pc(pc104)"	};
+  };
+  :END:
+
+  #+BEGIN_SRC sh :results table drawer replace output
+    localectl list-x11-keymap-variants us
+  #+END_SRC
+
+  #+RESULTS:
+  :RESULTS:
+  | alt-intl        |
+  | altgr-intl      |
+  | chr             |
+  | colemak         |
+  | dvorak          |
+  | dvorak-alt-intl |
+  | dvorak-classic  |
+  | dvorak-intl     |
+  | dvorak-l        |
+  | dvorak-r        |
+  | dvp             |
+  | euro            |
+  | hbs             |
+  | intl            |
+  | mac             |
+  | olpc2           |
+  | rus             |
+  | workman         |
+  | workman-intl    |
+  :END:
+
+* xkb setup with ctrl super swap
+
+  #+BEGIN_SRC text :tangle ~/.xkb/symbols/myswap
+    xkb_symbols "swap_l_super_control" {
+        replace key <LWIN>  { [ Control_L ] };
+        replace key <LCTL> { [ Super_L ] };
+    };
+  #+END_SRC
+
+  #+BEGIN_SRC text :tangle ~/.xkb/keymap/mykbd
+    xkb_keymap {
+            xkb_keycodes  { include "evdev+chromebook_m(media)+aliases(qwerty)"     };
+            xkb_types     { include "complete"      };
+            xkb_compat    { include "complete+chromebook"   };
+            xkb_symbols   { include "pc+us+inet(evdev)+chromebook_m_ralt(overlay)+us(colemak):2+myswap(swap_l_super_control)"    };
+            xkb_geometry  { include "pc(pc104)"     };
+    };
+  #+END_SRC
+

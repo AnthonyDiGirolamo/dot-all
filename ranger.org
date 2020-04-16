@@ -1,3 +1,4 @@
+#+TITLE: ranger
 #+STARTUP: content
 
 * Ranger

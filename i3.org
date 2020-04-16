@@ -1,502 +1,504 @@
+#+TITLE: i3
 #+STARTUP: content
 #+PROPERTY: header-args :mkdirp yes
 
 * Table of Contents                                                     :TOC:
- - [[#i3][i3]]
-   - [[#links][Links]]
-   - [[#main-config][Main Config]]
-   - [[#i3status][i3status]]
-
-* i3
-
-** Links
-
-  [[http://i3wm.org/docs/userguide.html][i3 User's Guide]]
-  [[http://i3wm.org/docs/userguide.html#command_chaining][i3 Command Chaining]]
-
-** Main Config
-
-*** PC modifiers
-
-   #+BEGIN_SRC conf :tangle (if (not (string-match "chip" (shell-command-to-string "uname -a"))) "~/.i3/config" "no")
-     # i3 config file (v4)
-     # Please see http://i3wm.org/docs/userguide.html for a complete reference!
-
-     # # alt+super+ctrl together as the mod key
-     # set $mod Mod1+Mod4+Ctrl
-
-     # super by itself as the mod key
-     set $mod Mod4
-
-     font pango:Roboto Bold 8
-
-     # More font options
-     # font -*-terminus-bold-r-normal-*-14-*-*-*-c-*-iso10646-*
-     # font pango:DejaVu Sans Mono 8
-     # font pango:PragmataPro 10
-     # :antialias=false:hinting=true:autohint=false:hintstyle=hintnone:dpi=96
-   #+END_SRC
-
-*** PocketCHIP modifiers
-
-   #+BEGIN_SRC conf :tangle (if (string-match "chip" (shell-command-to-string "uname -a")) "~/.i3/config" "no")
-     set $mod Mod4
-     font pango:Roboto Medium 7
-   #+END_SRC
-
-*** common config
-
-   #+BEGIN_SRC conf :tangle ~/.i3/config
-     # Use Mouse+$mod to drag floating windows to their wanted position
-     floating_modifier $mod
-
-     # toggle tiling / floating
-     bindsym $mod+Shift+space floating toggle
-     bindsym $mod+button1 move
-     bindsym $mod+Shift+button1 resize
-
-     # change focus between tiling / floating windows
-     # bindsym $mod+space focus mode_toggle
-
-     # floating windows, use xprop to get class (the second part of WM_CLASS) or use title=
-     for_window [class="Blueman-manager"] floating enable
-     #, resize set 640 480
-     for_window [title="Ediff"] floating enable
-     for_window [class="Xfce4-appfinder"] floating enable
-     #, resize set 640 480
-     for_window [class="pico8"] floating enable
-
-     # need a newer version of i3 for title_format
-     # title_format "%class > %title"
-     # for_window [class="google-chrome"] title_format "Chrome - <span foreground='red'>%title</span>"
-
-     # screen lock
-     # bindsym $mod+k exec i3lock -c 000000
-     bindsym $mod+k exec xscreensaver-command -lock
-     bindsym XF86MonBrightnessDown exec lux -s 5%
-     bindsym XF86MonBrightnessUp exec lux -a 5%
-     bindsym XF86AudioPrev exec lux -s 5%
-     bindsym XF86AudioNext exec lux -a 5%
-     bindsym F5 exec lux -s 1%
-     bindsym F6 exec lux -a 1%
-     bindsym F10 exec --no-startup-id $HOME/Preferences/bin/invert_screen.sh
-
-     # bindsym XF86MonBrightnessDown exec lux -s 5%
-     # bindsym XF86MonBrightnessUp exec lux -a 5%
-
-     # start a terminal
-     # bindsym $mod+Return exec urxvt -e ~/Preferences/bin/tmux-new-or-attatch.sh
-     bindsym $mod+Shift+Return exec urxvt
-     bindsym $mod+Return exec alacritty
-
-     # web browser
-     # bindsym $mod+w exec google-chrome
-
-     # file manager
-     # bindsym $mod+Shift+f exec nemo --no-desktop
-     # bindsym $mod+Shift+f exec thunar
-     bindsym $mod+Shift+f exec urxvt -e ~/.local/bin/ranger
-     bindsym $mod+Shift+p exec pcmanfm
-     # bindsym $mod+Shift+g exec nautilus --no-desktop
-
-     # themes
-     bindsym $mod+Shift+t exec lxappearance
-
-     # kill focused window
-     bindsym $mod+q kill
-
-     # Program launchers
-     # bindsym $mod+d exec dmenu_run
-     bindsym $mod+d exec rofi -show run
-     bindsym $mod+a exec xfce4-appfinder --disable-server
-     bindsym $mod+space exec rofi -show drun
-
-     # Alt+Tab to rofi window mode
-     bindsym Mod1+Tab exec rofi -show window
-
-     # Open clipman
-     bindsym $mod+v exec xfce4-popup-clipman
-
-     # There also is the (new) i3-dmenu-desktop which only displays applications
-     # shipping a .desktop file. It is a wrapper around dmenu, so you need that
-     # installed.
-     bindsym $mod+Shift+d exec --no-startup-id i3-dmenu-desktop
-
-     # change focus
-     bindsym $mod+h focus left
-     bindsym $mod+n focus down
-     bindsym $mod+e focus up
-     bindsym $mod+l focus right
-
-     # alternatively, you can use the cursor keys:
-     bindsym $mod+Left focus left
-     bindsym $mod+Down focus down
-     bindsym $mod+Up focus up
-     bindsym $mod+Right focus right
-
-     # move focused window
-     bindsym $mod+Shift+h move left
-     bindsym $mod+Shift+n move down
-     bindsym $mod+Shift+e move up
-     bindsym $mod+Shift+l move right
-
-     # alternatively, you can use the cursor keys:
-     bindsym $mod+Shift+Left move left
-     bindsym $mod+Shift+Down move down
-     bindsym $mod+Shift+Up move up
-     bindsym $mod+Shift+Right move right
-
-     # split in horizontal orientation
-     bindsym $mod+s split v
-
-     # # split in vertical orientation
-     # bindsym $mod+v split h
-
-     # enter fullscreen mode for the focused container
-     bindsym $mod+f fullscreen
-
-     # change container layout (stacked, tabbed, toggle split)
-     bindsym $mod+t layout toggle split
-     bindsym $mod+p layout tabbed
-     bindsym $mod+g layout stacking
-
-     # focus the parent container
-     bindsym $mod+y focus parent
-
-     # focus the child container
-     bindsym $mod+u focus child
-
-     # switch to workspace
-     bindsym $mod+1 workspace 1
-     bindsym $mod+2 workspace 2
-     bindsym $mod+3 workspace 3
-     bindsym $mod+4 workspace 4
-     bindsym $mod+5 workspace 5
-     bindsym $mod+6 workspace 6
-     bindsym $mod+7 workspace 7
-     bindsym $mod+8 workspace 8
-     bindsym $mod+9 workspace 9
-     bindsym $mod+0 workspace 10
-
-     bindsym $mod+Tab workspace back_and_forth
-
-     # move focused container to workspace
-     bindsym $mod+Shift+1 move container to workspace 1
-     bindsym $mod+Shift+2 move container to workspace 2
-     bindsym $mod+Shift+3 move container to workspace 3
-     bindsym $mod+Shift+4 move container to workspace 4
-     bindsym $mod+Shift+5 move container to workspace 5
-     bindsym $mod+Shift+6 move container to workspace 6
-     bindsym $mod+Shift+7 move container to workspace 7
-     bindsym $mod+Shift+8 move container to workspace 8
-     bindsym $mod+Shift+9 move container to workspace 9
-     bindsym $mod+Shift+0 move container to workspace 10
-
-     bindsym $mod+Shift+Tab move container to workspace back_and_forth
-
-     # reload the configuration file
-     bindsym $mod+Shift+c reload
-     # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-     bindsym $mod+Shift+r restart
-     # exit i3 (logs you out of your X session)
-     bindsym $mod+Shift+q exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
-
-     set $mode_change CHANGE: [h]orizontal  [v]ertical  [t]abbed  [s]tacked  [p]arent  [f]loat  [b]order  [g]rid  [o]nly
-     bindsym $mod+c mode "$mode_change"
-
-     mode "$mode_change" {
-         bindsym t layout tabbed; mode "default"
-         bindsym s layout stacking; mode "default"
-         bindsym h layout splith; mode "default"
-         bindsym v layout splitv; mode "default"
-
-         bindsym p mode "$mode_change_parent"
-
-         bindsym f floating toggle; mode "default"
-         bindsym b border toggle; mode "default"
-
-         bindsym o focus parent;  layout tabbed; focus child;   layout stacking; mode "default"
-         bindsym g layout splitv; focus parent;  layout splith; focus child;     mode "default"
-
-         bindsym Escape mode "default"
-         bindsym Return mode "default"
-         bindsym q mode "default"
-     }
-
-     set $mode_change_parent CHANGE PARENT: [h]orizontal  [v]ertical  [t]abbed  [s]tacked
-     mode "$mode_change_parent" {
-         bindsym t focus parent; layout tabbed;   focus child; mode "default"
-         bindsym s focus parent; layout stacking; focus child; mode "default"
-         bindsym h focus parent; layout splith;   focus child; mode "default"
-         bindsym v focus parent; layout splitv;   focus child; mode "default"
-         bindsym Escape mode "default"
-         bindsym Return mode "default"
-         bindsym q mode "default"
-     }
-
-     bindsym $mod+Shift+o resize shrink width 320 px or 12 ppt; focus right; resize grow width 320 px or 12 ppt; move right
-     bindsym $mod+o focus left; focus parent; move right; move right; focus child; resize grow width 320 px or 12 ppt
-     bindsym $mod+m move right; focus up; move left; focus right
-
-     # Make the currently focused window a scratchpad
-     bindsym $mod+Shift+minus move scratchpad
-     # Show the first scratchpad window
-     bindsym $mod+minus scratchpad show
-
-     bindsym $mod+b border toggle
-
-     # resize window (you can also use the mouse for that)
-     mode "resize" {
-             # These bindings trigger as soon as you enter the resize mode
-
-             # Pressing left will shrink the window’s width.
-             # Pressing right will grow the window’s width.
-             # Pressing up will shrink the window’s height.
-             # Pressing down will grow the window’s height.
-             bindsym h resize shrink width 5 px or 5 ppt
-             bindsym n resize grow height 5 px or 5 ppt
-             bindsym e resize shrink height 5 px or 5 ppt
-             bindsym l resize grow width 5 px or 5 ppt
-
-             # same bindings, but for the arrow keys
-             bindsym Left resize shrink width 5 px or 5 ppt
-             bindsym Down resize grow height 5 px or 5 ppt
-             bindsym Up resize shrink height 5 px or 5 ppt
-             bindsym Right resize grow width 5 px or 5 ppt
-
-             # back to normal: Enter or Escape or r
-             bindsym Escape mode "default"
-             bindsym Return mode "default"
-             bindsym r mode "default"
-             bindsym q mode "default"
-     }
-
-     bindsym $mod+r mode "resize"
-
-     # # Start i3bar to display a workspace bar (plus the system information i3status
-     # # finds out, if available)
-     # bar {
-     #         status_command i3status
-     #         position bottom
-     #         separator_symbol "   "
-     #         workspace_buttons yes
-     #         tray_padding 2
-     #         tray_output none
-     #         colors {
-     #                background #25252d
-     #                statusline #5f676a
-     #                separator #969696
-     #                focused_workspace  #2196f3 #2196f3 #e7eaed
-     #                active_workspace   #e7eaed #e7eaed #3f51b5
-     #                inactive_workspace #e7eaed #e7eaed #969696
-     #                urgent_workspace   #e7eaed #ff9388 #e7eaed
-     #                binding_mode       #e7eaed #ff9388 #e7eaed
-     #         }
-     # }
-
-     # # Old Border Settings
-     # # border style for new windows: normal or pixel <<size>>
-     # # new_window normal
-     # new_window pixel 1
-     # # hide_edge_borders none|vertical|horizontal|both
-     # hide_edge_borders none
-
-     for_window [class="^.*"] border pixel 0
-
-     gaps inner 6
-     gaps outer 0
-     smart_gaps on
-
-     # class                 border  backgr. text    indicator child_border
-     # # numix chrome theme
-     # client.focused          #2d2d2d #2d2d2d #00ffff #9575cd   #aa00ff
-     # # last focused split
-     # client.focused_inactive #424242 #424242 #969696 #292d2e   #222222
-     # client.unfocused        #969696 #969696 #2d2d2d #484e50   #5f676a
-
-     # # bright blue
-     # # class                 border  backgr. text    indicator child_border
-     # client.focused          #aae3fa #aae3fa #2196f3 #3f51b5   #FFFFFF
-     # client.focused_inactive #FFFFFF #FFFFFF #37a4d6 #FFFFFF   #FFFFFF
-     # client.unfocused        #FFFFFF #FFFFFF #EEEEEE #FFFFFF   #FFFFFF
-     # client.urgent           #FFFFFF #ff9388 #ffffff #ff9388   #ff9388
-     # client.background       #FFFFFF
-
-     # # numix gray
-     # # class                 border  backgr. text    indicator child_border
-     # client.focused          #424242 #424242 #aae3fa #37a4d6   #424242
-     # client.focused_inactive #2d2d2d #2d2d2d #37a4d6 #444444   #2d2d2d
-     # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
-     # client.urgent           #2f343a #d64937 #ffffff #d64937   #d64937
-     # client.background       #37474F
-
-     # # numix blue
-     # # class                 border  backgr. text    indicator child_border
-     # client.focused          #37a4d6 #37a4d6 #2d2d2d #aae3fa   #37a4d6
-     # client.focused_inactive #2d2d2d #2d2d2d #37a4d6 #444444   #2d2d2d
-     # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
-     # client.urgent           #2f343a #d64937 #ffffff #d64937   #d64937
-     # client.background       #37474F
-
-     # # numix green
-     # # class                 border  backgr. text    indicator child_border
-     # client.focused          #0f9d58 #0f9d58 #2d2d2d #17f288   #0f9d58
-     # client.focused_inactive #2d2d2d #2d2d2d #0f9d58 #444444   #2d2d2d
-     # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
-     # client.urgent           #2f343a #d64937 #ffffff #d64937   #d64937
-     # client.background       #37474F
-
-     # # numix red
-     # client.focused          #d64937 #d64937 #2d2d2d #ff9388   #d64937
-     # client.focused_inactive #2d2d2d #2d2d2d #d64937 #444444   #2d2d2d
-     # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
-     # client.urgent           #2f343a #ff3e2b #ffffff #ff3e2b   #ff3e2b
-     # client.background       #37474F
-
-     # Other Colors
-     # bright blue
-     # client.focused          #2196f3 #2196f3 #ffffff #9575cd   #aa00ff
-     # client.focused_inactive #3f51b5 #3f51b5 #ffffff #484e50   #5f676a
-
-     # # bright blue background matching default chrome theme
-     # # class                 border  backgr. text    indicator child_border
-     # # client.focused          #2196f3 #2196f3 #e7eaed #aa00ff   #2196f3
-     # # client.focused          #5657f5 #5657f5 #e7eaed #aa00ff   #5657f5
-     # client.focused          #0f9d58 #0f9d58 #e7eaed #17f288   #0f9d58
-     # client.focused_inactive #e7eaed #e7eaed #0f9d58 #5f676a   #e7eaed
-     # client.unfocused        #e7eaed #e7eaed #969696 #e7eaed   #e7eaed
-     # client.urgent           #e7eaed #ff9388 #e7eaed #ff9388   #ff9388
-     # client.background       #e7eaed
-
-     # Layan gray highlights
-     # class                 border  backgr. text    indicator child_border
-     client.focused          #969696 #969696 #25252d #aae3fa   #969696
-     client.focused_inactive #5f676a #5f676a #969696 #969696   #5f676a
-     client.unfocused        #25252d #25252d #969696 #25252d   #25252d
-     client.urgent           #25252d #ff9388 #25252d #ff9388   #ff9388
-     client.background       #25252d
-
-     # # bright blue background
-     # # class                 border  backgr. text    indicator child_border
-     # client.focused          #2196f3 #2196f3 #f5f5f5 #aa00ff   #2196f3
-     # client.focused_inactive #3f51b5 #3f51b5 #f5f5f5 #5f676a   #3f51b5
-     # client.unfocused        #f5f5f5 #f5f5f5 #969696 #f5f5f5   #f5f5f5
-     # client.urgent           #f5f5f5 #ff9388 #f5f5f5 #ff9388   #ff9388
-     # client.background       #f5f5f5
-
-     # # class                 border  backgr. text    indicator child_border
-     # client.focused          #2196f3 #2196f3 #2d2d2d #aa00ff   #2196f3
-     # client.focused_inactive #2d2d2d #2d2d2d #2196f3 #444444   #2d2d2d
-     # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
-     # client.urgent           #2f343a #ff9388 #ffffff #ff9388   #ff9388
-     # client.background       #37474F
-
-     # # bright blue text w/ gray background
-     # # class                 border  backgr. text    indicator child_border
-     # client.focused          #cccccc #cccccc #2196f3 #aa00ff   #2196f3
-     # client.focused_inactive #cccccc #cccccc #3f51b5 #5f676a   #3f51b5
-     # client.unfocused        #f5f5f5 #f5f5f5 #969696 #f5f5f5   #f5f5f5
-     # client.urgent           #f5f5f5 #ff9388 #f5f5f5 #ff9388   #ff9388
-     # client.background       #f5f5f5
-
-     # grayish
-     # client.focused          #607d8b #607d8b #ffffff #9575cd   #aa00ff
-     # client.focused_inactive #455a64 #455a64 #ffffff #484e50   #5f676a
-
-     # flatui green/teal
-     # client.focused          #1abc9c #1abc9c #ffffff #9575cd   #aa00ff
-     # client.focused_inactive #8cddcd #8cddcd #ffffff #484e50   #5f676a
-
-     # client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
-   #+END_SRC
-
-*** PC start-up apps
-
-   #+BEGIN_SRC conf :tangle (if (not (string-match "chip" (shell-command-to-string "uname -a"))) "~/.i3/config" "no")
-     exec --no-startup-id xset r rate 200 30
-     exec --no-startup-id feh --bg-fill $HOME/Pictures/autum.jpg
-
-     # exec nm-applet
-     # exec blueman-applet
-
-     exec xfce4-clipman
-
-     # exec cinnamon-settings-daemon # use lxappearance instead
-
-     exec xscreensaver
-
-     # exec --no-startup-id xinput set-prop "anthony’s trackpad" "Synaptics Two-Finger Scrolling" 1, 1
-     # exec --no-startup-id xinput set-prop "anthony’s trackpad" "Synaptics Scrolling Distance" -156, -156
-   #+END_SRC
-
-** i3status
-
-   #+NAME: interface
-   #+BEGIN_SRC sh :cache yes
-     ls /proc/sys/net/ipv4/conf/ | grep -v -E '(all|lo|default)' | head -n1
-   #+END_SRC
-
-   #+BEGIN_SRC conf :tangle ~/.i3status.conf :noweb tangle
-     # i3status configuration file.
-     # see "man i3status" for documentation.
-
-     # It is important that this file is edited as UTF-8.
-     # The following line should contain a sharp s:
-     # ß
-     # If the above line is not correctly displayed, fix your editor first!
-
-     general {
-             colors = true
-             interval = 5
-             markup = "pango"
-     }
-
-     # order += "disk /"
-     # order += "run_watch DHCP"
-     # order += "run_watch VPN"
-     order += "wireless wlan0"
-     order += "ethernet <<interface()>>"
-     # order += "ipv6"
-     # order += "battery 0"
-     order += "load"
-     order += "tztime local"
-
-     wireless wlan0 {
-             format_up = "wifi: (%quality at %essid) %ip"
-             format_down = "wifi: down"
-     }
-
-     ethernet <<interface()>> {
-             # if you use %speed, i3status requires root privileges
-             format_up = "<<interface()>>: %ip (%speed)"
-             format_down = "<<interface()>>: down"
-     }
-
-     battery 0 {
-             format = "%status %percentage %remaining"
-     }
-
-     run_watch DHCP {
-             pidfile = "/var/run/dhclient*.pid"
-     }
-
-     run_watch VPN {
-             pidfile = "/var/run/vpnc/pid"
-     }
-
-     tztime local {
-        format = "<span font_weight='bold' foreground='#aae3fa'>%time</span>"
-        format_time = "📅 %Y-%m-%d  🕒 %H:%M"
-     }
-     # <span size='large'>📅</span> <span font_family='Roboto Light'>%A %B %d %Y</span>  <span size='large'>🕒</span> <span font_family='Roboto Medium'>%R</span>
-
-     load {
-             format = "%1min"
-     }
-
-     disk "/" {
-             format = "%avail"
-     }
-   #+END_SRC
+ - [[#links][Links]]
+ - [[#main-config][Main Config]]
+   - [[#pc-modifiers][PC modifiers]]
+   - [[#pocketchip-modifiers][PocketCHIP modifiers]]
+   - [[#common-config][common config]]
+   - [[#pc-start-up-apps][PC start-up apps]]
+ - [[#i3status][i3status]]
+
+* Links
+
+ [[http://i3wm.org/docs/userguide.html][i3 User's Guide]]
+ [[http://i3wm.org/docs/userguide.html#command_chaining][i3 Command Chaining]]
+
+* Main Config
+
+** PC modifiers
+
+  #+BEGIN_SRC conf :tangle (if (not (string-match "chip" (shell-command-to-string "uname -a"))) "~/.i3/config" "no")
+    # i3 config file (v4)
+    # Please see http://i3wm.org/docs/userguide.html for a complete reference!
+
+    # # alt+super+ctrl together as the mod key
+    # set $mod Mod1+Mod4+Ctrl
+
+    # super by itself as the mod key
+    set $mod Mod4
+
+    font pango:Roboto Bold 8
+
+    # More font options
+    # font -*-terminus-bold-r-normal-*-14-*-*-*-c-*-iso10646-*
+    # font pango:DejaVu Sans Mono 8
+    # font pango:PragmataPro 10
+    # :antialias=false:hinting=true:autohint=false:hintstyle=hintnone:dpi=96
+  #+END_SRC
+
+** PocketCHIP modifiers
+
+  #+BEGIN_SRC conf :tangle (if (string-match "chip" (shell-command-to-string "uname -a")) "~/.i3/config" "no")
+    set $mod Mod4
+    font pango:Roboto Medium 7
+  #+END_SRC
+
+** common config
+
+  #+BEGIN_SRC conf :tangle ~/.i3/config
+    # Use Mouse+$mod to drag floating windows to their wanted position
+    floating_modifier $mod
+
+    # toggle tiling / floating
+    bindsym $mod+Shift+space floating toggle
+    bindsym $mod+button1 move
+    bindsym $mod+Shift+button1 resize
+
+    # change focus between tiling / floating windows
+    # bindsym $mod+space focus mode_toggle
+
+    # floating windows, use xprop to get class (the second part of WM_CLASS) or use title=
+    for_window [class="Blueman-manager"] floating enable
+    #, resize set 640 480
+    for_window [title="Ediff"] floating enable
+    for_window [class="Xfce4-appfinder"] floating enable
+    #, resize set 640 480
+    for_window [class="pico8"] floating enable
+
+    # need a newer version of i3 for title_format
+    # title_format "%class > %title"
+    # for_window [class="google-chrome"] title_format "Chrome - <span foreground='red'>%title</span>"
+
+    # screen lock
+    # bindsym $mod+k exec i3lock -c 000000
+    bindsym $mod+k exec xscreensaver-command -lock
+    bindsym XF86MonBrightnessDown exec lux -s 5%
+    bindsym XF86MonBrightnessUp exec lux -a 5%
+    bindsym XF86AudioPrev exec lux -s 5%
+    bindsym XF86AudioNext exec lux -a 5%
+    bindsym F5 exec lux -s 1%
+    bindsym F6 exec lux -a 1%
+    bindsym F10 exec --no-startup-id $HOME/Preferences/bin/invert_screen.sh
+
+    # bindsym XF86MonBrightnessDown exec lux -s 5%
+    # bindsym XF86MonBrightnessUp exec lux -a 5%
+
+    # start a terminal
+    # bindsym $mod+Return exec urxvt -e ~/Preferences/bin/tmux-new-or-attatch.sh
+    bindsym $mod+Shift+Return exec urxvt
+    bindsym $mod+Return exec alacritty
+
+    # web browser
+    # bindsym $mod+w exec google-chrome
+
+    # file manager
+    # bindsym $mod+Shift+f exec nemo --no-desktop
+    # bindsym $mod+Shift+f exec thunar
+    bindsym $mod+Shift+f exec urxvt -e ~/.local/bin/ranger
+    bindsym $mod+Shift+p exec pcmanfm
+    # bindsym $mod+Shift+g exec nautilus --no-desktop
+
+    # themes
+    bindsym $mod+Shift+t exec lxappearance
+
+    # kill focused window
+    bindsym $mod+q kill
+
+    # Program launchers
+    # bindsym $mod+d exec dmenu_run
+    bindsym $mod+d exec rofi -show run
+    bindsym $mod+a exec xfce4-appfinder --disable-server
+    bindsym $mod+space exec rofi -show drun
+
+    # Alt+Tab to rofi window mode
+    bindsym Mod1+Tab exec rofi -show window
+
+    # Open clipman
+    bindsym $mod+v exec xfce4-popup-clipman
+
+    # There also is the (new) i3-dmenu-desktop which only displays applications
+    # shipping a .desktop file. It is a wrapper around dmenu, so you need that
+    # installed.
+    bindsym $mod+Shift+d exec --no-startup-id i3-dmenu-desktop
+
+    # change focus
+    bindsym $mod+h focus left
+    bindsym $mod+n focus down
+    bindsym $mod+e focus up
+    bindsym $mod+l focus right
+
+    # alternatively, you can use the cursor keys:
+    bindsym $mod+Left focus left
+    bindsym $mod+Down focus down
+    bindsym $mod+Up focus up
+    bindsym $mod+Right focus right
+
+    # move focused window
+    bindsym $mod+Shift+h move left
+    bindsym $mod+Shift+n move down
+    bindsym $mod+Shift+e move up
+    bindsym $mod+Shift+l move right
+
+    # alternatively, you can use the cursor keys:
+    bindsym $mod+Shift+Left move left
+    bindsym $mod+Shift+Down move down
+    bindsym $mod+Shift+Up move up
+    bindsym $mod+Shift+Right move right
+
+    # split in horizontal orientation
+    bindsym $mod+s split v
+
+    # # split in vertical orientation
+    # bindsym $mod+v split h
+
+    # enter fullscreen mode for the focused container
+    bindsym $mod+f fullscreen
+
+    # change container layout (stacked, tabbed, toggle split)
+    bindsym $mod+t layout toggle split
+    bindsym $mod+p layout tabbed
+    bindsym $mod+g layout stacking
+
+    # focus the parent container
+    bindsym $mod+y focus parent
+
+    # focus the child container
+    bindsym $mod+u focus child
+
+    # switch to workspace
+    bindsym $mod+1 workspace 1
+    bindsym $mod+2 workspace 2
+    bindsym $mod+3 workspace 3
+    bindsym $mod+4 workspace 4
+    bindsym $mod+5 workspace 5
+    bindsym $mod+6 workspace 6
+    bindsym $mod+7 workspace 7
+    bindsym $mod+8 workspace 8
+    bindsym $mod+9 workspace 9
+    bindsym $mod+0 workspace 10
+
+    bindsym $mod+Tab workspace back_and_forth
+
+    # move focused container to workspace
+    bindsym $mod+Shift+1 move container to workspace 1
+    bindsym $mod+Shift+2 move container to workspace 2
+    bindsym $mod+Shift+3 move container to workspace 3
+    bindsym $mod+Shift+4 move container to workspace 4
+    bindsym $mod+Shift+5 move container to workspace 5
+    bindsym $mod+Shift+6 move container to workspace 6
+    bindsym $mod+Shift+7 move container to workspace 7
+    bindsym $mod+Shift+8 move container to workspace 8
+    bindsym $mod+Shift+9 move container to workspace 9
+    bindsym $mod+Shift+0 move container to workspace 10
+
+    bindsym $mod+Shift+Tab move container to workspace back_and_forth
+
+    # reload the configuration file
+    bindsym $mod+Shift+c reload
+    # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+    bindsym $mod+Shift+r restart
+    # exit i3 (logs you out of your X session)
+    bindsym $mod+Shift+q exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+    set $mode_change CHANGE: [h]orizontal  [v]ertical  [t]abbed  [s]tacked  [p]arent  [f]loat  [b]order  [g]rid  [o]nly
+    bindsym $mod+c mode "$mode_change"
+
+    mode "$mode_change" {
+        bindsym t layout tabbed; mode "default"
+        bindsym s layout stacking; mode "default"
+        bindsym h layout splith; mode "default"
+        bindsym v layout splitv; mode "default"
+
+        bindsym p mode "$mode_change_parent"
+
+        bindsym f floating toggle; mode "default"
+        bindsym b border toggle; mode "default"
+
+        bindsym o focus parent;  layout tabbed; focus child;   layout stacking; mode "default"
+        bindsym g layout splitv; focus parent;  layout splith; focus child;     mode "default"
+
+        bindsym Escape mode "default"
+        bindsym Return mode "default"
+        bindsym q mode "default"
+    }
+
+    set $mode_change_parent CHANGE PARENT: [h]orizontal  [v]ertical  [t]abbed  [s]tacked
+    mode "$mode_change_parent" {
+        bindsym t focus parent; layout tabbed;   focus child; mode "default"
+        bindsym s focus parent; layout stacking; focus child; mode "default"
+        bindsym h focus parent; layout splith;   focus child; mode "default"
+        bindsym v focus parent; layout splitv;   focus child; mode "default"
+        bindsym Escape mode "default"
+        bindsym Return mode "default"
+        bindsym q mode "default"
+    }
+
+    bindsym $mod+Shift+o resize shrink width 320 px or 12 ppt; focus right; resize grow width 320 px or 12 ppt; move right
+    bindsym $mod+o focus left; focus parent; move right; move right; focus child; resize grow width 320 px or 12 ppt
+    bindsym $mod+m move right; focus up; move left; focus right
+
+    # Make the currently focused window a scratchpad
+    bindsym $mod+Shift+minus move scratchpad
+    # Show the first scratchpad window
+    bindsym $mod+minus scratchpad show
+
+    bindsym $mod+b border toggle
+
+    # resize window (you can also use the mouse for that)
+    mode "resize" {
+            # These bindings trigger as soon as you enter the resize mode
+
+            # Pressing left will shrink the window’s width.
+            # Pressing right will grow the window’s width.
+            # Pressing up will shrink the window’s height.
+            # Pressing down will grow the window’s height.
+            bindsym h resize shrink width 5 px or 5 ppt
+            bindsym n resize grow height 5 px or 5 ppt
+            bindsym e resize shrink height 5 px or 5 ppt
+            bindsym l resize grow width 5 px or 5 ppt
+
+            # same bindings, but for the arrow keys
+            bindsym Left resize shrink width 5 px or 5 ppt
+            bindsym Down resize grow height 5 px or 5 ppt
+            bindsym Up resize shrink height 5 px or 5 ppt
+            bindsym Right resize grow width 5 px or 5 ppt
+
+            # back to normal: Enter or Escape or r
+            bindsym Escape mode "default"
+            bindsym Return mode "default"
+            bindsym r mode "default"
+            bindsym q mode "default"
+    }
+
+    bindsym $mod+r mode "resize"
+
+    # # Start i3bar to display a workspace bar (plus the system information i3status
+    # # finds out, if available)
+    # bar {
+    #         status_command i3status
+    #         position bottom
+    #         separator_symbol "   "
+    #         workspace_buttons yes
+    #         tray_padding 2
+    #         tray_output none
+    #         colors {
+    #                background #25252d
+    #                statusline #5f676a
+    #                separator #969696
+    #                focused_workspace  #2196f3 #2196f3 #e7eaed
+    #                active_workspace   #e7eaed #e7eaed #3f51b5
+    #                inactive_workspace #e7eaed #e7eaed #969696
+    #                urgent_workspace   #e7eaed #ff9388 #e7eaed
+    #                binding_mode       #e7eaed #ff9388 #e7eaed
+    #         }
+    # }
+
+    # # Old Border Settings
+    # # border style for new windows: normal or pixel <<size>>
+    # # new_window normal
+    # new_window pixel 1
+    # # hide_edge_borders none|vertical|horizontal|both
+    # hide_edge_borders none
+
+    for_window [class="^.*"] border pixel 0
+
+    gaps inner 6
+    gaps outer 0
+    smart_gaps on
+
+    # class                 border  backgr. text    indicator child_border
+    # # numix chrome theme
+    # client.focused          #2d2d2d #2d2d2d #00ffff #9575cd   #aa00ff
+    # # last focused split
+    # client.focused_inactive #424242 #424242 #969696 #292d2e   #222222
+    # client.unfocused        #969696 #969696 #2d2d2d #484e50   #5f676a
+
+    # # bright blue
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #aae3fa #aae3fa #2196f3 #3f51b5   #FFFFFF
+    # client.focused_inactive #FFFFFF #FFFFFF #37a4d6 #FFFFFF   #FFFFFF
+    # client.unfocused        #FFFFFF #FFFFFF #EEEEEE #FFFFFF   #FFFFFF
+    # client.urgent           #FFFFFF #ff9388 #ffffff #ff9388   #ff9388
+    # client.background       #FFFFFF
+
+    # # numix gray
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #424242 #424242 #aae3fa #37a4d6   #424242
+    # client.focused_inactive #2d2d2d #2d2d2d #37a4d6 #444444   #2d2d2d
+    # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
+    # client.urgent           #2f343a #d64937 #ffffff #d64937   #d64937
+    # client.background       #37474F
+
+    # # numix blue
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #37a4d6 #37a4d6 #2d2d2d #aae3fa   #37a4d6
+    # client.focused_inactive #2d2d2d #2d2d2d #37a4d6 #444444   #2d2d2d
+    # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
+    # client.urgent           #2f343a #d64937 #ffffff #d64937   #d64937
+    # client.background       #37474F
+
+    # # numix green
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #0f9d58 #0f9d58 #2d2d2d #17f288   #0f9d58
+    # client.focused_inactive #2d2d2d #2d2d2d #0f9d58 #444444   #2d2d2d
+    # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
+    # client.urgent           #2f343a #d64937 #ffffff #d64937   #d64937
+    # client.background       #37474F
+
+    # # numix red
+    # client.focused          #d64937 #d64937 #2d2d2d #ff9388   #d64937
+    # client.focused_inactive #2d2d2d #2d2d2d #d64937 #444444   #2d2d2d
+    # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
+    # client.urgent           #2f343a #ff3e2b #ffffff #ff3e2b   #ff3e2b
+    # client.background       #37474F
+
+    # Other Colors
+    # bright blue
+    # client.focused          #2196f3 #2196f3 #ffffff #9575cd   #aa00ff
+    # client.focused_inactive #3f51b5 #3f51b5 #ffffff #484e50   #5f676a
+
+    # # bright blue background matching default chrome theme
+    # # class                 border  backgr. text    indicator child_border
+    # # client.focused          #2196f3 #2196f3 #e7eaed #aa00ff   #2196f3
+    # # client.focused          #5657f5 #5657f5 #e7eaed #aa00ff   #5657f5
+    # client.focused          #0f9d58 #0f9d58 #e7eaed #17f288   #0f9d58
+    # client.focused_inactive #e7eaed #e7eaed #0f9d58 #5f676a   #e7eaed
+    # client.unfocused        #e7eaed #e7eaed #969696 #e7eaed   #e7eaed
+    # client.urgent           #e7eaed #ff9388 #e7eaed #ff9388   #ff9388
+    # client.background       #e7eaed
+
+    # Layan gray highlights
+    # class                 border  backgr. text    indicator child_border
+    client.focused          #969696 #969696 #25252d #aae3fa   #969696
+    client.focused_inactive #5f676a #5f676a #969696 #969696   #5f676a
+    client.unfocused        #25252d #25252d #969696 #25252d   #25252d
+    client.urgent           #25252d #ff9388 #25252d #ff9388   #ff9388
+    client.background       #25252d
+
+    # # bright blue background
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #2196f3 #2196f3 #f5f5f5 #aa00ff   #2196f3
+    # client.focused_inactive #3f51b5 #3f51b5 #f5f5f5 #5f676a   #3f51b5
+    # client.unfocused        #f5f5f5 #f5f5f5 #969696 #f5f5f5   #f5f5f5
+    # client.urgent           #f5f5f5 #ff9388 #f5f5f5 #ff9388   #ff9388
+    # client.background       #f5f5f5
+
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #2196f3 #2196f3 #2d2d2d #aa00ff   #2196f3
+    # client.focused_inactive #2d2d2d #2d2d2d #2196f3 #444444   #2d2d2d
+    # client.unfocused        #2d2d2d #2d2d2d #777777 #444444   #2d2d2d
+    # client.urgent           #2f343a #ff9388 #ffffff #ff9388   #ff9388
+    # client.background       #37474F
+
+    # # bright blue text w/ gray background
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #cccccc #cccccc #2196f3 #aa00ff   #2196f3
+    # client.focused_inactive #cccccc #cccccc #3f51b5 #5f676a   #3f51b5
+    # client.unfocused        #f5f5f5 #f5f5f5 #969696 #f5f5f5   #f5f5f5
+    # client.urgent           #f5f5f5 #ff9388 #f5f5f5 #ff9388   #ff9388
+    # client.background       #f5f5f5
+
+    # grayish
+    # client.focused          #607d8b #607d8b #ffffff #9575cd   #aa00ff
+    # client.focused_inactive #455a64 #455a64 #ffffff #484e50   #5f676a
+
+    # flatui green/teal
+    # client.focused          #1abc9c #1abc9c #ffffff #9575cd   #aa00ff
+    # client.focused_inactive #8cddcd #8cddcd #ffffff #484e50   #5f676a
+
+    # client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
+  #+END_SRC
+
+** PC start-up apps
+
+  #+BEGIN_SRC conf :tangle (if (not (string-match "chip" (shell-command-to-string "uname -a"))) "~/.i3/config" "no")
+    exec --no-startup-id xset r rate 200 30
+    exec --no-startup-id feh --bg-fill $HOME/Pictures/autum.jpg
+
+    # exec nm-applet
+    # exec blueman-applet
+
+    exec xfce4-clipman
+
+    # exec cinnamon-settings-daemon # use lxappearance instead
+
+    exec xscreensaver
+
+    # exec --no-startup-id xinput set-prop "anthony’s trackpad" "Synaptics Two-Finger Scrolling" 1, 1
+    # exec --no-startup-id xinput set-prop "anthony’s trackpad" "Synaptics Scrolling Distance" -156, -156
+  #+END_SRC
+
+* i3status
+
+  #+NAME: interface
+  #+BEGIN_SRC sh :cache yes
+    ls /proc/sys/net/ipv4/conf/ | grep -v -E '(all|lo|default)' | head -n1
+  #+END_SRC
+
+  #+BEGIN_SRC conf :tangle ~/.i3status.conf :noweb tangle
+    # i3status configuration file.
+    # see "man i3status" for documentation.
+
+    # It is important that this file is edited as UTF-8.
+    # The following line should contain a sharp s:
+    # ß
+    # If the above line is not correctly displayed, fix your editor first!
+
+    general {
+            colors = true
+            interval = 5
+            markup = "pango"
+    }
+
+    # order += "disk /"
+    # order += "run_watch DHCP"
+    # order += "run_watch VPN"
+    order += "wireless wlan0"
+    order += "ethernet <<interface()>>"
+    # order += "ipv6"
+    # order += "battery 0"
+    order += "load"
+    order += "tztime local"
+
+    wireless wlan0 {
+            format_up = "wifi: (%quality at %essid) %ip"
+            format_down = "wifi: down"
+    }
+
+    ethernet <<interface()>> {
+            # if you use %speed, i3status requires root privileges
+            format_up = "<<interface()>>: %ip (%speed)"
+            format_down = "<<interface()>>: down"
+    }
+
+    battery 0 {
+            format = "%status %percentage %remaining"
+    }
+
+    run_watch DHCP {
+            pidfile = "/var/run/dhclient*.pid"
+    }
+
+    run_watch VPN {
+            pidfile = "/var/run/vpnc/pid"
+    }
+
+    tztime local {
+       format = "<span font_weight='bold' foreground='#aae3fa'>%time</span>"
+       format_time = "📅 %Y-%m-%d  🕒 %H:%M"
+    }
+    # <span size='large'>📅</span> <span font_family='Roboto Light'>%A %B %d %Y</span>  <span size='large'>🕒</span> <span font_family='Roboto Medium'>%R</span>
+
+    load {
+            format = "%1min"
+    }
+
+    disk "/" {
+            format = "%avail"
+    }
+  #+END_SRC
 
 

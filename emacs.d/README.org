@@ -657,7 +657,9 @@
 
     #+BEGIN_SRC emacs-lisp
       (use-package moe-theme)
-      ;; (amd/moe-dark-theme)
+      (amd/moe-dark-theme)
+      (load-theme 'airline-owo t)
+      ;; (load-theme 'airline-term t)
       ;; (load-theme 'airline-behelit t)
 
       ;; (use-package modus-operandi-theme)
@@ -666,7 +668,7 @@
       ;; (amd/leuven-light-theme)
       ;; (load-theme 'airline-light t)
 
-      (amd/doom-one-theme)
+      ;; (amd/doom-one-theme)
 
       ;; (load-theme 'doom-monokai-pro t)
       ;; (load-theme 'airline-doom-molokai t)

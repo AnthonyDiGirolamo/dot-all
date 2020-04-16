@@ -1,3 +1,4 @@
+#+TITLE: tmux
 #+PROPERTY: header-args :mkdirp yes
 
 * Table of Contents                                                     :TOC:
@@ -8,6 +9,7 @@
    - [[#orange][orange]]
    - [[#green][green]]
    - [[#red][red]]
+ - [[#screenrc][=~/.screenrc=]]
 
 * =~/.tmux.conf=
 
@@ -341,3 +343,115 @@
      set -g mode-style                   'bg=colour160,fg=colour217'
    #+end_src
 
+* =~/.screenrc=
+
+  Kept for posterity.
+
+  #+begin_src conf-space
+    ignorecase on
+
+    # Key Bindings
+    bind s # Disable freezing terminal command
+    # bindkey -k k4 detach
+    bindkey -k k4 copy
+    bindkey -k k5 screen
+    bindkey -k k6 title
+    bindkey -k k7 prev
+    bindkey -k k8 next
+
+    # Arrow keys to switch terminals (only works with X)
+    # Run cat > /dev/null to get key presses
+
+    # Ctrl + Alt + left/right
+    # bindkey ^[[1;7D prev
+    # bindkey ^[[1;7C next
+
+    # Ctrl + left/right
+    #bindkey ^[[D prev
+    #bindkey ^[[C next
+
+    # Colors in screenrc
+    # ------------------
+    #  0 Black             .    leave color unchanged
+    #  1 Red               b    blue
+    #  2 Green             c    cyan
+    #  3 Brown / yellow    d    default color
+    #  4 Blue              g    green           b    bold
+    #  5 Purple            k    blacK           B    blinking
+    #  6 Cyan              m    magenta         d    dim
+    #  7 White             r    red             r    reverse
+    #  8 unused/illegal    w    white           s    standout
+    #  9 transparent       y    yellow          u    underline
+    # note: "dim" is not mentioned in the manual.
+    #
+    # STRING ESCAPES
+    # --------------
+    #  %%      percent sign (the escape character itself)
+    #  %a      either 'am' or 'pm' - according to the current time
+    #  %A      either 'AM' or 'PM' - according to the current time
+    #  %c      current time HH:MM in 24h format
+    #  %C      current time HH:MM in 12h format
+    #  %d      day number - number of current day
+    #  %D      Day's name - the weekday name of the current day
+    #  %f      flags of the window
+    #  %F      sets %? to true if the window has the focus
+    #  %h      hardstatus of the window
+    #  %H      hostname of the system
+    #  %l      current load of the system
+    #  %m      month number
+    #  %M      month name
+    #  %n      window number
+    #  %s      seconds
+    #  %t      window title
+    #  %u      all other users on this window
+    #  %w      all window numbers and names.
+    #  %-w     all window numbers up to the current window
+    #  %+w     all window numbers after the current window
+    #  %W      all window numbers and names except the current one
+    #  %y      last two digits of the year number
+    #  %Y      full year number
+
+    # Blue Highlight on Black
+    #caption always "%{= kw}%-w%{= BW}%n %t%{-}%+w %-= @%H - %LD %d %LM - %c"
+
+    caption always "%{= kw}%-w%{= BW}%n %t%{-}%+w %-= @%H - %LD %d %LM"
+    # Red on Green theme
+    #caption always "%{= gk}%-Lw%{= rW}%50> %n%f* %t %{-}%+Lw%< %= %{= Gk} %H %{= rW} %l %{= Gk} %0c:%s %d/%m %{-}"
+    # White on Blue theme
+    #caption always "%{= .w}%-Lw%{= wk}%50> %n%f* %t %{-}%+Lw%< %= %{= .w} %H %0c:%s %d/%m %{-}"
+
+    # Day and Date Left justified
+    #caption always "%{= dd} %=%LD, %LM %d"
+
+    # Cyan/Yellow Highlighted Windows - Hostname Time Date
+    #hardstatus alwayslastline "%{= dd}%-w%{= cy}%{+b} %n*%t %{= dd}%+w %= %{= dR}%{+b}%H %{= dG}%{+b}%0c:%s %{= dB}%{+b}%m/%d/%Y"
+
+    #                          background  selected       background
+    #hardstatus alwayslastline "%{= db}%-w%{= by}%{+b}%n*%t%{= db}%+w %= %{= dR}%{+b} %H %{= dB}%{+b}%m/%d/%Y"
+
+    # Time - White on Blue bar
+    # hardstatus alwayslastline "%{= bw} %{= bc}[%{-}%0c%{= bc}]%{-} [%-Lw%{= bW}%{+b}%50>%n%f* %t%{-b}%{= bw}%+Lw]%<"
+
+    sorendition 04 43
+
+    shell zsh
+    # shell /opt/local/bin/zsh
+    defutf8 on
+    altscreen on # Allow apps like vi to use the alt screen
+    defscrollback 16384
+    startup_message off
+    vbell off
+
+    attrcolor b ".I"    # Make bold text a bright color
+    termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm' # 256 Colors
+    defbce on           # Background Color Erase
+    #term xterm-256color # Set the TERM to something else
+
+    # Send Scroll History to the terminal buffer
+    termcapinfo xterm ti@:te@
+
+    # Enable Shift-Page Up/Down to scroll
+    bindkey "^[[5;2~" eval "copy" "stuff ^u"
+    bindkey -m "^[[5;2~" stuff ^u
+    bindkey -m "^[[6;2~" stuff ^d
+  #+end_src

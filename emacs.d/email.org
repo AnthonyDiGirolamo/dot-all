@@ -1,0 +1,120 @@
+#+STARTUP: content
+
+* Email
+
+ #+BEGIN_SRC fundamental :noweb-ref email-address
+   anthony@example.com
+ #+END_SRC
+
+** mbsync
+
+   #+BEGIN_SRC sh :results silent
+     mkdir -p ~/Mail/INBOX
+   #+END_SRC
+
+   #+BEGIN_SRC conf :tangle ~/.mbsyncrc :noweb yes
+     IMAPAccount gmail
+     Host imap.gmail.com
+     User <<email-address>>
+     PassCmd "gpg2 --use-agent --quiet -d ~/.authinfo.gpg | cut -d ' ' -f 6"
+     AuthMechs LOGIN
+     SSLType IMAPS
+     # SSLVersions SSLv3
+     CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+     IMAPStore gmail-remote
+     Account gmail
+
+     MaildirStore gmail-local
+     Path ~/Mail/
+     Inbox ~/Mail/INBOX
+
+     Channel gmail-inbox
+     Master :gmail-remote:
+     Slave :gmail-local:
+     Patterns "INBOX"
+     Create Both
+     Expunge Both
+     SyncState *
+
+     Channel gmail-trash
+     Master :gmail-remote:"[Gmail]/Trash"
+     Slave :gmail-local:"[Gmail].Trash"
+     Create Both
+     Expunge Both
+     SyncState *
+
+     Channel gmail-sent
+     Master :gmail-remote:"[Gmail]/Sent Mail"
+     Slave :gmail-local:"[Gmail].Sent Mail"
+     Create Both
+     Expunge Both
+     SyncState *
+
+     Channel gmail-all
+     Master :gmail-remote:"[Gmail]/All Mail"
+     Slave :gmail-local:"[Gmail].All Mail"
+     Create Both
+     Expunge Both
+     SyncState *
+
+     Channel gmail-starred
+     Master :gmail-remote:"[Gmail]/Starred"
+     Slave :gmail-local:"[Gmail].Starred"
+     Create Both
+     Expunge Both
+     SyncState *
+
+     Group gmail
+     Channel gmail-inbox
+     Channel gmail-sent
+     Channel gmail-trash
+     Channel gmail-all
+     Channel gmail-starred
+   #+END_SRC
+
+** mu4e and emacs smtpmail
+
+   #+BEGIN_SRC emacs-lisp :tangle ~/.emacs.d/email-settings.el :noweb yes
+     (setq mu4e-user-mail-address-list '("<<email-address>>"))
+     (setq mu4e-reply-to-address "<<email-address>>"
+           user-mail-address "<<email-address>>"
+           user-full-name  "Anthony DiGirolamo")
+     (setq mu4e-compose-signature
+           (concat
+            "Anthony DiGirolamo\n"
+            "<<email-address>>"))
+
+     (setq message-send-mail-function    'smtpmail-send-it
+           smtpmail-stream-type          'starttls
+           ;; smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
+           ;; smtpmail-smtp-user            "<<email-address>>"
+           smtpmail-default-smtp-server  "smtp.gmail.com"
+           smtpmail-smtp-server          "smtp.gmail.com"
+           smtpmail-smtp-service         587
+           ;; smtpmail-local-domain         ""
+           smtpmail-debug-info t
+           smtpmail-debug-verb t)
+
+     (setq gnutls-algorithm-priority "NORMAL:%COMPAT")
+
+     (setq
+      mu4e-maildir       "~/Mail"
+      mu4e-sent-folder   "/[Gmail].Sent Mail"
+      mu4e-drafts-folder "/[Gmail].Drafts"
+      mu4e-trash-folder  "/[Gmail].Trash"
+      mu4e-refile-folder "/[Gmail].All Mail")
+     (setq mu4e-maildir-shortcuts
+           '( ("/INBOX"            . ?i)
+              ("/[Gmail].All Mail" . ?a)
+              ("/[Gmail].Sent Mail" . ?s)))
+
+     (setq mu4e-compose-complete-ignore-address-regexp "no-?reply\|via RT")
+   #+END_SRC
+
+** smtpmail ~/.authinfo.gpg
+
+   #+BEGIN_SRC conf :tangle no :noweb yes
+     machine smtp.gmail.com login <<email-address>> password p455w0rd
+   #+END_SRC
+

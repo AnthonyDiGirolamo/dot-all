@@ -1,3 +1,6 @@
+#+TITLE: Xresources
+#+PROPERTY: header-args :mkdirp yes
+
 * ~/.Xresources
 
   #+begin_src conf-xdefaults :tangle "~/.Xresources"

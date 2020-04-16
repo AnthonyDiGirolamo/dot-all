@@ -1,0 +1,16 @@
+*  fonts.tar.xz
+
+  Should be extracted to ~/.fonts
+
+* Python Modules
+
+  Installing modules from this directory
+
+  #+begin_src sh
+    pip3 install --user virtualenv
+    cd ~/new-project-directory
+    virtualenv --no-site-packages .env
+    source .env/bin/activate.fish
+    pip3 install ~/Preferences/python-site-packages/docopt-0.6.2.tar.gz
+  #+end_src
+

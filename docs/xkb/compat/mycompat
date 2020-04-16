@@ -1,0 +1,3 @@
+xkb_compatibility {
+    interpret ISO_Level3_Shift { action= SetMods(modifiers=Mod5); };
+}

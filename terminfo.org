@@ -1,3 +1,4 @@
+#+TITLE: terminfo
 #+PROPERTY: header-args :mkdirp yes
 
 * Table of Contents                                                     :TOC:
