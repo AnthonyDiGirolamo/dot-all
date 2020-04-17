@@ -2,11 +2,14 @@
 #+PROPERTY: header-args :mkdirp yes
 
 * Table of Contents                                                     :TOC:
+ - [[#gitconfig-local][=~/.gitconfig-local=]]
  - [[#gitconfig][=~/.gitconfig=]]
 
-* =~/.gitconfig=
+* =~/.gitconfig-local=
 
-  #+begin_src text :tangle ~/.gitconfig
+  Secondary gitconfig file so a local =~/.gitconfig= isn't clobbered.
+
+  #+begin_src text :tangle "~/.gitconfig-local"
     [color]
       diff = auto
       status = auto
@@ -14,10 +17,17 @@
     [push]
       default = current
     [alias]
-      ribbon = tag --force _ribbon origin/master
-      catchup = log --patch --reverse --topo-order _ribbon..origin/master
       l = log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
       hist = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
     [core]
       editor = vim
+  #+end_src
+
+* =~/.gitconfig=
+
+  Only create this if it doesn't already exist.
+
+  #+begin_src text :tangle (if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig"))
+    [include]
+      path = ~/.gitconfig-local
   #+end_src
