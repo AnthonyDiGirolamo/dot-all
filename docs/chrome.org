@@ -175,6 +175,8 @@
        map f createHint
        map mf createMultiHint
        map A openLastHint
+       map W :tabdetatch<CR>
+       map w :tabattach<space>
        map b :bookmarks!<space>
        map B :bookmarks<space>
        map T :tabnew<space>
@@ -200,6 +202,8 @@
        map f createHint
        map mf createMultiHint
        map A openLastHint
+       map W :tabdetatch<CR>
+       map w :tabattach<space>
        map b :bookmarks!<space>
        map B :bookmarks<space>
        map T :tabnew<space>
