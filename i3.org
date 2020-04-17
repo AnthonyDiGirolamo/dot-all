@@ -303,11 +303,11 @@
     # # hide_edge_borders none|vertical|horizontal|both
     # hide_edge_borders none
 
-    for_window [class="^.*"] border pixel 0
+    for_window [class="^.*"] border pixel 2
 
-    gaps inner 6
-    gaps outer 0
-    smart_gaps on
+    # gaps inner 0
+    # gaps outer 0
+    # smart_gaps off
 
     # class                 border  backgr. text    indicator child_border
     # # numix chrome theme
@@ -370,13 +370,37 @@
     # client.urgent           #e7eaed #ff9388 #e7eaed #ff9388   #ff9388
     # client.background       #e7eaed
 
-    # Layan gray highlights
+    # # Qogir-ubuntu: dark w/ text color highlight
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #282a33 #282a33 #fb8441 #fb8441   #282a33
+    # client.focused_inactive #282a33 #282a33 #7c828d #282a33   #282a33
+    # client.unfocused        #282a33 #282a33 #7c828d #282a33   #282a33
+    # client.urgent           #282a33 #282a33 #ef5350 #282a33   #282a33
+    # client.background       #282a33
+
+    # Qogir-manjaro: dark w/ text color highlight
     # class                 border  backgr. text    indicator child_border
-    client.focused          #969696 #969696 #25252d #aae3fa   #969696
-    client.focused_inactive #5f676a #5f676a #969696 #969696   #5f676a
-    client.unfocused        #25252d #25252d #969696 #25252d   #25252d
-    client.urgent           #25252d #ff9388 #25252d #ff9388   #ff9388
-    client.background       #25252d
+    client.focused          #282a33 #282a33 #2eb398 #2eb398   #282a33
+    client.focused_inactive #282a33 #282a33 #7c828d #282a33   #282a33
+    client.unfocused        #282a33 #282a33 #7c828d #282a33   #282a33
+    client.urgent           #282a33 #282a33 #ef5350 #282a33   #282a33
+    client.background       #282a33
+
+    # # Qogir-theme orange: dark w/ text color highlight
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #fb8441 #282a33 #fb8441 #fb8441   #fb8441
+    # client.focused_inactive #282a33 #282a33 #bc693d #282a33   #282a33
+    # client.unfocused        #282a33 #282a33 #7c828d #282a33   #282a33
+    # client.urgent           #282a33 #282a33 #ef5350 #282a33   #282a33
+    # client.background       #282a33
+
+    # # Layan gray highlights
+    # # class                 border  backgr. text    indicator child_border
+    # client.focused          #969696 #969696 #25252d #aae3fa   #969696
+    # client.focused_inactive #5f676a #5f676a #969696 #969696   #5f676a
+    # client.unfocused        #25252d #25252d #969696 #25252d   #25252d
+    # client.urgent           #25252d #ff9388 #25252d #ff9388   #ff9388
+    # client.background       #25252d
 
     # # bright blue background
     # # class                 border  backgr. text    indicator child_border

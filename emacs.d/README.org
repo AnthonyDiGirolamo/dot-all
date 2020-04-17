@@ -1143,7 +1143,6 @@
       (:states '(insert)
        "C-s" (lambda() (interactive) (save-buffer) (evil-normal-state))
        "C-M-t" 'amd/eshell-or-project-eshell
-       "C-e" 'emmet-expand-line
        "C-y" 'counsel-yank-pop
        "M-t" 'ivy-switch-buffer
        "M-b" 'ibuffer
@@ -2915,6 +2914,9 @@
     ;; Web Settings
     (use-package web-mode
       :defer t
+      :general
+      (:states '(insert) :keymaps '(web-mode-map)
+       "C-e" 'emmet-expand-line)
       :init
       (setq web-mode-markup-indent-offset 2
             web-mode-css-indent-offset 2
