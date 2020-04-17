@@ -13,8 +13,8 @@
 
 * Links
 
- [[http://i3wm.org/docs/userguide.html][i3 User's Guide]]
- [[http://i3wm.org/docs/userguide.html#command_chaining][i3 Command Chaining]]
+ - [[http://i3wm.org/docs/userguide.html][i3 User's Guide]]
+ - [[http://i3wm.org/docs/userguide.html#command_chaining][i3 Command Chaining]]
 
 * Main Config
 

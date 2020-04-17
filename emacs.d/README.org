@@ -1128,6 +1128,7 @@
        "C-s" 'save-buffer
        "C-p" 'counsel-git
        "C-M-t" 'amd/eshell-or-project-eshell
+       "C-M-c" 'amd/split-compilation
        "g j" 'amd/join-to-end-of-next-line
        "g s" 'count-words
        "g W" 'macro-join-inner-paragraph
@@ -1162,6 +1163,7 @@
        amd/leader-key 'hydra-leader-menu/body)
       (:states '(motion emacs)
        "C-M-t" 'amd/eshell-or-project-eshell
+       "C-M-c" 'amd/split-compilation
        "C-w N" 'evil-window-move-very-bottom
        "C-w E" 'evil-window-move-very-top
        "C-w H" 'evil-window-move-far-left
@@ -1767,6 +1769,13 @@
        ;;          (message "Compilation exited abnormally: %s" string))))
 
        :config
+       (defun amd/split-compilation ()
+         "Open/close the *compilation* buffer."
+         (interactive)
+         (if (string-equal (buffer-name) "*compilation*")
+             (delete-window)
+           (pop-to-buffer "*compilation*")))
+
        (setq compilation-finish-function
              (lambda (buf str)
                (if (null (string-match ".*exited abnormally.*" str))

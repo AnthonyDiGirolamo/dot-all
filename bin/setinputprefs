@@ -4,6 +4,7 @@
 xset r rate 200 30
 
 DEVICE_NAME='anthony’s trackpad'
+xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
 then
     xinput list-props "${DEVICE_NAME}"
@@ -14,6 +15,7 @@ fi
 # xinput list-props "${DEVICE_NAME}"
 
 DEVICE_NAME='DLL07BF:01 06CB:7A13 Touchpad'
+DEVICE_NAME='SynPS/2 Synaptics TouchPad'
 xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
 then

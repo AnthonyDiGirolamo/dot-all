@@ -9,6 +9,8 @@ SHELL := bash
 # endif
 # .RECIPEPREFIX = >
 
+HOSTNAME := $(shell uname -n)
+
 # First rule (help) is the default if make is run with no targets
 .PHONY: help
 help:  ## show help
@@ -65,7 +67,7 @@ CD_TO_BUILD_DIR=cd $(abspath $(CACHEDIR)/$(subst build-,,$@)) ; URL="$($(subst b
 
 .PHONY: build-fish
 .ONESHELL:
-build-fish:
+build-fish: download-fish
 	@echo "[BUILD] fish"
 	$(CD_TO_BUILD_DIR)
 	mkdir -p build ; cd build
@@ -77,7 +79,7 @@ build-fish:
 
 .PHONY: build-emacs
 .ONESHELL:
-build-emacs:
+build-emacs: download-emacs
 	@echo "[BUILD] emacs"
 	$(CD_TO_BUILD_DIR)
 	./configure --prefix=$$HOME/apps/emacs
@@ -146,6 +148,8 @@ $(CACHEDIR)/%.out: %.org
 	(setq make-backup-files nil) \
 	(defalias 'yes-or-no-p 'y-or-n-p) \
 	(setq org-confirm-babel-evaluate nil) \
+	(setq hostname \"$(HOSTNAME)\")
+	(defun tangle-file-if (file p) (if (eval p) file \"no\"))
 	(defun amd/post-tangle () \
 	  (let ((tangled-output-file (buffer-file-name)) \
 	        (dot-out-file (car command-line-args-left))) \

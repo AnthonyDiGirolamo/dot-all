@@ -1,2 +1,4 @@
 /.cache/
 /.artifacts/
+/bin/xcape
+/emacs.d/abbrev_defs
