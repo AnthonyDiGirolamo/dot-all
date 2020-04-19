@@ -225,7 +225,7 @@ function Canvas.new(r,c)
 end
 
 function Canvas:__tostring()
-  return "Canvas [" .. tostring(self.rows) .. ", " .. tostring(self.cols) .. "]"
+  return "Canvas [rows:" .. tostring(self.rows) .. ", cols:" .. tostring(self.cols) .. "]"
 end
 
 function Canvas:clear_canvas()
@@ -395,32 +395,38 @@ function Terminal:draw_canvas(canvas, transparency, rmin, rmax, cmin, cmax)
     -- debug: draw col numbers
     self:write(self:clear_formatting().."   ")
     for col=col_start,col_end do
-      self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%d",col%10))
+      if col <= self.screen_width then
+        self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%d",col%10))
+      end
     end
     self:write(self:clear_formatting().."\n")
   end
 
   for row=row_start,row_end do
     for col=col_start,col_end do
-      local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
+      if col <= self.screen_width then
+        local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
 
-      -- debug: draw row numbers
-      if DEBUG then
-        if col==col_start then
-          self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row))
+        -- debug: draw row numbers
+        if DEBUG then
+          if col==col_start then
+            if col <= self.screen_width then
+              self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row))
+            end
+          end
         end
-      end
 
-      if transparency then
-        if c == EMPTY then
-          -- transparent
-          self:write(self:clear_formatting().." ")
+        if transparency then
+          if c == EMPTY then
+            -- transparent
+            self:write(self:clear_formatting().." ")
+          else
+            self:write(self:fg(rf,gf,bf)..self:bg(rb,gb,bb)..c)
+          end
         else
+          if c == EMPTY then c = " " end
           self:write(self:fg(rf,gf,bf)..self:bg(rb,gb,bb)..c)
         end
-      else
-        if c == EMPTY then c = " " end
-        self:write(self:fg(rf,gf,bf)..self:bg(rb,gb,bb)..c)
       end
     end
     self:write(self:clear_formatting().."\n")
@@ -439,7 +445,9 @@ function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin
     -- debug: draw col numbers
     self:write(self:clear_formatting().."   ")
     for col=col_start,col_end do
-      self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%d",col%10))
+      if col <= self.screen_width then
+        self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%d",col%10))
+      end
     end
     self:write(self:clear_formatting().."\n")
   end
@@ -461,7 +469,9 @@ function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin
           if DEBUG then
             -- debug: print leading row number
             if col==col_start then
-              self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row)..self:clear_formatting())
+              if col <= self.screen_width then
+                self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row)..self:clear_formatting())
+              end
             end
           end
 
@@ -495,26 +505,28 @@ function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin
         -- is it the last row?
         self:write(self:clear_formatting())
         for col=col_start,col_end do
+          if col <= self.screen_width then
 
-          if DEBUG then
-            -- debug: print leading row number
-            if col==col_start then
-              self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row)..self:clear_formatting())
+            if DEBUG then
+              -- debug: print leading row number
+              if col==col_start then
+                self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row)..self:clear_formatting())
+              end
             end
-          end
 
-          local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
-          if transparency then
-            if c == EMPTY then
-              -- write a space
-              self:write(self:clear_formatting().." ")
+            local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
+            if transparency then
+              if c == EMPTY then
+                -- write a space
+                self:write(self:clear_formatting().." ")
+              else
+                -- write a top box character
+                self:write(self:clear_formatting()..self:fg(rb,gb,bb).."▀")
+              end
             else
-              -- write a top box character
-              self:write(self:clear_formatting()..self:fg(rb,gb,bb).."▀")
+              -- set bg colors
+              self:write(self:fg(rb,gb,bb)..self:bg(rb,gb,bb).."▀")
             end
-          else
-            -- set bg colors
-            self:write(self:fg(rb,gb,bb)..self:bg(rb,gb,bb).."▀")
           end
 
         end
@@ -639,7 +651,7 @@ dark_planet_colors=split"x0011055545531121"
 health_colormap=split"x8899aaabbb"
 damage_colors=split"x7a98507a98507a9850"
 sun_colors=split"x6ea9d789ac"
-ship_names=split"afighter,cruiser,freighter,superfreighter,station,"
+ship_names=split"aFighter,Cruiser,Freighter,Super Freighter,Station,"
 ship_types=nsplit"n1.5,.25,.7,.75,.8,-2,1,14,18,|n3.5,.5,.583333,0,.8125,-1,1,18,24,|n3,2,.2125,0,.8125,-3,1,16,22,|n6,0,.7,-.25,.85,.25,1,32,45,|n4,1,.1667,-1,.3334,0,.6668,1,.8335,-1,1,30,40,|"
 
 
@@ -767,13 +779,13 @@ function ship:buildship(seed,stype)
   self.hp=hp
   self.max_hp=hp
   self.hp_percent=1
-  self.deltav=max(hp*-0.0188+4.5647,1)*0.0326
+  self.deltav=max(hp*-0.0188+4.5647,1)*0.0326*30.593514175
   local turn_factor=1
   if self.ship_type_index==4 then
     turn_factor = turn_factor * .5
   end
-  self.turn_rate=round(turn_factor*max(hp*-0.0470+11.4117,2))
   self.turn_rate=180
+  self.turn_rate=turn_factor*max(hp*-0.0470+11.4117,2)
   self.sprite_rows=rows
   self.sprite_columns=#ship_mask[1]
   self.transparent_color=ship_colors[4]
@@ -915,19 +927,32 @@ pilot=ship.new()
 --   os.execute("sleep " .. tonumber(.5))
 -- end
 
-while true do
+-- while true do
 
-pilot:buildship(nil,nil)
-print(
-  "ShipSeed: ".. pilot.seed_value..","..pilot.ship_type_index
-  -- ..", TerminalRows_Cols: " .. term.screen_height .."x".. term.screen_width
-    -- ..", ShipRows_Columns: " .. pilot.sprite_rows .. "x" .. pilot.sprite_columns
-)
+pilot:buildship()
+-- pilot:buildship(160921,2)
+-- pilot:buildship(131525,2)
 
-DEBUG = false
+-- center text
+-- local spec_attribute_width = max(10, round(max(pilot.sprite_columns, pilot.sprite_rows)/2))
+-- left text
+local spec_attribute_width = 10
+local fstr = ("%0" .. spec_attribute_width .. "s %s")
+print(string.format(fstr, "Class:", pilot.name))
+print(string.format(fstr, "Serial#:",
+                    string.format("%d, %d", pilot.seed_value, pilot.ship_type_index)))
+print(string.format(fstr, "HP:", pilot.hp))
+print(string.format(fstr, "DeltaV:",
+                    string.format("%.02fg", pilot.deltav)))
+print(string.format(fstr, "TurnRate:",
+                    string.format("%.01f deg/sec ", pilot.turn_rate)))
+
+local rotation_start = 0
+local rotation_inc = .0625
+local rotation_end = 0
 
 local sprites = {}
-for r=0,.5,.1 do
+for r=rotation_start,rotation_end,rotation_inc do
   local s = pilot:get_sprite_canvas_rotated(r, true)
   add(sprites, s)
 end
@@ -953,13 +978,17 @@ for i, sprite in ipairs(sprites) do
 end
 
 -- term:draw_canvas(s.canvas, NO_TRANSPARENCY)
--- term:draw_canvas(s.canvas, WITH_TRANSPARENCY)
 -- term:draw_canvas_half_height(s.canvas, NO_TRANSPARENCY)
+
+-- DEBUG = true
 
 term:update_screen_width()
 term:update_screen_height()
+if DEBUG then
+  term.screen_width = term.screen_width - 3
+end
+-- term:draw_canvas(s.canvas, WITH_TRANSPARENCY)
 term:draw_canvas_half_height(s.canvas, WITH_TRANSPARENCY)
 
-os.execute("sleep " .. tonumber(.5))
-end
-
+-- os.execute("sleep " .. tonumber(.5))
+-- end
