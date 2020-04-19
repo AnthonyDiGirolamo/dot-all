@@ -1,5 +1,7 @@
 #!/usr/bin/env lua
 
+local DEBUG
+
 local actual_random = math.random
 function randomseed(s)
   return math.randomseed(s)
@@ -207,53 +209,141 @@ end
 
 setmetatable(Vector,{__call=function(_,...) return Vector.new(...) end})
 
+EMPTY = ""
+WITH_TRANSPARENCY = true
+NO_TRANSPARENCY = false
+
 Canvas={}
 Canvas.__index=Canvas
 function Canvas.new(r,c)
   local c=setmetatable(
     {canvas = {},
-     canvas_rows=r,
-     canvas_cols=c}, Canvas)
+     rows=r,
+     cols=c}, Canvas)
   c:clear_canvas()
   return c
 end
 
+function Canvas:__tostring()
+  return "Canvas [" .. tostring(self.rows) .. ", " .. tostring(self.cols) .. "]"
+end
+
 function Canvas:clear_canvas()
   self.canvas = {}
-  for y=1,self.canvas_rows do
+  for y=1,self.rows do
     add(self.canvas,{})
-    for x=1,self.canvas_cols do
+    for x=1,self.cols do
       add(self.canvas[y], {
             0, 0, 0, -- fg rgb
             0, 0, 0, -- bg rgb
-            "" --character
+            EMPTY --character
       })
     end
   end
 end
 
-function Canvas:draw_fg(row, col, r, g, b, c)
+function Canvas:blit(subcanvas, srow, scol)
+  local start_row = srow or 0
+  local start_col = scol or 0
+  local end_row = min(start_row + subcanvas.rows, self.rows)
+  local end_col = min(start_col + subcanvas.cols, self.cols)
+
+  for r=1,subcanvas.rows do
+    local newr = r+start_row
+    if newr <= end_row then
+      for c=1,subcanvas.cols do
+        local newc = c+start_col
+        if newc <= end_col then
+          local rf, gf, bf, rb, gb, bb, ch = unpack(subcanvas.canvas[r][c])
+          -- print("start_row: "..start_row.." start_col:"..start_col.." base["..r..", "..c.."] offset["..newr..", "..newc.."] ".. "end_row:"..end_row.." end_col:"..end_col.." "..tostring(subcanvas).. " -> "..tostring(self))
+          self:draw_fgbg(newr, newc, rf, gf, bf, rb, gb, bb, ch)
+        end
+      end
+    end
+  end
+end
+
+function Canvas:draw_char(row, col, c)
+  self.canvas[row][col][7] = c
+end
+
+function Canvas:draw_fg(row, col, r, g, b, character)
   self.canvas[row][col][1] = r
   self.canvas[row][col][2] = g
   self.canvas[row][col][3] = b
-  if c ~= nil then self.canvas[row][col][7] = c end
+  if character ~= nil then self.canvas[row][col][7] = character end
 end
 
-function Canvas:draw_bg(row, col, r, g, b, c)
+function Canvas:draw_bg(row, col, r, g, b, character)
   self.canvas[row][col][4] = r
   self.canvas[row][col][5] = g
   self.canvas[row][col][6] = b
-  if c ~= nil then self.canvas[row][col][7] = c end
+  if character ~= nil then self.canvas[row][col][7] = character end
 end
 
-function Canvas:draw_fgbg(row, col, rf, gf, bf, rb, gb, bb, c)
+function Canvas:draw_fgbg(row, col, rf, gf, bf, rb, gb, bb, character)
   self.canvas[row][col][1] = rf
   self.canvas[row][col][2] = gf
   self.canvas[row][col][3] = bf
   self.canvas[row][col][4] = rb
   self.canvas[row][col][5] = gb
   self.canvas[row][col][6] = bb
-  if c ~= nil then self.canvas[row][col][7] = c end
+  if character ~= nil then self.canvas[row][col][7] = character end
+end
+
+function Canvas:row_col_min_max()
+  local rmin = #self.canvas
+  local rmax = 0
+  local cmin = #self.canvas[1]
+  local cmax = 0
+
+  for row=1,#self.canvas do
+    for col=1,#self.canvas[1] do
+      local rf, gf, bf, rb, gb, bb, c = unpack(self.canvas[row][col])
+      -- if rb ~= 0 or gb ~= 0 or bb ~= 0 then
+      if c ~= EMPTY then
+        if col < cmin then cmin = col end
+        if col > cmax then cmax = col end
+        if row < rmin then rmin = row end
+        if row > rmax then rmax = row end
+      end
+    end
+  end
+
+  if DEBUG then
+    print("Canvas row["..rmin..".."..rmax.."] col["..cmin..".."..cmax.."]")
+  end
+  return rmin, rmax, cmin, cmax
+end
+
+function Canvas:new_canvas_cropped_with_stroke()
+  local rmin, rmax, cmin, cmax = self:row_col_min_max()
+  newcanvas = Canvas.new(rmax-rmin+1+2, cmax-cmin+1+2) -- adding +1 for indexing from 1, +2 or one extra pixel on each edge
+
+  for row=rmin-1,rmax+1 do
+    for col=cmin-1,cmax+1 do
+      local fr, fg, fb, br, bg, bb, c = unpack(self.canvas[row][col])
+      -- +1: for the indexing from 1
+      -- +another 1: to offset to position 1,1
+      local new_row = row - rmin + 1 + 1
+      local new_col = col - cmin + 1 + 1
+
+      if c == EMPTY then
+        -- check neighbors
+        local frs, fgs, fbs, brs, bgs, bbs, cs = unpack(self.canvas[row-1][col])
+        local frn, fgn, fbn, brn, bgn, bbn, cn = unpack(self.canvas[row+1][col])
+        local fre, fge, fbe, bre, bge, bbe, ce = unpack(self.canvas[row][col-1])
+        local frw, fgw, fbw, brw, bgw, bbw, cw = unpack(self.canvas[row][col+1])
+        if cs ~= EMPTY or cn ~= EMPTY or ce ~= EMPTY or cw ~= EMPTY then
+          newcanvas:draw_fgbg(new_row, new_col, fr, fg, fb, br, bg, bb, " ")
+        end
+      else
+        -- copy character as normal
+        newcanvas:draw_fgbg(new_row, new_col, fr, fg, fb, br, bg, bb, c)
+      end
+    end
+  end
+  return newcanvas
 end
 
 setmetatable(Canvas,{__call=function(_,...) return Canvas.new(...) end})
@@ -269,75 +359,64 @@ function Terminal.new()
   return t
 end
 
-function Terminal:clear_canvas()
-  self.canvas = {}
-  for y=1,self.screen_height do
-    add(self.canvas,{})
-    for x=1,self.screen_width do
-      add(self.canvas[y], {
-            0, 0, 0, -- fg rgb
-            0, 0, 0, -- bg rgb
-            "" --character
-      })
-    end
-  end
-end
-
-function Terminal:row_col_min_max()
-  local rmin = #self.canvas
-  local rmax = 0
-  local cmin = #self.canvas[1]
-  local cmax = 0
-
-  for row=1,#self.canvas do
-    for col=1,#self.canvas[1] do
-      local rf, gf, bf, rb, gb, bb, c = unpack(self.canvas[row][col])
-      -- if rb ~= 0 or gb ~= 0 or bb ~= 0 then
-      if c ~= "" then
-        if col < cmin then cmin = col end
-        if col > cmax then cmax = col end
-        if row < rmin then rmin = row end
-        if row > rmax then rmax = row end
-      end
-    end
-  end
-  return rmin, rmax, cmin, cmax
-end
-
-function Terminal:draw_canvas(rmin, rmax, cmin, cmax)
+function Terminal:draw_canvas(canvas, transparency, rmin, rmax, cmin, cmax)
   row_start = rmin or 1
-  row_end = rmax or #self.canvas-2
+  row_end = rmax or #canvas
   col_start = cmin or 1
-  col_end = cmax or #self.canvas[1]-2
+  col_end = cmax or #canvas[1]
+
+  if DEBUG then
+    -- debug: draw col numbers
+    self:write(self:clear_formatting().."   ")
+    for col=col_start,col_end do
+      self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%d",col%10))
+    end
+    self:write(self:clear_formatting().."\n")
+  end
+
   for row=row_start,row_end do
     for col=col_start,col_end do
-      local rf, gf, bf, rb, gb, bb, c = unpack(self.canvas[row][col])
-      if col==col_start then
-        self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row))
+      local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
+
+      -- debug: draw row numbers
+      if DEBUG then
+        if col==col_start then
+          self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row))
+        end
       end
-      if c=="" then
-        -- transparent
-        self:write(self:clear_formatting().." ")
+
+      if transparency then
+        if c == EMPTY then
+          -- transparent
+          self:write(self:clear_formatting().." ")
+        else
+          self:write(self:fg(rf,gf,bf)..self:bg(rb,gb,bb)..c)
+        end
       else
+        if c == EMPTY then c = " " end
         self:write(self:fg(rf,gf,bf)..self:bg(rb,gb,bb)..c)
       end
     end
-    self:write("\n")
+    self:write(self:clear_formatting().."\n")
   end
   self:write(self:clear_formatting())
 end
 
-function Terminal:draw_canvas_half_height(rmin, rmax, cmin, cmax)
+function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin, cmax)
   row_start = rmin or 1
-  row_end = rmax or #self.canvas-2
+  row_end = rmax or #canvas
   col_start = cmin or 1
-  col_end = cmax or #self.canvas[1]-2
+  col_end = cmax or #canvas[1]
   local even_row
-  self:write(self:clear_formatting().."   ")
-  for col=col_start,col_end do
-    self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%d",col%10))
+
+  if DEBUG then
+    -- debug: draw col numbers
+    self:write(self:clear_formatting().."   ")
+    for col=col_start,col_end do
+      self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%d",col%10))
+    end
+    self:write(self:clear_formatting().."\n")
   end
-  self:write(self:clear_formatting().."\n")
 
   for row=row_start,row_end do
     if row%2 == 0 then
@@ -347,64 +426,78 @@ function Terminal:draw_canvas_half_height(rmin, rmax, cmin, cmax)
     end
 
     if even_row then
+      -- current row is even
       for col=col_start,col_end do
-        local rf2, gf2, bf2, rb2, gb2, bb2, c2 = unpack(self.canvas[row-1][col])
-        local rf, gf, bf, rb, gb, bb, c = unpack(self.canvas[row][col])
+        if col <= self.screen_width then
+          local rf2, gf2, bf2, rb2, gb2, bb2, c2 = unpack(canvas[row-1][col])
+          local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
 
-        -- print leading row number
-        if col==col_start then
-          self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row))
-        end
-
-        -- previous row is bg
-        -- current row is bg with box character
-        self:write(self:fg(rb,gb,bb)..self:bg(rb2,gb2,bb2).."▄")
-        -- Box Characters: ▄▀█
-
-      end
-      self:write(self:clear_formatting().."\n")
-    else
-      if row==row_end then
-        self:write(self:clear_formatting())
-        for col=col_start,col_end do
-          -- print leading row number
-          if col==col_start then
-            self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row))
+          if DEBUG then
+            -- debug: print leading row number
+            if col==col_start then
+              self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row)..self:clear_formatting())
+            end
           end
 
-          local rf, gf, bf, rb, gb, bb, c = unpack(self.canvas[row][col])
-          self:write(self:fg(rb,gb,bb).."▀")
+          if transparency then
+            if c2 == EMPTY and c == EMPTY then
+              self:write(self:clear_formatting() .." ")
+            elseif c2 == EMPTY and c ~= EMPTY then
+              -- previous row is empty, draw just the fg character for this row
+              self:write(self:clear_formatting()..self:fg(rb,gb,bb).."▄")
+            elseif c2 ~= EMPTY and c == EMPTY then
+              -- this row is empty draw previous row color as fg character on top
+              self:write(self:clear_formatting()..self:fg(rb2,gb2,bb2).."▀")
+            else
+              -- both pixels are set
+              -- previous row is bg
+              -- current row is bg with box character
+              self:write(self:fg(rb,gb,bb)..self:bg(rb2,gb2,bb2).."▄")
+              -- Box Characters: ▄▀█
+            end
+          else
+            self:write(self:fg(rb,gb,bb)..self:bg(rb2,gb2,bb2).."▄")
+          end
+
+        end -- if col <= self.screen_width then
+      end
+      self:write(self:clear_formatting().."\n")
+
+    else
+      -- current row is odd
+      if row==row_end then
+        -- is it the last row?
+        self:write(self:clear_formatting())
+        for col=col_start,col_end do
+
+          if DEBUG then
+            -- debug: print leading row number
+            if col==col_start then
+              self:write(self:fg(255,255,255)..self:bg(0,0,0)..string.format("%02d:",row)..self:clear_formatting())
+            end
+          end
+
+          local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
+          if transparency then
+            if c == EMPTY then
+              -- write a space
+              self:write(self:clear_formatting().." ")
+            else
+              -- write a top box character
+              self:write(self:clear_formatting()..self:fg(rb,gb,bb).."▀")
+            end
+          else
+            -- set bg colors
+            self:write(self:fg(rb,gb,bb)..self:bg(rb,gb,bb).."▀")
+          end
+
         end
         self:write(self:clear_formatting().."\n")
       end
-    end
-  end
+    end -- row==row_end
+
+  end -- current row is odd
   self:write(self:clear_formatting())
-end
-
-
-function Terminal:draw_fg(row, col, r, g, b, c)
-  self.canvas[row][col][1] = r
-  self.canvas[row][col][2] = g
-  self.canvas[row][col][3] = b
-  if c ~= nil then self.canvas[row][col][7] = c end
-end
-
-function Terminal:draw_bg(row, col, r, g, b, c)
-  self.canvas[row][col][4] = r
-  self.canvas[row][col][5] = g
-  self.canvas[row][col][6] = b
-  if c ~= nil then self.canvas[row][col][7] = c end
-end
-
-function Terminal:draw_fgbg(row, col, rf, gf, bf, rb, gb, bb, c)
-  self.canvas[row][col][1] = rf
-  self.canvas[row][col][2] = gf
-  self.canvas[row][col][3] = bf
-  self.canvas[row][col][4] = rb
-  self.canvas[row][col][5] = gb
-  self.canvas[row][col][6] = bb
-  if c ~= nil then self.canvas[row][col][7] = c end
 end
 
 function Terminal:update_screen_width()
@@ -476,7 +569,6 @@ end
 setmetatable(Terminal,{__call=function(_,...) return Terminal.new(...) end})
 
 term = Terminal.new()
-term:clear_canvas()
 
 function split(s)
   local t,start_index,ti={},2,split_start or 0
@@ -663,9 +755,26 @@ function ship:buildship(seed,stype)
   return self
 end
 
-function ship:draw_sprite_rotated(pos, angle)
-  local screen_position=pos or Vector(1,1)
-  -- screen_position:add(Vector(1,1))
+function ship:get_sprite_canvas_rotated(angle, add_stroke)
+  local size_factor = 1.5
+  newcanvas = Canvas(ceil(pilot.sprite_rows * size_factor),
+                     ceil(pilot.sprite_columns * size_factor))
+  self:draw_sprite_rotated(newcanvas, angle)
+  if add_stroke then
+    return newcanvas:new_canvas_cropped_with_stroke()
+  else
+    return newcanvas
+  end
+end
+
+function ship:draw_sprite_rotated(canvas, angle, pos)
+  -- canvas center point minus spritesize/2 offset
+  local sc = Vector(round(canvas.cols/2),
+                    round(canvas.rows/2)) -
+    Vector(round(self.sprite_columns/2),
+           round(self.sprite_rows/2))
+
+  local screen_position=pos or sc
   screen_position:add(
     Vector(
       ceil(self.sprite_rows/2),
@@ -698,8 +807,8 @@ function ship:draw_sprite_rotated(pos, angle)
         r, g, b = unpack(picocolors[color])
 
         -- draw using space and bg character
-        term:draw_bg(pixel1.y, pixel1.x, r, g, b, " ")
-        term:draw_bg(pixel2.y, pixel2.x, r, g, b, " ")
+        canvas:draw_bg(pixel1.y, pixel1.x, r, g, b, " ")
+        canvas:draw_bg(pixel2.y, pixel2.x, r, g, b, " ")
 
         -- print("x: "..x.." y: "..y.." c: "..color)
         -- rectfill(
@@ -707,18 +816,10 @@ function ship:draw_sprite_rotated(pos, angle)
         --   pixel2.x,pixel2.y,
         --   color)
         -- pixel1:draw_line(pixel2, color)
-
-      -- else
-      --   term:move_cursor(x, y)
-      --   term:write(term:bg(0, 0, 0) .. "x")
       end
     end
   end
 
-  if projectile_hit_by then
-    self.last_hit_time=secondcount
-    self.last_hit_attacking_ship=projectile_hit_by
-  end
 end
 
 
@@ -740,6 +841,7 @@ randomseed(os.time()+(os.clock()*1000000))
 
 pilot=ship.new()
 pilot:buildship(nil,nil)
+-- pilot:buildship(202915,2)
 -- pilot:buildship(147828, 2)
 -- pilot:buildship(30718,1)
 -- pilot:buildship(9266,2)
@@ -753,12 +855,6 @@ pilot:buildship(nil,nil)
 -- pilot:buildship(50110,2)
 -- pilot:buildship(63953,2)
 -- pilot:buildship(35957,2)
-
-print("TerminalRows_Cols: " .. term.screen_height .."x".. term.screen_width ..
-        ", ShipSeed: ".. pilot.seed_value ..
-        ", ShipRows_Columns: " .. pilot.sprite_rows ..
-        "x" .. pilot.sprite_columns)
-
 
 -- -- Rotation Montage 0.0 to 1.0
 -- offsets = {}
@@ -776,8 +872,6 @@ print("TerminalRows_Cols: " .. term.screen_height .."x".. term.screen_width ..
 -- term:draw_canvas()
 -- term:draw_canvas_half_height()
 
--- screen center minus spritesize/2 offset
-local sc = Vector(round(term.screen_width/2), round(term.screen_height/2)) - Vector(round(pilot.sprite_columns/2), round(pilot.sprite_rows/2))
 
 -- -- Rotation
 -- for r=0,2,.05 do
@@ -795,16 +889,42 @@ local sc = Vector(round(term.screen_width/2), round(term.screen_height/2)) - Vec
 --   os.execute("sleep " .. tonumber(.5))
 -- end
 
-for r=.5,.5,.25 do
-  term:clear_canvas()
-  pilot:draw_sprite_rotated(
-    nil,
-    -- sc:clone(),
-    r)
-  local rmin, rmax, cmin, cmax = term:row_col_min_max()
-  print("row["..rmin..".."..rmax.."] col["..cmin..".."..cmax.."]")
-  -- term:draw_canvas(rmin, rmax, cmin, cmax)
-  term:draw_canvas_half_height(rmin, rmax, cmin, cmax)
+DEBUG = false
+local sprites = {}
+for r=0,.75,.25 do
+  local s = pilot:get_sprite_canvas_rotated(r, true)
+  add(sprites, s)
 end
 
+local total_cols = 2
+local max_rows = 0
+for i, sprite in ipairs(sprites) do
+  total_cols = total_cols + sprite.cols
+  if sprite.rows > max_rows then
+    max_rows = sprite.rows
+  end
+end
+
+local s = Canvas.new(max_rows, total_cols)
+local current_col_offset = 0
+for i, sprite in ipairs(sprites) do
+  local angle = (i-1)*.25
+  -- print(string.format("r = %.02f (%d deg)", angle, angle*360 ))
+  row_offset = floor((max_rows - sprite.rows)/2)
+  -- print(row_offset)
+  s:blit(sprite, row_offset, current_col_offset)
+  current_col_offset = current_col_offset + sprite.cols + 1
+end
+
+-- term:draw_canvas(s.canvas, NO_TRANSPARENCY)
+-- term:draw_canvas(s.canvas, WITH_TRANSPARENCY)
+-- term:draw_canvas_half_height(s.canvas, NO_TRANSPARENCY)
+term:draw_canvas_half_height(s.canvas, WITH_TRANSPARENCY)
+
+
+print(
+  "ShipSeed: ".. pilot.seed_value
+  -- ..", TerminalRows_Cols: " .. term.screen_height .."x".. term.screen_width
+    -- ..", ShipRows_Columns: " .. pilot.sprite_rows .. "x" .. pilot.sprite_columns
+)
 
