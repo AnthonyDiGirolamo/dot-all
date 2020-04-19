@@ -329,11 +329,37 @@ function Canvas:new_canvas_cropped_with_stroke()
       local new_col = col - cmin + 1 + 1
 
       if c == EMPTY then
+        local cn, cs, ce, cw
+
         -- check neighbors
-        local frs, fgs, fbs, brs, bgs, bbs, cs = unpack(self.canvas[row-1][col])
-        local frn, fgn, fbn, brn, bgn, bbn, cn = unpack(self.canvas[row+1][col])
-        local fre, fge, fbe, bre, bge, bbe, ce = unpack(self.canvas[row][col-1])
-        local frw, fgw, fbw, brw, bgw, bbw, cw = unpack(self.canvas[row][col+1])
+        if row-1 > 0 then
+          local frn, fgn, fbn, brn, bgn, bbn, ch = unpack(self.canvas[row-1][col])
+          cs = ch
+        else
+          cs = EMPTY
+        end
+
+        if row+1 <= self.rows then
+          local frs, fgs, fbs, brs, bgs, bbs, ch = unpack(self.canvas[row+1][col])
+          cn = ch
+        else
+          cn = EMPTY
+        end
+
+        if col-1 > 0 then
+          local fre, fge, fbe, bre, bge, bbe, ch = unpack(self.canvas[row][col-1])
+          ce = ch
+        else
+          ce = EMPTY
+        end
+
+        if col+1 <= self.cols then
+          local frw, fgw, fbw, brw, bgw, bbw, ch = unpack(self.canvas[row][col+1])
+          cw = ch
+        else
+          cw = EMPTY
+        end
+
         if cs ~= EMPTY or cn ~= EMPTY or ce ~= EMPTY or cw ~= EMPTY then
           newcanvas:draw_fgbg(new_row, new_col, fr, fg, fb, br, bg, bb, " ")
         end
@@ -756,7 +782,7 @@ function ship:buildship(seed,stype)
 end
 
 function ship:get_sprite_canvas_rotated(angle, add_stroke)
-  local size_factor = 1.5
+  local size_factor = 2
   newcanvas = Canvas(ceil(pilot.sprite_rows * size_factor),
                      ceil(pilot.sprite_columns * size_factor))
   self:draw_sprite_rotated(newcanvas, angle)
@@ -840,7 +866,7 @@ end
 randomseed(os.time()+(os.clock()*1000000))
 
 pilot=ship.new()
-pilot:buildship(nil,nil)
+-- pilot:buildship(5725,2)
 -- pilot:buildship(202915,2)
 -- pilot:buildship(147828, 2)
 -- pilot:buildship(30718,1)
@@ -889,14 +915,24 @@ pilot:buildship(nil,nil)
 --   os.execute("sleep " .. tonumber(.5))
 -- end
 
+while true do
+
+pilot:buildship(nil,nil)
+print(
+  "ShipSeed: ".. pilot.seed_value..","..pilot.ship_type_index
+  -- ..", TerminalRows_Cols: " .. term.screen_height .."x".. term.screen_width
+    -- ..", ShipRows_Columns: " .. pilot.sprite_rows .. "x" .. pilot.sprite_columns
+)
+
 DEBUG = false
+
 local sprites = {}
-for r=0,.75,.25 do
+for r=0,.5,.1 do
   local s = pilot:get_sprite_canvas_rotated(r, true)
   add(sprites, s)
 end
 
-local total_cols = 2
+local total_cols = #sprites-1
 local max_rows = 0
 for i, sprite in ipairs(sprites) do
   total_cols = total_cols + sprite.cols
@@ -919,12 +955,11 @@ end
 -- term:draw_canvas(s.canvas, NO_TRANSPARENCY)
 -- term:draw_canvas(s.canvas, WITH_TRANSPARENCY)
 -- term:draw_canvas_half_height(s.canvas, NO_TRANSPARENCY)
+
+term:update_screen_width()
+term:update_screen_height()
 term:draw_canvas_half_height(s.canvas, WITH_TRANSPARENCY)
 
-
-print(
-  "ShipSeed: ".. pilot.seed_value
-  -- ..", TerminalRows_Cols: " .. term.screen_height .."x".. term.screen_width
-    -- ..", ShipRows_Columns: " .. pilot.sprite_rows .. "x" .. pilot.sprite_columns
-)
+os.execute("sleep " .. tonumber(.5))
+end
 
