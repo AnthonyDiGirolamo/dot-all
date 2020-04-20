@@ -293,7 +293,7 @@ function Canvas:blit(subcanvas, srow, scol)
       for c=1,subcanvas.cols do
         local newc = c+start_col
         if newc <= end_col then
-          local rf, gf, bf, rb, gb, bb, ch, f256, b256 = unpack(subcanvas.canvas[r][c])
+          local rf, gf, bf, rb, gb, bb, ch, f256, b256 = subcanvas:get_pixel(r, c)
           -- print("start_row: "..start_row.." start_col:"..start_col.." base["..r..", "..c.."] offset["..newr..", "..newc.."] ".. "end_row:"..end_row.." end_col:"..end_col.." "..tostring(subcanvas).. " -> "..tostring(self))
           self:draw_fgbg(newr, newc, rf, gf, bf, rb, gb, bb, ch, f256, b256)
         end
@@ -334,6 +334,11 @@ function Canvas:draw_fgbg(row, col, rf, gf, bf, rb, gb, bb, character, c256f, c2
   if c256b ~= nil then self.canvas[row][col][9] = c256b end
 end
 
+function Canvas:get_pixel(row, col)
+  return self.canvas[row][col][1], self.canvas[row][col][2], self.canvas[row][col][3], self.canvas[row][col][4], self.canvas[row][col][5], self.canvas[row][col][6], self.canvas[row][col][7], self.canvas[row][col][8], self.canvas[row][col][9]
+end
+
+
 function Canvas:row_col_min_max()
   local rmin = #self.canvas
   local rmax = 0
@@ -342,7 +347,7 @@ function Canvas:row_col_min_max()
 
   for row=1,#self.canvas do
     for col=1,#self.canvas[1] do
-      local rf, gf, bf, rb, gb, bb, c, f256, b256 = unpack(self.canvas[row][col])
+      local rf, gf, bf, rb, gb, bb, c, f256, b256 = self:get_pixel(row, col)
       -- if rb ~= 0 or gb ~= 0 or bb ~= 0 then
       if c ~= EMPTY then
         if col < cmin then cmin = col end
@@ -365,7 +370,7 @@ function Canvas:new_canvas_cropped_with_stroke()
 
   for row=rmin-1,rmax+1 do
     for col=cmin-1,cmax+1 do
-      local fr, fg, fb, br, bg, bb, c, f256, b256 = unpack(self.canvas[row][col])
+      local fr, fg, fb, br, bg, bb, c, f256, b256 = self:get_pixel(row, col)
       -- +1: for the indexing from 1
       -- +another 1: to offset to position 1,1
       local new_row = row - rmin + 1 + 1
@@ -426,9 +431,9 @@ end
 
 function Terminal:draw_canvas(canvas, transparency, rmin, rmax, cmin, cmax)
   row_start = rmin or 1
-  row_end = rmax or #canvas
+  row_end = rmax or canvas.rows
   col_start = cmin or 1
-  col_end = cmax or #canvas[1]
+  col_end = cmax or canvas.cols
 
   if DEBUG then
     -- debug: draw col numbers
@@ -444,7 +449,7 @@ function Terminal:draw_canvas(canvas, transparency, rmin, rmax, cmin, cmax)
   for row=row_start,row_end do
     for col=col_start,col_end do
       if col <= self.screen_width then
-        local rf, gf, bf, rb, gb, bb, c, f256, b256 = unpack(canvas[row][col])
+        local rf, gf, bf, rb, gb, bb, c, f256, b256 = canvas:get_pixel(row, col)
 
         -- debug: draw row numbers
         if DEBUG then
@@ -491,9 +496,9 @@ end
 
 function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin, cmax)
   row_start = rmin or 1
-  row_end = rmax or #canvas
+  row_end = rmax or canvas.rows
   col_start = cmin or 1
-  col_end = cmax or #canvas[1]
+  col_end = cmax or canvas.cols
   local even_row
 
   if DEBUG then
@@ -518,8 +523,8 @@ function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin
       -- current row is even
       for col=col_start,col_end do
         if col <= self.screen_width then
-          local rf2, gf2, bf2, rb2, gb2, bb2, c2, f2562, b2562 = unpack(canvas[row-1][col])
-          local rf,  gf,  bf,  rb,  gb,  bb,  c,  f256,  b256  = unpack(canvas[row][col])
+          local rf2, gf2, bf2, rb2, gb2, bb2, c2, f2562, b2562 = canvas:get_pixel(row-1, col)
+          local rf,  gf,  bf,  rb,  gb,  bb,  c,  f256,  b256  = canvas:get_pixel(row, col)
 
           if DEBUG then
             -- debug: print leading row number
@@ -597,7 +602,7 @@ function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin
               end
             end
 
-            local rf, gf, bf, rb, gb, bb, c, f256, b256 = unpack(canvas[row][col])
+            local rf, gf, bf, rb, gb, bb, c, f256, b256 = canvas:get_pixel(row, col)
             if transparency then
               if c == EMPTY then
                 -- write a space
@@ -938,7 +943,9 @@ function ship:draw_sprite_rotated(canvas, angle, pos)
 
         if color == nil then color = 0 end
         if color<0 then color=5 end
-        r, g, b = unpack(picocolors[color])
+        local r = picocolors[color][1]
+        local g = picocolors[color][2]
+        local b = picocolors[color][3]
         c256 = picocolors256[color]
 
         -- draw using space and bg character
@@ -1042,8 +1049,8 @@ for i, sprite in ipairs(sprites) do
   current_col_offset = current_col_offset + sprite.cols + 1
 end
 
--- term:draw_canvas(s.canvas, NO_TRANSPARENCY)
--- term:draw_canvas_half_height(s.canvas, NO_TRANSPARENCY)
+-- term:draw_canvas(s, NO_TRANSPARENCY)
+-- term:draw_canvas_half_height(s, NO_TRANSPARENCY)
 
 -- DEBUG = true
 
@@ -1054,8 +1061,8 @@ term:update_screen_height()
 if DEBUG then
   term.screen_width = term.screen_width - 3
 end
--- term:draw_canvas(s.canvas, WITH_TRANSPARENCY)
-term:draw_canvas_half_height(s.canvas, WITH_TRANSPARENCY)
+term:draw_canvas(s, WITH_TRANSPARENCY)
+term:draw_canvas_half_height(s, WITH_TRANSPARENCY)
 
 -- os.execute("sleep " .. tonumber(.5))
 -- end
