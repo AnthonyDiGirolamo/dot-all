@@ -7,22 +7,28 @@ DEVICE_NAME='anthony’s trackpad'
 xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
 then
-    xinput list-props "${DEVICE_NAME}"
     xinput set-prop "${DEVICE_NAME}" 'libinput Tapping Enabled' 1
     xinput set-prop "${DEVICE_NAME}" 'libinput Natural Scrolling Enabled' 1
     xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' 0.7
 fi
-# xinput list-props "${DEVICE_NAME}"
 
-DEVICE_NAME='DLL07BF:01 06CB:7A13 Touchpad'
+DEVICE_NAME='TPPS/2 Elan TrackPoint'
+xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
+if [ $? -eq 0 ]
+then
+    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' .8
+    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Profile Enabled' 1, 0
+    xinput list-props "${DEVICE_NAME}"
+fi
+
 DEVICE_NAME='SynPS/2 Synaptics TouchPad'
 xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
 then
-    xinput list-props "${DEVICE_NAME}"
-    xinput set-prop "${DEVICE_NAME}" 'libinput Tapping Enabled' 1
-    xinput set-prop "${DEVICE_NAME}" 'libinput Natural Scrolling Enabled' 1
-    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' 1.0
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Two-Finger Scrolling' 1, 1
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Coasting Speed' 0, 50
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Scrolling Distance' -114, -114
+
 fi
 
 

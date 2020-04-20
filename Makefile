@@ -94,8 +94,8 @@ build-lua: download-lua
 	@echo "[BUILD] lua"
 	$(CD_TO_BUILD_DIR)
 	make linux -j 4
-	make INSTALL_TOP=$(abspath $(HOME)/apps/$*) install
-	cd $(abspath $(CACHEDIR)/$*)
+	make INSTALL_TOP=$(abspath $(HOME)/apps/lua) install
+	cd $(abspath $(CACHEDIR)/lua)
 	rm -rf $$D
 
 .PHONY: download-%
@@ -152,13 +152,13 @@ $(CACHEDIR)/%.out: %.org
 	(defun tangle-file-if (file p) (if (eval p) file \"no\"))
 	(defun amd/post-tangle () \
 	  (let ((tangled-output-file (buffer-file-name)) \
-	        (dot-out-file (car command-line-args-left))) \
+		(dot-out-file (car command-line-args-left))) \
 	      (save-excursion \
-	        (find-file dot-out-file) \
-	        (goto-char (point-max)) \
-	        (insert (format \"%s\n\" tangled-output-file)) \
-	        (sort-lines nil (point-min) (point-max)) \
-	        (save-buffer)) \
+		(find-file dot-out-file) \
+		(goto-char (point-max)) \
+		(insert (format \"%s\n\" tangled-output-file)) \
+		(sort-lines nil (point-min) (point-max)) \
+		(save-buffer)) \
 	      (princ (format \"  %s\n\" tangled-output-file) t)) \
 	) \
 	(add-hook 'org-babel-post-tangle-hook 'amd/post-tangle) \

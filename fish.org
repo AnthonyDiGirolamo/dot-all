@@ -36,7 +36,11 @@
     end
 
     # Prepend PATH variable
+    add_directory_to_path $HOME/apps/lua/bin
+    add_directory_to_path $HOME/apps/fish/bin
+    add_directory_to_path $HOME/apps/emacs/bin
     add_directory_to_path $HOME/dot-all/bin
+
     add_directory_to_path /usr/local/go/bin
     add_directory_to_path $HOME/.local/bin
     add_directory_to_path $HOME/.rbenv/bin
