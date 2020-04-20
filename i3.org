@@ -203,38 +203,38 @@
     # exit i3 (logs you out of your X session)
     bindsym $mod+Shift+q exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
-    set $mode_change CHANGE: [h]orizontal  [v]ertical  [t]abbed  [s]tacked  [p]arent  [f]loat  [b]order  [g]rid  [o]nly
-    bindsym $mod+c mode "$mode_change"
+    # set $mode_change CHANGE: [h]orizontal  [v]ertical  [t]abbed  [s]tacked  [p]arent  [f]loat  [b]order  [g]rid  [o]nly
+    # bindsym $mod+c mode "$mode_change"
 
-    mode "$mode_change" {
-        bindsym t layout tabbed; mode "default"
-        bindsym s layout stacking; mode "default"
-        bindsym h layout splith; mode "default"
-        bindsym v layout splitv; mode "default"
+    # mode "$mode_change" {
+    #     bindsym t layout tabbed; mode "default"
+    #     bindsym s layout stacking; mode "default"
+    #     bindsym h layout splith; mode "default"
+    #     bindsym v layout splitv; mode "default"
 
-        bindsym p mode "$mode_change_parent"
+    #     bindsym p mode "$mode_change_parent"
 
-        bindsym f floating toggle; mode "default"
-        bindsym b border toggle; mode "default"
+    #     bindsym f floating toggle; mode "default"
+    #     bindsym b border toggle; mode "default"
 
-        bindsym o focus parent;  layout tabbed; focus child;   layout stacking; mode "default"
-        bindsym g layout splitv; focus parent;  layout splith; focus child;     mode "default"
+    #     bindsym o focus parent;  layout tabbed; focus child;   layout stacking; mode "default"
+    #     bindsym g layout splitv; focus parent;  layout splith; focus child;     mode "default"
 
-        bindsym Escape mode "default"
-        bindsym Return mode "default"
-        bindsym q mode "default"
-    }
+    #     bindsym Escape mode "default"
+    #     bindsym Return mode "default"
+    #     bindsym q mode "default"
+    # }
 
-    set $mode_change_parent CHANGE PARENT: [h]orizontal  [v]ertical  [t]abbed  [s]tacked
-    mode "$mode_change_parent" {
-        bindsym t focus parent; layout tabbed;   focus child; mode "default"
-        bindsym s focus parent; layout stacking; focus child; mode "default"
-        bindsym h focus parent; layout splith;   focus child; mode "default"
-        bindsym v focus parent; layout splitv;   focus child; mode "default"
-        bindsym Escape mode "default"
-        bindsym Return mode "default"
-        bindsym q mode "default"
-    }
+    # set $mode_change_parent CHANGE PARENT: [h]orizontal  [v]ertical  [t]abbed  [s]tacked
+    # mode "$mode_change_parent" {
+    #     bindsym t focus parent; layout tabbed;   focus child; mode "default"
+    #     bindsym s focus parent; layout stacking; focus child; mode "default"
+    #     bindsym h focus parent; layout splith;   focus child; mode "default"
+    #     bindsym v focus parent; layout splitv;   focus child; mode "default"
+    #     bindsym Escape mode "default"
+    #     bindsym Return mode "default"
+    #     bindsym q mode "default"
+    # }
 
     bindsym $mod+Shift+o resize shrink width 320 px or 12 ppt; focus right; resize grow width 320 px or 12 ppt; move right
     bindsym $mod+o focus left; focus parent; move right; move right; focus child; resize grow width 320 px or 12 ppt
@@ -247,54 +247,53 @@
 
     bindsym $mod+b border toggle
 
-    # resize window (you can also use the mouse for that)
-    mode "resize" {
-            # These bindings trigger as soon as you enter the resize mode
+    # # resize window (you can also use the mouse for that)
+    # mode "resize" {
+    #         # These bindings trigger as soon as you enter the resize mode
 
-            # Pressing left will shrink the window’s width.
-            # Pressing right will grow the window’s width.
-            # Pressing up will shrink the window’s height.
-            # Pressing down will grow the window’s height.
-            bindsym h resize shrink width 5 px or 5 ppt
-            bindsym n resize grow height 5 px or 5 ppt
-            bindsym e resize shrink height 5 px or 5 ppt
-            bindsym l resize grow width 5 px or 5 ppt
+    #         # Pressing left will shrink the window’s width.
+    #         # Pressing right will grow the window’s width.
+    #         # Pressing up will shrink the window’s height.
+    #         # Pressing down will grow the window’s height.
+    #         bindsym h resize shrink width 5 px or 5 ppt
+    #         bindsym n resize grow height 5 px or 5 ppt
+    #         bindsym e resize shrink height 5 px or 5 ppt
+    #         bindsym l resize grow width 5 px or 5 ppt
 
-            # same bindings, but for the arrow keys
-            bindsym Left resize shrink width 5 px or 5 ppt
-            bindsym Down resize grow height 5 px or 5 ppt
-            bindsym Up resize shrink height 5 px or 5 ppt
-            bindsym Right resize grow width 5 px or 5 ppt
+    #         # same bindings, but for the arrow keys
+    #         bindsym Left resize shrink width 5 px or 5 ppt
+    #         bindsym Down resize grow height 5 px or 5 ppt
+    #         bindsym Up resize shrink height 5 px or 5 ppt
+    #         bindsym Right resize grow width 5 px or 5 ppt
 
-            # back to normal: Enter or Escape or r
-            bindsym Escape mode "default"
-            bindsym Return mode "default"
-            bindsym r mode "default"
-            bindsym q mode "default"
-    }
-
-    bindsym $mod+r mode "resize"
-
-    # # Start i3bar to display a workspace bar (plus the system information i3status
-    # # finds out, if available)
-    # bar {
-    #         status_command i3status
-    #         position bottom
-    #         separator_symbol "   "
-    #         workspace_buttons yes
-    #         tray_padding 2
-    #         tray_output none
-    #         colors {
-    #                background #25252d
-    #                statusline #5f676a
-    #                separator #969696
-    #                focused_workspace  #2196f3 #2196f3 #e7eaed
-    #                active_workspace   #e7eaed #e7eaed #3f51b5
-    #                inactive_workspace #e7eaed #e7eaed #969696
-    #                urgent_workspace   #e7eaed #ff9388 #e7eaed
-    #                binding_mode       #e7eaed #ff9388 #e7eaed
-    #         }
+    #         # back to normal: Enter or Escape or r
+    #         bindsym Escape mode "default"
+    #         bindsym Return mode "default"
+    #         bindsym r mode "default"
+    #         bindsym q mode "default"
     # }
+    # bindsym $mod+r mode "resize"
+
+    # Start i3bar to display a workspace bar (plus the system information i3status
+    # finds out, if available)
+    bar {
+            status_command i3status
+            position bottom
+            separator_symbol "   "
+            workspace_buttons yes
+            tray_padding 2
+            tray_output none
+            colors {
+                   background #25252d
+                   statusline #5f676a
+                   separator #969696
+                   focused_workspace  #2196f3 #2196f3 #e7eaed
+                   active_workspace   #e7eaed #e7eaed #3f51b5
+                   inactive_workspace #e7eaed #e7eaed #969696
+                   urgent_workspace   #e7eaed #ff9388 #e7eaed
+                   binding_mode       #e7eaed #ff9388 #e7eaed
+            }
+    }
 
     # # Old Border Settings
     # # border style for new windows: normal or pixel <<size>>
@@ -380,7 +379,7 @@
 
     # Qogir-manjaro: dark w/ text color highlight
     # class                 border  backgr. text    indicator child_border
-    client.focused          #282a33 #282a33 #2eb398 #2eb398   #282a33
+    client.focused          #282a33 #282a33 #2eb398 #2eb398   #2eb398
     client.focused_inactive #282a33 #282a33 #7c828d #282a33   #282a33
     client.unfocused        #282a33 #282a33 #7c828d #282a33   #282a33
     client.urgent           #282a33 #282a33 #ef5350 #282a33   #282a33

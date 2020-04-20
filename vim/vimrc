@@ -92,6 +92,8 @@ nnoremap <leader>st :set wrap!<cr>
 nnoremap <leader>sn :set number! relativenumber!<cr>
 nnoremap <leader>sN :set number!<cr>
 nnoremap <leader>sR :set relativenumber!<cr>
+" set whitespace visualization
+nnoremap <leader>sw :set list!<cr>
 
 " set :make command to rake
 " let &makeprg = "cd ~/project/ && make "

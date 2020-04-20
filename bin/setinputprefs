@@ -18,7 +18,6 @@ if [ $? -eq 0 ]
 then
     xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' .8
     xinput set-prop "${DEVICE_NAME}" 'libinput Accel Profile Enabled' 1, 0
-    xinput list-props "${DEVICE_NAME}"
 fi
 
 DEVICE_NAME='SynPS/2 Synaptics TouchPad'
@@ -28,9 +27,7 @@ then
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Two-Finger Scrolling' 1, 1
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Coasting Speed' 0, 50
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Scrolling Distance' -114, -114
-
+    # xinput list-props "${DEVICE_NAME}"
 fi
-
-
 
 # xinput list-props "${DEVICE_NAME}"
