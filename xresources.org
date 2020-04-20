@@ -22,12 +22,15 @@
     ! xterm*faceName: 6x9
     ! URxvt*font:     6x9
     ! URxvt*boldFont: 6x9
-    ! xterm*faceName: xft:Iosevka\ SS08:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
-    ! URxvt*font:     xft:Iosevka\ SS08:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
-    ! URxvt*boldFont: xft:Iosevka\ SS08:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
-    xterm*faceName: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
-    URxvt*font:     xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
-    URxvt*boldFont: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
+    xterm*faceName: Terminus-14
+    URxvt*font:     Terminus-14
+    URxvt*boldFont: Terminus-14
+    ! xterm*faceName: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
+    ! URxvt*font:     xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
+    ! URxvt*boldFont: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
+    ! xterm*faceName: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
+    ! URxvt*font:     xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
+    ! URxvt*boldFont: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
 
     ! Extra options for xft font spec - ~/.fonts.conf seems to override this
     !:antialias=false:hintstyle=hintfull

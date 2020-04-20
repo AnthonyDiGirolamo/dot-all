@@ -8,6 +8,7 @@
    - [[#blue][blue]]
    - [[#orange][orange]]
    - [[#green][green]]
+   - [[#green-defaultbg-dark][green defaultbg dark]]
    - [[#red][red]]
  - [[#screenrc][=~/.screenrc=]]
 
@@ -253,7 +254,7 @@
 
 ** green
 
-   #+begin_src conf-space :tangle (tangle-file-if "~/.tmux.conf" (string-suffix-p "laptop" hostname))
+   #+begin_src conf-space :tangle no
      # Status Bar Colors
 
      # List current session on the left
@@ -291,6 +292,52 @@
      set -g window-status-style          'bg=colour28,fg=colour78'
      # Active tab
      set -g window-status-current-style  'bg=colour35,fg=colour255'
+     # Window activity
+     set -g window-status-activity-style 'bg=colour226,fg=colour28'
+     # Clipboard selection
+     set -g mode-style                   'bg=colour28,fg=colour78'
+   #+end_src
+
+** green defaultbg dark
+
+   #+begin_src conf-space :tangle (tangle-file-if "~/.tmux.conf" (string-suffix-p "laptop" hostname))
+     # Status Bar Colors
+
+     # List current session on the left
+     # SESSION NUMBER
+     #   bg white                         = colour255
+     #   fg green text                    = colour28
+     # TAB/PANE NUMBER
+     #   bg very light green almost green = colour78
+     #   fg green text                    = colour28
+     set-option -g status-left '#[bg=terminal,fg=colour255] #S #[bg=terminal,fg=colour28] #I.#P '
+
+     # Hostname and Date on the right
+     # HOSTNAME
+     #   bg light green                 = colour35
+     #   fg very light green            = colour78
+     # DATE
+     #   bg slightly darker light green = colour78
+     #   fg darker green text           = colour28
+     set-option -g status-right '#[bg=terminal,fg=colour35] #h #[bg=terminal,fg=colour78] %F %R '
+
+     set -g display-panes-active-colour colour35  # big numbers shown by display-panes command
+     set -g display-panes-colour        colour28
+     set -g display-panes-time          12000
+
+     # Use default background colors - so they match terminal background
+
+     # tmux command line and prompts
+     set -g message-style                'bg=terminal,fg=default'
+     # Window pane highlight colors
+     set -g pane-border-style            'bg=terminal,fg=colour28'
+     set -g pane-active-border-style     'bg=terminal,fg=colour35'
+     # Center bar
+     set -g status-style                 'bg=terminal,fg=colour78'
+     # Inactive tab
+     set -g window-status-style          'bg=terminal,fg=colour35'
+     # Active tab
+     set -g window-status-current-style  'bg=terminal,fg=colour78,underscore'
      # Window activity
      set -g window-status-activity-style 'bg=colour226,fg=colour28'
      # Clipboard selection

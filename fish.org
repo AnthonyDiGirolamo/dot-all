@@ -72,6 +72,15 @@
     # if ~/.config/fish/config-local.fish exists, load it
     set config_local $HOME/.config/fish/config-local.fish
     test -f $config_local; and source $config_local
+
+    function fish_greeting
+        if which lua 1>/dev/null 2>/dev/null
+            if test -f $HOME/dot-all/bin/ship.lua
+                $HOME/dot-all/bin/ship.lua
+            end
+        end
+    end
+
   #+END_SRC
 
 * ~/.config/fish/conf.d/aliases.fish

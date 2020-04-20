@@ -1061,7 +1061,7 @@ term:update_screen_height()
 if DEBUG then
   term.screen_width = term.screen_width - 3
 end
-term:draw_canvas(s, WITH_TRANSPARENCY)
+-- term:draw_canvas(s, WITH_TRANSPARENCY)
 term:draw_canvas_half_height(s, WITH_TRANSPARENCY)
 
 -- os.execute("sleep " .. tonumber(.5))

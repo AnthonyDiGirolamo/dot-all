@@ -2,6 +2,7 @@
 
 # keyboard
 xset r rate 200 30
+# xset r off
 
 DEVICE_NAME='anthony’s trackpad'
 xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
