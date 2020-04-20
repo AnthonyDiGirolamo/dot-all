@@ -73,6 +73,24 @@ local min = math.min
 local max = math.max
 local floor = math.floor
 local ceil = math.ceil
+
+-- pico8   256term #
+-- #1d2b53 #00005f 17
+-- #7e2553 #5f0000 52
+-- #008751 #005f00 22
+-- #ab5236 #af5f00 130
+-- #5f574f #4e4e4e 239
+-- #c2c3c7 #bcbcbc 250
+-- #fff1e8 #eeeeee 255
+-- #ff004d #ff005f 197
+-- #ffa300 #ffaf00 214
+-- #ffec27 #ffd700 220
+-- #00e436 #00d75f 41
+-- #29adff #00afff 39
+-- #83769c #8787af 103
+-- #ff77a8 #ff5faf 206
+-- #ffccaa #ffd7af 223
+
 local picocolors = {
   {0x1D, 0x2B, 0x53}, -- 1 dark_blue
   {0x7E, 0x25, 0x53}, -- 2 dark_purple
@@ -91,6 +109,25 @@ local picocolors = {
   {0xFF, 0xCC, 0xAA}, -- 15 peach
 }
 picocolors[0] = {0,0,0} -- 0 black
+
+local picocolors256 = {
+ 17,  -- 1 dark_blue
+ 52,  -- 2 dark_purple
+ 22,  -- 3 dark_green
+ 130, -- 4 brown
+ 239, -- 5 dark_gray
+ 250, -- 6 light_gray
+ 255, -- 7 white
+ 197, -- 8 red
+ 214, -- 9 orange
+ 220, -- 10 yellow
+ 41,  -- 11 green
+ 39,  -- 12 blue
+ 103, -- 13 indigo
+ 206, -- 14 pink
+ 223, -- 15 peach
+}
+picocolors256[0] = 16 -- 0 black
 
 Vector={}
 Vector.__index=Vector
@@ -236,7 +273,9 @@ function Canvas:clear_canvas()
       add(self.canvas[y], {
             0, 0, 0, -- fg rgb
             0, 0, 0, -- bg rgb
-            EMPTY --character
+            EMPTY, --character
+            16, -- fg 265 color number
+            16, -- bg 265 color number
       })
     end
   end
@@ -254,9 +293,9 @@ function Canvas:blit(subcanvas, srow, scol)
       for c=1,subcanvas.cols do
         local newc = c+start_col
         if newc <= end_col then
-          local rf, gf, bf, rb, gb, bb, ch = unpack(subcanvas.canvas[r][c])
+          local rf, gf, bf, rb, gb, bb, ch, f256, b256 = unpack(subcanvas.canvas[r][c])
           -- print("start_row: "..start_row.." start_col:"..start_col.." base["..r..", "..c.."] offset["..newr..", "..newc.."] ".. "end_row:"..end_row.." end_col:"..end_col.." "..tostring(subcanvas).. " -> "..tostring(self))
-          self:draw_fgbg(newr, newc, rf, gf, bf, rb, gb, bb, ch)
+          self:draw_fgbg(newr, newc, rf, gf, bf, rb, gb, bb, ch, f256, b256)
         end
       end
     end
@@ -272,16 +311,18 @@ function Canvas:draw_fg(row, col, r, g, b, character)
   self.canvas[row][col][2] = g
   self.canvas[row][col][3] = b
   if character ~= nil then self.canvas[row][col][7] = character end
+  if c256 ~= nil then self.canvas[row][col][8] = c256 end
 end
 
-function Canvas:draw_bg(row, col, r, g, b, character)
+function Canvas:draw_bg(row, col, r, g, b, character, c256)
   self.canvas[row][col][4] = r
   self.canvas[row][col][5] = g
   self.canvas[row][col][6] = b
   if character ~= nil then self.canvas[row][col][7] = character end
+  if c256 ~= nil then self.canvas[row][col][9] = c256 end
 end
 
-function Canvas:draw_fgbg(row, col, rf, gf, bf, rb, gb, bb, character)
+function Canvas:draw_fgbg(row, col, rf, gf, bf, rb, gb, bb, character, c256f, c256b)
   self.canvas[row][col][1] = rf
   self.canvas[row][col][2] = gf
   self.canvas[row][col][3] = bf
@@ -289,6 +330,8 @@ function Canvas:draw_fgbg(row, col, rf, gf, bf, rb, gb, bb, character)
   self.canvas[row][col][5] = gb
   self.canvas[row][col][6] = bb
   if character ~= nil then self.canvas[row][col][7] = character end
+  if c256f ~= nil then self.canvas[row][col][8] = c256f end
+  if c256b ~= nil then self.canvas[row][col][9] = c256b end
 end
 
 function Canvas:row_col_min_max()
@@ -299,7 +342,7 @@ function Canvas:row_col_min_max()
 
   for row=1,#self.canvas do
     for col=1,#self.canvas[1] do
-      local rf, gf, bf, rb, gb, bb, c = unpack(self.canvas[row][col])
+      local rf, gf, bf, rb, gb, bb, c, f256, b256 = unpack(self.canvas[row][col])
       -- if rb ~= 0 or gb ~= 0 or bb ~= 0 then
       if c ~= EMPTY then
         if col < cmin then cmin = col end
@@ -322,7 +365,7 @@ function Canvas:new_canvas_cropped_with_stroke()
 
   for row=rmin-1,rmax+1 do
     for col=cmin-1,cmax+1 do
-      local fr, fg, fb, br, bg, bb, c = unpack(self.canvas[row][col])
+      local fr, fg, fb, br, bg, bb, c, f256, b256 = unpack(self.canvas[row][col])
       -- +1: for the indexing from 1
       -- +another 1: to offset to position 1,1
       local new_row = row - rmin + 1 + 1
@@ -333,39 +376,35 @@ function Canvas:new_canvas_cropped_with_stroke()
 
         -- check neighbors
         if row-1 > 0 then
-          local frn, fgn, fbn, brn, bgn, bbn, ch = unpack(self.canvas[row-1][col])
-          cs = ch
+          cs = self.canvas[row-1][col][7]
         else
           cs = EMPTY
         end
 
         if row+1 <= self.rows then
-          local frs, fgs, fbs, brs, bgs, bbs, ch = unpack(self.canvas[row+1][col])
-          cn = ch
+          cn = self.canvas[row+1][col][7]
         else
           cn = EMPTY
         end
 
         if col-1 > 0 then
-          local fre, fge, fbe, bre, bge, bbe, ch = unpack(self.canvas[row][col-1])
-          ce = ch
+          ce = self.canvas[row][col-1][7]
         else
           ce = EMPTY
         end
 
         if col+1 <= self.cols then
-          local frw, fgw, fbw, brw, bgw, bbw, ch = unpack(self.canvas[row][col+1])
-          cw = ch
+          cw = self.canvas[row][col+1][7]
         else
           cw = EMPTY
         end
 
         if cs ~= EMPTY or cn ~= EMPTY or ce ~= EMPTY or cw ~= EMPTY then
-          newcanvas:draw_fgbg(new_row, new_col, fr, fg, fb, br, bg, bb, " ")
+          newcanvas:draw_fgbg(new_row, new_col, fr, fg, fb, br, bg, bb, " ", f256, b256)
         end
       else
         -- copy character as normal
-        newcanvas:draw_fgbg(new_row, new_col, fr, fg, fb, br, bg, bb, c)
+        newcanvas:draw_fgbg(new_row, new_col, fr, fg, fb, br, bg, bb, c, f256, b256)
       end
     end
   end
@@ -405,7 +444,7 @@ function Terminal:draw_canvas(canvas, transparency, rmin, rmax, cmin, cmax)
   for row=row_start,row_end do
     for col=col_start,col_end do
       if col <= self.screen_width then
-        local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
+        local rf, gf, bf, rb, gb, bb, c, f256, b256 = unpack(canvas[row][col])
 
         -- debug: draw row numbers
         if DEBUG then
@@ -421,11 +460,27 @@ function Terminal:draw_canvas(canvas, transparency, rmin, rmax, cmin, cmax)
             -- transparent
             self:write(self:clear_formatting().." ")
           else
-            self:write(self:fg(rf,gf,bf)..self:bg(rb,gb,bb)..c)
+            local fg, bg
+            if COLORS_256 then
+              fg = self:fg256(f256)
+              bg = self:bg256(b256)
+            else
+              fg = self:fg(rf,gf,bf)
+              bg = self:bg(rb,gb,bb)
+            end
+            self:write(fg..bg..c)
           end
         else
           if c == EMPTY then c = " " end
-          self:write(self:fg(rf,gf,bf)..self:bg(rb,gb,bb)..c)
+          local fg, bg
+          if COLORS_256 then
+            local fg = self:fg256(f256)
+            local bg = self:bg256(b256)
+          else
+            local fg = self:fg(rf,gf,bf)
+            local bg = self:bg(rb,gb,bb)
+          end
+          self:write(fg..bg..c)
         end
       end
     end
@@ -463,8 +518,8 @@ function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin
       -- current row is even
       for col=col_start,col_end do
         if col <= self.screen_width then
-          local rf2, gf2, bf2, rb2, gb2, bb2, c2 = unpack(canvas[row-1][col])
-          local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
+          local rf2, gf2, bf2, rb2, gb2, bb2, c2, f2562, b2562 = unpack(canvas[row-1][col])
+          local rf,  gf,  bf,  rb,  gb,  bb,  c,  f256,  b256  = unpack(canvas[row][col])
 
           if DEBUG then
             -- debug: print leading row number
@@ -480,19 +535,47 @@ function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin
               self:write(self:clear_formatting() .." ")
             elseif c2 == EMPTY and c ~= EMPTY then
               -- previous row is empty, draw just the fg character for this row
-              self:write(self:clear_formatting()..self:fg(rb,gb,bb).."▄")
+              local fg
+              if COLORS_256 then
+                fg = self:fg256(b256)
+              else
+                fg = self:fg(rb,gb,bb)
+              end
+              self:write(self:clear_formatting()..fg.."▄")
             elseif c2 ~= EMPTY and c == EMPTY then
               -- this row is empty draw previous row color as fg character on top
-              self:write(self:clear_formatting()..self:fg(rb2,gb2,bb2).."▀")
+              local fg
+              if COLORS_256 then
+                fg = self:fg256(b2562)
+              else
+                fg = self:fg(rb2,gb2,bb2)
+              end
+              self:write(self:clear_formatting()..fg.."▀")
             else
               -- both pixels are set
               -- previous row is bg
               -- current row is bg with box character
-              self:write(self:fg(rb,gb,bb)..self:bg(rb2,gb2,bb2).."▄")
+              local fg, bg
+              if COLORS_256 then
+                fg = self:fg256(b256)
+                bg = self:bg256(b2562)
+              else
+                fg = self:fg(rb,gb,bb)
+                bg = self:bg(rb2,gb2,bb2)
+              end
+              self:write(fg..bg.."▄")
               -- Box Characters: ▄▀█
             end
           else
-            self:write(self:fg(rb,gb,bb)..self:bg(rb2,gb2,bb2).."▄")
+            local fg, bg
+            if COLORS_256 then
+              fg = self:fg256(b256)
+              bg = self:bg256(b2562)
+            else
+              fg = self:fg(rb,gb,bb)
+              bg = self:bg(rb2,gb2,bb2)
+            end
+            self:write(fg..bg.."▄")
           end
 
         end -- if col <= self.screen_width then
@@ -514,18 +597,31 @@ function Terminal:draw_canvas_half_height(canvas, transparency, rmin, rmax, cmin
               end
             end
 
-            local rf, gf, bf, rb, gb, bb, c = unpack(canvas[row][col])
+            local rf, gf, bf, rb, gb, bb, c, f256, b256 = unpack(canvas[row][col])
             if transparency then
               if c == EMPTY then
                 -- write a space
                 self:write(self:clear_formatting().." ")
               else
                 -- write a top box character
-                self:write(self:clear_formatting()..self:fg(rb,gb,bb).."▀")
+                local fg, bg
+                if COLORS_256 then
+                  local fg = self:fg256(b256)
+                end
+                local fg = self:fg(rb,gb,bb)
+                self:write(self:clear_formatting()..fg.."▀")
               end
             else
               -- set bg colors
-              self:write(self:fg(rb,gb,bb)..self:bg(rb,gb,bb).."▀")
+              local fg, bg
+              if COLORS_256 then
+                fg = self:fg256(b256)
+                bg = self:bg256(b256)
+              else
+                fg = self:fg(rb,gb,bb)
+                bg = self:bg(rb,gb,bb)
+              end
+              self:write(fg..bg.."▀")
             end
           end
 
@@ -843,10 +939,11 @@ function ship:draw_sprite_rotated(canvas, angle, pos)
         if color == nil then color = 0 end
         if color<0 then color=5 end
         r, g, b = unpack(picocolors[color])
+        c256 = picocolors256[color]
 
         -- draw using space and bg character
-        canvas:draw_bg(pixel1.y, pixel1.x, r, g, b, " ")
-        canvas:draw_bg(pixel2.y, pixel2.x, r, g, b, " ")
+        canvas:draw_bg(pixel1.y, pixel1.x, r, g, b, " ", c256)
+        canvas:draw_bg(pixel2.y, pixel2.x, r, g, b, " ", c256)
 
         -- print("x: "..x.." y: "..y.." c: "..color)
         -- rectfill(
@@ -878,6 +975,7 @@ end
 randomseed(os.time()+(os.clock()*1000000))
 
 pilot=ship.new()
+-- some nice looking seeds
 -- pilot:buildship(5725,2)
 -- pilot:buildship(202915,2)
 -- pilot:buildship(147828, 2)
@@ -893,45 +991,12 @@ pilot=ship.new()
 -- pilot:buildship(50110,2)
 -- pilot:buildship(63953,2)
 -- pilot:buildship(35957,2)
-
--- -- Rotation Montage 0.0 to 1.0
--- offsets = {}
--- offsets[0] = Vector(2,2)
--- offsets[.25] = Vector(0+2, pilot.sprite_rows+8)
--- offsets[.5] = Vector(pilot.sprite_columns+8, 0+2)
--- offsets[.75] = Vector(pilot.sprite_columns+8, pilot.sprite_rows+8)
--- for r=0,.75,.25 do
---   local offset = Vector(0,0)
---   if pilot.sprite_columns%2==0 then
---     offset = Vector(1,1)
---   end
---   pilot:draw_sprite_rotated(offset+offsets[r], r)
--- end
--- term:draw_canvas()
--- term:draw_canvas_half_height()
-
-
--- -- Rotation
--- for r=0,2,.05 do
---   term:clear_canvas()
---   term:clear_screen()
---   local offset = Vector(0,0)
---   if pilot.sprite_columns%2==0 then
---     offset = Vector(1,1)
---   end
---   pilot:draw_sprite_rotated(
---     offset,
---     -- sc:clone(),
---     r)
---   term:draw_canvas_half_height()
---   os.execute("sleep " .. tonumber(.5))
--- end
+-- pilot:buildship(160921,2)
+-- pilot:buildship(131525,2)
 
 -- while true do
 
 pilot:buildship()
--- pilot:buildship(160921,2)
--- pilot:buildship(131525,2)
 
 -- center text
 -- local spec_attribute_width = max(10, round(max(pilot.sprite_columns, pilot.sprite_rows)/2))
@@ -981,6 +1046,8 @@ end
 -- term:draw_canvas_half_height(s.canvas, NO_TRANSPARENCY)
 
 -- DEBUG = true
+
+COLORS_256 = false
 
 term:update_screen_width()
 term:update_screen_height()
