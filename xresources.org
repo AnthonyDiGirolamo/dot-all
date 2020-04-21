@@ -22,24 +22,29 @@
     ! xterm*faceName: 6x9
     ! URxvt*font:     6x9
     ! URxvt*boldFont: 6x9
-    xterm*faceName: Terminus-16
-    URxvt*font:     Terminus-14
-    URxvt*boldFont: Terminus-14
+
     ! xterm*faceName: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
-    ! URxvt*font:     xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
-    ! URxvt*boldFont: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
+    URxvt*font:     xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
+    URxvt*boldFont: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
     ! xterm*faceName: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
     ! URxvt*font:     xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
     ! URxvt*boldFont: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
 
+    xterm*faceName: xft:Terminus
+    xterm*faceSize: 16.0
+    xterm*faceSize1: 7.0
+    xterm*faceSize2: 8.0
+    xterm*faceSize3: 12.0
+    xterm*faceSize4: 13.0
+    xterm*faceSize5: 14.0
+    xterm*faceSize6: 19.0
+
     ! Extra options for xft font spec - ~/.fonts.conf seems to override this
     !:antialias=false:hintstyle=hintfull
 
-    #define WINDOWGEOMETRY 90x20
     ! xterm
     xterm*dynamiccolors:      true
     xterm*utf8:               2
-    xterm*geometry:           WINDOWGEOMETRY
     xterm*visualBell:         off
     xterm*highlightSelection: true
     !xterm*background:      lightblack
@@ -252,7 +257,7 @@
     ! "Number of columns" Set from: Default
     ! rofi.columns:                        1
     ! "Font to use" Set from: XResources
-    rofi.font:                           PragmataProMono 32
+    rofi.font:                           Iosevka Fixed SS08 32
     ! "Border width" Set from: Default
     ! rofi.bw:                             1
     ! "Location on screen" Set from: Default

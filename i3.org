@@ -81,7 +81,7 @@
     bindsym XF86AudioNext exec lux -a 5%
     bindsym F5 exec lux -s 1%
     bindsym F6 exec lux -a 1%
-    bindsym F10 exec --no-startup-id $HOME/Preferences/bin/invert_screen.sh
+    # bindsym F10 exec --no-startup-id $HOME/Preferences/bin/invert_screen.sh
 
     # bindsym XF86MonBrightnessDown exec lux -s 5%
     # bindsym XF86MonBrightnessUp exec lux -a 5%

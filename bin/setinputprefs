@@ -28,7 +28,9 @@ then
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Two-Finger Scrolling' 1, 1
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Coasting Speed' 0, 50
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Scrolling Distance' -114, -114
-    # xinput list-props "${DEVICE_NAME}"
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Detection' 1
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Dimensions' 4, 50
+    xinput list-props "${DEVICE_NAME}"
 fi
 
 # xinput list-props "${DEVICE_NAME}"
