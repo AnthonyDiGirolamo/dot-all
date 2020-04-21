@@ -22,7 +22,7 @@
     ! xterm*faceName: 6x9
     ! URxvt*font:     6x9
     ! URxvt*boldFont: 6x9
-    xterm*faceName: Terminus-14
+    xterm*faceName: Terminus-16
     URxvt*font:     Terminus-14
     URxvt*boldFont: Terminus-14
     ! xterm*faceName: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120

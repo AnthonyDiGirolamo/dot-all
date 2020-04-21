@@ -1021,7 +1021,7 @@ print(string.format(fstr, "TurnRate:",
 
 local rotation_start = 0
 local rotation_inc = .0625
-local rotation_end = 0
+local rotation_end = .25
 
 local sprites = {}
 for r=rotation_start,rotation_end,rotation_inc do

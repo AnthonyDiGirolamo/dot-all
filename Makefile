@@ -25,6 +25,8 @@ emacs_url := http://ftpmirror.gnu.org/emacs/emacs-26.3.tar.xz
 emacs_md5 := 0a2e4b965d31a7cb1930eae3b79df793
 lua_url := https://www.lua.org/ftp/lua-5.3.5.tar.gz
 lua_md5 := 4f4b4f323fd3514a68e0ab3da8ce3455
+luarocks_url := https://luarocks.org/releases/luarocks-3.3.0.tar.gz
+luarocks_md5 := 202794e8f4945c6085963ecf908ae890
 
 ORG_FILES := $(wildcard *.org)
 ORG_OUT_FILES := $(foreach f, $(ORG_FILES),$(CACHEDIR)/$(basename $(f)).out)
@@ -98,6 +100,17 @@ build-lua: download-lua
 	cd $(abspath $(CACHEDIR)/lua)
 	rm -rf $$D
 
+.PHONY: build-%
+.ONESHELL:
+build-luarocks: download-luarocks
+	@echo "[BUILD] luarocks"
+	$(CD_TO_BUILD_DIR)
+	./configure --prefix=$$HOME/apps/lua
+	make
+	make install
+	cd $(abspath $(CACHEDIR)/luarocks)
+	rm -rf $$D
+
 .PHONY: download-%
 .ONESHELL:
 download-%:
@@ -117,6 +130,10 @@ download-%:
 .PHONY: lua
 .ONESHELL:
 lua: build-lua ## download, compile and install lua
+
+.PHONY: luarocks
+.ONESHELL:
+luarocks: build-luarocks ## download, compile and install luarocks
 
 .PHONY: emacs
 .ONESHELL:

@@ -36,7 +36,6 @@
     end
 
     # Prepend PATH variable
-    add_directory_to_path $HOME/apps/lua/bin
     add_directory_to_path $HOME/apps/fish/bin
     add_directory_to_path $HOME/apps/emacs/bin
     add_directory_to_path $HOME/dot-all/bin
@@ -45,8 +44,16 @@
     add_directory_to_path $HOME/.local/bin
     add_directory_to_path $HOME/.rbenv/bin
     add_directory_to_path $HOME/.cargo/bin
-    add_directory_to_path $HOME/.luarocks/bin
     add_directory_to_path $HOME/.npm-packages/bin
+
+    # lua and luarocks
+    add_directory_to_path $HOME/apps/lua/bin
+    if which luarocks 1>/dev/null 2>/dev/null
+      add_directory_to_path $HOME/.luarocks/bin
+      for line in (luarocks path --no-bin | sed -e 's/^export /set -x /' -e 's/=\'/ \'/')
+        eval $line
+      end
+    end
 
     # This breaks some scripts
     # set -x SHELL fish
@@ -66,7 +73,7 @@
     set -x EDITOR "vim"
     set -x VISUAL $EDITOR
     if not set -q INSIDE_EMACS
-        set -x TERM xterm-24bit
+      set -x TERM xterm-24bit
     end
 
     # if ~/.config/fish/config-local.fish exists, load it
@@ -74,11 +81,11 @@
     test -f $config_local; and source $config_local
 
     function fish_greeting
-        if which lua 1>/dev/null 2>/dev/null
-            if test -f $HOME/dot-all/bin/ship.lua
-                $HOME/dot-all/bin/ship.lua
-            end
+      if which lua 1>/dev/null 2>/dev/null
+        if test -f $HOME/dot-all/bin/ship.lua
+          $HOME/dot-all/bin/ship.lua
         end
+      end
     end
 
   #+END_SRC
