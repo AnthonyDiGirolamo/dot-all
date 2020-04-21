@@ -273,6 +273,8 @@
 
         ;; No Terminal Italics (which is sometimes reverse video)
         ;; see: http://permalink.gmane.org/gmane.comp.terminal-emulators.tmux.user/2347
+
+        `(font-lock-string-face            ((t (:slant normal :foreground "#ffb86c"))))
         `(font-lock-comment-delimiter-face ((t (:slant normal :foreground "#6c6c6c"))))
         `(font-lock-comment-face           ((t (:slant normal :foreground "#6c6c6c"))))
 
