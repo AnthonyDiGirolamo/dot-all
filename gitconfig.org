@@ -19,6 +19,8 @@
     [alias]
       l = log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
       hist = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+      ls-updated-in-head = diff-tree --no-commit-id --name-only -r HEAD
+      ls-updated-in = diff-tree --no-commit-id --name-only -r
     [core]
       editor = vim
   #+end_src
