@@ -56,8 +56,8 @@ the actual name of the character. For example to generate "{" the
 expression `'ModKey=Shift_L|bracketleft'` could be used (assuming that you
 have a key with "{" above "[").
 
-You can also specify ModKey in decimal (prefix `#`), octal (`#0`), or
-hexadecimal (`#0x`). It will be interpreted as a keycode unless no corresponding
+You can also specify keys in decimal (prefix `#`), octal (`#0`), or
+hexadecimal (`#0x`). They will be interpreted as keycodes unless no corresponding
 key name is found.
 
 #### Examples
@@ -68,11 +68,11 @@ key name is found.
 
         xcape -e 'Shift_L=Escape;Control_L=Control_L|O'
 
-+   In conjugation with xmodmap it is possible to make an ordinary key act
++   In conjunction with xmodmap it is possible to make an ordinary key act
     as an extra modifier. First map the key to the modifier with xmodmap
     and then the modifier back to the key with xcape. However, this has
     several limitations: the key will not work as ordinary until it is
-    relased, and in particular, *it may act as a modifier unintentionally if
+    released, and in particular, *it may act as a modifier unintentionally if
     you type too fast.* This is not a bug in xcape, but an unavoidable
     consequence of using these two tools together in this way.
     As an example, we can make the space bar work as an additional ctrl

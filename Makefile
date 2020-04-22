@@ -143,6 +143,29 @@ emacs: build-emacs ## download, compile and install emacs
 .ONESHELL:
 fish: build-fish ## download, compile and install fish
 
+xcape_git_url := https://github.com/alols/xcape.git
+lux_git_url := https://github.com/Ventto/lux.git
+
+.PHONY: git-pull-%
+.ONESHELL:
+git-pull-%:
+	URL=$($(subst git-pull-,,$@)_git_url)
+	GDIR=$$(basename -s .git $$URL)
+	echo $$URL
+	echo "-> $${GDIR}"
+	rm -rf $$GDIR
+	git clone --depth=1 --branch=master $$URL
+	rm -rf $$GDIR/.git
+	git add -A $$GDIR
+
+.PHONY: pull-xcape
+.ONESHELL:
+pull-xcape: git-pull-xcape
+
+.PHONY: pull-lux
+.ONESHELL:
+pull-lux: git-pull-lux
+
 .PHONY: clean-removed-files
 .ONESHELL:
 clean-removed-files:  ## rm files removed since last make tangle
