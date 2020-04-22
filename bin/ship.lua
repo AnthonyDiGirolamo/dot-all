@@ -807,8 +807,8 @@ function new_planet(planet_spec)
     mmap_color = args[4],
     full_shadow = args[5] or 1,
     transparent_color = args[6] or 14,
-    minc = args[7] or 1,
-    maxc = args[8] or 1,
+    min_noise_stretch_factor = args[7] or 1,
+    max_noise_stretch_factor = args[8] or 1,
     min_size = args[9] or 16,
     color_map = p[3]
   }
@@ -838,8 +838,8 @@ function _init()
     new_planet("agas giant,|n1,.4,.75,2,1,14,4,20,50,|x76d121c|"),
     new_planet("agas giant,|n1,.4,.75,8,1,12,4,20,50,|x7fe21288|"),
     new_planet("agas giant,|n1,.7,.75,10,1,14,4,20,50,|xfa949a|"),
-    new_planet("aterran,|n5,.3,.65,11,0,|x1111111dcfbb3334567|"),
-    new_planet("aisland,|n5,.55,.65,12,0,|x11111111dcfb3|"),
+    new_planet("aterran,|n5,.3,.65,11,1,|x1111111dcfbb3334567|"),
+    new_planet("aisland,|n5,.55,.65,12,1,|x11111111dcfb3|"),
     new_planet("arainbow giant,|n1,.7,.75,15,1,4,4,20,50,|x1dcba9e82|"),
   }
   planet_max_radius = 20
@@ -1130,10 +1130,10 @@ end
 
 planet={}
 planet.__index=planet
-function planet.new(x,y,phase,r)
+function planet.new(x,y,phase,r,max_radius)
   local planet_type=planet_types[random_int(#planet_types)+1]
 
-  local radius=24
+  local radius=max_radius or planet_max_radius
   -- local radius=r or random_int(planet_max_radius, planet_type.min_size)
   local planet_canvas = Canvas.new(radius*2+1, radius*2+1)
   return setmetatable({
@@ -1144,7 +1144,9 @@ function planet.new(x,y,phase,r)
       bottom_right_coord=2*radius-1,
       phase=phase,
       planet_type=planet_type,
-      noise_factor_vert=random_int(planet_type.maxc+1,planet_type.minc),
+      noise_factor_vert=random_int(
+        planet_type.max_noise_stretch_factor + 1,
+        planet_type.min_noise_stretch_factor),
       noisedx=random(1024),
       noisedy=random(1024),
       noisedz=random(1024),
@@ -1188,8 +1190,10 @@ function planet:render_planet(fullmap, render_far_side)
     if fullmap then
       self.width,self.height=114,96
     else
+      -- draw filled black
       self.xvalues=draw_sprite_circle(self.planet_canvas, radius, radius, radius, true, 0)
-      draw_sprite_circle(self.planet_canvas, radius, radius, radius, false, self.planet_type.mmap_color)
+      -- draw not-filled planet primary color
+      -- draw_sprite_circle(self.planet_canvas, radius, radius, radius, false, self.planet_type.mmap_color)
     end
     self.rendered_circle=true
   end
@@ -1265,7 +1269,8 @@ function planet:render_planet(fullmap, render_far_side)
         if fullmap or
           (phasevalue ~= 0 and
              xvalueindex<=#self.xvalues and
-             self.x >= self.radius-self.xvalues[xvalueindex] and
+             -- left edge of planet circle
+             self.x >= self.radius-self.xvalues[xvalueindex]-1 and
              self.x < self.radius+self.xvalues[xvalueindex]
           )
 
@@ -1298,11 +1303,11 @@ function planet:render_planet(fullmap, render_far_side)
           end
         end
 
-        if xvalueindex<=#self.xvalues and
-          (self.x == self.radius-self.xvalues[xvalueindex]-1 or
-           self.x == self.radius+self.xvalues[xvalueindex]-1) then
-          c=0 -- color = black
-        end
+        -- if xvalueindex<=#self.xvalues and
+        --   (self.x == self.radius-self.xvalues[xvalueindex]-1 or
+        --    self.x == self.radius+self.xvalues[xvalueindex]-1) then
+        --   c=0 -- color = black
+        -- end
         if c ~= nil then
           -- sset(self.x,self.y)
           -- self.planet_canvas:draw_bg_picocolor(1 + self.x, 1 + self.y, c, " ")
@@ -1327,8 +1332,8 @@ function planet:render_planet(fullmap, render_far_side)
 end
 
 function draw_solarsystem()
-  local px = 1000 -- pilot.sector_position.x
-  local py = -1000 -- pilot.sector_position.y
+  local px = 50 -- sector_position.x
+  local py = -100 -- sector_position.y
   p = planet.new(px, py, ((1-Vector(px,py):angle())-.25)%1)
 
   local rendering_done = false
@@ -1440,6 +1445,7 @@ end
 randomseed(os.time()+(os.clock()*1000000))
 
 _init()
+planet_max_radius = floor(term.screen_width/2)
 
 draw_shipyard()
 
