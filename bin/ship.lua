@@ -1,95 +1,40 @@
 #!/usr/bin/env lua
 
+-- debug printing
 local DEBUG
 
-local actual_random = math.random
-function randomseed(s)
-  return math.randomseed(s)
-end
-local round
-round = function(i)
-  return math.floor(i + .5)
-end
-local random
-random = function(a, b)
-  if not a then
-    a, b = 0, 1
+function pt(t)
+  for index, v in ipairs(t) do
+    -- print("[" .. tostring(index) .. ": " .. tostring(v) .. "]")
+    io.write(tostring(v) .. ",")
   end
-  if not b then
-    b = 0
-  end
-  return a + actual_random() * (b - a)
-end
-local random_int
-random_int = function(n, minimum)
-  return math.floor(random(n, minimum))
-end
-local cos
-cos = function(x)
-  return math.cos((x or 0) * math.pi * 2)
-end
-local sin
-sin = function(x)
-  return -math.sin((x or 0) * math.pi * 2)
-end
-local atan2
-atan2 = function(x, y)
-  return (0.75 + math.atan2(x, y) / (math.pi * 2)) % 1.0
-end
-local sqrt = math.sqrt
-local sub = string.sub
-local add = table.insert
-
-function isarray(x)
-  return (type(x) == "table" and x[1] ~= nil) and true or false
 end
 
-local getiter = function(x)
-  if isarray(x) then
-    return ipairs
-  elseif type(x) == "table" then
-    return pairs
+function pti(t)
+  for index, v in ipairs(t) do
+    print("[" .. tostring(index) .. ": " .. tostring(v) .. "]")
+    -- io.write(tostring(v) .. ",")
   end
-  error("expected table", 3)
 end
 
-function del(t, x)
-  local iter = getiter(t)
-  for i, v in iter(t) do
-    if v == x then
-      if isarray(t) then
-        table.remove(t, i)
-        break
-      else
-        t[i] = nil
-        break
-      end
-    end
-  end
-  return x
-end
-local abs = math.abs
-local min = math.min
-local max = math.max
-local floor = math.floor
-local ceil = math.ceil
-
--- pico8   256term #
--- #1d2b53 #00005f 17
--- #7e2553 #5f0000 52
--- #008751 #005f00 22
--- #ab5236 #af5f00 130
--- #5f574f #4e4e4e 239
--- #c2c3c7 #bcbcbc 250
--- #fff1e8 #eeeeee 255
--- #ff004d #ff005f 197
--- #ffa300 #ffaf00 214
--- #ffec27 #ffd700 220
--- #00e436 #00d75f 41
--- #29adff #00afff 39
--- #83769c #8787af 103
--- #ff77a8 #ff5faf 206
--- #ffccaa #ffd7af 223
+-- pico8 color palette
+--                pico8 rgb,  256 color, terminal number
+-- 0 black        #000000     #000000    16
+-- 1 dark_blue    #1d2b53     #00005f    17
+-- 2 dark_purple  #7e2553     #5f0000    52
+-- 3 dark_green   #008751     #005f00    22
+-- 4 brown        #ab5236     #af5f00    130
+-- 5 dark_gray    #5f574f     #4e4e4e    239
+-- 6 light_gray   #c2c3c7     #bcbcbc    250
+-- 7 white        #fff1e8     #eeeeee    255
+-- 8 red          #ff004d     #ff005f    197
+-- 9 orange       #ffa300     #ffaf00    214
+-- 10 yellow      #ffec27     #ffd700    220
+-- 11 green       #00e436     #00d75f    41
+-- 12 blue        #29adff     #00afff    39
+-- 13 indigo      #83769c     #8787af    103
+-- 14 pink        #ff77a8     #ff5faf    206
+-- 15 peach       #ffccaa     #ffd7af    223
 
 local picocolors = {
   {0x1D, 0x2B, 0x53}, -- 1 dark_blue
@@ -128,6 +73,103 @@ local picocolors256 = {
  223, -- 15 peach
 }
 picocolors256[0] = 16 -- 0 black
+
+
+local actual_random = math.random
+function randomseed(s)
+  return math.randomseed(s)
+end
+function round(i)
+  return math.floor(i + .5)
+end
+function random(a, b)
+  if not a then
+    a, b = 0, 1
+  end
+  if not b then
+    b = 0
+  end
+  return a + actual_random() * (b - a)
+end
+function random_int(n, minimum)
+  return math.floor(random(n, minimum))
+end
+function cos(x)
+  return math.cos((x or 0) * math.pi * 2)
+end
+function sin(x)
+  return -math.sin((x or 0) * math.pi * 2)
+end
+function atan2(x, y)
+  return (0.75 + math.atan2(x, y) / (math.pi * 2)) % 1.0
+end
+local sqrt = math.sqrt
+local sub = string.sub
+local add = table.insert
+
+function isarray(x)
+  return (type(x) == "table" and x[1] ~= nil) and true or false
+end
+
+function getiter(x)
+  if isarray(x) then
+    return ipairs
+  elseif type(x) == "table" then
+    return pairs
+  end
+  error("expected table", 3)
+end
+
+function del(t, x)
+  local iter = getiter(t)
+  for i, v in iter(t) do
+    if v == x then
+      if isarray(t) then
+        table.remove(t, i)
+        break
+      else
+        t[i] = nil
+        break
+      end
+    end
+  end
+  return x
+end
+
+local abs = math.abs
+local min = math.min
+local max = math.max
+local floor = math.floor
+local ceil = math.ceil
+
+-- bitwise math functions
+
+function band(x, y)
+  -- return bit.band(x * 0x10000, y * 0x10000) / 0x10000
+  return ((x * 0x10000) & (y * 0x10000)) / 0x10000
+end
+function bor(x, y)
+  -- return bit.bor(x * 0x10000, y * 0x10000) / 0x10000
+  return ((x * 0x10000) | (y * 0x10000)) / 0x10000
+end
+function bxor(x, y)
+  -- return bit.bxor(x * 0x10000, y * 0x10000) / 0x10000
+  return ((x * 0x10000) ~ (y * 0x10000)) / 0x10000
+end
+function bnot(x)
+  -- return bit.bnot(x * 0x10000) / 0x10000
+  return (~(x * 0x10000)) / 0x10000
+end
+function shl(x, y)
+  -- return bit.lshift(x * 0x10000, y) / 0x10000
+  return ((x * 0x10000) << y) / 0x10000
+end
+function shr(x, y)
+  -- return bit.arshift(x * 0x10000, y) / 0x10000
+  return ((x * 0x10000) >> y) / 0x10000
+end
+
+-- vector class
 
 Vector={}
 Vector.__index=Vector
@@ -320,6 +362,14 @@ function Canvas:draw_bg(row, col, r, g, b, character, c256)
   self.canvas[row][col][6] = b
   if character ~= nil then self.canvas[row][col][7] = character end
   if c256 ~= nil then self.canvas[row][col][9] = c256 end
+end
+
+function Canvas:draw_bg_picocolor(row, col, color, character)
+  local r = picocolors[color][1]
+  local g = picocolors[color][2]
+  local b = picocolors[color][3]
+  local c256 = picocolors256[color]
+  self:draw_bg(row, col, r, g, b, character, c256)
 end
 
 function Canvas:draw_fgbg(row, col, rf, gf, bf, rb, gb, bb, character, c256f, c256b)
@@ -744,52 +794,79 @@ function nsplit(s)
   return t
 end
 
-split_start=1
-star_colors=nsplit"xaecd76|x98d165|x421051|x767676|x656565|x515151|"
--- star_colors={{0xa,0xe,0xc,0xd,0x7,0x6},{0x9,0x8,0xd,0x1,0x6,0x5},{0x4,0x2,0x1,0x0,0x5,0x1},{0x7,0x6,0x7,0x6,0x7,0x6},{0x6,0x5,0x6,0x5,0x6,0x5},{0x5,0x1,0x5,0x1,0x5,0x1}}
-darkshipcolors=split"x01221562493d189"
-dark_planet_colors=split"x0011055545531121"
-health_colormap=split"x8899aaabbb"
-damage_colors=split"x7a98507a98507a9850"
-sun_colors=split"x6ea9d789ac"
-ship_names=split"aFighter,Cruiser,Freighter,Super Freighter,Station,"
-ship_types=nsplit"n1.5,.25,.7,.75,.8,-2,1,14,18,|n3.5,.5,.583333,0,.8125,-1,1,18,24,|n3,2,.2125,0,.8125,-3,1,16,22,|n6,0,.7,-.25,.85,.25,1,32,45,|n4,1,.1667,-1,.3334,0,.6668,1,.8335,-1,1,30,40,|"
+-- init values
+-- Make a new planet type
+function new_planet(planet_spec)
+  local p = nsplit(planet_spec)
+  local args = p[2]
+  return {
+    class_name = p[1][1],
+    noise_octaves = args[1],
+    noise_zoom = args[2],
+    noise_persistance = args[3],
+    mmap_color = args[4],
+    full_shadow = args[5] or 1,
+    transparent_color = args[6] or 14,
+    minc = args[7] or 1,
+    maxc = args[8] or 1,
+    min_size = args[9] or 16,
+    color_map = p[3]
+  }
+end
 
+function _init()
+  -- grads3 needs split_start = 0
+  grads3 = nsplit"n1,1,0,|n-1,1,0,|n1,-1,0,|n-1,-1,0,|n1,0,1,|n-1,0,1,|n1,0,-1,|n-1,0,-1,|n0,1,1,|n0,-1,1,|n0,1,-1,|n0,-1,-1,|"
+  -- following nsplits need split_start = 1
+  split_start = 1
+  ijks = nsplit"n1,0,0,1,1,0,|n1,0,0,1,0,1,|n0,0,1,1,0,1,|n0,0,1,0,1,1,|n0,1,0,0,1,1,|n0,1,0,1,1,0,|"
+  star_colors = nsplit"xaecd76|x98d165|x421051|x767676|x656565|x515151|"
+  -- star_colors = {{0xa,0xe,0xc,0xd,0x7,0x6},{0x9,0x8,0xd,0x1,0x6,0x5},{0x4,0x2,0x1,0x0,0x5,0x1},{0x7,0x6,0x7,0x6,0x7,0x6},{0x6,0x5,0x6,0x5,0x6,0x5},{0x5,0x1,0x5,0x1,0x5,0x1}}
+  darkshipcolors = split"x01221562493d189"
+  dark_planet_colors = split"x0011055545531121"
+  health_colormap = split"x8899aaabbb"
+  damage_colors = split"x7a98507a98507a9850"
+  sun_colors = split"x6ea9d789ac"
+  ship_names = split"aFighter,Cruiser,Freighter,Super Freighter,Station,"
+  ship_types = nsplit"n1.5,.25,.7,.75,.8,-2,1,14,18,|n3.5,.5,.583333,0,.8125,-1,1,18,24,|n3,2,.2125,0,.8125,-3,1,16,22,|n6,0,.7,-.25,.85,.25,1,32,45,|n4,1,.1667,-1,.3334,0,.6668,1,.8335,-1,1,30,40,|"
 
-ship={}
-ship.__index=ship
+  planet_types = {
+    new_planet("atundra,|n5,.5,.6,6,|x76545676543|"),
+    new_planet("adesert,|n5,.35,.3,9,|x449944994499b1949949949949949|"),
+    new_planet("abarren,|n5,.55,.35,5,|x565056765056|"),
+    new_planet("alava,|n5,.55,.65,4,|x040504049840405040|"),
+    new_planet("agas giant,|n1,.4,.75,2,1,14,4,20,50,|x76d121c|"),
+    new_planet("agas giant,|n1,.4,.75,8,1,12,4,20,50,|x7fe21288|"),
+    new_planet("agas giant,|n1,.7,.75,10,1,14,4,20,50,|xfa949a|"),
+    new_planet("aterran,|n5,.3,.65,11,0,|x1111111dcfbb3334567|"),
+    new_planet("aisland,|n5,.55,.65,12,0,|x11111111dcfb3|"),
+    new_planet("arainbow giant,|n1,.7,.75,15,1,4,4,20,50,|x1dcba9e82|"),
+  }
+  planet_max_radius = 20
+end
+
+-- ship functions
+ship = {}
+ship.__index = ship
 function ship.new(h)
-  local shp={
-    npc=false,
-    hostile=h,
-    sector_position=Vector(),
-    cur_deltav=0,
-    cur_gees=0,
-    angle=0,
-    angle_radians=0,
-    heading=90,
-    velocity_angle=0,
-    velocity_angle_opposite=180,
-    velocity=0,
-    velocity_vector=Vector(),
-    orders={},
-    last_fire_time=-6
+  local shp = {
+    npc = false,
+    hostile = h,
+    sector_position = Vector(),
+    cur_deltav = 0,
+    cur_gees = 0,
+    angle = 0,
+    angle_radians = 0,
+    heading = 90,
+    velocity_angle = 0,
+    velocity_angle_opposite = 180,
+    velocity = 0,
+    velocity_vector = Vector(),
+    orders = {},
+    last_fire_time = -6
   }
   setmetatable(shp,ship)
   return shp
-end
-
-function pt(t)
-  for index, v in ipairs(t) do
-    -- print("[" .. tostring(index) .. ": " .. tostring(v) .. "]")
-    io.write(tostring(v) .. ",")
-  end
-end
-function pti(t)
-  for index, v in ipairs(t) do
-    print("[" .. tostring(index) .. ": " .. tostring(v) .. "]")
-    -- io.write(tostring(v) .. ",")
-  end
 end
 
 
@@ -951,118 +1028,419 @@ function ship:draw_sprite_rotated(canvas, angle, pos)
         -- draw using space and bg character
         canvas:draw_bg(pixel1.y, pixel1.x, r, g, b, " ", c256)
         canvas:draw_bg(pixel2.y, pixel2.x, r, g, b, " ", c256)
-
-        -- print("x: "..x.." y: "..y.." c: "..color)
-        -- rectfill(
-        --   pixel1.x,pixel1.y,
-        --   pixel2.x,pixel2.y,
-        --   color)
-        -- pixel1:draw_line(pixel2, color)
       end
     end
   end
 
 end
 
+-- planets
+function draw_sprite_circle(canvas, xc, yc, radius, filled, color)
+  local xvalues={}
+  local fx,fy=0,0
+  local x,y=-radius,0
+  local err=2-2*radius
 
--- -- test 256 colors
--- for i=1,256 do
---   term:write((term:fg256(i) .. i))
--- end
--- term:write(term:clear_formatting())
--- term:write("\n")
+  while(x<0) do
+    xvalues[1+x*-1]=y
 
--- -- test pico8 colors
--- for i=0,#picocolors do
---   r, g, b = unpack(picocolors[i])
---   print(term:fg(r,g,b) .. "pico-" .. i .. ": " .. r ..", ".. g ..", ".. b)
+    if not filled then
+      fx,fy=x,y
+    end
+    for i=x,fx do
+      -- sset(xc-i,yc+y)
+      -- sset(xc+i,yc-y)
+      -- canvas:draw_bg_picocolor(1 + xc-i, 1 + yc+y, color, " ")
+      -- canvas:draw_bg_picocolor(1 + xc+i, 1 + yc-y, color, " ")
+      canvas:draw_bg_picocolor(1 + yc+y, 1 + xc-i, color, " ")
+      canvas:draw_bg_picocolor(1 + yc-y, 1 + xc+i, color, " ")
+    end
+    for i=fy,y do
+      -- sset(xc-i,yc-x)
+      -- sset(xc+i,yc+x)
+      -- canvas:draw_bg_picocolor(1 + xc-i, 1 + yc-x, color, " ")
+      -- canvas:draw_bg_picocolor(1 + xc+i, 1 + yc+x, color, " ")
+      canvas:draw_bg_picocolor(1 + yc-x, 1 + xc-i, color, " ")
+      canvas:draw_bg_picocolor(1 + yc+x, 1 + xc+i, color, " ")
+    end
+
+    radius=err
+    if radius<=y then
+      y = y + 1
+      err = err + y*2+1
+    end
+    if radius>x or err>y then
+      x = x + 1
+      err = err + x*2+1
+    end
+  end
+  xvalues[1]=xvalues[2]
+  return xvalues
+end
+
+perms={}
+for i=0,255 do perms[i]=i end
+for i=0,255 do
+  local r=random_int(32767)%256
+  perms[i],perms[r]=perms[r],perms[i]
+end
+
+perms12={}
+for i=0,255 do
+  local x=perms[i]%12
+  perms[i+256],perms12[i],perms12[i+256]=perms[i],x,x
+end
+
+function getn_3d(ix,iy,iz,x,y,z)
+  local t=.6-x*x-y*y-z*z
+  local index=perms12[ix+perms[iy+perms[iz]]]
+  return max(0,(t*t)*(t*t))*(grads3[index][0]*x+grads3[index][1]*y+grads3[index][2]*z)
+end
+
+function simplex3d(x,y,z)
+  local s=(x+y+z)*0.333333333
+  local ix,iy,iz=floor(x+s),floor(y+s),floor(z+s)
+  local t=(ix+iy+iz)*0.166666667
+  local x0,y0,z0=x+t-ix,y+t-iy,z+t-iz
+  ix,iy,iz=band(ix,255),band(iy,255),band(iz,255)
+  local n0=getn_3d(ix,iy,iz,x0,y0,z0)
+  local n3=getn_3d(ix+1,iy+1,iz+1,x0-0.5,y0-0.5,z0-0.5)
+  local ijk
+  if x0>=y0 then
+    if y0>=z0 then
+      ijk=ijks[1]
+    elseif x0>=z0 then
+      ijk=ijks[2]
+    else
+      ijk=ijks[3]
+    end
+  else
+    if y0<z0 then
+      ijk=ijks[4]
+    elseif x0<z0 then
+      ijk=ijks[5]
+    else
+      ijk=ijks[6]
+    end
+  end
+  local n1=getn_3d(ix+ijk[1],iy+ijk[2],iz+ijk[3],x0+0.166666667-ijk[1],y0+0.166666667-ijk[2],z0+0.166666667-ijk[3])
+  local n2=getn_3d(ix+ijk[4],iy+ijk[5],iz+ijk[6],x0+0.333333333-ijk[4],y0+0.333333333-ijk[5],z0+0.333333333-ijk[6])
+  return 32*(n0+n1+n2+n3)
+end
+
+planet={}
+planet.__index=planet
+function planet.new(x,y,phase,r)
+  local planet_type=planet_types[random_int(#planet_types)+1]
+
+  local radius=24
+  -- local radius=r or random_int(planet_max_radius, planet_type.min_size)
+  local planet_canvas = Canvas.new(radius*2+1, radius*2+1)
+  return setmetatable({
+      planet_canvas=planet_canvas,
+      screen_position=Vector(),
+      radius=radius,
+      sector_position=Vector(x,y),
+      bottom_right_coord=2*radius-1,
+      phase=phase,
+      planet_type=planet_type,
+      noise_factor_vert=random_int(planet_type.maxc+1,planet_type.minc),
+      noisedx=random(1024),
+      noisedy=random(1024),
+      noisedz=random(1024),
+      rendered_circle=false,
+      rendered_terrain=false,
+      color=planet_type.mmap_color},planet)
+end
+
+-- function planet:draw(ship_pos)
+--   if stellar_object_is_visible(self,ship_pos) then
+--     self:render_planet()
+--     love.graphics.draw(
+--       self.planet_canvas,
+--       self.screen_position.x-self.radius+zoom_offset.x,
+--       self.screen_position.y-self.radius+zoom_offset.y
+--     )
+--   end
 -- end
--- term:write(term:clear_formatting())
+
+function planet:render_planet(fullmap, render_far_side)
+  local radius=self.radius-1
+  if fullmap then radius=47 end
+
+  if not self.rendered_circle then
+    self.width=self.radius*2
+    self.height=self.radius*2
+    self.x=0
+    self.yfromzero=0
+    self.y=radius-self.yfromzero
+    self.phi=0
+    -- sect:reset_planet_visibility()
+    -- pal()
+    -- palt(0,false)
+    -- palt(self.planet_type.transparent_color,true)
+    self.planet_canvas:clear_canvas()
+    -- color(pink)
+    -- sset(0,0)
+    -- sset(1,1)
+    -- sset(2,2)
+    xvaluestring = ""
+    if fullmap then
+      self.width,self.height=114,96
+    else
+      self.xvalues=draw_sprite_circle(self.planet_canvas, radius, radius, radius, true, 0)
+      draw_sprite_circle(self.planet_canvas, radius, radius, radius, false, self.planet_type.mmap_color)
+    end
+    self.rendered_circle=true
+  end
+
+  -- local m = ""
+  -- for i, x in ipairs(self.xvalues) do
+  --   m = m..x..", "
+  -- end
+
+  -- table.insert(debug_messages, self.xvalues[1])
+  -- table.insert(debug_messages, self.xvalues[#self.xvalues])
+  -- local absy=abs(radius-self.y)+1
+  -- xvaluestring = xvaluestring..absy.." "
+  -- xvaluestring = xvaluestring..self.y.." -> "
+  -- if self.xvalues[absy] then
+  --   xvaluestring = xvaluestring.." "..self.xvalues[absy].." "
+  -- else
+  --   xvaluestring = xvaluestring.." nil "
+  -- end
+  -- if self.xvalues[self.y] then
+  --   xvaluestring = xvaluestring.." "..self.xvalues[self.y].."\n"
+  -- else
+  --   xvaluestring = xvaluestring.." nil\n"
+  -- end
+  -- table.insert(debug_messages, xvaluestring)
+
+  if (not self.rendered_terrain) and self.rendered_circle then
+
+    local theta_start,theta_end=0,.5
+    local theta_increment=theta_end/self.width
+    if fullmap and render_far_side then
+      theta_start=.5
+      theta_end=1
+    end
+
+    if self.phi>.25 then
+      self.rendered_terrain=true
+    else
+
+      local partialshadow=self.planet_type.full_shadow~=1
+      local phase_values,phase={},self.phase
+
+      local x,doublex,x1,x2,i,c1,c2
+      local y=radius-self.y
+      local xvalueindex=abs(y)+1
+      if xvalueindex<=#self.xvalues then
+        x=floor(sqrt(radius*radius-y*y))
+        doublex=2*x
+        if phase<.5 then
+          x1=-self.xvalues[xvalueindex]
+          x2=floor(doublex-2*phase*doublex-x)
+        else
+          x1=floor(x-2*phase*doublex+doublex)
+          x2=self.xvalues[xvalueindex]
+        end
+        for i=x1,x2 do
+          if partialshadow
+            or (phase<.5 and i>x2-2)
+          or (phase>=.5 and i<x1+2) then
+            phase_values[radius+i] = 1
+          else
+            phase_values[radius+i] = 0
+          end
+        end
+      end
+
+      for theta=theta_start,theta_end-theta_increment,theta_increment do
+
+        local phasevalue=phase_values[self.x]
+        local c=nil
+
+        -- if fullmap or phasevalue==1 then
+        if fullmap or
+          (phasevalue ~= 0 and
+             xvalueindex<=#self.xvalues and
+             self.x >= self.radius-self.xvalues[xvalueindex] and
+             self.x < self.radius+self.xvalues[xvalueindex]
+          )
+
+        then
+          -- and sget(self.x,self.y)~=self.planet_type.transparent_color then
+          local freq=self.planet_type.noise_zoom
+          local max_amp=0
+          local amp=1
+          local value=0
+          for n=1,self.planet_type.noise_octaves do
+            -- value=value+love.math.noise(
+            value=value+simplex3d(
+              self.noisedx+freq*cos(self.phi)*cos(theta),
+              self.noisedy+freq*cos(self.phi)*sin(theta),
+              self.noisedz+freq*sin(self.phi)*self.noise_factor_vert)
+            max_amp = max_amp + amp
+            amp = amp * self.planet_type.noise_persistance
+            freq = freq * 2
+          end
+          value = value / max_amp
+          if value>1 then value=1 end
+          if value<-1 then value=-1 end
+          value = value + 1
+          value = value * (#self.planet_type.color_map-1)/2
+          value=round(value)
+
+          c=self.planet_type.color_map[value+1]
+          if not fullmap and phasevalue==1 then
+            c=dark_planet_colors[c+1]
+          end
+        end
+
+        if xvalueindex<=#self.xvalues and
+          (self.x == self.radius-self.xvalues[xvalueindex]-1 or
+           self.x == self.radius+self.xvalues[xvalueindex]-1) then
+          c=0 -- color = black
+        end
+        if c ~= nil then
+          -- sset(self.x,self.y)
+          -- self.planet_canvas:draw_bg_picocolor(1 + self.x, 1 + self.y, c, " ")
+          self.planet_canvas:draw_bg_picocolor(1 + self.y, 1 + self.x, c, " ")
+        end
+        self.x = self.x + 1
+      end
+      self.x=0
+      if self.phi>=0 then
+        self.yfromzero = self.yfromzero + 1
+        self.y=radius+self.yfromzero
+        self.phi = self.phi + .5/(self.height-1)
+      else
+        self.y=radius-self.yfromzero
+      end
+      self.phi = self.phi * -1
+    end
+
+  end
+
+  return self.rendered_terrain
+end
+
+function draw_solarsystem()
+  local px = 1000 -- pilot.sector_position.x
+  local py = -1000 -- pilot.sector_position.y
+  p = planet.new(px, py, ((1-Vector(px,py):angle())-.25)%1)
+
+  local rendering_done = false
+  while not rendering_done do
+    rendering_done = p:render_planet()
+  end
+  -- DEBUG = true
+  -- COLORS_256 = true
+
+  -- term:draw_canvas(p.planet_canvas, WITH_TRANSPARENCY)
+  term:draw_canvas_half_height(p.planet_canvas, WITH_TRANSPARENCY)
+
+  -- for index, pixel in ipairs(p.planet_canvas.canvas[24]) do
+  --   print(index)
+  --   pti(pixel)
+  -- end
+end
+
+
+-- terminal output routines
+
+function draw_shipyard()
+  pilot=ship.new()
+  -- some nice looking seeds
+  -- pilot:buildship(5725,2)
+  -- pilot:buildship(202915,2)
+  -- pilot:buildship(147828, 2)
+  -- pilot:buildship(30718,1)
+  -- pilot:buildship(9266,2)
+  -- pilot:buildship(122414,1)
+  -- pilot:buildship(174969,nil)
+  -- pilot:buildship(97515,1)
+  -- pilot:buildship(160782,2)
+  -- pilot:buildship(70182,2)
+  -- pilot:buildship(19741,2)
+  -- pilot:buildship(157247,2)
+  -- pilot:buildship(50110,2)
+  -- pilot:buildship(63953,2)
+  -- pilot:buildship(35957,2)
+  -- pilot:buildship(160921,2)
+  -- pilot:buildship(131525,2)
+
+  -- while true do
+
+  pilot:buildship()
+
+  -- local rotation_start = 0
+  -- local rotation_inc = .0625
+  -- local rotation_end = .25
+
+  local rotation_start = 0
+  local rotation_inc = .0625
+  local rotation_end = 0
+
+  local sprites = {}
+  for r=rotation_start,rotation_end,rotation_inc do
+    local s = pilot:get_sprite_canvas_rotated(r, true)
+    add(sprites, s)
+  end
+
+  local total_cols = #sprites-1
+  local max_rows = 0
+  for i, sprite in ipairs(sprites) do
+    total_cols = total_cols + sprite.cols
+    if sprite.rows > max_rows then
+      max_rows = sprite.rows
+    end
+  end
+
+  local s = Canvas.new(max_rows, total_cols)
+  local current_col_offset = 0
+  for i, sprite in ipairs(sprites) do
+    local angle = (i-1)*.25
+    -- print(string.format("r = %.02f (%d deg)", angle, angle*360 ))
+    row_offset = floor((max_rows - sprite.rows)/2)
+    -- print(row_offset)
+    s:blit(sprite, row_offset, current_col_offset)
+    current_col_offset = current_col_offset + sprite.cols + 1
+  end
+
+  -- term:draw_canvas(s, NO_TRANSPARENCY)
+  -- term:draw_canvas_half_height(s, NO_TRANSPARENCY)
+
+  term:update_screen_width()
+  term:update_screen_height()
+  if DEBUG then
+    term.screen_width = term.screen_width - 3
+  end
+  -- term:draw_canvas(s, WITH_TRANSPARENCY)
+  term:draw_canvas_half_height(s, WITH_TRANSPARENCY)
+
+  -- center text
+  -- local spec_attribute_width = max(10, round(max(pilot.sprite_columns, pilot.sprite_rows)/2))
+  -- left text
+  local spec_attribute_width = 2
+  local fstr = ("%0" .. spec_attribute_width .. "s %s")
+  print(string.format(fstr, "[Serial#]:",
+                      string.format("%d,%d", pilot.seed_value, pilot.ship_type_index)) .."  ".. string.format(fstr, "[Class]:", pilot.name))
+  print(string.format(fstr, "[HP]:", pilot.hp) .."  "..
+          string.format(fstr, "[DeltaV]:", string.format("%.02fg", pilot.deltav)) .."  "..
+          string.format(fstr, "[TurnRate]:", string.format("%.01f deg/sec ", pilot.turn_rate)))
+
+
+  -- os.execute("sleep " .. tonumber(.5))
+  -- end
+end
+
 
 randomseed(os.time()+(os.clock()*1000000))
 
-pilot=ship.new()
--- some nice looking seeds
--- pilot:buildship(5725,2)
--- pilot:buildship(202915,2)
--- pilot:buildship(147828, 2)
--- pilot:buildship(30718,1)
--- pilot:buildship(9266,2)
--- pilot:buildship(122414,1)
--- pilot:buildship(174969,nil)
--- pilot:buildship(97515,1)
--- pilot:buildship(160782,2)
--- pilot:buildship(70182,2)
--- pilot:buildship(19741,2)
--- pilot:buildship(157247,2)
--- pilot:buildship(50110,2)
--- pilot:buildship(63953,2)
--- pilot:buildship(35957,2)
--- pilot:buildship(160921,2)
--- pilot:buildship(131525,2)
+_init()
 
--- while true do
+draw_shipyard()
 
-pilot:buildship()
-
--- center text
--- local spec_attribute_width = max(10, round(max(pilot.sprite_columns, pilot.sprite_rows)/2))
--- left text
-local spec_attribute_width = 10
-local fstr = ("%0" .. spec_attribute_width .. "s %s")
-print(string.format(fstr, "Class:", pilot.name))
-print(string.format(fstr, "Serial#:",
-                    string.format("%d, %d", pilot.seed_value, pilot.ship_type_index)))
-print(string.format(fstr, "HP:", pilot.hp))
-print(string.format(fstr, "DeltaV:",
-                    string.format("%.02fg", pilot.deltav)))
-print(string.format(fstr, "TurnRate:",
-                    string.format("%.01f deg/sec ", pilot.turn_rate)))
-
-local rotation_start = 0
-local rotation_inc = .0625
-local rotation_end = .25
-
-local sprites = {}
-for r=rotation_start,rotation_end,rotation_inc do
-  local s = pilot:get_sprite_canvas_rotated(r, true)
-  add(sprites, s)
-end
-
-local total_cols = #sprites-1
-local max_rows = 0
-for i, sprite in ipairs(sprites) do
-  total_cols = total_cols + sprite.cols
-  if sprite.rows > max_rows then
-    max_rows = sprite.rows
-  end
-end
-
-local s = Canvas.new(max_rows, total_cols)
-local current_col_offset = 0
-for i, sprite in ipairs(sprites) do
-  local angle = (i-1)*.25
-  -- print(string.format("r = %.02f (%d deg)", angle, angle*360 ))
-  row_offset = floor((max_rows - sprite.rows)/2)
-  -- print(row_offset)
-  s:blit(sprite, row_offset, current_col_offset)
-  current_col_offset = current_col_offset + sprite.cols + 1
-end
-
--- term:draw_canvas(s, NO_TRANSPARENCY)
--- term:draw_canvas_half_height(s, NO_TRANSPARENCY)
-
--- DEBUG = true
-
-COLORS_256 = false
-
-term:update_screen_width()
-term:update_screen_height()
-if DEBUG then
-  term.screen_width = term.screen_width - 3
-end
--- term:draw_canvas(s, WITH_TRANSPARENCY)
-term:draw_canvas_half_height(s, WITH_TRANSPARENCY)
-
--- os.execute("sleep " .. tonumber(.5))
--- end
+draw_solarsystem()

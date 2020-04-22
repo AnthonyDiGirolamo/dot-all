@@ -158,13 +158,13 @@ git-pull-%:
 	rm -rf $$GDIR/.git
 	git add -A $$GDIR
 
-.PHONY: pull-xcape
+.PHONY: xcape
 .ONESHELL:
-pull-xcape: git-pull-xcape
+xcape: git-pull-xcape
 
-.PHONY: pull-lux
+.PHONY: lux
 .ONESHELL:
-pull-lux: git-pull-lux
+lux: git-pull-lux
 
 .PHONY: clean-removed-files
 .ONESHELL:
