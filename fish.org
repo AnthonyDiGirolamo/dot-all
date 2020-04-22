@@ -190,7 +190,7 @@
      end
 
      set powerline_right_arrow ''
-     if set -q INSIDE_EMACS; or string match -q -r 'raspberrypi|chip' (uname -a)
+     if set -q INSIDE_EMACS; or set -q XTERM_VERSION; or string match -q -r 'raspberrypi|chip' (uname -n)
        set powerline_right_arrow ''
      end
 

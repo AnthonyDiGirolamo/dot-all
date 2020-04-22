@@ -88,7 +88,7 @@
 
     # start a terminal
     # bindsym $mod+Return exec urxvt -e ~/Preferences/bin/tmux-new-or-attatch.sh
-    bindsym $mod+Shift+Return exec urxvt
+    bindsym $mod+Shift+Return exec uxterm -e fish
     bindsym $mod+Return exec alacritty -e fish
 
     # web browser
