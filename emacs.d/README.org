@@ -2111,6 +2111,7 @@
       :init
       (setq magit-last-seen-setup-instructions "1.4.0")
       (setq magit-diff-expansion-threshold 10.0)
+      (setq magit-commit-show-diff nil)
 
       :general
       ;; (:keymaps '(magit-popup-mode-map)
@@ -2482,18 +2483,20 @@
               ("*Async Shell Command*" :ignore t)
 
               ;; Bottom popups
-              ("*Help*" :size 0.3 :align bottom)
+              ("*Help*" :size 0.4 :align bottom)
               ("\\*helpful.*\\*" :regexp t :size 0.3 :align bottom)
               ("*Completions*" :size 0.2 :align bottom)
               (compilation-mode :select nil :size 0.3 :align bottom)
 
               ("*Warnings*" :select nil :inhibit-window-quit t :other t)
+              ("*Flycheck error messages*" :ignore t)
 
               ;; Top popups
-              ("\\*e?shell.*\\*" :regexp t :popup t :size 0.4 :align above)
+              ("\\*e?shell.*\\*" :regexp t :popup t :size 0.5 :align above)
 
               ;; Full size popups
               ('magit-status-mode :same t)
+
               ;; eww popups should just replace current buffer
               ('eww-bookmark-mode :same t)
               ('eww-history-mode :same t)
