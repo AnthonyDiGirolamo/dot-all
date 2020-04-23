@@ -135,12 +135,10 @@
       alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
     end
 
-    alias ew="emacs-w32 &"
-    alias e="emacs -nw"
-    alias eg="emacs &"
-    alias ed="emacs --daemon"
-    alias ec="emacsclient --alternate-editor='' -nw"
-    alias ecg="emacsclient --alternate-editor='' --no-wait --create-frame"
+    alias e="env TERM=xterm-24bits emacs -nw"
+    # alias ed="emacs --daemon"
+    alias ec="env TERM=xterm-24bits emacsclient --alternate-editor='' -nw"
+    alias ecg="env TERM=xterm-24bits emacsclient --alternate-editor='' --no-wait --create-frame"
   #+END_SRC
 
 * ~/.config/fish/conf.d/fish_user_key_bindings.fish
