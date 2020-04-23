@@ -1,6 +1,18 @@
 #+STARTUP: content
 
 * cvim
+  - https://github.com/1995eaton/chromium-vim ([[https://chrome.google.com/webstore/detail/cvim/ihlenndgcmojhcghmfjfneahoeklbjjh][chrome web store link]])
+
+  - Possible new fork: https://github.com/dcchambers/vb4c
+
+
+  Link hints are currently broken and extension is un-maintained. Fix requires
+  changing a line in =content_scripts/hints.js=:
+
+  #+begin_src text
+  -Hints.shadowDOM = main.createShadowRoot();
+  +Hints.shadowDOM = main.attachShadow({mode: 'open'});
+  #+end_src
 
 ** cvimrc
 
@@ -113,7 +125,6 @@
      }}
      map <Leader>oc :call org_capture<CR>
      map <Leader>os :call org_store_link<CR>
-
      css_for_docs() -> {{
        // document.addEventListener("DOMContentLoaded", function(event) {
        document.styleSheets[0].insertRule(
@@ -214,6 +225,7 @@
        map L goForward
        map o :open<space>
        imap <C-e> editWithVim
+       map W :tabdetatch<CR>
        map <Leader>oc :call org_capture<CR>
        map <Leader>os :call org_store_link<CR>
        map <Leader>ol :call orgmodeLink<CR>
@@ -385,3 +397,40 @@
        border: 3px solid yellow;
      }
    #+END_SRC
+
+* vimium
+
+  - https://github.com/philc/vimium ([[https://chrome.google.com/webstore/detail/vimium/dbepggeogbaibhgnhhndojpepiihcmeb][chrome web store link]])
+
+** =vimium-options.json=
+
+   #+begin_src json
+     {
+       "settingsVersion": "1.66",
+       "exclusionRules": [
+         {
+           "pattern": "https?://mail.google.com/*",
+           "passKeys": ""
+         }
+       ],
+       "filterLinkHints": false,
+       "waitForEnterForFilteredHints": true,
+       "hideHud": false,
+       "keyMappings": "# Insert your preferred key mappings here.\n\nunmap N\nmap n scrollDown\nmap e scrollUp\nmap k performFind\nmap K performBackwardsFind",
+       "linkHintCharacters": "tnsedhriaobkgvfplum",
+       "linkHintNumbers": "0123456789",
+       "newTabUrl": "about:newtab",
+       "nextPatterns": "next,more,newer,>,›,→,»,≫,>>",
+       "previousPatterns": "prev,previous,back,older,<,‹,←,«,≪,<<",
+       "regexFindMode": false,
+       "ignoreKeyboardLayout": false,
+       "scrollStepSize": 60,
+       "smoothScroll": true,
+       "grabBackFocus": false,
+       "searchEngines": "w: https://www.wikipedia.org/w/index.php?title=Special:Search&search=%s Wikipedia\n\n# More examples.\n#\n# (Vimium supports search completion Wikipedia, as\n# above, and for these.)\n#\n# g: https://www.google.com/search?q=%s Google\n# l: https://www.google.com/search?q=%s&btnI I'm feeling lucky...\n# y: https://www.youtube.com/results?search_query=%s Youtube\n# gm: https://www.google.com/maps?q=%s Google maps\n# b: https://www.bing.com/search?q=%s Bing\n# d: https://duckduckgo.com/?q=%s DuckDuckGo\n# az: https://www.amazon.com/s/?field-keywords=%s Amazon\n# qw: https://www.qwant.com/?q=%s Qwant",
+       "searchUrl": "https://www.google.com/search?q=",
+       "userDefinedLinkHintCss": "div > .vimiumHintMarker {\n/* linkhint boxes */\nbackground: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FFF785),\n  color-stop(100%,#FFC542));\nborder: 1px solid #E3BE23;\n}\n\ndiv > .vimiumHintMarker span {\n/* linkhint text */\ncolor: black;\nfont-weight: bold;\nfont-size: 16px;\n}\n\ndiv > .vimiumHintMarker > .matchingCharacter {\n}"
+     }
+   #+end_src
+
+
