@@ -468,6 +468,28 @@ end
 
 setmetatable(Canvas,{__call=function(_,...) return Canvas.new(...) end})
 
+function concat_canvases(sprite_canvases, separation)
+  local offset = separation or 0
+  local total_cols = (#sprite_canvases-1)*offset
+  local max_rows = 0
+
+  for i, sprite in ipairs(sprite_canvases) do
+    total_cols = total_cols + sprite.cols
+    if sprite.rows > max_rows then
+      max_rows = sprite.rows
+    end
+  end
+
+  local s = Canvas.new(max_rows, total_cols)
+  local current_col_offset = 0
+  for i, sprite in ipairs(sprite_canvases) do
+    row_offset = floor((max_rows - sprite.rows)/2)
+    s:blit(sprite, row_offset, current_col_offset)
+    current_col_offset = current_col_offset + sprite.cols + offset
+  end
+  return s
+end
+
 Terminal={}
 Terminal.__index=Terminal
 function Terminal.new()
@@ -809,7 +831,7 @@ function new_planet(planet_spec)
     transparent_color = args[6] or 14,
     min_noise_stretch_factor = args[7] or 1,
     max_noise_stretch_factor = args[8] or 1,
-    min_size = args[9] or 16,
+    min_size = args[9] or 10,
     color_map = p[3]
   }
 end
@@ -835,12 +857,12 @@ function _init()
     new_planet("adesert,|n5,.35,.3,9,|x449944994499b1949949949949949|"),
     new_planet("abarren,|n5,.55,.35,5,|x565056765056|"),
     new_planet("alava,|n5,.55,.65,4,|x040504049840405040|"),
-    new_planet("agas giant,|n1,.4,.75,2,1,14,4,20,50,|x76d121c|"),
-    new_planet("agas giant,|n1,.4,.75,8,1,12,4,20,50,|x7fe21288|"),
-    new_planet("agas giant,|n1,.7,.75,10,1,14,4,20,50,|xfa949a|"),
     new_planet("aterran,|n5,.3,.65,11,1,|x1111111dcfbb3334567|"),
     new_planet("aisland,|n5,.55,.65,12,1,|x11111111dcfb3|"),
-    new_planet("arainbow giant,|n1,.7,.75,15,1,4,4,20,50,|x1dcba9e82|"),
+    new_planet("agas giant,|n1,.4,.75,2,1,14,4,20,20,|x76d121c|"),
+    new_planet("agas giant,|n1,.4,.75,8,1,12,4,20,20,|x7fe21288|"),
+    new_planet("agas giant,|n1,.7,.75,10,1,14,4,20,20,|xfa949a|"),
+    new_planet("arainbow giant,|n1,.7,.75,15,1,4,4,20,20,|x1dcba9e82|"),
   }
   planet_max_radius = 20
 end
@@ -1130,11 +1152,11 @@ end
 
 planet={}
 planet.__index=planet
-function planet.new(x,y,phase,r,max_radius)
-  local planet_type=planet_types[random_int(#planet_types)+1]
+function planet.new(x,y,phase,r,ptype)
+  local planet_type_index = ptype or random_int(#planet_types)+1
+  local planet_type = planet_types[planet_type_index]
 
-  local radius=max_radius or planet_max_radius
-  -- local radius=r or random_int(planet_max_radius, planet_type.min_size)
+  local radius=r or random_int(planet_type.min_size+10, planet_type.min_size)
   local planet_canvas = Canvas.new(radius*2+1, radius*2+1)
   return setmetatable({
       planet_canvas=planet_canvas,
@@ -1331,20 +1353,47 @@ function planet:render_planet(fullmap, render_far_side)
   return self.rendered_terrain
 end
 
-function draw_solarsystem()
-  local px = 50 -- sector_position.x
-  local py = -100 -- sector_position.y
-  p = planet.new(px, py, ((1-Vector(px,py):angle())-.25)%1)
+function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
+  local px = camera_x or 50 -- sector_position.x
+  local py = camera_z or -100 -- sector_position.y
+  local seed_value=starting_seed or random_int(262144)
+  randomseed(seed_value)
+  local pcount = planet_count or 8
+  local planets = {}
 
-  local rendering_done = false
-  while not rendering_done do
-    rendering_done = p:render_planet()
+  local max_rows = 0
+  for i=1,pcount do
+    local ptype = 1
+    if i <= 5 then
+      ptype = random_int(7, 1)
+    else
+      ptype = random_int(5, 1) + 6
+    end
+
+
+    local p = planet.new(px, py, ((1-Vector(px,py):angle())-.25)%1, nil, ptype)
+    if p.planet_canvas.rows > max_rows then
+      max_rows = p.planet_canvas.rows
+    end
+    local rendering_done = false
+    while not rendering_done do
+      rendering_done = p:render_planet()
+    end
+    add(planets, p)
   end
+
+  local planet_sprites = {}
+  for i, p in ipairs(planets) do
+    add(planet_sprites, p.planet_canvas)
+  end
+
+  local planet_map_canvas = concat_canvases(planet_sprites, 4)
+
   -- DEBUG = true
   -- COLORS_256 = true
 
   -- term:draw_canvas(p.planet_canvas, WITH_TRANSPARENCY)
-  term:draw_canvas_half_height(p.planet_canvas, WITH_TRANSPARENCY)
+  term:draw_canvas_half_height(planet_map_canvas, WITH_TRANSPARENCY)
 
   -- for index, pixel in ipairs(p.planet_canvas.canvas[24]) do
   --   print(index)
@@ -1355,7 +1404,7 @@ end
 
 -- terminal output routines
 
-function draw_shipyard()
+function cmd_draw_shipyard()
   pilot=ship.new()
   -- some nice looking seeds
   -- pilot:buildship(5725,2)
@@ -1364,7 +1413,7 @@ function draw_shipyard()
   -- pilot:buildship(30718,1)
   -- pilot:buildship(9266,2)
   -- pilot:buildship(122414,1)
-  -- pilot:buildship(174969,nil)
+  -- pilot:buildship(174969,1)
   -- pilot:buildship(97515,1)
   -- pilot:buildship(160782,2)
   -- pilot:buildship(70182,2)
@@ -1380,13 +1429,11 @@ function draw_shipyard()
 
   pilot:buildship()
 
-  -- local rotation_start = 0
-  -- local rotation_inc = .0625
-  -- local rotation_end = .25
 
   local rotation_start = 0
   local rotation_inc = .0625
-  local rotation_end = 0
+  -- local rotation_end = 0
+  local rotation_end = .25
 
   local sprites = {}
   for r=rotation_start,rotation_end,rotation_inc do
@@ -1394,26 +1441,7 @@ function draw_shipyard()
     add(sprites, s)
   end
 
-  local total_cols = #sprites-1
-  local max_rows = 0
-  for i, sprite in ipairs(sprites) do
-    total_cols = total_cols + sprite.cols
-    if sprite.rows > max_rows then
-      max_rows = sprite.rows
-    end
-  end
-
-  local s = Canvas.new(max_rows, total_cols)
-  local current_col_offset = 0
-  for i, sprite in ipairs(sprites) do
-    local angle = (i-1)*.25
-    -- print(string.format("r = %.02f (%d deg)", angle, angle*360 ))
-    row_offset = floor((max_rows - sprite.rows)/2)
-    -- print(row_offset)
-    s:blit(sprite, row_offset, current_col_offset)
-    current_col_offset = current_col_offset + sprite.cols + 1
-  end
-
+  local s = concat_canvases(sprites, 1)
   -- term:draw_canvas(s, NO_TRANSPARENCY)
   -- term:draw_canvas_half_height(s, NO_TRANSPARENCY)
 
@@ -1447,6 +1475,6 @@ randomseed(os.time()+(os.clock()*1000000))
 _init()
 planet_max_radius = floor(term.screen_width/2)
 
-draw_shipyard()
+-- cmd_draw_shipyard()
 
-draw_solarsystem()
+cmd_draw_planet_map()
