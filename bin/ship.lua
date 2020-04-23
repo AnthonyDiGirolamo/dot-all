@@ -1358,20 +1358,24 @@ function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
   local py = camera_z or -100 -- sector_position.y
   local seed_value=starting_seed or random_int(262144)
   randomseed(seed_value)
-  local pcount = planet_count or 8
+  local pcount = planet_count or #planet_types
   local planets = {}
+  local planet_sprites = {}
+  local planet_maps = {}
 
   local max_rows = 0
   for i=1,pcount do
     local ptype = 1
-    if i <= 5 then
+    local rad = 5
+    if i <= 6 then
       ptype = random_int(7, 1)
+      rad = random_int(8) + 5
     else
       ptype = random_int(5, 1) + 6
+      rad = random_int(8) + 10
     end
 
-
-    local p = planet.new(px, py, ((1-Vector(px,py):angle())-.25)%1, nil, ptype)
+    local p = planet.new(px, py, ((1-Vector(px,py):angle())-.25)%1, rad, i)
     if p.planet_canvas.rows > max_rows then
       max_rows = p.planet_canvas.rows
     end
@@ -1380,20 +1384,27 @@ function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
       rendering_done = p:render_planet()
     end
     add(planets, p)
-  end
-
-  local planet_sprites = {}
-  for i, p in ipairs(planets) do
     add(planet_sprites, p.planet_canvas)
+    if i == 6 or i == 10 then
+      local c = concat_canvases(planet_sprites, 0)
+      -- add(planet_maps, c)
+      term:draw_canvas_half_height(c, WITH_TRANSPARENCY)
+      planet_sprites = {}
+    end
+
   end
 
-  local planet_map_canvas = concat_canvases(planet_sprites, 4)
+  -- -- local planet_map_canvas = concat_canvases(planet_sprites, 0)
+  -- for i, p in ipairs(planet_maps) do
+  --   term:draw_canvas_half_height(p, WITH_TRANSPARENCY)
+  -- end
+
 
   -- DEBUG = true
   -- COLORS_256 = true
 
   -- term:draw_canvas(p.planet_canvas, WITH_TRANSPARENCY)
-  term:draw_canvas_half_height(planet_map_canvas, WITH_TRANSPARENCY)
+  -- term:draw_canvas_half_height(planet_map_canvas, WITH_TRANSPARENCY)
 
   -- for index, pixel in ipairs(p.planet_canvas.canvas[24]) do
   --   print(index)
@@ -1475,6 +1486,6 @@ randomseed(os.time()+(os.clock()*1000000))
 _init()
 planet_max_radius = floor(term.screen_width/2)
 
--- cmd_draw_shipyard()
-
 cmd_draw_planet_map()
+
+cmd_draw_shipyard()
