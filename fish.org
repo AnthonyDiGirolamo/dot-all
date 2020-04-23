@@ -73,7 +73,8 @@
     set -x EDITOR "vim"
     set -x VISUAL $EDITOR
     if not set -q INSIDE_EMACS
-      set -x TERM xterm-24bit
+      # set -x TERM xterm-24bits
+      set -x TERM xterm-256color
     end
 
     # if ~/.config/fish/config-local.fish exists, load it

@@ -94,7 +94,8 @@
 
     #set-window-option -g alternate-screen on
     set -g default-terminal "screen-256color"
-    set -ga terminal-overrides ",*256col*:Tc"
+    # set -g default-terminal "xterm-24bits"
+    set -ga terminal-overrides ",*256*:Tc"
 
     # Run fish if available
     if-shell 'which fish' 'set -g default-command "fish"'
