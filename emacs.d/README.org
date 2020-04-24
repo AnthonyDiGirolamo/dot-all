@@ -3634,8 +3634,9 @@
         (ivy-mode 1)
 
         (defun amd/update-evil-search (&optional arg1 &rest args)
-          "Update evil search pattern history with the last swiper regex and recenter."
-          (recenter)
+          "Update evil search pattern history with the last swiper regex."
+          ;; recenter after hitting RET from swiper is jarring.
+          ;; (recenter)
           (let ((count 1)
                 (direction 'forward)
                 (regex (ivy--regex ivy-text)))
