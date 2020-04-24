@@ -1354,8 +1354,13 @@ function planet:render_planet(fullmap, render_far_side)
 end
 
 function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
-  local px = camera_x or 50 -- sector_position.x
-  local py = camera_z or -100 -- sector_position.y
+  print(term.screen_width)
+
+  local camera_angle = random()
+  local px = cos(camera_angle)*100
+  local py = sin(camera_angle)*100
+  -- local px = camera_x or 50 -- sector_position.x
+  -- local py = camera_z or -100 -- sector_position.y
   local seed_value=starting_seed or random_int(262144)
   randomseed(seed_value)
   local pcount = planet_count or #planet_types
@@ -1391,7 +1396,6 @@ function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
       term:draw_canvas_half_height(c, WITH_TRANSPARENCY)
       planet_sprites = {}
     end
-
   end
 
   -- -- local planet_map_canvas = concat_canvases(planet_sprites, 0)
@@ -1400,9 +1404,6 @@ function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
   -- end
 
 
-  -- DEBUG = true
-  -- COLORS_256 = true
-
   -- term:draw_canvas(p.planet_canvas, WITH_TRANSPARENCY)
   -- term:draw_canvas_half_height(planet_map_canvas, WITH_TRANSPARENCY)
 
@@ -1410,6 +1411,9 @@ function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
   --   print(index)
   --   pti(pixel)
   -- end
+  print(camera_angle)
+  print(px)
+  print(py)
 end
 
 
@@ -1486,6 +1490,9 @@ randomseed(os.time()+(os.clock()*1000000))
 _init()
 planet_max_radius = floor(term.screen_width/2)
 
+-- DEBUG = true
+-- COLORS_256 = true
+
 cmd_draw_planet_map()
 
-cmd_draw_shipyard()
+-- cmd_draw_shipyard()
