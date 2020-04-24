@@ -744,6 +744,16 @@
       )
     #+END_SRC
 
+*** highlight-indent-guides
+    #+begin_src emacs-lisp
+      (use-package highlight-indent-guides
+        :custom
+        (highlight-indent-guides-method 'character)
+        (highlight-indent-guides-responsive 'top)
+        ;; (highlight-indent-guides-delay 3)
+        (highlight-indent-guides-character ?\|))
+    #+end_src
+
 *** nlinum-relative
 
     Relative line numbering using ~nlinum~ which is faster than the built-in
@@ -1321,8 +1331,9 @@
 
   #+BEGIN_SRC emacs-lisp
     (use-package recentf
-      :init
-      (setq recentf-max-menu-items 25)
+      :custom
+      (recentf-auto-cleanup 300)
+      (recentf-max-menu-items 30)
       :config
       (recentf-mode 1))
   #+END_SRC
@@ -1352,10 +1363,10 @@
 ** savehist - save minibuffer history
 
   #+BEGIN_SRC emacs-lisp
+    ;; save minibuffer history
     (use-package savehist
-      ;; save minibuffer history
-      :init
-      (setq savehist-autosave-interval 150)
+      :custom
+      (savehist-autosave-interval 150)
       :config
       (savehist-mode))
   #+END_SRC
@@ -1364,10 +1375,10 @@
 
   #+BEGIN_SRC emacs-lisp
     (use-package desktop
-      :init
-      (setq desktop-auto-save-timeout 30)
-      :config
-      (desktop-save-mode 1)
+      :custom
+      (desktop-auto-save-timeout 30)
+      ;; :config
+      ;; (desktop-save-mode 1)
     )
   #+END_SRC
 
@@ -1375,21 +1386,18 @@
 
   #+BEGIN_SRC emacs-lisp
     (use-package dired
-      :defer t
+      :custom
+      ;; Suggest locations for operations, ie midnight commander style copy if another window is open.
+      (dired-dwim-target t)
+      ;; Auto refresh dired, but be quiet about it
+      (dired-auto-revert-buffer t)
+      ;; (setq global-auto-revert-non-file-buffers t)
+      (auto-revert-verbose nil)
+      ;; Always copy/delete recursively
+      (dired-recursive-copies 'always)
+      (dired-recursive-deletes 'top)
       :init
       (put 'dired-find-alternate-file 'disabled nil)
-      ;; Suggest locations for operations, ie midnight commander style copy if another window is open.
-      (setq dired-dwim-target t)
-
-      ;; Auto refresh dired, but be quiet about it
-      (setq dired-auto-revert-buffer t)
-      ;; (setq global-auto-revert-non-file-buffers t)
-      (setq auto-revert-verbose nil)
-
-      ;; Always copy/delete recursively
-      (setq dired-recursive-copies  'always
-            dired-recursive-deletes 'top)
-
       (setq wdired-allow-to-change-permissions t)
       (setq insert-directory-program
             (or (executable-find "gls")
@@ -2071,8 +2079,6 @@
     (use-package yasnippet
       :defer 10
       :diminish yas-minor-mode
-      :config
-      (yas-global-mode 1)
     )
 
     (use-package yankpad
@@ -3315,18 +3321,21 @@
          ("i" align-interactively "align interactive"))))
 
      (pretty-hydra-define hydra-set-toggles (:color blue :quit-key "q" :formatter amd/pretty-hydra-strip-header)
-       ("s: Set Toggles"
+       ("Line Endings"
         (("t" toggle-truncate-lines "truncate-lines" :toggle truncate-lines :color amaranth)
          ("i" fci-mode "fill column indicator mode" :toggle t :color amaranth)
          ("f" auto-fill-mode "auto-fill-mode" :toggle auto-fill-function :color amaranth)
-         ("L" display-line-numbers-mode "display-line-numbers-mode" :toggle t :color amaranth)
-         ("l" nlinum-mode "nlinum-mode" :toggle t :color amaranth)
-         ("r" nlinum-relative-mode "nlinum-relative-mode" :toggle t :color amaranth)
-         ("h" hl-line-mode "hl-line-mode" :toggle t :color amaranth)
+         ("F" fringe-mode "fringe-mode" :toggle (not (eq fringe-mode 0)) :color amaranth))
+        "Line Numbers"
+        (("ld" display-line-numbers-mode "display-line-numbers-mode" :toggle t :color amaranth)
+         ("ln" nlinum-mode "nlinum-mode" :toggle t :color amaranth)
+         ("lr" nlinum-relative-mode "nlinum-relative-mode" :toggle t :color amaranth)
+         ("hl" hl-line-mode "hl-line-mode" :toggle t :color amaranth))
+        "Code"
+        (("hi" highlight-indent-guides-mode "highighlight-indent-guides-mode" :toggle t :color amaranth)
          ("d" rainbow-delimiters-mode "rainbow-delimiters-mode" :toggle t :color amaranth)
          ("c" color-identifiers-mode "color-identifiers-mode" :toggle t :color amaranth)
-         ("F" fringe-mode "fringe-mode" :toggle (not (eq fringe-mode 0)) :color amaranth)
-         )))
+         ("g" glasses-mode "glasses-mode" :toggle t :color amaranth))))
 
      (amd/define-hydra-with-columns 'hydra-leader-menu 'blue
       `((

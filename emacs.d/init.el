@@ -79,51 +79,14 @@
 ;; Load use-package, used for loading packages
 (require 'use-package)
 
-;; (defun my-tangle-config-org (src-file output-file)
-;;   "This function will write all source blocks from =config.org= into
-;; =config.el= that are ...
-;; - not marked as =tangle: no=
-;; - doesn't have the TODO state =CANCELLED=
-;; - have a source-code of =emacs-lisp="
-;;   (require 'org)
-;;   (let* ((body-list ())
-;;          (org-babel-default-header-args (org-babel-merge-params org-babel-default-header-args
-;;                                                                 (list (cons :tangle output-file)))))
-;;     (message "Writing %s ..." output-file)
-;;     (save-restriction
-;;      (save-excursion
-;;       (org-babel-map-src-blocks src-file
-;;                                 (let* ((info (org-babel-get-src-block-info 'light))
-;;                                        (tfile (cdr (assq :tangle (nth 2 info))))
-;;                                        (match))
-;;                                   (save-excursion
-;;                                    (catch 'exit
-;;                                      (org-back-to-heading t)
-;;                                      (when (looking-at org-outline-regexp)
-;;                                        (goto-char (1- (match-end 0))))
-;;                                      (when (looking-at (concat " +" org-todo-regexp "\\( +\\|[ \t]*$\\)"))
-;;                                        (setq match (match-string 1)))))
-;;                                   (unless (or (string= "no" tfile)
-;;                                               (string= "CANCELED" match)
-;;                                               (not (string= "emacs-lisp" lang)))
-;;                                     (add-to-list 'body-list body)))))
-;;      (with-temp-file output-file
-;;        (insert (format ";; Don't edit this file, edit '%s' instead.\n\n" src-file))
-;;        (insert (apply 'concat (reverse body-list))))
-;;      (message "Wrote %s" output-file))))
-
-;; (load amd/settings-file)
-;; (message (concat "Done loading " amd/settings-org-file))
-
 ;; Load early settings.el
 (load (expand-file-name "~/.emacs.d/settings.el"))
 
+;; conditionally tangle README.org
 (if (and amd/using-pocketchip (file-exists-p amd/settings-file))
     (load amd/settings-file)
   (progn
     (org-babel-load-file amd/settings-org-file)
-    ;; (my-tangle-config-org amd/settings-org-file amd/settings-file)
-    ;; (load amd/settings-file)
     (message (concat "Done loading " amd/settings-org-file))))
 
 ;; Message how long it took to load everything (minus packages)
