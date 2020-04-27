@@ -353,6 +353,11 @@ Invoke `async-shell-command' in the project's root.
 
 \(fn)" t nil)
 
+(autoload 'projectile-run-gdb "projectile" "\
+Invoke `gdb' in the project's root.
+
+\(fn)" t nil)
+
 (autoload 'projectile-run-shell "projectile" "\
 Invoke `shell' in the project's root.
 

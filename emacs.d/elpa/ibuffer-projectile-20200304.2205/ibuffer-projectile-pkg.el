@@ -1,0 +1,2 @@
+;;; -*- no-byte-compile: t -*-
+(define-package "ibuffer-projectile" "20200304.2205" "Group ibuffer's list by projectile root" '((projectile "0.11.0") (emacs "24.1")) :commit "504b0edaa0d937ce60ccc8fdf09f2dae0a90fbaf" :keywords '("convenience") :authors '(("Steve Purcell" . "steve@sanityinc.com")) :maintainer '("Steve Purcell" . "steve@sanityinc.com") :url "http://github.com/purcell/ibuffer-projectile")

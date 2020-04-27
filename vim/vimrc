@@ -16,11 +16,11 @@ set background=dark
 " let g:airline_theme='aludin'
 
 " let g:one_allow_italics = 1
-" colorscheme one
+colorscheme one
 " colorscheme distinguished
 " colorscheme ir_black-256
 " colorscheme molokai
-colorscheme atomic
+" colorscheme atomic
 
 set noswapfile
 set nobackup  " do not keep a backup file (file~), use versions instead

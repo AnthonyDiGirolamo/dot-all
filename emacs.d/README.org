@@ -2400,7 +2400,7 @@
           ("n" make-frame "new frame")
           ("c" delete-frame "delete frame"))
 
-        (add-to-list 'aw-dispatch-alist '(?z hydra-window-size/body) t)
+        (add-to-list 'aw-dispatch-alist '(?w hydra-window-size/body) t)
         (add-to-list 'aw-dispatch-alist '(?f hydra-window-frame/body) t)))
   #+END_SRC
 
@@ -2443,7 +2443,8 @@
   #+BEGIN_SRC emacs-lisp
     (use-package projectile
       :diminish ""
-      :commands (ivy-switch-project
+      :commands (ibuffer
+                 ivy-switch-project
                  projectile-project-root
                  projectile-switch-project
                  projectile-load-known-projects
@@ -2511,7 +2512,7 @@
               ('dired-mode :other t :align left :size 0.3)
 
               ;; right side for ibuffer
-              ("\\*[Ii]buffer\\*" :regexp t :popup t :align right :size 0.4)
+              ("\\*[Ii]buffer\\*" :regexp t :popup t :align bottom :size 0.4)
               ('undo-tree-mode :align right :size 0.4)
               ('flycheck-error-list-mode :select t :align bottom :size 0.2)
 
@@ -2533,31 +2534,56 @@
 
   #+BEGIN_SRC emacs-lisp
     (use-package ibuffer
+      :custom
+      (ibuffer-use-header-line t)
+      (ibuffer-truncate-lines t)
+      (ibuffer-use-other-window t)
       :init
       (add-hook 'ibuffer-mode-hook (lambda () (hl-line-mode 1)))
-      (setq ibuffer-use-header-line t
-            ibuffer-truncate-lines t
-            ibuffer-use-other-window t)
       (setq ibuffer-formats
-            '((mark modified read-only locked " "
-                    (name 32 32 :left :elide)
-                    " "
-                    (size 9 -1 :right)
-                    " "
-                    (mode 16 16 :left :elide)
-                    " " filename-and-process)
-              (mark " "
-                    (name 16 -1)
-                    " " filename)))
+            '(
+              (mark
+               " " (name 32 32 :left)
+               " "
+               filename-and-process
+               ;; project-relative-file
+              )
+              (mark
+               ;; modified
+               ;; read-only
+               ;; locked
+               ;; " " (size 9 -1 :right)
+               ;; " " (mode 16 16 :left :elide)
+               " "
+               filename-and-process
+               ;; project-relative-file
+               "  --  " name
+              )
+             ))
       :general
       (:states '(emacs)
        :keymaps 'ibuffer-mode-map
        "e" 'ibuffer-backward-line
        "/" 'swiper
        "C-/" 'swiper
+       "C-d" 'evil-scroll-down
+       "C-u" 'evil-scroll-up
        ;; "RET" 'ibuffer-visit-buffer-other-window ;; default is "o"
        ;; "a" 'ibuffer-visit-buffer                ;; default is "RET"
       )
+      :config
+      ;; create a "default" placeholder to build the filter groups
+      ;; (setf ibuffer-saved-filter-groups (quote (("default"))))
+
+      ;; ;; replace the PROJECTS directory with whatever you like
+      ;; (cl-dolist (dir (directory-files "~/projects/"))
+      ;;   (when (not (member dir '("." "..")))
+      ;;     (setf (car ibuffer-saved-filter-groups)
+      ;;           (append (car ibuffer-saved-filter-groups)
+      ;;                   `((,dir
+      ;;                      (filename . ,(expand-file-name
+      ;;                                    dir "~/projects/"))))))))
+
     )
 
     (use-package ibuffer-vc
@@ -2566,9 +2592,18 @@
       (add-hook 'ibuffer-hook
         (lambda ()
           (ibuffer-vc-set-filter-groups-by-vc-root)
-          (unless (eq ibuffer-sorting-mode 'alphabetic)
-            (ibuffer-do-sort-by-alphabetic))))
+          (unless (eq ibuffer-sorting-mode 'filename/process)
+            (ibuffer-do-sort-by-filename/process))))
     )
+
+    ;; (use-package ibuffer-projectile
+    ;;   :init
+    ;;   (add-hook 'ibuffer-hook
+    ;;       (lambda ()
+    ;;         (ibuffer-projectile-set-filter-groups)
+    ;;         (unless (eq ibuffer-sorting-mode 'alphabetic)
+    ;;           (ibuffer-do-sort-by-alphabetic))))
+    ;; )
   #+END_SRC
 
 ** tmux-window-navigation
@@ -2708,7 +2743,8 @@
     #+END_SRC
 
 * email
-  #+BEGIN_SRC emacs-lisp
+
+  #+BEGIN_SRC emacs-lisp :tangle no
     (eval-and-compile
       (defun amd/mu4e-load-path ()
         (list "~/apps/mu/share/emacs/site-lisp/mu4e"
@@ -2910,7 +2946,7 @@
       :config
       (lispyville-set-key-theme
        '(operators
-         additional-motions
+         ;; additional-motions
          slurp/barf-cp
          commentary)))
 
@@ -2918,7 +2954,6 @@
       :diminish "")
 
     (use-package lua-mode
-      :defer t
       :init
       (setq lua-indent-level 2))
 

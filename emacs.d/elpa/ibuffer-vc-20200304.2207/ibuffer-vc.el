@@ -4,7 +4,7 @@
 ;;
 ;; Author: Steve Purcell <steve@sanityinc.com>
 ;; Keywords: convenience
-;; Package-Version: 0.11
+;; Package-Version: 20200304.2207
 ;; Package-Requires: ((emacs "24.1") (cl-lib "0.2"))
 ;; URL: http://github.com/purcell/ibuffer-vc
 ;; Version: DEV
