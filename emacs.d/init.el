@@ -1,4 +1,4 @@
-(setq initial-buffer-choice nil ;; Open *scratch* buffer by default
+(setq initial-buffer-choice t ;; Open *scratch* buffer by default
       ;; initial-major-mode 'fundamental-mode
       inhibit-startup-message t
       inhibit-startup-screen t)
@@ -78,9 +78,6 @@
 
 ;; Load use-package, used for loading packages
 (require 'use-package)
-
-;; Load early settings.el
-(load (expand-file-name "~/.emacs.d/settings.el"))
 
 ;; conditionally tangle README.org
 (if (and amd/using-pocketchip (file-exists-p amd/settings-file))
