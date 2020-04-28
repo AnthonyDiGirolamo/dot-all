@@ -88,14 +88,26 @@
 
 * top level settings
   #+begin_src emacs-lisp
-    ;; amd/variables
+    ;; Initial buffer to open
+    (setq initial-buffer-choice t ;; Open *scratch* buffer by default
+          ;; initial-major-mode 'fundamental-mode
+          inhibit-startup-message t
+          inhibit-startup-screen t)
 
+    ;; Open org-default-notes-file by default
+    ;; (when (file-exists-p org-default-notes-file)
+    ;;   (find-file org-default-notes-file))
+
+    ;; Start Maximized
+    ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+    ;; leader key
     (setq amd/leader-key ",")
     (setq amd/leader-key-insert "C-,")
     (when amd/using-pocketchip
       (setq amd/leader-key "SPC"))
 
-    ;; path
+    ;; $PATH
 
     (when (memq window-system '(mac ns))
       (exec-path-from-shell-initialize))
@@ -177,6 +189,10 @@
 
     ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
     (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+
+    ;; Enable narrowing and erasing buffers
+    (put 'narrow-to-region 'disabled nil)
+    (put 'erase-buffer 'disabled nil)
   #+end_src
 
 * fonts
@@ -727,14 +743,14 @@
        :load-path "airline-themes"
      )
 
-     ;; (use-package fast-scroll
-     ;;   :load-path "fast-scroll"
-     ;;   :config
-     ;;   (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
-     ;;   (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
-     ;;   (fast-scroll-config)
-     ;;   (fast-scroll-minor-mode 1)
-     ;; )
+     (use-package fast-scroll
+       :load-path "fast-scroll"
+       :config
+       (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
+       (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
+       (fast-scroll-config)
+       (fast-scroll-minor-mode 1)
+     )
 
      (use-package powerline
        :init

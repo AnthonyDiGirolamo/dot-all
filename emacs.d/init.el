@@ -1,10 +1,6 @@
-(setq initial-buffer-choice t ;; Open *scratch* buffer by default
-      ;; initial-major-mode 'fundamental-mode
-      inhibit-startup-message t
-      inhibit-startup-screen t)
-
-;; Start Maximized
-;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+;;; init.el --- Summary
+;;; Commentary:
+;;; Code:
 
 ;; Keep track of loading time
 (defconst emacs-start-time (current-time))
@@ -14,7 +10,6 @@
 (setq amd/uname (shell-command-to-string "uname -a"))
 (setq amd/using-android (string-match "Android" amd/uname))
 (setq amd/using-pocketchip (string-match "chip" amd/uname))
-(setq amd/using-chromebook (string-match "galliumos" amd/uname))
 (setq amd/using-pc (and (not amd/using-pocketchip)
                         (not amd/using-android)))
 
@@ -24,12 +19,11 @@
 ;; Don’t compact font caches during GC.
 (setq inhibit-compacting-font-caches t)
 
+;; Disable garbage collection when the minibuffer is active
 (defun my-minibuffer-setup-hook ()
   (setq gc-cons-threshold most-positive-fixnum))
-
 (defun my-minibuffer-exit-hook ()
   (setq gc-cons-threshold 16000000))
-
 (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
 (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
 
@@ -40,11 +34,12 @@
 
 ;; Initialize all ELPA packages
 (require 'package)
-(add-to-list 'package-archives '("melpa"        . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/" ) t)
 (setq package-enable-at-startup nil
       package--init-file-ensured t)
 
+;; Don't package-initialize
 ;; (package-initialize)
 
 (defvar cache-file "~/.emacs.d/cache/autoloads")
@@ -90,11 +85,6 @@
 (let ((elapsed (float-time (time-subtract (current-time) emacs-start-time))))
   (message "Loaded settings, elapsed time: %.3fs" elapsed))
 
-;; ;; restore gc-cons-threshold
-;; (setq gc-cons-threshold 16000000)
+;; Loading done, restore gc-cons-threshold
+(setq gc-cons-threshold 16000000)
 
-;; Open org-default-notes-file
-;; (when (file-exists-p org-default-notes-file)
-;;   (find-file org-default-notes-file))
-(put 'narrow-to-region 'disabled nil)
-(put 'erase-buffer 'disabled nil)
