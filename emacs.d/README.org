@@ -744,13 +744,13 @@
      )
 
      (use-package fast-scroll
+       :diminish fast-scroll-minor-mode
        :load-path "fast-scroll"
        :config
        (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
        (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
        (fast-scroll-config)
-       (fast-scroll-minor-mode 1)
-     )
+       (fast-scroll-minor-mode 1))
 
      (use-package powerline
        :init
