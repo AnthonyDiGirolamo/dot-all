@@ -2443,6 +2443,15 @@
   #+BEGIN_SRC emacs-lisp
     (use-package projectile
       :diminish ""
+      :custom
+      (projectile-completion-system 'ivy)
+      (projectile-require-project-root t)  ;; require .git or similar to mark a project
+      (projectile-enable-caching nil)
+      (projectile-indexing-method 'alien)
+      (projectile-globally-ignored-directories '("vendor/ruby"))
+      (projectile-switch-project-action
+       ;; 'projectile-dired
+       'projectile-find-file)
       :commands (ibuffer
                  ivy-switch-project
                  projectile-project-root
@@ -2451,16 +2460,6 @@
                  projectile-run-eshell
                  projectile-find-file)
       :init
-      (setq projectile-completion-system 'ivy)
-      (setq projectile-switch-project-action 'projectile-find-file)
-      ;; (setq projectile-switch-project-action 'projectile-dired)
-
-      (setq projectile-globally-ignored-directories '("vendor/ruby"))
-
-      (setq projectile-require-project-root t)  ;; require .git or similar to mark a project
-      (setq projectile-enable-caching nil)
-      (setq projectile-indexing-method 'alien)
-
       ;; (defun amd/projectile-switch-project (old-function &rest arguments)
       ;;   (message "%s" old-function)
       ;;   (message "%s" arguments)
@@ -2476,10 +2475,9 @@
     (use-package shackle
       :init
       (setq help-window-select t) ;; not shackle but select new help windows when they open
-
-      (setq shackle-select-reused-windows nil) ; default nil
-      (setq shackle-default-alignment 'below) ; default below
-      (setq shackle-default-size 0.4) ; default 0.5
+      (setq shackle-select-reused-windows nil)
+      (setq shackle-default-alignment 'below)
+      (setq shackle-default-size 0.4)
 
       (setq shackle-default-rule '(:select t)
             shackle-rules
@@ -3403,11 +3401,12 @@
         (
          ("a" hydra-align-menu/body "align")
          ("G"  counsel-git-grep       "search git grep")
+         ("rg"  counsel-rg       "ripgrep")
          ("pa" counsel-ag             "search ag counsel")
          ("pf" amd/counsel-ag-with-filename-regex "search ag filename regex")
-         ("pt" counsel-pt             "search pt counsel")
-         ("pp" projectile-pt          "search pt project")
-         ("po" pt-regexp              "search pt other")
+         ;; ("pt" counsel-pt             "search pt counsel")
+         ;; ("pp" projectile-pt          "search pt project")
+         ;; ("po" pt-regexp              "search pt other")
          ("/"  counsel-grep-or-swiper "search grep/swiper")
          (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra")
          )
@@ -3657,15 +3656,34 @@
           ;; "C-n" 'next-line  ;; this is the default
           "<C-return>" 'ivy-alt-done
           "<C-M-return>" 'ivy-immediate-done)
-        (:states '(normal)
+        (:states '(motion)
          :keymaps '(ivy-occur-grep-mode-map)
           "M-n" 'tmux-window-navigation/move-down ;; was compilation-next-error
+          "C-d" 'evil-scroll-down
+          "C-u" 'evil-scroll-up
+          "gg" 'evil-goto-first-line
+          "G" 'evil-goto-line
+          "k" 'evil-ex-search-next
           "n" 'ivy-occur-next-line
           "e" 'ivy-occur-previous-line
-          "C-n" 'next-error-no-select
-          "C-e" 'previous-error-no-select)
+          "N" 'next-error-no-select
+          "E" 'previous-error-no-select)
+        (:states '(motion)
+         :keymaps '(grep-mode-map)
+          "M-n" 'tmux-window-navigation/move-down ;; was compilation-next-error
+          "C-d" 'evil-scroll-down
+          "C-u" 'evil-scroll-up
+          "gg" 'evil-goto-first-line
+          "G" 'evil-goto-line
+          "k" 'evil-ex-search-next
+          "n" 'evil-next-line
+          "e" 'evil-previous-line
+          "N" 'next-error-no-select
+          "E" 'previous-error-no-select)
 
         :config
+        (add-to-list 'evil-motion-state-modes 'ivy-occur-grep-mode)
+        (add-to-list 'evil-motion-state-modes 'grep-mode)
         (ivy-mode 1)
 
         (defun amd/update-evil-search (&optional arg1 &rest args)
@@ -3714,8 +3732,7 @@
          (interactive "sFilename Regex: ")
          (let* ((ag-command (car (split-string counsel-ag-base-command "%s")))
                 (counsel-ag-base-command (concat ag-command " -G '" fileregex "' %s")))
-           (counsel-ag)
-         ))
+           (counsel-ag)))
      )
    #+END_SRC
 
