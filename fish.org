@@ -314,10 +314,17 @@
     function source-bash-aliases --description "Try to source bash aliases"
       bash -i -c 'alias' > ~/.active_aliases
       for line in (cat ~/.active_aliases) # | grep 'vim\|emacs'
-        set_color -b normal $powerline_blue2
-        echo $line
-        set_color -b normal normal
-        eval "$line"
+        if not string match -q -r '\$\(' $line
+          set_color -b normal $powerline_blue2
+          echo $line
+          set_color -b normal normal
+          eval "$line"
+        else
+          echo ERROR: $line
+          # set fixedline (string replace -q -r '\$\(' '(' $line)
+          # echo $fixedline
+          # eval "$fixedline"
+        end
       end
       rm -f ~/.active_aliases
     end
