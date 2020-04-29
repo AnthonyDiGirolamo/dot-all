@@ -47,40 +47,30 @@
     export LC_CTYPE=en_US.UTF-8
     export LC_ALL=en_US.UTF-8
 
-    export PATH=$HOME/apps/fish/bin:$PATH
-    export PATH=$HOME/apps/zsh/bin:$PATH
-    export PATH=$HOME/apps/bash/bin:$PATH
-    export PATH=$HOME/apps/tmux/bin:$PATH
+    export PATH=$HOME/Preferences/bin/els:$PATH
+    export PATH=$HOME/Preferences/bin:$PATH
     export PATH=$HOME/apps/ack/bin:$PATH
+    export PATH=$HOME/apps/bash/bin:$PATH
+    export PATH=$HOME/apps/ctags/bin:$PATH
+    export PATH=$HOME/apps/fish/bin:$PATH
+    export PATH=$HOME/apps/git/bin:$PATH
+    export PATH=$HOME/apps/tmux/bin:$PATH
+    export PATH=$HOME/apps/tree/bin:$PATH
+    export PATH=$HOME/apps/zsh/bin:$PATH
+    export PATH=$HOME/apps:$PATH
+    export PATH=$HOME/dot-all/bin:$PATH
+    export PATH=/usr/local/bin:$PATH
 
     export LS_COLORS='no=00:fi=00:di=00;34:ln=00;36:pi=00;33:so=00;35:do=00;35:bd=00;33:cd=00;33:or=00;31:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=00;32:*.xz=00;31:*.tar=00;31:*.tgz=00;31:*.svgz=00;31:*.arj=00;31:*.taz=00;31:*.lzh=00;31:*.lzma=00;31:*.zip=00;31:*.z=00;31:*.Z=00;31:*.dz=00;31:*.gz=00;31:*.bz2=00;31:*.bz=00;31:*.tbz2=00;31:*.tz=00;31:*.deb=00;31:*.rpm=00;31:*.jar=00;31:*.rar=00;31:*.ace=00;31:*.zoo=00;31:*.cpio=00;31:*.7z=00;31:*.rz=00;31:*.jpg=00;35:*.jpeg=00;35:*.gif=00;35:*.bmp=00;35:*.pbm=00;35:*.pgm=00;35:*.ppm=00;35:*.tga=00;35:*.xbm=00;35:*.xpm=00;35:*.tif=00;35:*.tiff=00;35:*.png=00;35:*.svg=00;35:*.mng=00;35:*.pcx=00;35:*.mov=00;35:*.mpg=00;35:*.mpeg=00;35:*.m2v=00;35:*.mkv=00;35:*.ogm=00;35:*.mp4=00;35:*.m4v=00;35:*.mp4v=00;35:*.vob=00;35:*.qt=00;35:*.nuv=00;35:*.wmv=00;35:*.asf=00;35:*.rm=00;35:*.rmvb=00;35:*.flc=00;35:*.avi=00;35:*.fli=00;35:*.gl=00;35:*.dl=00;35:*.xcf=00;35:*.xwd=00;35:*.yuv=00;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:';
 
-    function fixp_olcf {
-      chmod -Rv g+w $@
-      chgrp -Rv ccsstaff $@
-    }
-
-    function fixp_noaa {
-      chmod -Rv g+w $@
-      chgrp -Rv ncrcstaff $@
-    }
-
-    alias base16dark='source ~/Preferences/base16-shell/base16-eighties.dark.sh'
-    alias base16light='source ~/Preferences/base16-shell/base16-eighties.light.sh'
-    alias solarizeddark='source ~/Preferences/base16-shell/base16-solarized.dark.sh'
-    alias solarizedlight='source ~/Preferences/base16-shell/base16-solarized.light.sh'
+    # colemak startx
+    alias dfasfx=startx
 
     if [[ $TERM == *"eterm"* ]]
     then
         export TERM=xterm-256color
-    else
-        # If not in emacs load base16 shell colors
-        # base16
-        echo -n ''
     fi
 
-
-    alias which='which -a'
     alias b="bundle"
     alias bi="b install --path vendor"
     alias bu="b update"
@@ -88,7 +78,6 @@
     alias binit="bi && b package && echo 'vendor/ruby' >> .gitignore"
 
     # Rename files recursively in the current dir and replace space with _
-    alias space2under='zmv -Q "(**/)(* *)(D)" "\$1\${2// /_}"'
 
     alias w="w|sed -e '/^USER.*$/d'|sort|less"
 
@@ -108,7 +97,7 @@
       sed -n "$1p" $2
     }
 
-    alias xdef='xrdb -load ~/.Xdefaults'
+    alias xdef='xrdb -load ~/.Xresources'
 
     alias lltr='ll -tr'
     alias llsr='ll -Sr'
@@ -153,40 +142,19 @@
     alias u='cd ..'
     alias c=cd
 
-    # alias h='history 1'
-
     alias du='du -hsc'
     alias df='df -h'
 
-    # GTD Stuff
-    # alias t='vim ~/Notes/GTD.mkd'
-    # alias tg='gvim ~/Notes/GTD.mkd'
-    # alias today='grep `date +%m/%d` ~/Notes/GTD.mkd'
-
-    alias cjob='qsub -l walltime=02:00:00 -l size=12 -N compiling -j oe -I -A STF007'
-    alias cj='checkjob -v'
-
-    # module evironment files
-    # alias m=module
-    # alias ml='m load'
-    # alias mh='m help'
-    # alias ms='m swap'
-    # alias mr='m unload'
-    # alias md='m display'
-    # alias ma='m avail'
-    # alias mk='m keyword'
-    # alias mll="module list -l 2>&1 | ruby -e 'STDIN.readlines.tap{|s|s.delete_at(1)}.sort.each{|l| puts l}'"
-
+    # always color tree output
     alias tree='tree -C'
-    alias tls='tree -L 1'
-    alias tll='treetable -L 1'
-    alias tlla='treetable -a -L 1'
-    alias tls2='tree -L 2'
-    alias tll2='treetable -L 2'
-    alias tlla2='treetable -a -L 2'
-    alias tls3='tree -L 3'
-    alias tll3='treetable -L 3'
-    alias tlla3='treetable -a -L 3'
+    # # 1,2,3 level deep tree aliases
+    # alias t='tree -L 1'
+    # alias tt='tree -L 2'
+    # alias ttt='tree -L 3'
+    # tree aliases that show ll output on the left, file tree on the right
+    alias tll="tree -C -apugsD -L 2 | sed -e 's/^\(.*\) \(\[.*\]\) \(.*\)/\2 \1\3/'"
+    alias tlll="tree -C -apugsD -L 3 | sed -e 's/^\(.*\) \(\[.*\]\) \(.*\)/\2 \1\3/'"
+    alias tllll="tree -C -apugsD | sed -e 's/^\(.*\) \(\[.*\]\) \(.*\)/\2 \1\3/'"
 
     function dotbin {
       export PATH=`pwd`/bin:$PATH
@@ -200,45 +168,14 @@
       unzip -l $@ | ruby -e 'STDIN.readlines.tap{|f| f.shift(3); f.pop(2) }.each{|l| puts l.sub(/^\s+\S+\s+\S+\s+\S+\s+[^\/]+\//,"")}'
     }
 
-    export PATH=$HOME/apps:$PATH
-    export PATH=$HOME/apps/git/bin:$PATH
-    export PATH=$HOME/apps/ctags/bin:$PATH
-    export PATH=$HOME/apps/tree/bin:$PATH
-
-    export PATH=/usr/local/bin:$PATH
-
-    export PATH=$HOME/dot-all/bin:$PATH
-    export PATH=$HOME/Preferences/bin:$PATH
-    export PATH=$HOME/Preferences/bin/els:$PATH
-
-    # alias els='els --els-icons=fontawesome'
-
-    alias wd="pwd"
     alias sqltop="watch \"mysql -u root information_schema -e 'select * from processlist;'\""
+
     alias which="which -a"
     alias psme='ps afxu|grep -E "^$(whoami)"'
     alias psa='ps afxu| vim +"set bt=nowrite nowrap" -'
 
-    # alias mutt='TERM=xterm-256color LD_LIBRARY_PATH=$HOME/apps/gdbm/lib:$HOME/apps/w3m/lib PATH=$HOME/apps/w3m/bin:$HOME/apps/mutt/bin:$HOME/apps/gdbm/bin:$HOME/apps/msmtp/bin:$HOME/apps/imapfilter/bin:$PATH mutt'
-    export MAILDIR=$HOME/Mail
-    alias mu_mutt_aliases='mu find t:digirolamo --fields "f"|sort|uniq|grep -v help@nccs.gov|grep -v "via RT" |grep -v "@local"|ruby -e "STDIN.readlines.each{|l| puts "alias #{$1.delete(" \",.")} #{$1.delete("\"")} <#{$2}>" if l =~ /^(.*?) <(.*?)>$/}"|uniq'
-
-    alias sshfoxy1='ssh lmd@login1.ornl.gov -L2222:uac2.ornl.gov:22'
-    alias sshfoxy2='ssh -p 2222 lmd@localhost -D localhost:8888 -L9993:mail.ornl.gov:993 -L2525:smtp.ornl.gov:25'
-
-    alias sshfsolcf='sshfs lmd@home.ccs.ornl.gov: $HOME/OLCF'
-    alias sshfsncrc1='ssh lmd@home.ccs.ornl.gov -L2222:cave.ccs.ornl.gov:22'
-    alias sshfsncrc2='ssh -p 2222 lmd@127.0.0.1 -L2223:cavern.ncrc.gov:22'
-    alias sshfsncrc3='sshfs Anthony.DiGirolamo@127.0.0.1: $HOME/NCRC -p 2223 -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
-
-    alias sshhome='ssh lmd@home.ccs.ornl.gov -Y'
-    alias sshcave='ssh lmd@cave.ccs.ornl.gov -Y'
-
-    alias sshchester=" ssh -Y chester"
-    alias sshjag="ssh -Y jaguarpf"
-    alias sshcavern="ssh -Y cavern.ncrc.gov -l Anthony.DiGirolamo "
-
-    alias loadsmithy='source /sw/tools/smithy/environment.sh'
+    # export MAILDIR=$HOME/Mail
+    # alias mu_mutt_aliases='mu find t:digirolamo --fields "f"|sort|uniq|grep -v help@nccs.gov|grep -v "via RT" |grep -v "@local"|ruby -e "STDIN.readlines.each{|l| puts "alias #{$1.delete(" \",.")} #{$1.delete("\"")} <#{$2}>" if l =~ /^(.*?) <(.*?)>$/}"|uniq'
 
     alias gem_uninstall_all='gem list | cut -d" " -f1 | xargs gem uninstall -aIx'
 
@@ -271,18 +208,6 @@
     # Auth your sshkey with another server
     function authme {
         ssh $@ 'cat >>.ssh/authorized_keys' <~/.ssh/id_rsa.pub
-    }
-
-    function setupenv {
-      pushd ~
-      rsync -avLK --delete --exclude mthesaur-vim.txt apps/bin .gitconfig .vim .vimrc .zprezto .zlogin  .zlogout  .zpreztorc  .zprofile  .zshenv  .zshrc .screenrc .tmux.conf .aliases .irbrc $@:~/
-      popd
-    }
-
-    function setupenv_full {
-      pushd ~
-      rsync -avLK --delete --exclude mthesaur-vim.txt Preferences $@:~/
-      popd
     }
 
     function gpgastart {
@@ -336,52 +261,23 @@
       fi
 
     else
-    # Linux
-      #eval "`dircolors -b`"
+      # Linux
+      # eval "`dircolors -b`"
       alias ls='ls --color=auto'
-
-      alias rrm='/bin/rm'
-      alias rm='mv --verbose -i --target-directory ~/.Trash/'
-      alias empty='/bin/rm -rvf ~/.Trash/* ; /bin/rm -rvf ~/.Trash/.*'
-      alias f12insert='xmodmap -e "keycode 96 = Insert"'
+      # alias rrm='/bin/rm'
+      # alias rm='mv --verbose -i --target-directory ~/.Trash/'
+      # alias empty='/bin/rm -rvf ~/.Trash/* ; /bin/rm -rvf ~/.Trash/.*'
+      # alias f12insert='xmodmap -e "keycode 96 = Insert"'
       unset LESS
-
-      # function setinputprefs {
-      #   xset r rate 200 30
-      #   xinput list --name-only | grep -qs 'anthony’s trackpad'
-      #   if [ $? -eq 0 ]; then
-      #     xinput set-prop 'anthony’s trackpad' 'Synaptics Two-Finger Scrolling' 1, 1
-      #     xinput set-prop 'anthony’s trackpad' 'Synaptics Scrolling Distance' -156, -156
-      #   fi
-      # }
-
-      # if which xset &> /dev/null &&  [ ! -z "$DISPLAY" ]; then
-      #   setinputprefs
-      # fi
     fi
 
     # Disable CTRL-S Freeze
     stty -ixon
 
-    alias vims="vim -c 'colors solarized'"
     alias v=vim
-
-    EMACSHOMEPREFIX=$HOME/apps/emacs
-    if [ -e $EMACSHOMEPREFIX ] ; then
-      export PATH="$EMACSHOMEPREFIX/bin:$PATH"
-    fi
-
-    alias ew='emacs-w32 &'
-
-    uname -a | grep -qs Darwin ; if [ $? -eq 0 ]; then
-      alias emacs=/Applications/Emacs.app/Contents/MacOS/Emacs
-    fi
-
-    alias e='TERM=xterm-256color emacs -nw'
-    alias eg='emacs &'
-    alias ed='emacs --daemon'
-    alias ec="emacsclient --alternate-editor='' -nw"
-    alias ecg="emacsclient --alternate-editor='' --no-wait --create-frame"
+    alias e="env TERM=xterm-24bits emacs -nw"
+    alias ec="env TERM=xterm-24bits emacsclient --alternate-editor='' -nw"
+    alias ecg="env TERM=xterm-24bits emacsclient --alternate-editor='' --no-wait --create-frame"
 
     if [ -z ${DISPLAY+x} ];
     then
@@ -396,69 +292,37 @@
 
     alias tmux='tmux -2'
 
-    # hostname -s | grep -qs -E 'cave|yona'
-    # if [ $? -eq 0 ]; then
-    #   alias vim='/usr/bin/vim'
-    #   export EDITOR='/usr/bin/vim'
-    # fi
-
-    # For default ruby on arch linux
-    export PATH=$HOME/.gem/ruby/2.2.0/bin:$PATH
-
+    # rbenv
     if [ -e /usr/local/var/rbenv ] ; then
       export RBENV_ROOT=/usr/local/var/rbenv
+      # For default ruby on arch linux
     fi
     export PATH="$HOME/.rbenv/bin:$PATH"
+    export PATH=$HOME/.gem/ruby/2.5.0/bin:$PATH
     which rbenv &> /dev/null && eval "$(rbenv init -)"
 
-    if [[ -n $MODULESHOME ]]; then
-      if [[ -n ${ZSH_VERSION-} ]]; then
-        . $MODULESHOME/init/zsh
-      fi
-      if [[ -n ${BASH_VERSION-} ]]; then
-        . $MODULESHOME/init/bash
-      fi
-      declare -f module &> /dev/null && module load git ruby
-    fi
+    # function random-colors-dark {
+    #   FILES=( ~/Preferences/base16-shell/base16-*.dark.sh )
+    #   rf=$FILES[$RANDOM%$#FILES+1]
+    #   echo $rf
+    #   . $rf
+    # }
 
-    function random-colors-dark {
-      FILES=( ~/Preferences/base16-shell/base16-*.dark.sh )
-      rf=$FILES[$RANDOM%$#FILES+1]
-      echo $rf
-      . $rf
-    }
-
-    function load_qwerty_xorg {
-      setxkbmap -layout us
-    }
-
-    function load_colemak_xorg {
-      setxkbmap -layout us -variant colemak
-    }
-
-    function load_colemak_console {
-      sudo loadkeys colemak
-    }
-
-    function mailfetchloop {
-      while [ 1 ]
-      do
-        mbsync -V gmail
-        date
-        sleep 120
-      done
-    }
-    alias mfl=mailfetchloop
-
-    # if [[ -n ${BASH_VERSION-} ]]; then
-    #   . ~/.shell_prompt.sh
-    # fi
+    # function mailfetchloop {
+    #   while [ 1 ]
+    #   do
+    #     mbsync -V gmail
+    #     date
+    #     sleep 120
+    #   done
+    # }
 
     function setgitauthor {
       git config user.name "AnthonyDiGirolamo"
       git config user.email "anthony.digirolamo@gmail.com"
     }
 
+    # node
     export PATH="$HOME/apps/node-v8.5.0-linux-x64/bin:$PATH"
     NPM_PACKAGES="$HOME/.npm-packages"
     mkdir -p $NPM_PACKAGES/bin
@@ -468,13 +332,16 @@
     # echo "prefix = $NPM_PACKAGES" > ~/.npmrc
     export NPM_CONFIG_PREFIX=$NPM_PACKAGES
 
+    # pip
     # for python pip install --user
     export PATH="$HOME/.local/bin:$PATH"
     export PATH="$HOME/Library/Python/2.7/bin:$PATH"
 
+    # luarocks
     export PATH="$HOME/.luarocks/bin:$PATH"
-    which luarocks 2>/dev/null && eval $(luarocks path)
+    which luarocks 2>/dev/null 1>/dev/null && eval $(luarocks path)
 
+    # rust/cargo
     export PATH="$HOME/.cargo/bin:$PATH"
 
     export PATH="$HOME/apps/pebble-sdk-4.5-linux64/bin:$PATH"
@@ -482,10 +349,10 @@
     if [[ -n ${ZSH_VERSION-} ]]; then
       setopt clobber
       prompt kylewest
+      alias space2under='zmv -Q "(**/)(* *)(D)" "\$1\${2// /_}"'
     fi
 
-    source ~/.aliases-local
-    alias dfasfx=startx
+    test -f ~/.aliases-local && source ~/.aliases-local
   #+end_src
 
 * pocketchip =~/.aliases-local=
