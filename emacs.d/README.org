@@ -821,12 +821,14 @@
                sh-mode-hook)))
 
      (defun amd/add-appearance-mode (mode-to-add)
-       (interactive)
+       "Add MODE-TO-ADD to all hooks defined in amd/appearance-mode-hooks."
        (add-to-list 'amd/appearance-modes mode-to-add)
        (cl-loop for this-mode in amd/appearance-mode-hooks
                 collect (add-hook this-mode mode-to-add)))
 
+     ;; manually run appearance modes
      (defun amd/set-appearance-modes ()
+       "Manually run preffered appearance modes."
        (interactive)
        (cl-loop for this-mode in amd/appearance-modes
                 do (funcall this-mode 1)))
@@ -838,7 +840,6 @@
 
    #+BEGIN_SRC emacs-lisp
      (use-package hl-line
-       :commands (hl-line-mode)
        :config
        (amd/add-appearance-mode 'hl-line-mode))
    #+END_SRC
@@ -864,60 +865,69 @@
         (highlight-indent-guides-character ?\|))
     #+end_src
 
-*** nlinum-relative
+*** display-line-numbers-mode
 
-    Relative line numbering using ~nlinum~ which is faster than the built-in
-    ~linum~ mode.
+    #+begin_src emacs-lisp
+    (use-package display-line-numbers
+      :custom
+      (display-line-numbers-type 'relative)
+      (display-line-numbers-current-absolute t))
+    #+end_src
 
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (use-package nlinum-relative
-       :commands (nlinum-relative-mode)
-       :init
-       ;; (setq nlinum-relative-redisplay-delay 0)   ;; delay
-       ;; (setq nlinum-relative-current-symbol "->") ;; or "" for display current line number
-       ;; (setq nlinum-relative-offset 0)            ;; 1 if you want 0, 2, 3...
-       :config
-       (nlinum-relative-setup-evil)
-       (unless (or amd/using-pocketchip amd/using-android)
-         (amd/add-appearance-mode 'nlinum-relative-mode)))
-   #+END_SRC
+*** deprecated
 
-**** deprecated
+**** relative-line-numbers
 
-***** relative-line-numbers
+     No longer using ~relative-line-numbers~, ~nlinum-relative~ has better performance.
 
-      No longer using ~relative-line-numbers~, ~nlinum-relative~ has better performance.
+     #+BEGIN_SRC emacs-lisp :tangle no
+       ;; (use-package relative-line-numbers
+       ;;   :diminish ""
+       ;;   :config
+       ;;   (--map (add-hook it 'relative-line-numbers-mode) amd/appearance-mode-hooks)
+       ;;   (defun abs-rel-numbers (offset)
+       ;;     (if (= offset 0)
+       ;;         ;; current line
+       ;;         (format "%4d " (line-number-at-pos))
+       ;;       ;; not the current line
+       ;;       (format "%4d " (abs offset))
+       ;;     )
+       ;;   )
+       ;;   (setq relative-line-numbers-format #'abs-rel-numbers)
+       ;; )
+     #+END_SRC
 
-      #+BEGIN_SRC emacs-lisp :tangle no
-        ;; (use-package relative-line-numbers
-        ;;   :diminish ""
-        ;;   :config
-        ;;   (--map (add-hook it 'relative-line-numbers-mode) amd/appearance-mode-hooks)
-        ;;   (defun abs-rel-numbers (offset)
-        ;;     (if (= offset 0)
-        ;;         ;; current line
-        ;;         (format "%4d " (line-number-at-pos))
-        ;;       ;; not the current line
-        ;;       (format "%4d " (abs offset))
-        ;;     )
-        ;;   )
-        ;;   (setq relative-line-numbers-format #'abs-rel-numbers)
-        ;; )
-      #+END_SRC
+**** sublimity
 
-***** sublimity
+     #+BEGIN_SRC emacs-lisp :tangle no
+       ;; (use-package sublimity-map
+       ;;   :init
+       ;;   (setq sublimity-map-size 20)
+       ;;   (setq sublimity-map-fraction 0.3)
+       ;;   (setq sublimity-map-text-scale -7)
+       ;;   :config
+       ;;   (sublimity-mode 1)
+       ;;   ;; (sublimity-map-set-delay 0)
+       ;; )
+     #+END_SRC
 
-      #+BEGIN_SRC emacs-lisp
-        ;; (use-package sublimity-map
-        ;;   :init
-        ;;   (setq sublimity-map-size 20)
-        ;;   (setq sublimity-map-fraction 0.3)
-        ;;   (setq sublimity-map-text-scale -7)
-        ;;   :config
-        ;;   (sublimity-mode 1)
-        ;;   ;; (sublimity-map-set-delay 0)
-        ;; )
-      #+END_SRC
+**** nlinum-relative
+
+     Relative line numbering using ~nlinum~ which is faster than the built-in
+     ~linum~ mode.
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package nlinum-relative
+        :commands (nlinum-relative-mode)
+        :init
+        ;; (setq nlinum-relative-redisplay-delay 0)   ;; delay
+        ;; (setq nlinum-relative-current-symbol "->") ;; or "" for display current line number
+        ;; (setq nlinum-relative-offset 0)            ;; 1 if you want 0, 2, 3...
+        :config
+        (nlinum-relative-setup-evil)
+        (unless (or amd/using-pocketchip amd/using-android)
+          (amd/add-appearance-mode 'nlinum-relative-mode)))
+     #+END_SRC
 
 *** color-identifiers
 
@@ -3470,13 +3480,11 @@
          ("f" auto-fill-mode "auto-fill-mode" :toggle auto-fill-function :color amaranth)
          ("F" fringe-mode "fringe-mode" :toggle (not (eq fringe-mode 0)) :color amaranth))
         "Line Numbers"
-        (("ld" display-line-numbers-mode "display-line-numbers-mode" :toggle t :color amaranth)
-         ("ln" nlinum-mode "nlinum-mode" :toggle t :color amaranth)
-         ("lr" nlinum-relative-mode "nlinum-relative-mode" :toggle t :color amaranth)
-         ("hl" hl-line-mode "hl-line-mode" :toggle t :color amaranth))
+        (("ll" display-line-numbers-mode "display-line-numbers-mode" :toggle t :color amaranth)
+         ("hl" hl-line-mode "hl-line-mode" :toggle t :color amaranth)
+         ("hi" highlight-indent-guides-mode "highighlight-indent-guides-mode" :toggle t :color amaranth))
         "Code"
-        (("hi" highlight-indent-guides-mode "highighlight-indent-guides-mode" :toggle t :color amaranth)
-         ("d" rainbow-delimiters-mode "rainbow-delimiters-mode" :toggle t :color amaranth)
+        (("d" rainbow-delimiters-mode "rainbow-delimiters-mode" :toggle t :color amaranth)
          ("c" color-identifiers-mode "color-identifiers-mode" :toggle t :color amaranth)
          ("g" glasses-mode "glasses-mode" :toggle t :color amaranth))))
 
