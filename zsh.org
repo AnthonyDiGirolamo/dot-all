@@ -3833,3 +3833,10 @@
     ## END OF FILE #################################################################
     # vim:filetype=zsh foldmethod=marker autoindent expandtab shiftwidth=4
   #+end_src
+
+* =~/.zshrc.local=
+
+  #+begin_src sh :tangle ~/.zshrc.local
+    source ~/.aliases
+  #+end_src
+

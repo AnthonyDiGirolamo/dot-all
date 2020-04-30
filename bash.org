@@ -350,7 +350,6 @@
 
     if [[ -n ${ZSH_VERSION-} ]]; then
       setopt clobber
-      prompt kylewest
       alias space2under='zmv -Q "(**/)(* *)(D)" "\$1\${2// /_}"'
     fi
 
