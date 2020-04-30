@@ -181,6 +181,8 @@
 
 ** ~/.config/fish/functions/fish_prompt.fish
 
+   The =fish_prompt= function is responsible for setting the prompt.
+
    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_prompt.fish"
      set -x fish_color_history_current yellow
 
@@ -240,6 +242,9 @@
    #+END_SRC
 
 ** ~/.config/fish/functions/fish_mode_prompt.fish
+
+   The =fish_mode_prompt= formats the vi mode part of the prompt.
+   =fish_vi_key_bindings= must be enabled.
 
    #+BEGIN_SRC fish :tangle "~/.config/fish/functions/fish_mode_prompt.fish"
      # The fish_mode_prompt function is prepended to the prompt
