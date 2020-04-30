@@ -12,7 +12,8 @@
  - [[#directory-navigation][directory navigation]]
    - [[#configfishfunctionsufish][~/.config/fish/functions/u.fish]]
    - [[#configfishfunctionsdlfish][~/.config/fish/functions/dl.fish]]
- - [[#functions][functions]]
+ - [[#bash-releated][bash releated]]
+   - [[#configfishfunctionssource-bash-aliasesfish][~/.config/fish/functions/source-bash-aliases.fish]]
 
 * ~/.config/fish/config.fish
 
@@ -308,7 +309,8 @@
      end
    #+END_SRC
 
-* functions
+* bash releated
+** ~/.config/fish/functions/source-bash-aliases.fish
 
   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/source-bash-aliases.fish"
     # WIP: not all aliases work
@@ -322,9 +324,6 @@
           eval "$line"
         else
           echo ERROR: $line
-          # set fixedline (string replace -q -r '\$\(' '(' $line)
-          # echo $fixedline
-          # eval "$fixedline"
         end
       end
       rm -f ~/.active_aliases
