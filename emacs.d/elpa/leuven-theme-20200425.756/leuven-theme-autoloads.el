@@ -10,7 +10,7 @@
 ;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from leuven-dark-theme.el
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "leuven-dark-theme" '("leuven-")))
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "leuven-dark-theme" '("leuven-dark")))
 
 ;;;***
 
@@ -18,8 +18,6 @@
 ;;; Generated autoloads from leuven-theme.el
 
 (when (and (boundp 'custom-theme-load-path) load-file-name) (add-to-list 'custom-theme-load-path (file-name-as-directory (file-name-directory load-file-name))))
-
-(when (string-match "/etc/themes/$" (file-name-directory (or load-file-name (buffer-file-name)))) (message "To stay up-to-date, you should better install and use leuven-theme from MELPA.") (sit-for 2))
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "leuven-theme" '("leuven")))
 

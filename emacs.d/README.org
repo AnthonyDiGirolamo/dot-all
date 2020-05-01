@@ -7,11 +7,10 @@
  - [[#libraries][libraries]]
  - [[#appearance][appearance]]
    - [[#themes][themes]]
-   - [[#reference-pico-8-colors][Reference: pico-8 colors]]
-   - [[#light-theme][light theme]]
-   - [[#dark-theme][dark theme]]
-   - [[#solaire-mode][solaire-mode]]
+   - [[#leuven-light][leuven light]]
+   - [[#moe-dark][moe dark]]
    - [[#doom-themes][doom-themes]]
+   - [[#solaire-mode][solaire-mode]]
    - [[#modeline][modeline]]
    - [[#load-theme][load theme]]
    - [[#appearance-minor-modes][appearance minor-modes]]
@@ -290,42 +289,41 @@
 
 ** themes
 
-** Reference: pico-8 colors
-
-   #+begin_src css
-     #000000 (0,   0,   0)   black
-     #1D2B53 (29,  43,  83)  dark-blue
-     #7E2553 (126, 37,  83)  dark-purple
-     #008751 (0,   135, 81)  dark-green
-     #AB5236 (171, 82,  54)  brown
-     #5F574F (95,  87,  79)  dark-gray
-     #C2C3C7 (194, 195, 199) light-gray
-     #FFF1E8 (255, 241, 232) white
-     #FF004D (255, 0,   77)  red
-     #FFA300 (255, 163, 0)   orange
-     #FFEC27 (255, 236, 39)  yellow
-     #00E436 (0,   228, 54)  green
-     #29ADFF (41,  173, 255) blue
-     #83769C (131, 118, 156) indigo
-     #FF77A8 (255, 119, 168) pink
-     #FFCCAA (255, 204, 170) peach
+   #+begin_src emacs-lisp
+     ;; (defadvice load-theme (before theme-dont-propagate activate)
+     (defun amd/disable-loaded-themes ()
+       (cl-loop for theme-name in custom-enabled-themes
+                do (funcall #'disable-theme theme-name))
+     )
    #+end_src
 
-** light theme
+** leuven light
 
    #+BEGIN_SRC emacs-lisp
+     ;; For some reason this use-package cause leuven org faces
+     ;; to be set that appear when other themes are loaded.
+
+     ;; (use-package leuven-theme
+     ;;   ;; :custom
+     ;;   ;; (leuven-scale-org-agenda-structure nil)
+     ;;   ;; (leuven-scale-outline-headlines nil)
+     ;;   :config)
+
      (defun amd/leuven-light-theme ()
        "Light background theme"
        (interactive)
+       (amd/disable-loaded-themes)
        (load-theme 'leuven t)
+       (load-theme 'airline-cobalt2 t)
+       ;; (load-theme 'airline-qwq t)
        (custom-theme-set-faces
         'leuven
-        `(org-level-1 ((t (:height 1.3 :weight bold :slant normal :foreground "#875fff" :underline nil))))
-        `(org-level-2 ((t (:height 1.1 :weight bold :slant normal :foreground "#005fff" :underline nil))))
-        `(org-level-3 ((t (:height 1.0 :weight bold :slant normal :foreground "#00875f" :underline nil))))
+        ;; `(org-level-1 ((t (:height 1.3 :weight bold :slant normal :foreground "#875fff" :underline nil))))
+        ;; `(org-level-2 ((t (:height 1.1 :weight bold :slant normal :foreground "#005fff" :underline nil))))
+        ;; `(org-level-3 ((t (:height 1.0 :weight bold :slant normal :foreground "#00875f" :underline nil))))
 
-        `(magit-section-heading ((t (:foreground "#483d8b"))))
-        `(magit-section-heading-selection ((t (:foreground "#6a5acd"))))
+        ;; `(magit-section-heading ((t (:foreground "#483d8b"))))
+        ;; `(magit-section-heading-selection ((t (:foreground "#6a5acd"))))
 
         `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
         `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
@@ -366,161 +364,228 @@
         ;; `(web-mode-keyword-face ((t (:foreground "#ff4500"))))
         ;; `(web-mode-css-selector-face ((t (:foreground "#ff4500"))))
         ;; `(which-key-group-description-face ((t (:foreground "#ff4500"))))
-
-        ))
+     ))
    #+END_SRC
 
-** dark theme
+** moe dark
 
    #+BEGIN_SRC emacs-lisp
-     (defun amd/moe-dark-theme ()
-       "dark background theme"
-       (interactive)
-       (load-theme 'moe-dark t)
-       (custom-theme-set-faces 'moe-dark
-        ;; `(default ((t (:background "#000000"))))
-        `(region ((t (:background "#626262"))))
+     (use-package moe-theme
+       :config
+       (defun amd/moe-dark-theme ()
+         "dark background theme"
+         (interactive)
+         (amd/disable-loaded-themes)
+         (load-theme 'moe-dark t)
+         (load-theme 'airline-owo t)
+         ;; some alternative airline colors that match
+         ;; (load-theme 'airline-onedark t)
+         ;; (load-theme 'airline-behelit t)
+         (custom-theme-set-faces
+          'moe-dark
+          ;; `(default ((t (:background "#000000"))))
+          `(region ((t (:background "#626262"))))
 
-        ;; No Terminal Italics (which is sometimes reverse video)
-        ;; see: http://permalink.gmane.org/gmane.comp.terminal-emulators.tmux.user/2347
+          ;; No Terminal Italics (which is sometimes reverse video)
+          ;; see: http://permalink.gmane.org/gmane.comp.terminal-emulators.tmux.user/2347
 
-        `(font-lock-string-face            ((t (:slant normal :foreground "#ffb86c"))))
-        `(font-lock-comment-delimiter-face ((t (:slant normal :foreground "#6c6c6c"))))
-        `(font-lock-comment-face           ((t (:slant normal :foreground "#6c6c6c"))))
+          `(font-lock-string-face            ((t (:slant normal :foreground "#ffb86c"))))
+          `(font-lock-comment-delimiter-face ((t (:slant normal :foreground "#6c6c6c"))))
+          `(font-lock-comment-face           ((t (:slant normal :foreground "#6c6c6c"))))
 
-        `(org-document-title
-                      ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil)))) ;; purple
-        `(org-level-1 ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil)))) ;; purple
-        `(org-level-2 ((t (:height 1.0 :weight normal :slant normal :foreground "#88aaff" :underline nil)))) ;; blue
-        ;; `(org-level-1 ((t (:height 1.3 :weight bold   :slant normal :foreground "#aa88ff" :background "#3a3a3a" :underline nil :box (:line-width 4 :color "#3a3a3a" :style nil)))))
-        ;; `(org-level-2 ((t (:height 1.1 :weight bold   :slant normal :foreground "#88aaff" :background "#3a3a3a" :underline nil :box (:line-width 4 :color "#3a3a3a" :style nil)))))
-        `(org-level-3 ((t (:height 1.0 :weight normal :slant normal :foreground "#88ffff" :underline nil)))) ;; cyan
-        `(org-level-4 ((t (:height 1.0 :weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; sea-green
-        `(org-level-5 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffff66" :underline nil)))) ;; yellow
-        `(org-level-6 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffaa00" :underline nil)))) ;; orange
-        `(org-level-7 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff6666" :underline nil)))) ;; red
-        `(org-level-8 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff66aa" :underline nil)))) ;; pink
+          `(org-document-title
+            ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil)))) ;; purple
+          `(org-level-1 ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil)))) ;; purple
+          `(org-level-2 ((t (:height 1.0 :weight normal :slant normal :foreground "#88aaff" :underline nil)))) ;; blue
+          ;; `(org-level-1 ((t (:height 1.3 :weight bold   :slant normal :foreground "#aa88ff" :background "#3a3a3a" :underline nil :box (:line-width 4 :color "#3a3a3a" :style nil)))))
+          ;; `(org-level-2 ((t (:height 1.1 :weight bold   :slant normal :foreground "#88aaff" :background "#3a3a3a" :underline nil :box (:line-width 4 :color "#3a3a3a" :style nil)))))
+          `(org-level-3 ((t (:height 1.0 :weight normal :slant normal :foreground "#88ffff" :underline nil)))) ;; cyan
+          `(org-level-4 ((t (:height 1.0 :weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; sea-green
+          `(org-level-5 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffff66" :underline nil)))) ;; yellow
+          `(org-level-6 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffaa00" :underline nil)))) ;; orange
+          `(org-level-7 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff6666" :underline nil)))) ;; red
+          `(org-level-8 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff66aa" :underline nil)))) ;; pink
 
-        `(outshine-level-1 ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil)))) ;; purple
-        `(outshine-level-2 ((t (:height 1.0 :weight normal :slant normal :foreground "#88aaff" :underline nil)))) ;; blue
-        `(outshine-level-3 ((t (:height 1.0 :weight normal :slant normal :foreground "#88ffff" :underline nil)))) ;; cyan
-        `(outshine-level-4 ((t (:height 1.0 :weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; sea-green
-        `(outshine-level-5 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffff66" :underline nil)))) ;; yellow
-        `(outshine-level-6 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffaa00" :underline nil)))) ;; orange
-        `(outshine-level-7 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff6666" :underline nil)))) ;; red
-        `(outshine-level-8 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff66aa" :underline nil)))) ;; pink
+          `(outshine-level-1 ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil)))) ;; purple
+          `(outshine-level-2 ((t (:height 1.0 :weight normal :slant normal :foreground "#88aaff" :underline nil)))) ;; blue
+          `(outshine-level-3 ((t (:height 1.0 :weight normal :slant normal :foreground "#88ffff" :underline nil)))) ;; cyan
+          `(outshine-level-4 ((t (:height 1.0 :weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; sea-green
+          `(outshine-level-5 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffff66" :underline nil)))) ;; yellow
+          `(outshine-level-6 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffaa00" :underline nil)))) ;; orange
+          `(outshine-level-7 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff6666" :underline nil)))) ;; red
+          `(outshine-level-8 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff66aa" :underline nil)))) ;; pink
 
-        `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
-        `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
-        `(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))))
-        `(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))))
-        `(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))))
-        `(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))))
-        `(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))))
-        `(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))))
+          `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
+          `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
+          `(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))))
+          `(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))))
+          `(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))))
+          `(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))))
+          `(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))))
+          `(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))))
 
-        `(ace-jump-face-foreground ((t (:background "color-18" :foreground "#ff8700" :weight bold))))
+          `(ace-jump-face-foreground ((t (:background "color-18" :foreground "#ff8700" :weight bold))))
 
-        `(avy-lead-face ((t (:foreground "#ffaf00"))))
-        `(avy-lead-face-0 ((t (:foreground "#5fd7ff"))))
+          `(avy-lead-face ((t (:foreground "#ffaf00"))))
+          `(avy-lead-face-0 ((t (:foreground "#5fd7ff"))))
 
-        `(eyebrowse-mode-line-active ((t (:inherit mode-line-emphasis :foreground "#ffff87"))))
+          `(eyebrowse-mode-line-active ((t (:inherit mode-line-emphasis :foreground "#ffff87"))))
 
-        `(flycheck-error ((t (:inherit default :background "color-236" :foreground "#ff5f87" :underline t :weight bold))))
+          `(flycheck-error ((t (:inherit default :background "color-236" :foreground "#ff5f87" :underline t :weight bold))))
 
-        '(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
-        '(flyspell-incorrect ((t (:underline "yellow" :weight bold))))
+          '(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
+          '(flyspell-incorrect ((t (:underline "yellow" :weight bold))))
 
-        ;; (if (display-graphic-p)
-            `(org-todo ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "#ff00ff" ))))
+          ;; (if (display-graphic-p)
+          `(org-todo ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "#ff00ff" ))))
           ;; `(org-todo ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "color-201" )))))
 
-        ;; (if (display-graphic-p)
-            `(org-done ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "#00ffff"))))
+          ;; (if (display-graphic-p)
+          `(org-done ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "#00ffff"))))
           ;; `(org-done ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "color-51")))))
 
-        `(org-link ((t (:foreground "#87d7ff" :underline t))))
+          `(org-link ((t (:foreground "#87d7ff" :underline t))))
 
-        `(org-block-begin-line ((t (:foreground "#5a5a5a" :background "#2e2e2e"))))
-        `(org-block-end-line ((t (:foreground nil :background nil :inherit 'org-block-begin-line))))
-        `(org-block ((t (:foreground nil :background nil :inherit nil))))
+          `(org-block-begin-line ((t (:foreground "#5a5a5a" :background "#2e2e2e"))))
+          `(org-block-end-line ((t (:foreground nil :background nil :inherit 'org-block-begin-line))))
+          `(org-block ((t (:foreground nil :background nil :inherit nil))))
 
-        `(dired-subtree-depth-1-face ((t (:background "#3a3a3a"))))
-        `(dired-subtree-depth-2-face ((t (:background "#444444"))))
-        `(dired-subtree-depth-3-face ((t (:background "#4e4e4e"))))
-        `(dired-subtree-depth-4-face ((t (:background "#585858"))))
-        `(dired-subtree-depth-5-face ((t (:background "#626262"))))
-        `(dired-subtree-depth-6-face ((t (:background "#6c6c6c"))))
+          `(dired-subtree-depth-1-face ((t (:background "#3a3a3a"))))
+          `(dired-subtree-depth-2-face ((t (:background "#444444"))))
+          `(dired-subtree-depth-3-face ((t (:background "#4e4e4e"))))
+          `(dired-subtree-depth-4-face ((t (:background "#585858"))))
+          `(dired-subtree-depth-5-face ((t (:background "#626262"))))
+          `(dired-subtree-depth-6-face ((t (:background "#6c6c6c"))))
 
-        ;; :overline "#A7A7A7" :foreground "#3C3C3C" :background "#F0F0F0"
-        ;; :overline "#123555" :foreground "#123555" :background "#E5F4FB"
-        ;; :foreground "#005522" :background "#EFFFEF"
-        ;; :foreground "#EA6300"
-        ;; :foreground "#E3258D"
-        ;; :foreground "#0077CC"
-        ;; :foreground "#2EAE2C"
-        ;; :foreground "#FD8008"
+          ;; :overline "#A7A7A7" :foreground "#3C3C3C" :background "#F0F0F0"
+          ;; :overline "#123555" :foreground "#123555" :background "#E5F4FB"
+          ;; :foreground "#005522" :background "#EFFFEF"
+          ;; :foreground "#EA6300"
+          ;; :foreground "#E3258D"
+          ;; :foreground "#0077CC"
+          ;; :foreground "#2EAE2C"
+          ;; :foreground "#FD8008"
 
-        `(ediff-current-diff-A ((t (:foreground "gray33" :background "#FFDDDD"))))
-        `(ediff-current-diff-B ((t (:foreground "gray33" :background "#DDFFDD"))))
-        `(ediff-current-diff-C ((t (:foreground "black" :background "#00afff"))))
+          `(ediff-current-diff-A ((t (:foreground "gray33" :background "#FFDDDD"))))
+          `(ediff-current-diff-B ((t (:foreground "gray33" :background "#DDFFDD"))))
+          `(ediff-current-diff-C ((t (:foreground "black" :background "#00afff"))))
 
-        `(ediff-even-diff-A ((t (:background "#4e4e4e"))))
-        `(ediff-even-diff-B ((t (:background "#4e4e4e"))))
-        `(ediff-even-diff-C ((t (:background "#4e4e4e"))))
+          `(ediff-even-diff-A ((t (:background "#4e4e4e"))))
+          `(ediff-even-diff-B ((t (:background "#4e4e4e"))))
+          `(ediff-even-diff-C ((t (:background "#4e4e4e"))))
 
-        `(ediff-fine-diff-A ((t (:foreground "#af0000" :background "#FFAAAA"))))
-        `(ediff-fine-diff-B ((t (:foreground "#008000" :background "#55FF55"))))
+          `(ediff-fine-diff-A ((t (:foreground "#af0000" :background "#FFAAAA"))))
+          `(ediff-fine-diff-B ((t (:foreground "#008000" :background "#55FF55"))))
 
-        `(ediff-fine-diff-C ((t (:foreground "black" :background "#ffff5f"))))
-        `(ediff-odd-diff-A ((t (:background "#4e4e4e"))))
-        `(ediff-odd-diff-B ((t (:background "#4e4e4e"))))
-        `(ediff-odd-diff-C ((t (:background "#4e4e4e"))))
-        `(ediff-odd-diff-Ancestor ((t (:background "#4e4e4e"))))
+          `(ediff-fine-diff-C ((t (:foreground "black" :background "#ffff5f"))))
+          `(ediff-odd-diff-A ((t (:background "#4e4e4e"))))
+          `(ediff-odd-diff-B ((t (:background "#4e4e4e"))))
+          `(ediff-odd-diff-C ((t (:background "#4e4e4e"))))
+          `(ediff-odd-diff-Ancestor ((t (:background "#4e4e4e"))))
 
-        `(mu4e-unread-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; purple
+          `(mu4e-unread-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; purple
 
-        `(mu4e-contact-face ((t (:weight normal :slant normal :foreground "#88aaff" :underline nil)))) ;; purple
-        `(mu4e-header-value-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; purple
-        `(mu4e-special-header-value-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; purple
+          `(mu4e-contact-face ((t (:weight normal :slant normal :foreground "#88aaff" :underline nil)))) ;; purple
+          `(mu4e-header-value-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; purple
+          `(mu4e-special-header-value-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; purple
 
-        ;; `(header-line ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#4e4e4e" :underline nil))))
-        `(header-line ((t (:weight normal :slant normal :foreground "#6c6c6c" :background "#3a3a3a"))))
+          ;; `(header-line ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#4e4e4e" :underline nil))))
+          `(header-line ((t (:weight normal :slant normal :foreground "#6c6c6c" :background "#3a3a3a"))))
 
-        `(hl-line ((t (:background "#3a3a3a"))))
-        `(vline ((t (:background "#3a3a3a"))))
+          `(hl-line ((t (:background "#3a3a3a"))))
+          `(vline ((t (:background "#3a3a3a"))))
 
-        `(secondary-selection ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#5f87ff" :underline nil))))
-        `(magit-diff-file-heading-highlight ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#5f87ff" :underline nil))))
-        `(magit-section-highlight ((t (:weight bold :slant normal))))
+          `(secondary-selection ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#5f87ff" :underline nil))))
+          `(magit-diff-file-heading-highlight ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#5f87ff" :underline nil))))
+          `(magit-section-highlight ((t (:weight bold :slant normal))))
 
-        `(evil-ex-lazy-highlight ((t (:foreground "#FFFFFF" :background "#5f87ff"))))
+          `(evil-ex-lazy-highlight ((t (:foreground "#FFFFFF" :background "#5f87ff"))))
 
-        ;; ;; ivy-mode
-        ;; `(ivy-current-match ((,class (:foreground ,orange-2 :bold t :inherit highlight))))
-        `(ivy-current-match ((t (:inherit highlight))))
-        ;; `(ivy-confirm-face ((,class (:foreground ,green-4 :background ,green-00 :bold t))))
-        ;; `(ivy-subdir ((,class (:foreground ,blue-1 :bold t))))
-        ;; `(ivy-virtual ((,class (:foreground ,magenta-3))))
+          ;; ;; ivy-mode
+          ;; `(ivy-current-match ((,class (:foreground ,orange-2 :bold t :inherit highlight))))
+          `(ivy-current-match ((t (:inherit highlight))))
+          ;; `(ivy-confirm-face ((,class (:foreground ,green-4 :background ,green-00 :bold t))))
+          ;; `(ivy-subdir ((,class (:foreground ,blue-1 :bold t))))
+          ;; `(ivy-virtual ((,class (:foreground ,magenta-3))))
 
-        ;; `(ivy-minibuffer-match-face-1 ((,class (:background ,blue-1 :foreground ,white-0))))
-        ;; `(ivy-minibuffer-match-face-2 ((,class (:bold t :background ,green-2 :foreground ,white-0))))
-        ;; `(ivy-minibuffer-match-face-3 ((,class (:bold t :background ,magenta-2 :foreground ,white-0))))
-        ;; `(ivy-minibuffer-match-face-4 ((,class (:bold t :background ,cyan-3 :foreground ,white-0))))
+          ;; `(ivy-minibuffer-match-face-1 ((,class (:background ,blue-1 :foreground ,white-0))))
+          ;; `(ivy-minibuffer-match-face-2 ((,class (:bold t :background ,green-2 :foreground ,white-0))))
+          ;; `(ivy-minibuffer-match-face-3 ((,class (:bold t :background ,magenta-2 :foreground ,white-0))))
+          ;; `(ivy-minibuffer-match-face-4 ((,class (:bold t :background ,cyan-3 :foreground ,white-0))))
 
-        ;; ;; swiper
-        ;; `(swiper-match-face-1 ((t (:inherit isearch-lazy-highlight-face))))
-        ;; `(swiper-match-face-2 ((t (:inherit isearch))))
-        ;; `(swiper-match-face-3 ((t (:inherit match))))
-        ;; `(swiper-match-face-4 ((t (:inherit isearch-fail))))
-        `(swiper-line-face    ((t (:inherit highlight))))
-        `(minibuffer-prompt ((t (:foreground nil :background nil :inherit 'wgrep-reject-face))))
-        `(dired-header    ((t (:inherit minibuffer-prompt))))
+          ;; ;; swiper
+          ;; `(swiper-match-face-1 ((t (:inherit isearch-lazy-highlight-face))))
+          ;; `(swiper-match-face-2 ((t (:inherit isearch))))
+          ;; `(swiper-match-face-3 ((t (:inherit match))))
+          ;; `(swiper-match-face-4 ((t (:inherit isearch-fail))))
+          `(swiper-line-face    ((t (:inherit highlight))))
+          `(minibuffer-prompt ((t (:foreground nil :background nil :inherit 'wgrep-reject-face))))
+          `(dired-header    ((t (:inherit minibuffer-prompt))))
 
-        `(lsp-ui-doc-background ((t (:background "#4e4e4e"))))
-       )
-     )
+          `(lsp-ui-doc-background ((t (:background "#4e4e4e"))))
+          )
+         ))
    #+END_SRC
+
+** doom-themes
+
+   #+begin_src emacs-lisp
+     ;; set moe-dark theme with overrides
+     (use-package doom-themes
+       :custom
+       (doom-themes-enable-bold t)
+       (doom-themes-enable-italic t)
+       :config
+       (defun amd/doom-one-theme ()
+         "load doom-one-theme and override some colors"
+         (interactive)
+         (amd/disable-loaded-themes)
+         (load-theme 'doom-one t)
+         (load-theme 'airline-onedark t)
+         (custom-theme-set-faces
+          'doom-one
+          '(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
+          '(flyspell-incorrect ((t (:underline "yellow" :weight bold))))
+          `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
+          `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
+          `(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))))
+          `(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))))
+          `(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))))
+          `(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))))
+          `(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))))
+          `(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))))
+          ;; `(org-level-1 ((t (:height 1.3 :weight normal :slant normal :foreground "#00B3EF" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
+          ;; `(org-level-2 ((t (:height 1.1 :weight normal :slant normal :foreground "#40D3FF" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
+          ;; doom-one specific backgrounds
+          `(org-level-1 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#aa88ff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
+          `(org-level-2 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88aaff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
+          `(org-level-3 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88ffff" :underline nil)))) ;; cyan
+          `(org-level-4 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#66ffaa" :underline nil)))) ;; sea-green
+          `(org-level-5 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffff66" :underline nil)))) ;; yellow
+          `(org-level-6 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffaa00" :underline nil)))) ;; orange
+          `(org-level-7 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff6666" :underline nil)))) ;; red
+          `(org-level-8 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff66aa" :underline nil)))) ;; pink
+          ;; `(org-block ((t (:foreground nil :background nil :inherit 'org-block-begin-line))))
+          `(dired-subtree-depth-1-face ((t (:background "#23272e"))))
+          `(dired-subtree-depth-2-face ((t (:background "#363d47"))))
+          `(dired-subtree-depth-3-face ((t (:background "#4a5261"))))
+          `(dired-subtree-depth-4-face ((t (:background "#5d687a"))))
+          `(dired-subtree-depth-5-face ((t (:background "#717d94"))))
+          `(dired-subtree-depth-6-face ((t (:background "#8493ad"))))
+          `(ace-jump-face-foreground ((t (:background "color-18" :foreground "#ff8700" :weight bold))))
+          `(avy-lead-face ((t (:foreground "#ffaf00"))))
+          `(avy-lead-face-0 ((t (:foreground "#5fd7ff"))))
+          `(avy-lead-face-1 ((t (:foreground "#66ffaa"))))
+          `(avy-lead-face-2 ((t (:foreground "#ff6666"))))
+          `(eyebrowse-mode-line-active ((t (:foreground "#ECBE7B" :weight bold))))
+          `(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
+          `(flyspell-incorrect ((t (:underline "yellow" :weight bold))))
+          ;; `(secondary-selection ((t (:foreground "#51afef" :background "#181e26"))))
+          `(lsp-ui-doc-background ((t (:background "#42444a"))))
+          )
+         (solaire-mode-swap-bg))
+     )
+   #+end_src
 
 ** solaire-mode
 
@@ -537,73 +602,52 @@
      )
    #+END_SRC
 
-** doom-themes
+** modeline
 
    #+BEGIN_SRC emacs-lisp
-     (use-package doom-themes
-       :config
-       (defun amd/doom-one-theme ()
-         "load doom-one-theme and override some colors"
-         (interactive)
-
-         (load-theme 'doom-one t)
-         (load-theme 'airline-onedark t)
-
-         (custom-theme-set-faces
-          'doom-one
-          '(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
-          '(flyspell-incorrect ((t (:underline "yellow" :weight bold))))
-          `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
-          `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
-          `(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))))
-          `(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))))
-          `(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))))
-          `(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))))
-          `(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))))
-          `(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))))
-
-          ;; `(org-level-1 ((t (:height 1.3 :weight normal :slant normal :foreground "#00B3EF" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
-          ;; `(org-level-2 ((t (:height 1.1 :weight normal :slant normal :foreground "#40D3FF" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
-
-          ;; doom-one specific backgrounds
-          `(org-level-1 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#aa88ff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
-          `(org-level-2 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88aaff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
-          `(org-level-3 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88ffff" :underline nil)))) ;; cyan
-          `(org-level-4 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#66ffaa" :underline nil)))) ;; sea-green
-          `(org-level-5 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffff66" :underline nil)))) ;; yellow
-          `(org-level-6 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffaa00" :underline nil)))) ;; orange
-          `(org-level-7 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff6666" :underline nil)))) ;; red
-          `(org-level-8 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff66aa" :underline nil)))) ;; pink
-
-          ;; `(org-block ((t (:foreground nil :background nil :inherit 'org-block-begin-line))))
-
-          `(dired-subtree-depth-1-face ((t (:background "#23272e"))))
-          `(dired-subtree-depth-2-face ((t (:background "#363d47"))))
-          `(dired-subtree-depth-3-face ((t (:background "#4a5261"))))
-          `(dired-subtree-depth-4-face ((t (:background "#5d687a"))))
-          `(dired-subtree-depth-5-face ((t (:background "#717d94"))))
-          `(dired-subtree-depth-6-face ((t (:background "#8493ad"))))
-
-          `(ace-jump-face-foreground ((t (:background "color-18" :foreground "#ff8700" :weight bold))))
-          `(avy-lead-face ((t (:foreground "#ffaf00"))))
-          `(avy-lead-face-0 ((t (:foreground "#5fd7ff"))))
-          `(avy-lead-face-1 ((t (:foreground "#66ffaa"))))
-          `(avy-lead-face-2 ((t (:foreground "#ff6666"))))
-
-          `(eyebrowse-mode-line-active ((t (:foreground "#ECBE7B" :weight bold))))
-          `(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
-          `(flyspell-incorrect ((t (:underline "yellow" :weight bold))))
-          ;; `(secondary-selection ((t (:foreground "#51afef" :background "#181e26"))))
-          `(lsp-ui-doc-background ((t (:background "#42444a"))))
-          )
-
-         (solaire-mode-swap-bg)
-       )
+     (use-package airline-themes
+       :custom
+       (airline-hide-state-on-inactive-buffers t)
+       (airline-hide-vc-branch-on-inactive-buffers t)
+       (airline-hide-eyebrowse-on-inactive-buffers t)
+       ;; (airline-display-directory 'airline-directory-full)
+       (airline-display-directory 'airline-directory-shortened)
+       ;; (airline-display-directory nil)
+       (airline-eshell-colors t)
+       (airline-shortened-directory-length 16)
+       ;; (airline-utf-glyph-separator-left      #x20)
+       ;; (airline-utf-glyph-separator-right     #x20)
+       ;; (airline-utf-glyph-subseparator-left   #x20)
+       ;; (airline-utf-glyph-subseparator-right  #x20)
+       ;; (airline-utf-glyph-branch              #xe0a0)
+       ;; (airline-utf-glyph-readonly            #xe0a2)
+       ;; (airline-utf-glyph-linenumber          #xe0a1)
+       :load-path "airline-themes"
      )
-   #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp :tangle no
+     (use-package fast-scroll
+       :diminish fast-scroll-minor-mode
+       :load-path "fast-scroll"
+       :config
+       (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
+       (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
+       (fast-scroll-config)
+       (fast-scroll-minor-mode 1))
+
+     (use-package powerline
+       :init
+       (setq powerline-utf-8-separator-left  #x2572
+             powerline-utf-8-separator-right #x2572)
+       (setq powerline-utf-8-separator-left  #x20
+             powerline-utf-8-separator-right #x20)
+       ;; (setq powerline-utf-8-separator-left  #xe0b0
+       ;;       powerline-utf-8-separator-right #xe0b2)
+       (setq powerline-default-separator 'utf-8)
+       ;; (setq powerline-default-separator nil)
+       )
+
      (use-package doom-modeline
+       :disabled
        :init
        ;; ;; How tall the mode-line should be. It's only respected in GUI.
        ;; ;; If the actual char height is larger, it respects the actual height.
@@ -707,96 +751,27 @@
        ;;
        ;; ;; Function to stylize the irc buffer names.
        ;; (setq doom-modeline-irc-stylize 'identity)
-
        :hook (after-init . doom-modeline-mode))
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (use-package doom-themes-neotree
-       :after neotree
-       :config
-       (setq doom-neotree-enable-folder-icons t)
-       (setq doom-neotree-enable-file-icons 'simple))
-   #+END_SRC
-
-** modeline
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package airline-themes
-       :init
-       (setq airline-hide-state-on-inactive-buffers t
-             airline-hide-vc-branch-on-inactive-buffers t
-             airline-hide-eyebrowse-on-inactive-buffers t)
-       (setq airline-display-directory 'airline-directory-full)
-       (setq airline-display-directory 'airline-directory-shortened)
-       (setq airline-display-directory nil)
-       (setq airline-eshell-colors t)
-       (setq airline-shortened-directory-length 16)
-       (setq airline-utf-glyph-separator-left      #x20
-             airline-utf-glyph-separator-right     #x20
-             airline-utf-glyph-subseparator-left   #x20
-             airline-utf-glyph-subseparator-right  #x20
-             airline-utf-glyph-branch              #xe0a0
-             airline-utf-glyph-readonly            #xe0a2
-             ;; airline-utf-glyph-linenumber          #xe0a1
-       )
-       :load-path "airline-themes"
-     )
-
-     (use-package fast-scroll
-       :diminish fast-scroll-minor-mode
-       :load-path "fast-scroll"
-       :config
-       (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
-       (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
-       (fast-scroll-config)
-       (fast-scroll-minor-mode 1))
-
-     (use-package powerline
-       :init
-       (setq powerline-utf-8-separator-left  #x2572
-             powerline-utf-8-separator-right #x2572)
-       (setq powerline-utf-8-separator-left  #x20
-             powerline-utf-8-separator-right #x20)
-       ;; (setq powerline-utf-8-separator-left  #xe0b0
-       ;;       powerline-utf-8-separator-right #xe0b2)
-       (setq powerline-default-separator 'utf-8)
-       ;; (setq powerline-default-separator nil)
-     )
    #+END_SRC
 
 ** load theme
 
     #+BEGIN_SRC emacs-lisp
-      (use-package moe-theme)
-      (amd/moe-dark-theme)
-      (load-theme 'airline-owo t)
-      ;; (load-theme 'airline-term t)
-      ;; (load-theme 'airline-behelit t)
-
-      ;; (use-package modus-operandi-theme)
-      ;; (use-package modus-vivendi-theme)
-
       ;; (amd/leuven-light-theme)
-      ;; (load-theme 'airline-light t)
-
       ;; (amd/doom-one-theme)
+      (amd/moe-dark-theme)
 
-      ;; (load-theme 'doom-monokai-pro t)
-      ;; (load-theme 'airline-doom-molokai t)
+      ;; modus light
+      (use-package modus-operandi-theme
+        :disabled
+        :config
+        (load-theme 'airline-qwq t))
 
-      ;; (load-theme 'doom-opera)
-      ;; (load-theme 'doom-tomorrow-night)
-      ;; (load-theme 'kaolin t)
-      ;; (load-theme 'rebecca t)
-      ;; (load-theme 'spacemacs-dark t)
-      ;; (load-theme 'airline-doom-one t)
-
-      ;; (custom-theme-set-faces
-      ;;  'doom-monokai-pro
-      ;;  `(org-block-begin-line ((t (:foreground "#727072" :background "#221F22"))))
-      ;;  `(org-block-end-line ((t (:foreground "#727072" :background "221F22"))))
-      ;;  `(org-block ((t (:background "#221F22")))))
+      ;; modus dark
+      (use-package modus-vivendi-theme
+        :disabled
+        :config
+        (load-theme 'airline-ouo t))
     #+END_SRC
 
 ** appearance minor-modes
