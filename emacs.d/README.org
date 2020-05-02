@@ -2568,57 +2568,40 @@
 
   #+BEGIN_SRC emacs-lisp
     (use-package shackle
+      :custom
+      (help-window-select t) ;; (not shackle) select new help windows when they open
+      (shackle-select-reused-windows nil)
+      (shackle-default-rule '(:select t))
+      (shackle-default-alignment 'below)
+      (shackle-default-size 0.5)
       :init
-      (setq help-window-select t) ;; not shackle but select new help windows when they open
-      (setq shackle-select-reused-windows nil)
-      (setq shackle-default-alignment 'below)
-      (setq shackle-default-size 0.4)
-
-      (setq shackle-default-rule '(:select t)
-            shackle-rules
-            ;; CONDITION(:regexp|mode) :select :inhibit-window-quit :size+:align|:other :same|:popup
-            '(
-              ;; Hidden popups
-              ("*Shell Command Output*" :ignore t)
-              ("*Async Shell Command*" :ignore t)
-
-              ;; Bottom popups
-              ("*Help*" :size 0.4 :align bottom)
-              ("\\*helpful.*\\*" :regexp t :size 0.3 :align bottom)
-              ("*Completions*" :size 0.2 :align bottom)
-              (compilation-mode :select nil :size 0.3 :align bottom)
-
-              ("*Warnings*" :select nil :inhibit-window-quit t :other t)
-              ("*Flycheck error messages*" :ignore t)
-
-              ;; Top popups
-              ("\\*e?shell.*\\*" :regexp t :popup t :size 0.5 :align above)
-
-              ;; Full size popups
-              ('magit-status-mode :same t)
-
-              ;; eww popups should just replace current buffer
-              ('eww-bookmark-mode :same t)
-              ('eww-history-mode :same t)
-
-              ;; left side for dired
-              ('dired-mode :other t :align left :size 0.3)
-
-              ;; right side for ibuffer
-              ("\\*[Ii]buffer\\*" :regexp t :popup t :align bottom :size 0.4)
-              ('undo-tree-mode :align right :size 0.4)
-              ('flycheck-error-list-mode :select t :align bottom :size 0.2)
-
-              ;; other examples
-              ;; ("COMMIT_EDITMSG" :align above :size 0.5) ;; :same t
-              ;; ("\\*Async Shell.*\\*" :regexp t :ignore t )
-              ;; (occur-mode :select nil :align t )
-              ;; ("*Messages*" :select nil :inhibit-window-quit t :other t )
-              ;; ("\\*[Wo]*Man.*\\*" :regexp t :select t :inhibit-window-quit t :other t )
-              ;; ("\\*poporg.*\\*" :regexp t :select t :other t )
-              ;; ("\\`\\*helm.*?\\*\\'" :regexp t :size 0.3 :align t )
-              ;; ("*Calendar*" :select t :size 0.3 :align below)
-              ))
+      (setq
+       shackle-rules
+       '(;; Hidden popups
+         ("*Shell Command Output*" :ignore t)
+         ("*Async Shell Command*" :ignore t)
+         ("*Flycheck error messages*" :ignore t)
+         ;; Bottom popups
+         ("\\*[Ii]buffer\\*" :regexp t :popup t :align bottom :size 0.6)
+         (compilation-mode :select nil :size 0.3 :align bottom)
+         ("*Help*" :size 0.5 :align bottom)
+         ("\\*helpful.*\\*" :regexp t :size 0.3 :align bottom)
+         ("*Completions*" :size 0.2 :align bottom)
+         ('flycheck-error-list-mode :select t :align bottom :size 0.2)
+         ('ivy-occur-grep-mode :align bottom :size 0.5)
+         ('grep-mode :align bottom :size 0.5)
+         ("*Warnings*" :select nil :inhibit-window-quit t :other t)
+         ;; Top popups
+         ("\\*e?shell.*\\*" :regexp t :popup t :size 0.5 :align above)
+         ;; Full size popups
+         ('magit-status-mode :same t)
+         ;; eww popups should just replace current buffer
+         ('eww-bookmark-mode :same t)
+         ('eww-history-mode :same t)
+         ;; left side
+         ('dired-mode :other t :align left :size 0.3)
+         ;; right side
+         ('undo-tree-mode :align right :size 0.4)))
       :config
       (shackle-mode))
   #+END_SRC
@@ -2727,7 +2710,7 @@
 
 *** helm
 
-    #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp :tangle no
       ;; (use-package helm
       ;;   :diminish ""
       ;;   :bind (("M-x" . helm-M-x))
@@ -4010,11 +3993,11 @@
       ;; Roman Numeral Bullets
       ;; (setq org-bullets-bullet-list (quote ("Ⅰ" "Ⅱ" "Ⅲ" "Ⅳ" "Ⅴ" "Ⅵ" "Ⅶ" "Ⅷ" "Ⅸ" "Ⅹ" "Ⅺ" "Ⅻ")))
       ;; Nubered Circle Dingbat Bullets
-      ;; (setq org-bullets-bullet-list (quote ("❶" "❷" "❸" "❹" "❺" "❻" "❼" "❽" "❾" "❿")))
+      (setq org-bullets-bullet-list (quote ("❶" "❷" "❸" "❹" "❺" "❻" "❼" "❽" "❾" "❿")))
       ;; (setq org-bullets-bullet-list (quote ("➀" "➁" "➂" "➃" "➄" "➅" "➆" "➇" "➈" "➉")))
       ;; (setq org-bullets-bullet-list (quote ("" "" "" "" "" "" "" "" "" "")))
       ;;               
-      (setq org-bullets-bullet-list (quote ("◳" "◲" "◱" "◰" "◷" "◶" "◵" "◴" "◹" "◺" "◿" "◸")))
+      ;; (setq org-bullets-bullet-list (quote ("◳" "◲" "◱" "◰" "◷" "◶" "◵" "◴" "◹" "◺" "◿" "◸")))
 
       (setq org-hide-leading-stars t) ;; can be used instead of org-bullets
 
@@ -4468,7 +4451,7 @@
 **** xdg-mime
 
      #+BEGIN_SRC sh
-     xdg-mime default emacsclient.desktop x-scheme-handler/org-protocol
+       xdg-mime default org-protocol.desktop x-scheme-handler/org-protocol
      #+END_SRC
 
 *** Org 9 New Style Links
