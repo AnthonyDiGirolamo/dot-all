@@ -1382,10 +1382,12 @@
       :after evil
       :config
       (global-evil-surround-mode 1)
-      (add-hook 'web-mode-hook (lambda ()
-                                 (add-to-list 'evil-surround-pairs-alist '(?h . ("{{ " . " }}"))  )
-                                 (add-to-list 'evil-surround-pairs-alist '(?= . ("<%= " . " %>")) )
-                                 (add-to-list 'evil-surround-pairs-alist '(?- . ("<% "  . " %>")) ))))
+      (add-hook
+       'web-mode-hook
+       (lambda ()
+         (add-to-list 'evil-surround-pairs-alist '(?h . ("{{ " . " }}"))  )
+         (add-to-list 'evil-surround-pairs-alist '(?= . ("<%= " . " %>")) )
+         (add-to-list 'evil-surround-pairs-alist '(?- . ("<% "  . " %>")) ))))
 
     (use-package evil-matchit
       :after evil
@@ -1408,6 +1410,7 @@
     ;; s/\([^ \n]\)  */\1 /g
 
     (use-package expand-region
+      :after evil
       :general
       (:states '(normal)
         "ge" 'er/expand-region))
@@ -3961,7 +3964,7 @@
    - [[info:org#Specific%20header%20arguments][info:org#Specific header arguments]]
    - [[info:org#Structural%20markup%20elements][info:org#Structural markup elements]] ([[http://orgmode.org/org.html#Markup][The Org Manual - Markup Syntax]])
    - Clock table info [[info:org#The%20clock%20table][info:org#The clock table]]
-   - Exporting Options: [[info:org#Export%20settings][info:org#Export settings]]
+   - Exporting Options: [[info:org#Export Settings][info:org#Export Settings]]
 
 ** use-package org
 
@@ -4217,8 +4220,8 @@
            1 (point-max)
            "xclip -selection clipboard -i -t text/html &> /dev/null")
           (delete-window)
+          )
         )
-      )
 
 
       (defun amd/clipboard-html-to-org-pandoc-mac ()
@@ -4327,7 +4330,7 @@
 
    #+BEGIN_SRC emacs-lisp
      (use-package ox
-       :defer t
+       :after org
        :init
        (defun amd/org-export-html-wrap-src-blocks-in-tables (text backend info)
          "Add ``` to the beginning and end of src blocks."
@@ -4576,8 +4579,9 @@
 
 * neotree
 
-  #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp :tangle no
     (use-package neotree
+      :disabled
       :commands (neotree)
       :init
       (setq neo-smart-open t)
