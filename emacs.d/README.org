@@ -189,6 +189,8 @@
     ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
     (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
+    (when (display-graphic-p)
+      (server-start))
     ;; Enable narrowing and erasing buffers
     (put 'narrow-to-region 'disabled nil)
     (put 'erase-buffer 'disabled nil)
@@ -606,23 +608,32 @@
 
    #+BEGIN_SRC emacs-lisp
      (use-package airline-themes
-       :custom
-       (airline-hide-state-on-inactive-buffers t)
-       (airline-hide-vc-branch-on-inactive-buffers t)
-       (airline-hide-eyebrowse-on-inactive-buffers t)
-       ;; (airline-display-directory 'airline-directory-full)
-       (airline-display-directory 'airline-directory-shortened)
-       ;; (airline-display-directory nil)
-       (airline-eshell-colors t)
-       (airline-shortened-directory-length 16)
-       ;; (airline-utf-glyph-separator-left      #x20)
-       ;; (airline-utf-glyph-separator-right     #x20)
-       ;; (airline-utf-glyph-subseparator-left   #x20)
-       ;; (airline-utf-glyph-subseparator-right  #x20)
-       ;; (airline-utf-glyph-branch              #xe0a0)
-       ;; (airline-utf-glyph-readonly            #xe0a2)
-       ;; (airline-utf-glyph-linenumber          #xe0a1)
        :load-path "airline-themes"
+       :init
+       (setq powerline-default-separator 'utf-8)
+       ;; (setq powerline-utf-8-separator-left  #x2572
+       ;;       powerline-utf-8-separator-right #x2572)
+       (setq powerline-utf-8-separator-left  #x20
+             powerline-utf-8-separator-right #x20)
+       ;; (setq powerline-utf-8-separator-left  #xe0b0
+       ;;       powerline-utf-8-separator-right #xe0b2)
+
+       ;; (setq powerline-default-separator nil)
+       (setq airline-hide-state-on-inactive-buffers t)
+       (setq airline-hide-vc-branch-on-inactive-buffers t)
+       (setq airline-hide-eyebrowse-on-inactive-buffers t)
+       ;; (setq airline-display-directory 'airline-directory-full)
+       (setq airline-display-directory 'airline-directory-shortened)
+       ;; (setq airline-display-directory nil)
+       (setq airline-eshell-colors t)
+       (setq airline-shortened-directory-length 16)
+       ;; (setq airline-utf-glyph-separator-left      #x20)
+       ;; (setq airline-utf-glyph-separator-right     #x20)
+       ;; (setq airline-utf-glyph-subseparator-left   #x20)
+       ;; (setq airline-utf-glyph-subseparator-right  #x20)
+       ;; (setq airline-utf-glyph-branch              #xe0a0)
+       ;; (setq airline-utf-glyph-readonly            #xe0a2)
+       ;; (setq airline-utf-glyph-linenumber          #xe0a1)
      )
 
      (use-package fast-scroll
@@ -634,17 +645,7 @@
        (fast-scroll-config)
        (fast-scroll-minor-mode 1))
 
-     (use-package powerline
-       :init
-       (setq powerline-utf-8-separator-left  #x2572
-             powerline-utf-8-separator-right #x2572)
-       (setq powerline-utf-8-separator-left  #x20
-             powerline-utf-8-separator-right #x20)
-       ;; (setq powerline-utf-8-separator-left  #xe0b0
-       ;;       powerline-utf-8-separator-right #xe0b2)
-       (setq powerline-default-separator 'utf-8)
-       ;; (setq powerline-default-separator nil)
-       )
+     (use-package powerline)
 
      (use-package doom-modeline
        :disabled
@@ -3960,10 +3961,10 @@
 
 ** Help docs
 
-   - [[info:org#Using%20header%20arguments][info:org#Using header arguments]]
-   - [[info:org#Specific%20header%20arguments][info:org#Specific header arguments]]
-   - [[info:org#Structural%20markup%20elements][info:org#Structural markup elements]] ([[http://orgmode.org/org.html#Markup][The Org Manual - Markup Syntax]])
-   - Clock table info [[info:org#The%20clock%20table][info:org#The clock table]]
+   - [[info:org#Using header arguments][info:org#Using header arguments]]
+   - [[info:org#Specific header arguments][info:org#Specific header arguments]]
+   - [[info:org#Structural markup elements][info:org#Structural markup elements]] ([[http://orgmode.org/org.html#Markup][The Org Manual - Markup Syntax]])
+   - Clock table info [[info:org#The clock table][info:org#The clock table]]
    - Exporting Options: [[info:org#Export Settings][info:org#Export Settings]]
 
 ** use-package org
@@ -4341,7 +4342,7 @@
              ;; find starting <pre> tag
              (re-search-forward "<pre class=\"src src-[^\"]*\">")
              ;; start a table tag
-             (insert "<table class=\"kodify\"><tbody><tr><td>")
+             (insert "<table style=\"width:100%; border:1px solid rgb(224, 224, 224); background: rgb(250, 250, 250);\" class=\"kodify\"><tbody><tr><td>")
              ;; find the end </pre> tag
              (search-forward "\n</pre>")
              ;; delete the \n before the </pre> tag

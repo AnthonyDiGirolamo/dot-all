@@ -141,6 +141,7 @@
     # alias ed="emacs --daemon"
     alias ec="env TERM=xterm-24bits emacsclient --alternate-editor='' -nw"
     alias ecg="env TERM=xterm-24bits emacsclient --alternate-editor='' --no-wait --create-frame"
+    alias einterrupt="kill -USR2 (ps -o pid= -C emacs|head -n 1)"
   #+END_SRC
 
 * ~/.config/fish/conf.d/fish_user_key_bindings.fish
