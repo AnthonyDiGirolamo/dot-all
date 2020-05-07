@@ -51,12 +51,14 @@
     fade-out-step = 0.03; # Opacity change between steps while fading out. (default 0.03).
     #no-fading-openclose = true; # Fade windows in/out when opening/closing
 
+    inactive-opacity = 0.90;
+
     detect-client-opacity = true; # This prevents opacity being ignored for some apps. For example without this enabled my xfce4-notifyd is 100% opacity no matter what.
 
     # Window type settings
     wintypes:
     {
-      tooltip = { fade = true; shadow = false; };
+      tooltip = { fade = true; shadow = false; focus = true };
     };
   #+END_SRC
 

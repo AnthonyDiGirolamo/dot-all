@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016  Dominic Charlesworth <dgc336@gmail.com>
 
 ;; Author: Dominic Charlesworth <dgc336@gmail.com>
-;; Version: 3.1.4
+;; Version: 4.0.0
 ;; Package-Requires: ((emacs "24.3") (memoize "1.0.1"))
 ;; URL: https://github.com/domtronn/all-the-icons.el
 ;; Keywords: convenient, lisp
@@ -49,6 +49,7 @@
 ;; The simplest usage for this package is to use the following functions;
 
 ;;   `all-the-icons-icon-for-buffer'
+;;   `all-the-icons-icon-for-dir'
 ;;   `all-the-icons-icon-for-file'
 ;;   `all-the-icons-icon-for-mode'
 ;;   `all-the-icons-icon-for-url'
@@ -262,9 +263,18 @@
 
     ("\\.tf\\(vars\\|state\\)?$" all-the-icons-fileicon "terraform"     :height 1.0 :face all-the-icons-purple-alt)
 
-    ;; Verilog and system verilog
+    ;; Verilog(-AMS) and SystemVerilog(-AMS)
     ("\\.v$"             all-the-icons-fileicon "verilog"               :height 1.0 :v-adjust -0.2 :face all-the-icons-red)
+    ("\\.vams$"          all-the-icons-fileicon "verilog"               :height 1.0 :v-adjust -0.2 :face all-the-icons-red)
     ("\\.sv$"            all-the-icons-fileicon "verilog"               :height 1.0 :v-adjust -0.2 :face all-the-icons-red)
+    ("\\.sva$"           all-the-icons-fileicon "verilog"               :height 1.0 :v-adjust -0.2 :face all-the-icons-red)
+    ("\\.svh$"           all-the-icons-fileicon "verilog"               :height 1.0 :v-adjust -0.2 :face all-the-icons-red)
+    ("\\.svams$"         all-the-icons-fileicon "verilog"               :height 1.0 :v-adjust -0.2 :face all-the-icons-red)
+
+    ;; VHDL(-AMS)
+    ("\\.vhd$"           all-the-icons-fileicon "vhdl"                  :face all-the-icons-blue)
+    ("\\.vhdl$"          all-the-icons-fileicon "vhdl"                  :face all-the-icons-blue)
+    ("\\.vhms$"          all-the-icons-fileicon "vhdl"                  :face all-the-icons-blue)
 
     ;; Cabal
     ("\\.cabal$"         all-the-icons-fileicon "cabal"                 :face all-the-icons-lblue)
@@ -343,6 +353,9 @@
     ("\\.csv$"          all-the-icons-octicon "graph"                   :v-adjust 0.0 :face all-the-icons-dblue)
 
     ("\\.hs$"           all-the-icons-alltheicon "haskell"              :height 1.0  :face all-the-icons-red)
+    ("\\.chs$"          all-the-icons-alltheicon "haskell"              :height 1.0  :face all-the-icons-red)
+    ("\\.lhs$"          all-the-icons-alltheicon "haskell"              :height 1.0  :face all-the-icons-red)
+    ("\\.hsc$"          all-the-icons-alltheicon "haskell"              :height 1.0  :face all-the-icons-red)
 
     ;; Web modes
     ("\\.inky-haml$"    all-the-icons-fileicon "haml"                   :face all-the-icons-lyellow)
@@ -414,7 +427,7 @@
     ("^\\*new-tab\\*$"  all-the-icons-material "star"                     :face all-the-icons-cyan)
 
     ("^\\."             all-the-icons-octicon "gear"                    :v-adjust 0.0)
-    ("."                all-the-icons-faicon "file-o"                   :height 0.8 :v-adjust 0.0 :face all-the-icons-dsilver)))
+    ("."                all-the-icons-faicon "file-o"                   :v-adjust 0.0 :face all-the-icons-dsilver)))
 
 (defvar all-the-icons-dir-icon-alist
   '(
@@ -569,6 +582,8 @@
     (stylus-mode                        all-the-icons-alltheicon "stylus"         :face all-the-icons-lgreen)
     (csv-mode                           all-the-icons-octicon "graph"             :v-adjust 0.0 :face all-the-icons-dblue)
     (haskell-mode                       all-the-icons-alltheicon "haskell"        :height 1.0  :face all-the-icons-red)
+    (haskell-c2hs-mode                  all-the-icons-alltheicon "haskell"        :height 1.0  :face all-the-icons-red)
+    (literate-haskell-mode              all-the-icons-alltheicon "haskell"        :height 1.0  :face all-the-icons-red)
     (haml-mode                          all-the-icons-fileicon "haml"             :face all-the-icons-lyellow)
     (html-mode                          all-the-icons-alltheicon "html5"          :face all-the-icons-orange)
     (rhtml-mode                         all-the-icons-alltheicon "html5"          :face all-the-icons-lred)
@@ -587,6 +602,7 @@
     (tuareg-mode                        all-the-icons-fileicon "ocaml"            :v-adjust 0.0 :height 1.0)
     (purescript-mode                    all-the-icons-fileicon "purescript"       :v-adjust 0.0 :height 1.0)
     (verilog-mode                       all-the-icons-fileicon "verilog"          :height 1.0 :v-adjust -0.2 :face all-the-icons-red)
+    (vhdl-mode                          all-the-icons-fileicon "vhdl"             :face all-the-icons-blue)
     (haskell-cabal-mode                 all-the-icons-fileicon "cabal"            :face all-the-icons-lblue)
     (kotlin-mode                        all-the-icons-fileicon "kotlin"           :face all-the-icons-orange)
     (nim-mode                           all-the-icons-fileicon "nimrod"           :face all-the-icons-yellow)
@@ -726,7 +742,7 @@
         (search-forward-regexp module-search (point-max) t)))))
 
 ;; Icon functions
-(defun all-the-icons-icon-for-dir (dir &optional chevron padding)
+(defun all-the-icons-icon-for-dir-with-chevron (dir &optional chevron padding)
   "Format an icon for DIR with CHEVRON similar to tree based directories.
 
 If PADDING is provided, it will prepend and separate the chevron
@@ -735,18 +751,9 @@ and directory with PADDING.
 Produces different symbols by inspecting DIR to distinguish
 symlinks and git repositories which do not depend on the
 directory contents"
-  (let* ((matcher (all-the-icons-match-to-alist (file-name-base (directory-file-name dir)) all-the-icons-dir-icon-alist))
-         (path (expand-file-name dir))
-         (chevron (if chevron (all-the-icons-octicon (format "chevron-%s" chevron) :height 0.8 :v-adjust -0.1) ""))
-         (padding (or padding "\t"))
-         (icon (cond
-                ((file-symlink-p path)
-                 (all-the-icons-octicon "file-symlink-directory" :height 1.0))
-                ((all-the-icons-dir-is-submodule path)
-                 (all-the-icons-octicon "file-submodule" :height 1.0))
-                ((file-exists-p (format "%s/.git" path))
-                 (format "%s" (all-the-icons-octicon "repo" :height 1.1)))
-                (t (apply (car matcher) (cdr matcher))))))
+  (let ((icon (all-the-icons-icon-for-dir dir))
+        (chevron (if chevron (all-the-icons-octicon (format "chevron-%s" chevron) :height 0.8 :v-adjust -0.1) ""))
+        (padding (or padding "\t")))
     (format "%s%s%s%s%s" padding chevron padding icon padding)))
 
 (defun all-the-icons-icon-for-buffer ()
@@ -783,6 +790,28 @@ Providing ARG-OVERRIDES will modify the creation of the icon."
       (if family (all-the-icons-alltheicon-family) (apply 'all-the-icons-alltheicon (append '("html5") non-nil-args)))))))
 
 ;; Icon Functions
+
+;;;###autoload
+(defun all-the-icons-icon-for-dir (dir &rest arg-overrides)
+  "Get the formatted icon for DIR.
+ARG-OVERRIDES should be a plist containining `:height',
+`:v-adjust' or `:face' properties like in the normal icon
+inserting functions.
+
+Note: You want chevron, please use `all-the-icons-icon-for-dir-with-chevron'."
+  (let* ((dirname (file-name-base (directory-file-name dir)))
+         (path (expand-file-name dir))
+         (icon (all-the-icons-match-to-alist dirname all-the-icons-dir-icon-alist))
+         (args (cdr icon)))
+    (when arg-overrides (setq args (append `(,(car args)) arg-overrides (cdr args))))
+    (cond
+     ((file-symlink-p path)
+      (apply #'all-the-icons-octicon "file-symlink-directory" (cdr args)))
+     ((all-the-icons-dir-is-submodule path)
+      (apply #'all-the-icons-octicon "file-submodule" (cdr args)))
+     ((file-exists-p (format "%s/.git" path))
+      (apply #'all-the-icons-octicon "repo" (cdr args)))
+     (t (apply (car icon) args)))))
 
 ;;;###autoload
 (defun all-the-icons-icon-for-file (file &rest arg-overrides)
@@ -822,6 +851,7 @@ inserting functions."
     (when arg-overrides (setq args (append `(,(car args)) arg-overrides (cdr args))))
     (apply (car icon) args)))
 
+(memoize 'all-the-icons-icon-for-dir)
 (memoize 'all-the-icons-icon-for-file)
 (memoize 'all-the-icons-icon-for-mode)
 (memoize 'all-the-icons-icon-for-url)
@@ -845,7 +875,6 @@ inserting functions."
 (memoize 'all-the-icons-icon-family-for-mode)
 (memoize 'all-the-icons-icon-family)
 
-;;;###autoload
 (defun all-the-icons--icon-info-for-buffer (&optional f)
   "Get icon info for the current buffer.
 
@@ -977,7 +1006,7 @@ pause for DURATION seconds between printing each character."
        (when duration (sit-for duration 0)))
      data)))
 
-(defmacro define-icon (name alist family &optional font-name)
+(defmacro all-the-icons-define-icon (name alist family &optional font-name)
   "Macro to generate functions for inserting icons for icon set NAME.
 
 NAME defines is the name of the iconset and will produce a
@@ -1016,12 +1045,14 @@ FONT-NAME is the name of the .ttf file providing the font, defaults to FAMILY."
        (interactive "P")
        (all-the-icons-insert arg (quote ,name)))))
 
-(define-icon alltheicon all-the-icons-data/alltheicons-alist    "all-the-icons")
-(define-icon fileicon   all-the-icons-data/file-icon-alist      "file-icons")
-(define-icon faicon     all-the-icons-data/fa-icon-alist        "FontAwesome")
-(define-icon octicon    all-the-icons-data/octicons-alist       "github-octicons" "octicons")
-(define-icon wicon      all-the-icons-data/weather-icons-alist  "Weather Icons"   "weathericons")
-(define-icon material   all-the-icons-data/material-icons-alist "Material Icons"  "material-design-icons")
+(define-obsolete-function-alias 'define-icon 'all-the-icons-define-icon)
+
+(all-the-icons-define-icon alltheicon all-the-icons-data/alltheicons-alist    "all-the-icons")
+(all-the-icons-define-icon fileicon   all-the-icons-data/file-icon-alist      "file-icons")
+(all-the-icons-define-icon faicon     all-the-icons-data/fa-icon-alist        "FontAwesome")
+(all-the-icons-define-icon octicon    all-the-icons-data/octicons-alist       "github-octicons" "octicons")
+(all-the-icons-define-icon wicon      all-the-icons-data/weather-icons-alist  "Weather Icons"   "weathericons")
+(all-the-icons-define-icon material   all-the-icons-data/material-icons-alist "Material Icons"  "material-design-icons")
 
 (provide 'all-the-icons)
 

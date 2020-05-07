@@ -1,4 +1,22 @@
 * org-mode
+
+** ti: title                                                            :src:
+   #+begin_src org
+     ,#+TITLE: $1
+     ,#+AUTHOR: $2
+     ,#+EMAIL: $3
+     ,#+LANGUAGE: en
+     ,#+OPTIONS: title:nil toc:nil H:4 num:nil ^:nil ':nil
+     ,#+OPTIONS: html-style:nil html-preamble:t html-postamble:nil
+     ,#+HTML_DOCTYPE: html5
+     ,#+HTML_HEAD: <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono" rel="stylesheet">
+     ,#+HTML_HEAD: <link rel="stylesheet" href="styles/material.blue-indigo.min.css">
+     ,#+HTML_HEAD: <link rel="stylesheet" href="styles/material_style.css">
+     ,#+HTML_HEAD: <script defer src="styles/material.min.js"></script>
+     ,#+PROPERTY: UNNUMBERED t
+     $0
+   #+end_src
+
 ** s: src-block
    #+BEGIN_SRC $1
    $0
@@ -7,7 +25,7 @@
    #+BEGIN_SRC emacs-lisp
    $0
    #+END_SRC
-** t: org-mode table
+** ta: org-mode table
    | $0 |  |
    |--+--|
    |  |  |

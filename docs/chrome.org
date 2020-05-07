@@ -409,14 +409,14 @@
        "settingsVersion": "1.66",
        "exclusionRules": [
          {
-           "pattern": "https?://mail.google.com/*",
+           "pattern": "https?://remotedesktop.corp.google.com/*",
            "passKeys": ""
          }
        ],
        "filterLinkHints": false,
        "waitForEnterForFilteredHints": true,
        "hideHud": false,
-       "keyMappings": "# Insert your preferred key mappings here.\n\nunmap N\nmap n scrollDown\nmap e scrollUp\nmap k performFind\nmap K performBackwardsFind",
+       "keyMappings": "# # Insert your preferred key mappings here.\n# #unmap yy\n# #map Y copyCurrentUrl\n# unmap X\n# unmap h\n# unmap l\n# unmap gs\n# unmap N\n# unmap n\n# unmap e\n# # map n scrollDown\n# # map e scrollUp\n# map k performFind\n# map K performBackwardsFind\n\nunmapAll\n\n# Open a link in the current tab\nmap f LinkHints.activateMode\n# Open a link in a new tab\nmap F LinkHints.activateModeToOpenInNewTab\n# Open a link in a new tab & switch to it (LinkHints.activateModeToOpenInNewForegroundTab)\n# Open multiple links in a new tab\n# map <a-f> LinkHints.activateModeWithQueue\n# Download link url\n# map LinkHints.activateModeToDownloadLink\n# Open a link in incognito window\n# map LinkHints.activateModeToOpenIncognito\n# Copy a link URL to the clipboard\nmap yf LinkHints.activateModeToCopyLinkUrl",
        "linkHintCharacters": "tnsedhriaobkgvfplum",
        "linkHintNumbers": "0123456789",
        "newTabUrl": "about:newtab",
@@ -425,7 +425,7 @@
        "regexFindMode": false,
        "ignoreKeyboardLayout": false,
        "scrollStepSize": 60,
-       "smoothScroll": true,
+       "smoothScroll": false,
        "grabBackFocus": false,
        "searchEngines": "w: https://www.wikipedia.org/w/index.php?title=Special:Search&search=%s Wikipedia\n\n# More examples.\n#\n# (Vimium supports search completion Wikipedia, as\n# above, and for these.)\n#\n# g: https://www.google.com/search?q=%s Google\n# l: https://www.google.com/search?q=%s&btnI I'm feeling lucky...\n# y: https://www.youtube.com/results?search_query=%s Youtube\n# gm: https://www.google.com/maps?q=%s Google maps\n# b: https://www.bing.com/search?q=%s Bing\n# d: https://duckduckgo.com/?q=%s DuckDuckGo\n# az: https://www.amazon.com/s/?field-keywords=%s Amazon\n# qw: https://www.qwant.com/?q=%s Qwant",
        "searchUrl": "https://www.google.com/search?q=",
@@ -433,4 +433,37 @@
      }
    #+end_src
 
+** key mappings
+   #+begin_src text
+     # # Insert your preferred key mappings here.
+     # #unmap yy
+     # #map Y copyCurrentUrl
+     # unmap X
+     # unmap h
+     # unmap l
+     # unmap gs
+     # unmap N
+     # unmap n
+     # unmap e
+     # # map n scrollDown
+     # # map e scrollUp
+     # map k performFind
+     # map K performBackwardsFind
+
+     unmapAll
+
+     # Open a link in the current tab
+     map f LinkHints.activateMode
+     # Open a link in a new tab
+     map F LinkHints.activateModeToOpenInNewTab
+     # Open a link in a new tab & switch to it (LinkHints.activateModeToOpenInNewForegroundTab)
+     # Open multiple links in a new tab
+     # map <a-f> LinkHints.activateModeWithQueue
+     # Download link url
+     # map LinkHints.activateModeToDownloadLink
+     # Open a link in incognito window
+     # map LinkHints.activateModeToOpenIncognito
+     # Copy a link URL to the clipboard
+     map yf LinkHints.activateModeToCopyLinkUrl
+   #+end_src
 

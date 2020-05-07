@@ -2176,12 +2176,14 @@
 
   #+BEGIN_SRC emacs-lisp
     (use-package yasnippet
-      :defer 10
+      ;; :commands (yankpad-expand yankpad-insert)
       :diminish yas-minor-mode
+      :config
+      (yas-global-mode) ;; seems to be needed for yankpad
     )
 
     (use-package yankpad
-      :commands (yankpad-expand yankpad-insert)
+      ;; :commands (yankpad-expand yankpad-insert)
       :after yasnippet
       :init
       (setq yankpad-file "~/.emacs.d/yankpad.org")
@@ -2521,6 +2523,8 @@
         "TAB" 'Info-history-forward
         "C-o" 'Info-history-back
         "RET" 'Info-follow-nearest-node
+        "w"   'evil-forward-word-begin
+        "b"   'evil-backword-word-begin
         "n"   'evil-next-line
         "e"   'evil-previous-line
         "q"   'Info-exit)
@@ -4366,23 +4370,49 @@
    - [[info:org#Template%20expansion][info:org#Template expansion]]
 
    #+BEGIN_SRC emacs-lisp
+     (use-package all-the-icons)
+
      (use-package org-capture
        :after org
        :config
        (setq org-capture-templates
-             '(
-               ("f" "file-link" entry (file+headline org-default-notes-file "Inbox")
-                "* %f%?\n  %a")
-               ("w" "website with custom title, date, link, and body" entry (file+headline org-default-notes-file "Inbox")
-                "* %^{Title}\n\n  Source: %u, %c\n\n  %i\n"
+             `(("b"
+                ,(format "%s ~/dot-all/bookmarks.org & selected text"
+                         (all-the-icons-faicon "globe" :face 'all-the-icons-blue :v-adjust 0.01))
+                entry (file+olp+datetree "~/dot-all/bookmarks.org" "Bookmarks")
+                "* %U %a\n  %i\n"
                 :empty-lines 1)
-               ("c" "code with custom title, date, link" entry (file+headline org-default-notes-file "Inbox")
-                "* %^{Title}\n\n  #+BEGIN_SRC %^{language}\n  %i\n  #+END_SRC\n\n  Source: %u, %c\n"
+
+               ("t"
+                ,(format
+                  "%s Tasks"
+                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)))
+
+               ("th"
+                ,(format
+                  "%s %s headline w/ date+link & selected text"
+                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
+                  (all-the-icons-octicon "file-text" :face 'all-the-icons-purple :v-adjust 0.01))
+                entry (file+headline org-default-notes-file "Inbox")
+                "* %?\n  Source: %u %a\n\n  %i\n"
                 :empty-lines 1)
-               ;; ("e" "mu4e email" entry (file+headline org-default-notes-file "Inbox")
-               ;; "* %?\n  SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n  %a")
-               ("t" "task" entry (file+headline org-default-notes-file "Inbox")
-                "* TODO [#A] %?\n  SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n  %a\n\n  %i\n")
+
+               ("tc"
+                ,(format
+                  "%s %s code w/ date+link"
+                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
+                  (all-the-icons-faicon "sticky-note-o" :face 'all-the-icons-green :v-adjust 0.01))
+                entry (file+headline org-default-notes-file "Inbox")
+                "* %^{Title}%?\n  Source: %u %a\n\n  #+BEGIN_SRC %^{language}\n    %i\n  #+END_SRC\n"
+                :empty-lines 1)
+
+               ("tt"
+                ,(format
+                  "%s %s TODO"
+                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
+                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01))
+                entry (file+headline org-default-notes-file "Inbox")
+                "* TODO %?\n  SCHEDULED: %t\n  %a\n\n  %i\n")
                ))
        (add-hook 'org-capture-mode-hook 'evil-insert-state))
   #+END_SRC
