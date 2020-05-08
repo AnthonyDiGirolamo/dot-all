@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'lsp-mode)
+(require 'view)
 
 (defgroup lsp-metals nil
   "LSP support for Scala, using Metals."
@@ -117,7 +118,9 @@ more customizations like using environment variables."
   (erase-buffer)
   (insert html)
   (shr-render-region (point-min) (point-max))
-  (setq-local buffer-read-only t))
+  (goto-char (point-min))
+  (view-mode 1)
+  (setq view-exit-action 'kill-buffer))
 
 (defun lsp-metals--generate-doctor-buffer-name (workspace)
   (format "*Metals Doctor: %s*" (process-id (lsp--workspace-cmd-proc workspace))))
@@ -149,27 +152,132 @@ Should be ignored if there is no open doctor window."
   (with-lsp-workspace workspace
     (lsp-send-execute-command command)))
 
+(defun lsp-metals--publish-decorations (workspace params)
+  "Handle the metals/publishDecorations extension notification."
+  (with-lsp-workspace workspace
+    (let* ((file (lsp--uri-to-path (ht-get params "uri")))
+            (buffer (lsp--buffer-for-file file)))
+      (when buffer
+        (with-current-buffer buffer
+          (lsp--remove-overlays 'metals-decoration)
+          (mapc #'lsp-metals--make-overlay (ht-get params "options")))))))
+
+(defun lsp-metals--make-overlay (decoration)
+  "Create overlay from metals decoration."
+  (let* ((region (lsp--range-to-region (ht-get decoration "range")))
+          (content (ht-get (ht-get (ht-get decoration "renderOptions") "after") "contentText"))
+          (hover (ht-get (ht-get decoration "hoverMessage") "value"))
+          (ov (make-overlay (car region) (cdr region) nil t t)))
+    (overlay-put ov 'after-string (propertize content 'cursor t 'font-lock-face 'font-lock-comment-face))
+    (overlay-put ov 'help-echo hover)
+    (overlay-put ov 'metals-decoration t)))
+
+(defun lsp-metals--logs-toggle (_workspace)
+  "Focus or remove focus on the output logs reported by the
+server via `window/logMessage'."
+  (switch-to-buffer (get-buffer-create "*lsp-log*")))
+
+(defun lsp-metals--diagnostics-focus (_workspace)
+  "Focus on the window that lists all published diagnostics."
+  (defvar flymake-mode)
+  (defvar flycheck-mode)
+  (cond ((fboundp 'flymake-show-diagnostics-buffer) (flymake-show-diagnostics-buffer))
+        ((and flymake-mode (fboundp 'flymake-show-diagnostics-buffer)) (flymake-show-diagnostics-buffer))
+        ((and flycheck-mode (fboundp 'flycheck-list-errors)) (flycheck-list-errors))))
+
 (defun lsp-metals--execute-client-command (workspace params)
   "Handle the metals/executeClientCommand extension notification."
   (when-let ((command (pcase (ht-get params "command")
                         (`"metals-doctor-run" #'lsp-metals--doctor-run)
                         (`"metals-doctor-reload" #'lsp-metals--doctor-reload)
+                        (`"metals-logs-toggle" #'lsp-metals--logs-toggle)
+                        (`"metals-diagnostics-focus" #'lsp-metals--diagnostics-focus)
                         (`"metals-goto-location" #'lsp-metals--goto-location)
                         (`"metals-echo-command" #'lsp-metals--echo-command)
+                        (`"metals-model-refresh" #'lsp-metals--model-refresh)
                         (c (ignore (lsp-warn "Unknown metals client command: %s" c))))))
     (apply command (append (list workspace) (ht-get params "arguments") nil))))
+
+(defvar lsp-metals--current-buffer nil
+  "Current buffer used to send `metals/didFocusTextDocument' notification.")
+
+(defun lsp-metals--did-focus ()
+  "Send `metals/didFocusTextDocument' when current buffer changes."
+  (unless (eq lsp-metals--current-buffer (current-buffer))
+    (setq lsp-metals--current-buffer (current-buffer))
+    (lsp-notify "metals/didFocusTextDocument" (lsp--buffer-uri))))
+
+(declare-function dap-debug "ext:dap-mode" (conf))
+(declare-function dap-register-debug-provider "ext:dap-mode" (name conf))
+
+(defun lsp-metals--debug-start (no-debug params)
+  (dap-register-debug-provider "scala" #'identity)
+  (-let [session-params (lsp-send-execute-command
+                         "debug-adapter-start"
+                         (gethash "arguments" params))]
+    (dap-debug
+     (list :debugServer (-> (gethash "uri" session-params)
+                            (split-string ":")
+                            cl-third
+                            string-to-number)
+           :type "scala"
+           :name (gethash "name" session-params)
+           :host "localhost"
+           :request "launch"
+           :noDebug no-debug))))
+
+(defun lsp-metals--model-refresh (workspace)
+  (->> workspace
+       (lsp--workspace-buffers)
+       (mapc (lambda (buffer)
+               (with-current-buffer buffer
+                 (when (bound-and-true-p lsp-lens-mode)
+                   (lsp--lens-schedule-refresh t)))))))
+
+(defun lsp-metals--status-string-keymap (workspace command)
+  "Keymap for `metals/status' notification."
+  (when command
+    (-doto (make-sparse-keymap)
+      (define-key [mode-line mouse-1]
+        (lambda ()
+          (interactive)
+          (lsp-metals--execute-client-command workspace (ht ("command" command))))))))
+
+(defun lsp-metals--status-string (workspace params)
+  "Handle `metals/status' notification."
+  (-let (((&hash "text" "hide" "tooltip" "command") params))
+    (if (or hide (s-blank-str? text))
+        (lsp-workspace-status nil workspace)
+      (lsp-workspace-status (propertize text
+                              'help-echo tooltip
+                              'local-map (lsp-metals--status-string-keymap workspace command))
+        workspace))))
 
 (lsp-register-client
  (make-lsp-client :new-connection (lsp-stdio-connection 'lsp-metals--server-command)
                   :major-modes '(scala-mode)
                   :priority -1
+                  :custom-capabilities `((experimental (decorationProvider . t)
+                                                       (debuggingProvider . ,(fboundp 'dap-mode))
+                                                       (didFocusProvider . t)
+                                                       (executeClientCommandProvider . t)
+                                                       (doctorProvider . "html")
+                                                       (statusBarProvider . "on")))
                   :notification-handlers (ht ("metals/executeClientCommand" #'lsp-metals--execute-client-command)
-                                             ("metals/treeViewDidChange" #'ignore))
-		  :server-id 'metals
+                                             ("metals/publishDecorations" #'lsp-metals--publish-decorations)
+                                             ("metals/treeViewDidChange" #'ignore)
+                                             ("metals-model-refresh" #'lsp-metals--model-refresh)
+                                             ("metals/status" #'lsp-metals--status-string))
+                  :action-handlers (ht ("metals-debug-session-start" (-partial #'lsp-metals--debug-start :json-false))
+                                       ("metals-run-session-start" (-partial #'lsp-metals--debug-start t)))
+                  :server-id 'metals
                   :initialized-fn (lambda (workspace)
                                     (with-lsp-workspace workspace
                                       (lsp--set-configuration
-                                       (lsp-configuration-section "metals"))))))
+                                       (lsp-configuration-section "metals"))))
+                  :after-open-fn (lambda ()
+                                   (add-hook 'lsp-on-idle-hook #'lsp-metals--did-focus nil t))
+                  :completion-in-comments? t))
 
 (provide 'lsp-metals)
 ;;; lsp-metals.el ends here

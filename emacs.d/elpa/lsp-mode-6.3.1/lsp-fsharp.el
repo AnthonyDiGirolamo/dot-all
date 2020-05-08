@@ -40,20 +40,12 @@
                  (const :tag "Use .Net Framework" net-framework))
   :package-version '(lsp-mode . "6.1"))
 
-(defcustom lsp-fsharp-server-install-dir (locate-user-emacs-file "fsautocomplete/")
+(defcustom lsp-fsharp-server-install-dir (f-join lsp-server-install-dir "fsautocomplete/")
   "Install directory for fsautocomplete server.
 The slash is expected at the end."
   :group 'lsp-fsharp
   :risky t
   :type 'directory
-  :package-version '(lsp-mode . "6.1"))
-
-(defcustom lsp-fsharp-server-download-url "https://ci.appveyor.com/api/projects/fsautocomplete/fsautocomplete/artifacts/bin/pkgs/fsautocomplete.netcore.zip?branch=master"
-  "Fsautocomplete download url.
-To use the mono/.Net framework version, set this to \"https://ci.appveyor.com/api/projects/fsautocomplete/fsautocomplete/artifacts/bin/pkgs/fsautocomplete.zip?branch=master\""
-  :group 'lsp-fsharp
-  :risky t
-  :type 'string
   :package-version '(lsp-mode . "6.1"))
 
 (defcustom lsp-fsharp-server-args nil
@@ -179,36 +171,60 @@ disable if `--backgorund-service-enabled' is not used"
                     ".exe")))
     (expand-file-name (concat "fsautocomplete" file-ext) lsp-fsharp-server-install-dir)))
 
-(defun lsp-fsharp--fsac-locate ()
-  "Return the location of the fsautocomplete langauge server."
-  (let ((fsac (lsp-fsharp--fsac-cmd)))
-    (unless (file-exists-p fsac)
-      (if (yes-or-no-p "Server is not installed. Do you want to install it?")
-          (lsp-fsharp--fsac-install)
-        (error "LSP F# cannot be started without FsAutoComplete Server")))
-    fsac))
+(defun lsp-fsharp--version-list-latest (lst)
+  "Return latest version from LST (if any)."
+  (->> lst
+       (-map (lambda (x) (car (s-split " " x))))
+       (-filter (lambda (x) (> (length x) 0)))
+       (-sort (lambda (a b) (not (version<= (substring a 1)
+                                            (substring b 1)))))
+       cl-first))
 
-(defun lsp-fsharp--fsac-install ()
+(defun lsp-fsharp--fetch-json (url)
+  "Retrieve and parse JSON from URL."
+  (with-temp-buffer
+    (url-insert-file-contents url)
+    (let ((json-false :false))
+      (json-read))))
+
+(defun lsp-fsharp--latest-version-from-github ()
+  "Return latest version of the server available from github."
+   (lsp-fsharp--version-list-latest
+    (seq-map (lambda (elt) (s-trim (cdr (assq 'name elt))))
+             (lsp-fsharp--fetch-json "https://api.github.com/repos/fsharp/FsAutoComplete/releases"))))
+
+(defun lsp-fsharp--server-download-url (version)
+  "Return url for .zip file to download for given VERSION, depending on lsp-fsharp-server-runtime."
+  (concat "https://github.com/fsharp/FsAutoComplete/releases/download"
+          "/" version
+          "/" (if (eq lsp-fsharp-server-runtime 'net-core)
+                  "fsautocomplete.netcore.zip"
+                "fsautocomplete.zip")))
+
+(defun lsp-fsharp--fsac-install (_client callback _error-callback _update?)
   "Download the latest version of fsautocomplete and extract it to `lsp-fsharp-server-install-dir'."
   (let* ((temp-file (make-temp-file "fsautocomplete" nil ".zip"))
          (install-dir-full (expand-file-name lsp-fsharp-server-install-dir))
          (unzip-script (cond ((executable-find "unzip") (format "mkdir -p %s && unzip -qq %s -d %s" install-dir-full temp-file install-dir-full))
                              ((executable-find "powershell") (format "powershell -noprofile -noninteractive -nologo -ex bypass Expand-Archive -path '%s' -dest '%s'" temp-file install-dir-full))
-                             (t (user-error (format "Unable to unzip server - file %s cannot be extracted, please extract it manually" temp-file))))))
-    (url-copy-file lsp-fsharp-server-download-url temp-file t)
+                             (t (user-error (format "Unable to unzip server - file %s cannot be extracted, please extract it manually" temp-file)))))
+         (latest-version (lsp-fsharp--latest-version-from-github))
+         (server-download-url (lsp-fsharp--server-download-url latest-version)))
+    (url-copy-file server-download-url temp-file t)
     (shell-command unzip-script)
-    (shell-command (format "%s %s --version" (lsp-fsharp--fsac-runtime-cmd) (lsp-fsharp--fsac-cmd)))))
+    (shell-command (format "%s %s --version" (lsp-fsharp--fsac-runtime-cmd) (lsp-fsharp--fsac-cmd)))
+    (funcall callback)))
 
 (defun lsp-fsharp-update-fsac ()
   "Update fsautocomplete to the latest version."
   (interactive)
   (-let [install-dir (f-expand lsp-fsharp-server-install-dir)]
     (f-delete install-dir t)
-    (lsp-fsharp--fsac-install)))
+    (lsp-fsharp--fsac-install nil #'ignore #'lsp--error t)))
 
 (defun lsp-fsharp--make-launch-cmd ()
   "Build the command required to launch fsautocomplete."
-  (append (list (lsp-fsharp--fsac-runtime-cmd) (lsp-fsharp--fsac-locate) "--mode" "lsp" "--background-service-enabled")
+  (append (list (lsp-fsharp--fsac-runtime-cmd) (lsp-fsharp--fsac-cmd) "--background-service-enabled")
           lsp-fsharp-server-args))
 
 (defun lsp-fsharp--project-list ()
@@ -260,7 +276,9 @@ disable if `--backgorund-service-enabled' is not used"
    ("FSharp.EnableReferenceCodeLens" lsp-fsharp-enable-reference-code-lens t)))
 
 (lsp-register-client
- (make-lsp-client :new-connection (lsp-stdio-connection 'lsp-fsharp--make-launch-cmd)
+ (make-lsp-client :new-connection (lsp-stdio-connection
+                                   #'lsp-fsharp--make-launch-cmd
+                                   (lambda () (f-exists? (lsp-fsharp--fsac-cmd))))
                   :major-modes '(fsharp-mode)
                   :notification-handlers (ht ("fsharp/notifyCancel" #'ignore)
                                              ("fsharp/notifyWorkspace" #'ignore)
@@ -275,7 +293,8 @@ disable if `--backgorund-service-enabled' is not used"
                                          (lsp-configuration-section "fsharp"))
                                         (lsp-fsharp--workspace-load
                                          (lsp-fsharp--project-list)))))
-                  :server-id 'fsac))
+                  :server-id 'fsac
+                  :download-server-fn #'lsp-fsharp--fsac-install))
 
 (provide 'lsp-fsharp)
 ;;; lsp-fsharp.el ends here

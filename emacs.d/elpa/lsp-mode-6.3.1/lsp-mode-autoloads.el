@@ -9,7 +9,7 @@
 ;;;### (autoloads nil "lsp-clients" "lsp-clients.el" (0 0 0 0))
 ;;; Generated autoloads from lsp-clients.el
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-clients" '("lsp-")))
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-clients" '("parse-rf-language-server-" "expand-start-command" "lsp-")))
 
 ;;;***
 
@@ -17,6 +17,18 @@
 ;;; Generated autoloads from lsp-clojure.el
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-clojure" '("lsp-cl")))
+
+;;;***
+
+;;;### (autoloads nil "lsp-cpp" "lsp-cpp.el" (0 0 0 0))
+;;; Generated autoloads from lsp-cpp.el
+
+(autoload 'lsp-cpp-flycheck-clang-tidy-error-explainer "lsp-cpp" "\
+Explain a clang-tidy ERROR by scraping documentation from llvm.org.
+
+\(fn ERROR)" nil nil)
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-cpp" '("lsp-cpp-flycheck-clang-tidy--")))
 
 ;;;***
 
@@ -34,13 +46,6 @@
 
 ;;;***
 
-;;;### (autoloads nil "lsp-dart" "lsp-dart.el" (0 0 0 0))
-;;; Generated autoloads from lsp-dart.el
-
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-dart" '("lsp-")))
-
-;;;***
-
 ;;;### (autoloads nil "lsp-elm" "lsp-elm.el" (0 0 0 0))
 ;;; Generated autoloads from lsp-elm.el
 
@@ -55,6 +60,13 @@
 
 ;;;***
 
+;;;### (autoloads nil "lsp-eslint" "lsp-eslint.el" (0 0 0 0))
+;;; Generated autoloads from lsp-eslint.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-eslint" '("lsp-")))
+
+;;;***
+
 ;;;### (autoloads nil "lsp-fsharp" "lsp-fsharp.el" (0 0 0 0))
 ;;; Generated autoloads from lsp-fsharp.el
 
@@ -64,6 +76,13 @@ Load all of the provided PROJECTS.
 \(fn PROJECTS)" nil nil)
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-fsharp" '("lsp-fsharp-")))
+
+;;;***
+
+;;;### (autoloads nil "lsp-gdscript" "lsp-gdscript.el" (0 0 0 0))
+;;; Generated autoloads from lsp-gdscript.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-gdscript" '("lsp-gdscript-")))
 
 ;;;***
 
@@ -96,6 +115,13 @@ Load all of the provided PROJECTS.
 
 ;;;***
 
+;;;### (autoloads nil "lsp-json" "lsp-json.el" (0 0 0 0))
+;;; Generated autoloads from lsp-json.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-json" '("lsp-")))
+
+;;;***
+
 ;;;### (autoloads nil "lsp-metals" "lsp-metals.el" (0 0 0 0))
 ;;; Generated autoloads from lsp-metals.el
 
@@ -125,7 +151,14 @@ This avoids overloading the server with many files when starting Emacs.
 
 \(fn)" nil nil)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-mode" '("lsp-" "dash-expand:&lsp-wks" "make-lsp-client" "with-lsp-workspace" "when-lsp-workspace")))
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-mode" '("lsp-" "dash-expand:&lsp-" "make-lsp-client" "with-lsp-workspace" "when-lsp-workspace")))
+
+;;;***
+
+;;;### (autoloads nil "lsp-perl" "lsp-perl.el" (0 0 0 0))
+;;; Generated autoloads from lsp-perl.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-perl" '("lsp-perl-language-server-")))
 
 ;;;***
 
@@ -165,6 +198,13 @@ This avoids overloading the server with many files when starting Emacs.
 
 ;;;***
 
+;;;### (autoloads nil "lsp-verilog" "lsp-verilog.el" (0 0 0 0))
+;;; Generated autoloads from lsp-verilog.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-verilog" '("lsp-clients-verilog-executable")))
+
+;;;***
+
 ;;;### (autoloads nil "lsp-vetur" "lsp-vetur.el" (0 0 0 0))
 ;;; Generated autoloads from lsp-vetur.el
 
@@ -175,7 +215,7 @@ This avoids overloading the server with many files when starting Emacs.
 ;;;### (autoloads nil "lsp-vhdl" "lsp-vhdl.el" (0 0 0 0))
 ;;; Generated autoloads from lsp-vhdl.el
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-vhdl" '("lsp-vhdl-" "hdl-checker-" "vhdl-tool-")))
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "lsp-vhdl" '("lsp-vhdl-" "ghdl-ls-bin-name" "vhdl-" "hdl-checker-bin-name")))
 
 ;;;***
 
