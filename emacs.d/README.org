@@ -189,11 +189,21 @@
     ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
     (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
+    ;; start a server
     (when (display-graphic-p)
       (server-start))
+
     ;; Enable narrowing and erasing buffers
     (put 'narrow-to-region 'disabled nil)
     (put 'erase-buffer 'disabled nil)
+
+    ;; emacs27 specific features
+    (when (>= emacs-major-version 27)
+      (defun amd/tab-bar-tab-name-current ()
+        "Generate tab name from the buffer of the selected window."
+        (format " %s " (buffer-name (window-buffer (minibuffer-selected-window)))))
+      (setq tab-bar-tab-name-function #'amd/tab-bar-tab-name-current)
+    )
   #+end_src
 
 * fonts
