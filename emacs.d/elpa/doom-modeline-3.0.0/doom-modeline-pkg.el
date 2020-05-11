@@ -1,4 +1,4 @@
-(define-package "doom-modeline" "2.9.2" "A minimal and modern mode-line"
+(define-package "doom-modeline" "3.0.0" "A minimal and modern mode-line"
   '((emacs "25.1")
     (all-the-icons "2.2.0")
     (shrink-path "0.2.0")

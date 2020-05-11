@@ -4,7 +4,7 @@
 
 ;; Author: Vincent Zhang <seagle0128@gmail.com>
 ;; Homepage: https://github.com/seagle0128/doom-modeline
-;; Version: 2.9.2
+;; Version: 3.0.0
 ;; Package-Requires: ((emacs "25.1") (all-the-icons "2.2.0") (shrink-path "0.2.0") (dash "2.11.0"))
 ;; Keywords: faces mode-line
 
@@ -103,7 +103,7 @@
 
 (doom-modeline-def-modeline 'project
   '(bar window-number buffer-default-directory)
-  '(misc-info battery irc mu4e gnus github debug major-mode process))
+  '(misc-info battery irc mu4e gnus github debug minor-modes input-method major-mode process))
 
 (doom-modeline-def-modeline 'vcs
   '(bar window-number modals matches buffer-info buffer-position parrot selection-info)
@@ -126,8 +126,12 @@
   '(objed-state misc-info battery debug minor-modes input-method indent-info buffer-encoding major-mode))
 
 (doom-modeline-def-modeline 'pdf
-  '(bar window-number buffer-size buffer-info pdf-pages)
+  '(bar window-number matches buffer-info pdf-pages)
   '(misc-info major-mode process vcs))
+
+(doom-modeline-def-modeline 'org-src
+  '(bar window-number modals matches buffer-info-simple buffer-position word-count parrot selection-info)
+  '(objed-state misc-info debug lsp minor-modes input-method indent-info buffer-encoding major-mode process checker))
 
 (doom-modeline-def-modeline 'helm
   '(bar helm-buffer-id helm-number helm-follow helm-prefix-argument)
@@ -200,23 +204,29 @@ If DEFAULT is non-nil, set the default mode-line for all buffers."
   (doom-modeline-set-modeline 'pdf))
 
 ;;;###autoload
-(defun doom-modeline-set-timemachine-modeline ()
-  "Set timemachine mode-line."
-  (doom-modeline-set-modeline 'timemachine))
+(defun doom-modeline-set-org-src-modeline ()
+  "Set org-src mode-line."
+  (doom-modeline-set-modeline 'org-src))
 
 ;;;###autoload
 (defun doom-modeline-set-helm-modeline (&rest _) ; To advice helm
   "Set helm mode-line."
   (doom-modeline-set-modeline 'helm))
 
+;;;###autoload
+(defun doom-modeline-set-timemachine-modeline ()
+  "Set timemachine mode-line."
+  (doom-modeline-set-modeline 'timemachine))
+
 
 ;;
 ;; Minor mode
 ;;
 
-(defvar doom-modeline--old-format mode-line-format
-  "Storage for the old `mode-line-format', so it can be restored when
-`doom-modeline-mode' is disabled.")
+(defvar doom-modeline--default-format mode-line-format
+  "Storage for the default `mode-line-format'.
+
+So it can be restored when `doom-modeline-mode' is disabled.")
 
 (defvar doom-modeline-mode-map (make-sparse-keymap))
 
@@ -233,6 +243,7 @@ If DEFAULT is non-nil, set the default mode-line for all buffers."
   (if doom-modeline-mode
       (progn
         (doom-modeline-refresh-bars)        ; Create bars
+        (doom-modeline-set-main-modeline)   ; Set mode-line for current buffer
         (doom-modeline-set-main-modeline t) ; Set default mode-line
 
         ;; These buffers are already created and don't get modelines
@@ -253,6 +264,7 @@ If DEFAULT is non-nil, set the default mode-line for all buffers."
         (add-hook 'erc-mode-hook #'doom-modeline-set-special-modeline)
         (add-hook 'rcirc-mode-hook #'doom-modeline-set-special-modeline)
         (add-hook 'pdf-view-mode-hook #'doom-modeline-set-pdf-modeline)
+        (add-hook 'org-src-mode-hook #'doom-modeline-set-org-src-modeline)
         (add-hook 'git-timemachine-mode-hook #'doom-modeline-set-timemachine-modeline)
         (add-hook 'paradox-menu-mode-hook #'doom-modeline-set-package-modeline)
         (add-hook 'xwidget-webkit-mode-hook #'doom-modeline-set-minimal-modeline)
@@ -261,11 +273,12 @@ If DEFAULT is non-nil, set the default mode-line for all buffers."
         (advice-add #'helm-display-mode-line :after #'doom-modeline-set-helm-modeline))
     (progn
       ;; Restore mode-line
-      (setq-default mode-line-format doom-modeline--old-format)
+      (setq mode-line-format doom-modeline--default-format)
+      (setq-default mode-line-format doom-modeline--default-format)
       (dolist (bname '("*scratch*" "*Messages*"))
         (if (buffer-live-p (get-buffer bname))
             (with-current-buffer bname
-              (setq mode-line-format doom-modeline--old-format))))
+              (setq mode-line-format doom-modeline--default-format))))
 
       ;; Remove hooks
       (remove-hook 'Info-mode-hook #'doom-modeline-set-info-modeline)
@@ -279,6 +292,7 @@ If DEFAULT is non-nil, set the default mode-line for all buffers."
       (remove-hook 'erc-mode-hook #'doom-modeline-set-special-modeline)
       (remove-hook 'rcirc-mode-hook #'doom-modeline-set-special-modeline)
       (remove-hook 'pdf-view-mode-hook #'doom-modeline-set-pdf-modeline)
+      (remove-hook 'org-src-mode-hook #'doom-modeline-set-org-src-modeline)
       (remove-hook 'git-timemachine-mode-hook #'doom-modeline-set-timemachine-modeline)
       (remove-hook 'paradox-menu-mode-hook #'doom-modeline-set-package-modeline)
       (remove-hook 'xwidget-webkit-mode-hook #'doom-modeline-set-minimal-modeline)

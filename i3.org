@@ -289,14 +289,13 @@
     #         }
     # }
 
-    # # Old Border Settings
-    # # border style for new windows: normal or pixel <<size>>
-    # # new_window normal
-    # new_window pixel 1
-    # # hide_edge_borders none|vertical|horizontal|both
-    # hide_edge_borders none
 
-    for_window [class="^.*"] border pixel 0
+    # border style: normal or pixel <<size>>
+    default_border pixel 1
+    # hide_edge_borders none|vertical|horizontal|both|smart
+    hide_edge_borders smart
+
+    # for_window [class="^.*"] border pixel 1
 
     # gaps inner 0
     # gaps outer 0

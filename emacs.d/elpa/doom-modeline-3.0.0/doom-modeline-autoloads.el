@@ -65,8 +65,8 @@ Set pdf mode-line.
 
 \(fn)" nil nil)
 
-(autoload 'doom-modeline-set-timemachine-modeline "doom-modeline" "\
-Set timemachine mode-line.
+(autoload 'doom-modeline-set-org-src-modeline "doom-modeline" "\
+Set org-src mode-line.
 
 \(fn)" nil nil)
 
@@ -74,6 +74,11 @@ Set timemachine mode-line.
 Set helm mode-line.
 
 \(fn &rest _)" nil nil)
+
+(autoload 'doom-modeline-set-timemachine-modeline "doom-modeline" "\
+Set timemachine mode-line.
+
+\(fn)" nil nil)
 
 (defvar doom-modeline-mode nil "\
 Non-nil if Doom-Modeline mode is enabled.
@@ -98,7 +103,7 @@ Toggle doom-modeline on or off.
 ;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from doom-modeline-core.el
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-modeline-core" '("doom-mod")))
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "doom-modeline-core" '("doom-modeline")))
 
 ;;;***
 

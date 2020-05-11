@@ -84,7 +84,7 @@ build-fish: download-fish
 build-emacs: download-emacs
 	@echo "[BUILD] emacs"
 	$(CD_TO_BUILD_DIR)
-	./configure --prefix=$$HOME/apps/emacs
+	./configure --prefix=$$HOME/apps/emacs --with-modules --with-cairo
 	make -j 4
 	make install
 	cd $(abspath $(CACHEDIR)/emacs)

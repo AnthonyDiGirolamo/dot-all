@@ -326,8 +326,9 @@
        (interactive)
        (amd/disable-loaded-themes)
        (load-theme 'leuven t)
-       (load-theme 'airline-cobalt2 t)
-       ;; (load-theme 'airline-qwq t)
+       (when (featurep 'airline-themes)
+         ;; (load-theme 'airline-qwq t)
+         (load-theme 'airline-cobalt2 t))
        (custom-theme-set-faces
         'leuven
         ;; `(org-level-1 ((t (:height 1.3 :weight bold :slant normal :foreground "#875fff" :underline nil))))
@@ -389,10 +390,11 @@
          (interactive)
          (amd/disable-loaded-themes)
          (load-theme 'moe-dark t)
-         (load-theme 'airline-owo t)
-         ;; some alternative airline colors that match
-         ;; (load-theme 'airline-onedark t)
-         ;; (load-theme 'airline-behelit t)
+         (when (featurep 'airline-themes)
+           ;; some alternative airline colors that match
+           ;; (load-theme 'airline-onedark t)
+           ;; (load-theme 'airline-behelit t)
+           (load-theme 'airline-owo t))
          (custom-theme-set-faces
           'moe-dark
           ;; `(default ((t (:background "#000000"))))
@@ -553,7 +555,8 @@
          (amd/disable-loaded-themes)
          ;; (load-theme 'doom-one t)
          (load-theme 'doom-moonlight t)
-         (load-theme 'airline-onedark t)
+         (when (featurep 'airline-themes)
+           (load-theme 'airline-onedark t))
          ;; (custom-theme-set-faces
          ;;  'doom-one
          ;;  '(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
@@ -618,6 +621,7 @@
 
    #+BEGIN_SRC emacs-lisp
      (use-package airline-themes
+       :disabled
        :load-path "airline-themes"
        :init
        (setq powerline-default-separator 'utf-8)
@@ -655,113 +659,19 @@
        (fast-scroll-config)
        (fast-scroll-minor-mode 1))
 
-     (use-package powerline)
+     (use-package powerline
+       :disabled)
 
      (use-package doom-modeline
-       :disabled
+       :custom
+       ;; TODO: change evil-*-state-tags to the full NAME
+       (doom-modeline-bar-width 8) ;; fringe width/2
+       (doom-modeline-icon nil)
+       ;; TODO: force height to be (frame-char-height)
+       ;;   This seems to always multiply
+       ;;   (if doom-modeline-icon 1.68 1.25) by the (frame-char-height)
+       (doom-modeline-height 1)
        :init
-       ;; ;; How tall the mode-line should be. It's only respected in GUI.
-       ;; ;; If the actual char height is larger, it respects the actual height.
-       ;; (setq doom-modeline-height 25)
-       ;;
-       ;; ;; How wide the mode-line bar should be. It's only respected in GUI.
-       ;; (setq doom-modeline-bar-width 3)
-       ;;
-       ;; ;; Determines the style used by `doom-modeline-buffer-file-name'.
-       ;; ;;
-       ;; ;; Given ~/Projects/FOSS/emacs/lisp/comint.el
-       ;; ;;   truncate-upto-project => ~/P/F/emacs/lisp/comint.el
-       ;; ;;   truncate-from-project => ~/Projects/FOSS/emacs/l/comint.el
-       ;; ;;   truncate-with-project => emacs/l/comint.el
-       ;; ;;   truncate-except-project => ~/P/F/emacs/l/comint.el
-       ;; ;;   truncate-upto-root => ~/P/F/e/lisp/comint.el
-       ;; ;;   truncate-all => ~/P/F/e/l/comint.el
-       ;; ;;   relative-from-project => emacs/lisp/comint.el
-       ;; ;;   relative-to-project => lisp/comint.el
-       ;; ;;   file-name => comint.el
-       ;; ;;   buffer-name => comint.el<2> (uniquify buffer name)
-       ;; ;;
-       ;; ;; If you are expereicing the laggy issue, especially while editing remote files
-       ;; ;; with tramp, please try `file-name' style.
-       ;; ;; Please refer to https://github.com/bbatsov/projectile/issues/657.
-       ;; (setq doom-modeline-buffer-file-name-style 'truncate-upto-project)
-       ;;
-       ;; ;; Whether display icons in mode-line or not.
-       ;; (setq doom-modeline-icon t)
-       ;;
-       ;; ;; Whether display the icon for major mode. It respects `doom-modeline-icon'.
-       ;; (setq doom-modeline-major-mode-icon t)
-       ;;
-       ;; ;; Whether display color icons for `major-mode'. It respects
-       ;; ;; `doom-modeline-icon' and `all-the-icons-color-icons'.
-       ;; (setq doom-modeline-major-mode-color-icon t)
-       ;;
-       ;; ;; Whether display icons for buffer states. It respects `doom-modeline-icon'.
-       ;; (setq doom-modeline-buffer-state-icon t)
-       ;;
-       ;; ;; Whether display buffer modification icon. It respects `doom-modeline-icon'
-       ;; ;; and `doom-modeline-buffer-state-icon'.
-       ;; (setq doom-modeline-buffer-modification-icon t)
-       ;;
-       ;; ;; Whether display minor modes in mode-line or not.
-       ;; (setq doom-modeline-minor-modes nil)
-       ;;
-       ;; ;; If non-nil, a word count will be added to the selection-info modeline segment.
-       ;; (setq doom-modeline-enable-word-count nil)
-       ;;
-       ;; ;; Whether display buffer encoding.
-       ;; (setq doom-modeline-buffer-encoding t)
-       ;;
-       ;; ;; Whether display indentation information.
-       ;; (setq doom-modeline-indent-info nil)
-       ;;
-       ;; ;; If non-nil, only display one number for checker information if applicable.
-       ;; (setq doom-modeline-checker-simple-format t)
-       ;;
-       ;; ;; The maximum displayed length of the branch name of version control.
-       ;; (setq doom-modeline-vcs-max-length 12)
-       ;;
-       ;; ;; Whether display perspective name or not. Non-nil to display in mode-line.
-       ;; (setq doom-modeline-persp-name t)
-       ;;
-       ;; ;; Whether display icon for persp name. Nil to display a # sign. It respects `doom-modeline-icon'
-       ;; (setq doom-modeline-persp-name-icon nil)
-       ;;
-       ;; ;; Whether display `lsp' state or not. Non-nil to display in mode-line.
-       ;; (setq doom-modeline-lsp t)
-       ;;
-       ;; ;; Whether display github notifications or not. Requires `ghub` package.
-       ;; (setq doom-modeline-github nil)
-       ;;
-       ;; ;; The interval of checking github.
-       ;; (setq doom-modeline-github-interval (* 30 60))
-       ;;
-       ;; ;; Whether display environment version or not
-       ;; (setq doom-modeline-env-version t)
-       ;; ;; Or for individual languages
-       ;; (setq doom-modeline-env-enable-python t)
-       ;; (setq doom-modeline-env-enable-ruby t)
-       ;; (setq doom-modeline-env-enable-perl t)
-       ;; (setq doom-modeline-env-enable-go t)
-       ;; (setq doom-modeline-env-enable-elixir t)
-       ;; (setq doom-modeline-env-enable-rust t)
-       ;;
-       ;; ;; Change the executables to use for the language version string
-       ;; (setq doom-modeline-env-python-executable "python")
-       ;; (setq doom-modeline-env-ruby-executable "ruby")
-       ;; (setq doom-modeline-env-perl-executable "perl")
-       ;; (setq doom-modeline-env-go-executable "go")
-       ;; (setq doom-modeline-env-elixir-executable "iex")
-       ;; (setq doom-modeline-env-rust-executable "rustc")
-       ;;
-       ;; ;; Whether display mu4e notifications or not. Requires `mu4e-alert' package.
-       ;; (setq doom-modeline-mu4e t)
-       ;;
-       ;; ;; Whether display irc notifications or not. Requires `circe' package.
-       ;; (setq doom-modeline-irc t)
-       ;;
-       ;; ;; Function to stylize the irc buffer names.
-       ;; (setq doom-modeline-irc-stylize 'identity)
        :hook (after-init . doom-modeline-mode))
    #+END_SRC
 
@@ -776,13 +686,15 @@
       (use-package modus-operandi-theme
         :disabled
         :config
-        (load-theme 'airline-qwq t))
+        (when (featurep 'airline-themes)
+          (load-theme 'airline-qwq t)))
 
       ;; modus dark
       (use-package modus-vivendi-theme
         :disabled
         :config
-        (load-theme 'airline-ouo t))
+        (when (featurep 'airline-themes)
+          (load-theme 'airline-ouo t)))
     #+END_SRC
 
 ** appearance minor-modes
@@ -972,7 +884,7 @@
     (defun amd/recompile-all-elpa-packages ()
       "Recompile elc files"
       (interactive)
-      (byte-recompile-directory "~/.emacs.d/elpa/" 0))
+      (byte-recompile-directory "~/.emacs.d/elpa/" 0 t))
 
     (defun make-parent-directory ()
       "Make sure the directory of `buffer-file-name' exists."
@@ -1200,6 +1112,7 @@
       (when amd/using-android ;; don't use the system clipboard
         (setq x-select-enable-clipboard nil))
 
+      (setq evil-echo-state nil)
       (setq evil-auto-balance-windows nil)     ;; dont rebalance windows when deleting
       (setq evil-flash-delay .5)
       (setq evil-want-fine-undo 'no)           ;; Make sure undos are done atomically
@@ -1271,7 +1184,7 @@
        "C-w o" 'delete-other-windows
        amd/leader-key-insert 'hydra-leader-menu/body)
       (:states '(motion visual)
-       "RET" 'evil-ex ;; Enter opens : prompt
+       ;; "RET" 'evil-ex ;; Enter opens : prompt
        ";" 'evil-ex)  ;; semicolon also enters : prompt
       (:states '(motion visual emacs)
        "M-t" 'ivy-switch-buffer
