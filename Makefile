@@ -145,6 +145,7 @@ fish: build-fish ## download, compile and install fish
 
 xcape_git_url := https://github.com/alols/xcape.git
 lux_git_url := https://github.com/Ventto/lux.git
+clac_git_url := https://github.com/soveran/clac.git
 
 .PHONY: git-pull-%
 .ONESHELL:
@@ -165,6 +166,10 @@ xcape: git-pull-xcape
 .PHONY: lux
 .ONESHELL:
 lux: git-pull-lux
+
+.PHONY: clac
+.ONESHELL:
+clac: git-pull-clac
 
 .PHONY: clean-removed-files
 .ONESHELL:
