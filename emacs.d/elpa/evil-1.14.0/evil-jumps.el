@@ -1,8 +1,8 @@
-;;; evil-jumps.el --- Jump list implementation
+;;; evil-jumps.el --- Jump list implementation -*- lexical-binding: t -*-
 
 ;; Author: Bailey Ling <bling at live.ca>
 
-;; Version: 1.2.14
+;; Version: 1.14.0
 
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -143,10 +143,7 @@
       (unless evil-jumps-cross-buffers
         ;; skip jump marks pointing to other buffers
         (while (and (< idx size) (>= idx 0)
-                    (not (string= current-file-name
-                                  (let* ((place (ring-ref target-list idx))
-                                         (pos (car place)))
-                                    (cadr place)))))
+                    (not (string= current-file-name (cadr (ring-ref target-list idx)))))
           (setq idx (+ idx shift))))
       (when (and (< idx size) (>= idx 0))
         ;; actual jump
@@ -256,16 +253,15 @@ POS defaults to point."
           (setq idx 0)
           (setf (evil-jumps-struct-idx struct) 0)
           (evil--jumps-push))
-          (evil--jumps-jump idx -1)))))
+        (evil--jumps-jump idx -1)))))
 
-(defun evil--jumps-window-configuration-hook (&rest args)
+(defun evil--jumps-window-configuration-hook (&rest _args)
   (let* ((window-list (window-list-1 nil nil t))
          (existing-window (selected-window))
          (new-window (previous-window)))
     (when (and (not (eq existing-window new-window))
                (> (length window-list) 1))
-      (let* ((target-jump-struct (evil--jumps-get-current new-window))
-             (target-jump-count (ring-length (evil--jumps-get-jumps target-jump-struct))))
+      (let* ((target-jump-struct (evil--jumps-get-current new-window)))
         (if (not (ring-empty-p (evil--jumps-get-jumps target-jump-struct)))
             (evil--jumps-message "target window %s already has %s jumps" new-window target-jump-count)
           (evil--jumps-message "new target window detected; copying %s to %s" existing-window new-window)
@@ -275,7 +271,7 @@ POS defaults to point."
               (setf (evil-jumps-struct-idx target-jump-struct) (evil-jumps-struct-idx source-jump-struct))
               (setf (evil-jumps-struct-ring target-jump-struct) (ring-copy source-list)))))))
     ;; delete obsolete windows
-    (maphash (lambda (key val)
+    (maphash (lambda (key _val)
                (unless (member key window-list)
                  (evil--jumps-message "removing %s" key)
                  (remhash key evil--jumps-window-jumps)))

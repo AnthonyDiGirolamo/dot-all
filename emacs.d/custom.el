@@ -4,6 +4,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes t)
+ '(doom-themes-enable-bold t)
+ '(doom-themes-enable-italic t)
  '(elfeed-feeds
    (quote
     ("https://hackaday.com/blog/feed/" "http://planet.emacsen.org/atom.xml")))
@@ -13,7 +15,7 @@
  '(magit-status-buffer-switch-function (quote switch-to-buffer))
  '(package-selected-packages
    (quote
-    (all-the-icons ibuffer-projectile highlight-indent-guides major-mode-hydra airline-themes hide-mode-line modus-operandi-theme modus-vivendi-theme markdown-mode+ markdown-mode yasnippet gif-screencast lsp-mode gn-mode ninja-mode gnuplot ox-gfm fennel-mode blimp use-package ob-async ivy-xref dts-mode forth-mode company-jedi jedi-core jinja2-mode mmm-jinja2 request fill-column-indicator sqlup-mode scad-mode scad-preview toc-org steam ssh-config-mode ssh-agency general ht paradox sql-indent pylint moonscript smex xterm-color fish-mode vimrc-mode company-shell vlf exec-path-from-shell edit-server json-mode expand-region yari yaml-mode wgrep-pt wgrep-ag subatomic256-theme scss-mode robe rainbow-delimiters pt pandoc-mode js2-mode jedi htmlize haml-mode go-mode feature-mode evil-commentary esup emmet-mode edbi company-inf-ruby coffee-mode ag ace-link)))
+    (evil counsel-gtags ggtags all-the-icons ibuffer-projectile highlight-indent-guides major-mode-hydra airline-themes hide-mode-line modus-operandi-theme modus-vivendi-theme markdown-mode+ markdown-mode yasnippet gif-screencast lsp-mode gn-mode ninja-mode gnuplot ox-gfm fennel-mode blimp use-package ob-async ivy-xref dts-mode forth-mode company-jedi jedi-core jinja2-mode mmm-jinja2 request fill-column-indicator sqlup-mode scad-mode scad-preview toc-org steam ssh-config-mode ssh-agency general ht paradox sql-indent pylint moonscript smex xterm-color fish-mode vimrc-mode company-shell vlf exec-path-from-shell edit-server json-mode expand-region yari yaml-mode wgrep-pt wgrep-ag subatomic256-theme scss-mode robe rainbow-delimiters pt pandoc-mode js2-mode jedi htmlize haml-mode go-mode feature-mode evil-commentary esup emmet-mode edbi company-inf-ruby coffee-mode ag ace-link)))
  '(paradox-github-token t)
  '(projectile-mode-line (quote (:eval (format " p[%s]" (projectile-project-name)))))
  '(python-indent-guess-indent-offset t)

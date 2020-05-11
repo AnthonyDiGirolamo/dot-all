@@ -1,8 +1,8 @@
-;;; evil-development.el --- Useful features for Evil developers
+;;; evil-development.el --- Useful features for Evil developers -*- lexical-binding: t -*-
 
 ;; Author: Justin Burkett <justin at burkett dot cc>
 
-;; Version: 1.2.14
+;; Version: 1.14.0
 
 ;;
 ;; This file is NOT part of GNU Emacs.

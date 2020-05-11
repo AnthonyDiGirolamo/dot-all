@@ -1,8 +1,8 @@
-;;; evil-command-window.el --- Evil command line window implementation
+;;; evil-command-window.el --- Evil command line window implementation -*- lexical-binding: t -*-
 ;; Author: Emanuel Evans <emanuel.evans at gmail.com>
 ;; Maintainer: Vegard Øye <vegard_oye at hotmail.com>
 
-;; Version: 1.2.14
+;; Version: 1.14.0
 
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -69,14 +69,35 @@ execute on the result that the user selects."
   (evil-command-window-mode)
   (evil-command-window-insert-commands hist))
 
-(defun evil-command-window-ex (&optional current-command)
+(defun evil-command-window-ex (&optional current-command execute-fn)
   "Open a command line window for editing and executing ex commands.
 If CURRENT-COMMAND is present, it will be inserted under the
-cursor as the current command to be edited."
+cursor as the current command to be edited. If EXECUTE-FN is given,
+it will be used as the function to execute instead of
+`evil-command-window-ex-execute', the default."
   (interactive)
   (evil-command-window (cons (or current-command "") evil-ex-history)
                        ":"
-                       'evil-command-window-ex-execute))
+                       (or execute-fn 'evil-command-window-ex-execute)))
+
+(defun evil-ex-command-window ()
+  "Start command window with ex history and current minibuffer content."
+  (interactive)
+  (let ((current (minibuffer-contents))
+        (config (current-window-configuration)))
+    (evil-ex-teardown)
+    (select-window (minibuffer-selected-window) t)
+    (evil-command-window-ex current (apply-partially 'evil-ex-command-window-execute config))))
+
+(defun evil-ex-search-command-window ()
+  "Start command window with search history and current minibuffer content."
+  (interactive)
+  (let ((current (minibuffer-contents))
+        (config (current-window-configuration)))
+    (select-window (minibuffer-selected-window) t)
+    (evil-command-window (cons current evil-ex-search-history)
+                         (evil-search-prompt (eq evil-ex-search-direction 'forward))
+                         (apply-partially 'evil-ex-command-window-execute config))))
 
 (defun evil-command-window-execute ()
   "Execute the command under the cursor in the appropriate buffer.

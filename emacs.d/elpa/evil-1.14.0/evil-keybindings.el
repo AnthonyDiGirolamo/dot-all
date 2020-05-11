@@ -1,9 +1,9 @@
-;;; evil-keybindings.el --- Add some Evil keybindings to other modules
+;;; evil-keybindings.el --- Add some Evil keybindings to other modules -*- lexical-binding: t -*-
 
 ;; Author: Vegard Øye <vegard_oye at hotmail.com>
 ;; Maintainer: Vegard Øye <vegard_oye at hotmail.com>
 
-;; Version: 1.2.14
+;; Version: 1.14.0
 
 ;;
 ;; This file is NOT part of GNU Emacs.

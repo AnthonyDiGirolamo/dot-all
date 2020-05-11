@@ -1,9 +1,9 @@
-;;; evil-repeat.el --- Repeat system
+;;; evil-repeat.el --- Repeat system -*- lexical-binding: t -*-
 
 ;; Author: Frank Fischer <frank.fischer at mathematik.tu-chemnitz.de>
 ;; Maintainer: Vegard Øye <vegard_oye at hotmail.com>
 
-;; Version: 1.2.14
+;; Version: 1.14.0
 
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -276,7 +276,8 @@ has :repeat nil."
         ;; called.
         (evil-repeat-abort))
        ;; ignore those commands completely
-       ((null repeat-type))
+       ((or (null repeat-type)
+            (evil-mouse-events-p (this-command-keys))))
        ;; record command
        (t
         ;; In normal-state or visual state, each command is a single
@@ -406,7 +407,7 @@ buffer between (point) and (mark)."
    ((eq flag 'post)
     (remove-hook 'after-change-functions #'evil-repeat-insert-at-point-hook t))))
 
-(defun evil-repeat-insert-at-point-hook (beg end length)
+(defun evil-repeat-insert-at-point-hook (beg end _length)
   (let ((repeat-type (evil-repeat-type this-command t)))
     (when (and (evil-repeat-recording-p)
                (eq repeat-type 'evil-repeat-insert-at-point)

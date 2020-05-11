@@ -1,9 +1,9 @@
-;;; evil-maps.el --- Default keymaps
+;;; evil-maps.el --- Default keymaps -*- lexical-binding: t -*-
 
 ;; Author: Vegard Øye <vegard_oye at hotmail.com>
 ;; Maintainer: Vegard Øye <vegard_oye at hotmail.com>
 
-;; Version: 1.2.14
+;; Version: 1.14.0
 
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -101,6 +101,10 @@
 (define-key evil-normal-state-map [escape] 'evil-force-normal-state)
 (define-key evil-normal-state-map [remap cua-paste-pop] 'evil-paste-pop)
 (define-key evil-normal-state-map [remap yank-pop] 'evil-paste-pop)
+
+(when (featurep 'tab-bar)
+  (define-key evil-normal-state-map "gt" 'tab-bar-switch-to-next-tab)
+  (define-key evil-normal-state-map "gT" 'tab-bar-switch-to-prev-tab))
 
 ;; go to last change
 (define-key evil-normal-state-map "g;" 'goto-last-change)
@@ -375,6 +379,8 @@
     ,(if evil-want-C-w-delete
          '("\C-w" . evil-delete-backward-word)
        '("\C-w" . evil-window-map))
+    ,@(when evil-want-C-u-delete
+        '(("\C-u" . evil-delete-back-to-indentation)))
     ([mouse-2] . mouse-yank-primary))
   "Evil's bindings for insert state (for
 `evil-insert-state-map'), excluding <delete>, <escape>, and
@@ -509,8 +515,14 @@ included in `evil-insert-state-bindings' by default."
 (evil-ex-define-cmd "sor[t]" 'evil-ex-sort)
 (evil-ex-define-cmd "res[ize]" 'evil-ex-resize)
 
+(when (featurep 'tab-bar)
+  (evil-ex-define-cmd "tabnew" 'tab-bar-new-tab)
+  (evil-ex-define-cmd "tabn[ext]" 'tab-bar-switch-to-next-tab)
+  (evil-ex-define-cmd "tabp[revious]" 'tab-bar-switch-to-prev-tab))
+
 ;; search command line
 (define-key evil-ex-search-keymap "\d" #'evil-ex-delete-backward-char)
+(define-key evil-ex-search-keymap "\C-f" 'evil-ex-search-command-window)
 (define-key evil-ex-search-keymap "\C-r" 'evil-paste-from-register)
 (define-key evil-ex-search-keymap "\C-n" 'next-history-element)
 (define-key evil-ex-search-keymap "\C-p" 'previous-history-element)
@@ -524,6 +536,7 @@ included in `evil-insert-state-bindings' by default."
 (define-key evil-ex-completion-map "\C-b" 'move-beginning-of-line)
 (define-key evil-ex-completion-map "\C-c" 'abort-recursive-edit)
 (define-key evil-ex-completion-map "\C-d" 'evil-ex-completion)
+(define-key evil-ex-completion-map "\C-f" 'evil-ex-command-window)
 (define-key evil-ex-completion-map "\C-g" 'abort-recursive-edit)
 (define-key evil-ex-completion-map "\C-k" 'evil-insert-digraph)
 (define-key evil-ex-completion-map "\C-l" 'evil-ex-completion)
