@@ -447,7 +447,7 @@ Moe, moe, kyun!")
    `(magit-reflog-remote ((,class (:foreground ,blue-4 :background ,blue-0))))
    `(magit-reflog-reset ((,class (:foreground ,red-3 :background ,red-00))))
    `(magit-section-heading ((,class (:foreground ,orange-3 :background nil :bold t :underline t))))
-   `(magit-section-heading-selection ((,class (:background ,blue-0))))
+   `(magit-section-heading-selection ((,class (:foreground ,black-6 :background ,blue-0))))
    `(magit-section-highlight ((,class (:background ,yellow-00))))
    `(magit-sequence-done ((,class (:foreground ,green-3))))
    `(magit-sequence-drop ((,class (:foreground ,orange-2))))
@@ -793,6 +793,7 @@ Moe, moe, kyun!")
 
    ;; notmuch
    `(notmuch-search-unread-face ((,class (:weight bold))))
+   `(notmuch-message-summary-face ((,class (:background ,white-1))))
 
    ;; git-gutter (&-fringe)
    `(git-gutter:added ((,class (:foreground ,green-4 :background ,green-0 :bold t))))

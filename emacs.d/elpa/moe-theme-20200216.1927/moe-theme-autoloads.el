@@ -35,7 +35,7 @@
 ;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from moe-theme-switcher.el
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "moe-theme-switcher" '("moe-" "switch-" "convert-time-format-of-sunrise-and-sunset" "get-sunrise-sunset-string")))
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "moe-theme-switcher" '("convert-time-format-of-sunrise-and-sunset" "get-sunrise-sunset-string" "moe-" "switch-")))
 
 ;;;***
 
