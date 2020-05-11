@@ -3038,8 +3038,8 @@
       :diminish "")
 
     (use-package lua-mode
-      :init
-      (setq lua-indent-level 2))
+      :custom
+      (lua-indent-level 2))
 
     ;; Markdown mode
     (use-package markdown-mode
