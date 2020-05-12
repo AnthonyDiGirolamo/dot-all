@@ -553,6 +553,17 @@
          (load-theme 'doom-moonlight t)
          (when (featurep 'airline-themes)
            (load-theme 'airline-onedark t))
+         (custom-theme-set-faces
+          'doom-moonlight
+          `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
+          `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
+          `(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))))
+          `(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))))
+          `(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))))
+          `(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))))
+          `(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))))
+          `(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))))
+         )
          ;; (custom-theme-set-faces
          ;;  'doom-one
          ;;  '(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
@@ -1506,7 +1517,12 @@
                  amd/eshell-or-project-eshell
                  projectile-run-eshell)
       :init
-      (add-hook 'eshell-mode-hook #'hide-mode-line-mode)
+      (defun amd/move-modeline-to-header ()
+        (interactive)
+        (setq header-line-format mode-line-format)
+        (hide-mode-line-mode))
+      (add-hook 'eshell-mode-hook #'amd/move-modeline-to-header)
+
       (setq eshell-banner-message
             '(format "%s %s\n"
                      (propertize (format " %s " (string-trim (buffer-name)))
@@ -3619,7 +3635,7 @@
       :custom
       (ivy-display-style 'fancy)
       (ivy-use-virtual-buffers t)
-      (ivy-height 7)
+      (ivy-height 10)
       (ivy-fixed-height-minibuffer t)
       (enable-recursive-minibuffers t)
       :config
@@ -3739,10 +3755,13 @@
 ** counsel
 
    #+BEGIN_SRC emacs-lisp
-     (use-package smex) ;; used by counsel
+     (use-package amx
+       :config
+       (amx-mode)
+     ) ;; used by counsel
 
      (use-package counsel
-       :after smex
+       :after amx
        :demand
        :bind (("M-x" . counsel-M-x)
               ("C-h k" . counsel-descbinds)
