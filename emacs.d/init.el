@@ -91,3 +91,6 @@
 ;; Loading done, restore gc-cons-threshold
 (setq gc-cons-threshold 16000000)
 
+;; lastly, start a server
+(when (display-graphic-p)
+  (server-start))

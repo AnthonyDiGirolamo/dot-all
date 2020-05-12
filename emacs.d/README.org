@@ -189,10 +189,6 @@
     ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
     (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
-    ;; start a server
-    (when (display-graphic-p)
-      (server-start))
-
     ;; Enable narrowing and erasing buffers
     (put 'narrow-to-region 'disabled nil)
     (put 'erase-buffer 'disabled nil)
@@ -1510,13 +1506,19 @@
                  amd/eshell-or-project-eshell
                  projectile-run-eshell)
       :init
+      (add-hook 'eshell-mode-hook #'hide-mode-line-mode)
+      (setq eshell-banner-message
+            '(format "%s %s\n"
+                     (propertize (format " %s " (string-trim (buffer-name)))
+                                 'face 'mode-line-highlight)
+                     (propertize (current-time-string)
+                                 'face 'font-lock-keyword-face)))
+
       (defun eshell-set-keys ()
         (interactive)
         (general-define-key
          :keymaps '(eshell-mode-map)
          :states '(normal insert)
-         "C-e"  'eshell-previous-prompt
-         "C-n"  'eshell-next-prompt
          "C-l"  'eshell/clear-buffer
          "M-e" 'tmux-window-navigation/move-up
          "M-n" 'tmux-window-navigation/move-down)
@@ -1528,15 +1530,18 @@
         (general-define-key
          :keymaps '(eshell-mode-map)
          :states '(normal)
+         "E"  'eshell-previous-prompt
+         "N"  'eshell-next-prompt
          "G" 'amd/eshell-goto-prompt)
       )
       (add-hook 'eshell-first-time-mode-hook 'eshell-set-keys)
 
       ;; Use ivy for tab completion
       (add-hook 'eshell-mode-hook
-                (lambda () (define-key eshell-mode-map (kbd "<tab>")
-                        (lambda () (interactive)
-                          (pcomplete-std-complete)))))
+                (lambda ()
+                  (define-key eshell-mode-map (kbd "<tab>")
+                    (lambda () (interactive)
+                      (pcomplete-std-complete)))))
 
       ;; C-M-i -> complete-symbol (used for elisp inside eshell)
       ;; See completion-at-point-functions for more info
@@ -1628,7 +1633,6 @@
 
       ;; Disable Company mode
       (add-hook 'eshell-mode-hook (lambda () (company-mode -1)))
-
       (add-hook 'eshell-mode-hook (lambda () (undo-tree-mode -1)))
 
       ;; Visual commands
@@ -1644,6 +1648,8 @@
 
       (setenv "PAGER" "cat")
 
+      (defalias 'eshell/q 'eshell/exit)
+      (defalias 'eshell/x 'eshell/exit)
       (defalias 'eshell/e 'find-file-other-window)
       (defalias 'eshell/emacs 'find-file)
       (defalias 'eshell/d 'counsel-esh-directory-history)
@@ -1667,23 +1673,33 @@
           (backward-char)
           (eshell-next-prompt (- n))))
 
-      (defun eshell/x ()
-        "Exit eshell and delete it's window."
-        (interactive)
-        (let* ((current-eshell-window (get-buffer-window)))
-          (kill-buffer (current-buffer))
-          (delete-window current-eshell-window)))
+      ;; adapted from doom-emacs eshell
+      ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/term/eshell/autoload/eshell.el#L289
+      (defun amd/eshell-cleanup ()
+        "Close window on quit."
+        (let ((buf (current-buffer)))
+          (when-let (win (get-buffer-window buf))
+            (let ((ignore-window-parameters t)
+                  (popup-p (window-dedicated-p win)))
+              (delete-window win)
+              (when popup-p
+                (cl-loop for win in (window-list)
+                         for buf = (window-buffer win)
+                         for mode = (buffer-local-value 'major-mode buf)
+                         if (eq mode 'eshell-mode)
+                         return (select-window win)))))))
+      (add-hook 'eshell-exit-hook #'amd/eshell-cleanup)
 
       (defun eshell-enable-256-colors ()
         (interactive)
         (require 'xterm-color)
         ;; (add-hook 'eshell-mode-hook (lambda ()
-          (setq xterm-color-preserve-properties t)
+        (setq xterm-color-preserve-properties t)
         ;; ))
 
         (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
         (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
-      )
+        )
 
       ;; (require 'xterm-color)
       ;; (progn (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
@@ -2523,7 +2539,7 @@
          ('grep-mode :align bottom :size 0.5)
          ("*Warnings*" :select nil :inhibit-window-quit t :other t)
          ;; Top popups
-         ("\\*e?shell.*\\*" :regexp t :popup t :size 0.5 :align above)
+         ("\\*e?shell.*\\*" :regexp t :popup t :size 0.5 :align bottom)
          ;; Full size popups
          ('magit-status-mode :same t)
          ;; eww popups should just replace current buffer
@@ -3603,9 +3619,9 @@
       :custom
       (ivy-display-style 'fancy)
       (ivy-use-virtual-buffers t)
-      (ivy-height 10)
+      (ivy-height 7)
+      (ivy-fixed-height-minibuffer t)
       (enable-recursive-minibuffers t)
-      :init
       :config
       (defvar ivy-switch-project-map (make-sparse-keymap))
 
@@ -3615,29 +3631,30 @@
           (projectile-load-known-projects)
           (ivy-read
            "Switch to project: "
-           ;; (if (projectile-project-p)
-           ;;     (cons (abbreviate-file-name (projectile-project-root))
-           ;;           (projectile-relevant-known-projects))
-           ;;   projectile-known-projects)
            projectile-known-projects
-           ;; :action #'projectile-switch-project-by-name
            :action #'magit-status
            :keymap ivy-switch-project-map)))
 
       (ivy-set-actions
        'ivy-switch-project
        '(("k"
-          (lambda (x)
-            (setq projectile-known-projects
-                  (--reject (string= x it) projectile-known-projects))
+          (lambda (x) (setq projectile-known-projects
+                       (--reject (string= x it) projectile-known-projects))
             (projectile-merge-known-projects)
-            ;; (projectile-remove-known-project x)
             (ivy--reset-state ivy-last))
           "remove project")
-         ("d"
-          (lambda (x)
-            (dired x))
+         ("d" (lambda (x) (dired x))
           "dired")))
+
+      ;; TODO: https://github.com/abo-abo/swiper/issues/2560
+      ;; (defun amd/adjust-windows-for-minibuffer (&optional arg1 &rest args)
+      ;;   ;; (message "bn: %s" (buffer-name))
+      ;;   ;; (message "height: %s" (window-total-height))
+      ;; )
+      ;; (current-window-configuration)
+      ;; (advice-add 'ivy--minibuffer-setup :after #'amd/adjust-windows-for-minibuffer)
+      ;; (add-hook 'minibuffer-setup-hook #'amd/adjust-windows-for-minibuffer)
+      ;; (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
     )
 
     (use-package ivy-hydra
