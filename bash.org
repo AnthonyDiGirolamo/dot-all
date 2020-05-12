@@ -147,14 +147,17 @@
 
     # always color tree output
     alias tree='tree -C'
-    # # 1,2,3 level deep tree aliases
-    # alias t='tree -L 1'
-    # alias tt='tree -L 2'
-    # alias ttt='tree -L 3'
-    # tree aliases that show ll output on the left, file tree on the right
-    alias tll="tree -C -apugsD -L 2 | sed -e 's/^\(.*\) \(\[.*\]\) \(.*\)/\2 \1\3/'"
-    alias tlll="tree -C -apugsD -L 3 | sed -e 's/^\(.*\) \(\[.*\]\) \(.*\)/\2 \1\3/'"
-    alias tllll="tree -C -apugsD | sed -e 's/^\(.*\) \(\[.*\]\) \(.*\)/\2 \1\3/'"
+
+    # tree "ls -l" style output on the left, file tree on the right
+    function tllll {
+      tree -C -apuhgsD $* | sed -e 's/^\(.*\) \[\(.*\)\] \(.*\)/\2 \1\3/'
+    }
+    function tll {
+      tllll -L 2 $*
+    }
+    function tlll {
+      tllll -L 3 $*
+    }
 
     function dotbin {
       export PATH=`pwd`/bin:$PATH

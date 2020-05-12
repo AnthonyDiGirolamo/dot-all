@@ -114,6 +114,17 @@
     alias gpp='git push'
     alias gco='git checkout'
 
+    # tree "ls -l" style output
+    function tllll --description "tree ls -l style"
+      tree -C -apuhgsD $argv | sed -e 's/^\(.*\) \[\(.*\)\] \(.*\)/\2 \1\3/'
+    end
+    function tll --description "tree ls -l style with maxdepth of 2"
+      tllll -L 2 $argv
+    end
+    function tlll --description "tree ls -l style with maxdepth of 3"
+      tllll -L 3 $argv
+    end
+
     # fish specific aliases
     alias o=prevd
     alias pd=prevd
