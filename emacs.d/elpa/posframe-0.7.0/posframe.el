@@ -250,7 +250,7 @@ This posframe's buffer is BUFFER-OR-NAME."
       (setq-local left-fringe-width nil)
       (setq-local right-fringe-width nil)
       (setq-local fringes-outside-margins 0)
-      (setq-local truncate-lines nil)
+      (setq-local truncate-lines t)
       (setq-local cursor-type nil)
       (setq-local cursor-in-non-selected-windows nil)
       (setq-local show-trailing-whitespace nil)

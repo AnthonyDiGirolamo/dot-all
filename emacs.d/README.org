@@ -629,7 +629,7 @@
 
    #+BEGIN_SRC emacs-lisp
      (use-package airline-themes
-       :disabled
+       ;; :disabled
        :load-path "airline-themes"
        :init
        (setq powerline-default-separator 'utf-8)
@@ -668,9 +668,11 @@
        (fast-scroll-minor-mode 1))
 
      (use-package powerline
-       :disabled)
+       ;; :disabled
+     )
 
      (use-package doom-modeline
+       :disabled
        :custom
        ;; TODO: change evil-*-state-tags to the full NAME
        (doom-modeline-bar-width 8) ;; fringe width/2
@@ -687,8 +689,8 @@
 
     #+BEGIN_SRC emacs-lisp
       ;; (amd/leuven-light-theme)
-      (amd/doom-one-theme)
-      ;; (amd/moe-dark-theme)
+      ;; (amd/doom-one-theme)
+      (amd/moe-dark-theme)
 
       ;; modus light
       (use-package modus-operandi-theme
@@ -1522,7 +1524,7 @@
         (interactive)
         (setq header-line-format mode-line-format)
         (hide-mode-line-mode))
-      (add-hook 'eshell-mode-hook #'amd/move-modeline-to-header)
+      ;; (add-hook 'eshell-mode-hook #'amd/move-modeline-to-header)
 
       (setq eshell-banner-message
             '(format "%s %s\n"
@@ -2549,7 +2551,7 @@
          ("\\*[Ii]buffer\\*" :regexp t :popup t :align bottom :size 0.6)
          (compilation-mode :select nil :size 0.3 :align bottom)
          ("*Help*" :size 0.5 :align bottom)
-         ("\\*helpful.*\\*" :regexp t :size 0.3 :align bottom)
+         ("\\*helpful.*\\*" :regexp t :size 0.5 :align bottom)
          ("*Completions*" :size 0.2 :align bottom)
          ('flycheck-error-list-mode :select t :align bottom :size 0.2)
          ('ivy-occur-grep-mode :align bottom :size 0.5)
@@ -3102,6 +3104,9 @@
       :diminish ""
       ;; :commands (flycheck-list-errors)
       :demand
+      :custom
+      ;; (flycheck-display-errors-function 'flycheck-display-error-messages-unless-error-list)
+      (flycheck-display-errors-function nil)
       :general
       (:states '(motion) :keymaps '(flycheck-error-list-mode-map)
                "RET" 'flycheck-error-list-goto-error
@@ -3296,15 +3301,15 @@
       (setq hydra-posframe-show-params
             '(
               :internal-border-width 1
-              :internal-border-color "red"
+              :internal-border-color "cyan"
               :poshandler
               ;; posframe-poshandler-window-center
               ;; posframe-poshandler-frame-center
               ;; posframe-poshandler-frame-top-center
-              ;; posframe-poshandler-frame-top-left-corner
+              posframe-poshandler-frame-top-left-corner
               ;; posframe-poshandler-frame-top-right-corner
               ;; posframe-poshandler-frame-bottom-center
-              posframe-poshandler-frame-bottom-left-corner
+              ;; posframe-poshandler-frame-bottom-left-corner
               ;; posframe-poshandler-frame-bottom-right-corner
               ;; posframe-poshandler-window-center
               ;; posframe-poshandler-window-top-center
@@ -3809,6 +3814,7 @@
 
    #+begin_src emacs-lisp
      (use-package ivy-posframe
+       :diminish
        :init
        (setq
         ivy-posframe-height-alist
@@ -3824,9 +3830,11 @@
           ;; (t . ivy-posframe-display-at-frame-center)
           ;; (t . ivy-posframe-display)
           ))
+       (setq ivy-posframe-parameters
+             '((left-fringe . 17)
+               (right-fringe . 17)))
        :config
-       (ivy-posframe-mode 1)
-       )
+       (ivy-posframe-mode 1))
    #+end_src
 
 ** deprecated functions

@@ -283,7 +283,7 @@ This variable is useful for `ivy-posframe-read-action' .")
                    (let ((height (+ ivy-height 1)))
                      (min height (or ivy-posframe-height height))))
    :min-width (or ivy-posframe-min-width
-                  (let ((width (round (* (frame-width) 0.62))))
+                  (let ((width (- (round (* (frame-width) 1.0)) 0)))
                     (min width (or ivy-posframe-width width))))))
 
 (defun ivy-posframe-display (str)
