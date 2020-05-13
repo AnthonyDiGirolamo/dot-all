@@ -205,7 +205,7 @@
 
 * fonts
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (defun amd/set-font ()
       "Set preferred GUI font."
       (interactive)
@@ -276,11 +276,11 @@
            ("ERROR" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
            ("DEBUG" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))))
         (global-prettify-symbols-mode 1)))
-  #+END_SRC
+  #+end_src
 
 * libraries
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package general
       :demand
       ;; :config
@@ -292,7 +292,7 @@
     (use-package dash)
 
     (use-package subr-x) ;; needed for string-trim
-  #+END_SRC
+  #+end_src
 
 * appearance
 
@@ -308,7 +308,7 @@
 
 ** leuven light
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      ;; For some reason this use-package cause leuven org faces
      ;; to be set that appear when other themes are loaded.
 
@@ -375,11 +375,11 @@
         ;; `(web-mode-css-selector-face ((t (:foreground "#ff4500"))))
         ;; `(which-key-group-description-face ((t (:foreground "#ff4500"))))
      ))
-   #+END_SRC
+   #+end_src
 
 ** moe dark
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package moe-theme
        :config
        (defun amd/moe-dark-theme ()
@@ -536,7 +536,7 @@
           `(lsp-ui-doc-background ((t (:background "#4e4e4e"))))
           )
          ))
-   #+END_SRC
+   #+end_src
 
 ** doom-themes
 
@@ -612,7 +612,7 @@
 
 ** solaire-mode
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package solaire-mode
        :demand
        :hook
@@ -623,11 +623,11 @@
        (solaire-global-mode +1)
        ;; (solaire-mode-swap-bg)
      )
-   #+END_SRC
+   #+end_src
 
 ** modeline
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package airline-themes
        ;; :disabled
        :load-path "airline-themes"
@@ -683,11 +683,11 @@
        (doom-modeline-height 1)
        :init
        :hook (after-init . doom-modeline-mode))
-   #+END_SRC
+   #+end_src
 
 ** load theme
 
-    #+BEGIN_SRC emacs-lisp
+    #+begin_src emacs-lisp
       ;; (amd/leuven-light-theme)
       ;; (amd/doom-one-theme)
       (amd/moe-dark-theme)
@@ -705,14 +705,14 @@
         :config
         (when (featurep 'airline-themes)
           (load-theme 'airline-ouo t)))
-    #+END_SRC
+    #+end_src
 
 ** appearance minor-modes
 
    Setup a list of major-modes to load appearance minor-modes. ~eval-and-compile~
    is used so the list is accessible inside use-package definitions.
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (eval-and-compile
        (setq amd/appearance-modes nil)
        (setq amd/appearance-mode-hooks
@@ -740,28 +740,28 @@
        (interactive)
        (cl-loop for this-mode in amd/appearance-modes
                 do (funcall this-mode 1)))
-   #+END_SRC
+   #+end_src
 
 *** hl-line
 
     Highlight the current line using the built-in ~hl-line-mode~.
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package hl-line
        :config
        (amd/add-appearance-mode 'hl-line-mode))
-   #+END_SRC
+   #+end_src
 
 *** fill-column-indicator
 
-    #+BEGIN_SRC emacs-lisp
+    #+begin_src emacs-lisp
       (use-package fill-column-indicator
         :commands (fci-mode)
         :init
         ;; (unless (or amd/using-pocketchip amd/using-android)
         ;;   (amd/add-appearance-mode 'fci-mode))
       )
-    #+END_SRC
+    #+end_src
 
 *** highlight-indent-guides
     #+begin_src emacs-lisp
@@ -788,9 +788,10 @@
 
      No longer using ~relative-line-numbers~, ~nlinum-relative~ has better performance.
 
-     #+BEGIN_SRC emacs-lisp :tangle no
+     #+begin_src emacs-lisp :tangle no
        ;; (use-package relative-line-numbers
-       ;;   :diminish ""
+       ;;   :disabled
+       ;;   :diminish
        ;;   :config
        ;;   (--map (add-hook it 'relative-line-numbers-mode) amd/appearance-mode-hooks)
        ;;   (defun abs-rel-numbers (offset)
@@ -803,12 +804,13 @@
        ;;   )
        ;;   (setq relative-line-numbers-format #'abs-rel-numbers)
        ;; )
-     #+END_SRC
+     #+end_src
 
 **** sublimity
 
-     #+BEGIN_SRC emacs-lisp :tangle no
+     #+begin_src emacs-lisp :tangle no
        ;; (use-package sublimity-map
+       ;;   :disabled
        ;;   :init
        ;;   (setq sublimity-map-size 20)
        ;;   (setq sublimity-map-fraction 0.3)
@@ -817,15 +819,16 @@
        ;;   (sublimity-mode 1)
        ;;   ;; (sublimity-map-set-delay 0)
        ;; )
-     #+END_SRC
+     #+end_src
 
 **** nlinum-relative
 
      Relative line numbering using ~nlinum~ which is faster than the built-in
      ~linum~ mode.
 
-     #+BEGIN_SRC emacs-lisp :tangle no
+     #+begin_src emacs-lisp :tangle no
       (use-package nlinum-relative
+        :disabled
         :commands (nlinum-relative-mode)
         :init
         ;; (setq nlinum-relative-redisplay-delay 0)   ;; delay
@@ -835,13 +838,13 @@
         (nlinum-relative-setup-evil)
         (unless (or amd/using-pocketchip amd/using-android)
           (amd/add-appearance-mode 'nlinum-relative-mode)))
-     #+END_SRC
+     #+end_src
 
 *** color-identifiers
 
     This mode gives variables names unique colors.
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package color-identifiers-mode ;; the package is actually called "color-identifiers-mode" with -mode at the end
        :commands (color-identifiers-mode)
        :diminish color-identifiers-mode
@@ -855,12 +858,13 @@
        ;;                "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
        ;;                (nil font-lock-variable-name-face))))
      )
-   #+END_SRC
+   #+end_src
 
 *** rainbow-identifiers
 
-   #+BEGIN_SRC emacs-lisp :tangle no
+   #+begin_src emacs-lisp :tangle no
      ;; (use-package rainbow-identifiers
+     ;;   :disabled
      ;;   :commands (rainbow-identifiers-mode)
      ;;   :init
      ;;   (setq rainbow-identifiers-cie-l*a*b*-lightness 50
@@ -868,20 +872,20 @@
      ;;   ;; rainbow-identifiers-face-count 30
      ;;   (amd/add-appearance-mode 'rainbow-identifiers-mode)
      ;; )
-   #+END_SRC
+   #+end_src
 
 *** rainbow-delimiters
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package rainbow-delimiters
        :commands (rainbow-delimiters-mode)
        :init
        (amd/add-appearance-mode 'rainbow-delimiters-mode))
-   #+END_SRC
+   #+end_src
 
 * amd/functions
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (defun amd/run-lisp-love ()
       (interactive)
       (run-lisp "love ."))
@@ -1103,11 +1107,11 @@
       (interactive)
       (font-lock-add-keywords nil hexcolour-keywords))
     (add-hook 'css-mode-hook 'hexcolour-add-to-font-lock)
-  #+END_SRC
+  #+end_src
 
 * evil-mode
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package evil
       :demand
       :init
@@ -1330,7 +1334,7 @@
 
     (use-package evil-commentary
       :after evil
-      :diminish ""
+      :diminish
       :config
       (evil-commentary-mode))
 
@@ -1348,75 +1352,75 @@
       :general
       (:states '(normal)
         "ge" 'er/expand-region))
-  #+END_SRC
+  #+end_src
 
 * packages (built-in)
 
 ** Auto Revert mode
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package autorevert
        :diminish auto-revert-mode)
-   #+END_SRC
+   #+end_src
 
 ** Recent Files mode
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package recentf
       :custom
       (recentf-auto-cleanup 300)
       (recentf-max-menu-items 30)
       :config
       (recentf-mode 1))
-  #+END_SRC
+  #+end_src
 
 ** re-builder
 
    - [[info:emacs#Regexps][info:emacs#Regexps]]
    - [[info:emacs#Regexp%20Backslash][info:emacs#Regexp Backslash]]
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package re-builder
       :init
       (setq reb-re-syntax 'string))
-  #+END_SRC
+  #+end_src
 
 ** saveplace - save last position in a file
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package saveplace
       :config
       (save-place-mode)
       ;; TODO: make this work when in an org-src buffer
       (defadvice find-file (after advice-for-find-file activate) (recenter)) ;; recenter when opening a file?
     )
-  #+END_SRC
+  #+end_src
 
 ** savehist - save minibuffer history
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     ;; save minibuffer history
     (use-package savehist
       :custom
       (savehist-autosave-interval 150)
       :config
       (savehist-mode))
-  #+END_SRC
+  #+end_src
 
 ** desktop - save buffers, windows, and eyebrowse (tabs) between sessions
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package desktop
       :custom
       (desktop-auto-save-timeout 30)
       ;; :config
       ;; (desktop-save-mode 1)
     )
-  #+END_SRC
+  #+end_src
 
 ** dired
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package dired
       :custom
       ;; Suggest locations for operations, ie midnight commander style copy if another window is open.
@@ -1510,11 +1514,11 @@
         "TAB" 'dired-subtree-toggle
         "<backtab>" 'dired-subtree-cycle
         "z" 'dired-subtree-toggle))
-  #+END_SRC
+  #+end_src
 
 ** eshell
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package eshell
       :commands (eshell
                  amd/eshell-or-project-eshell
@@ -1780,10 +1784,10 @@
         (end-of-buffer))
 
     )
-  #+END_SRC
+  #+end_src
 
 ** shell
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package shell
        :general
        (:states '(normal)
@@ -1809,10 +1813,10 @@
        (when (executable-find "fish")
          (setq explicit-shell-file-name (executable-find "fish")))
      )
-   #+END_SRC
+   #+end_src
 
 ** compilation
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package compile
        :init
        (setq compilation-scroll-output 'first-error)
@@ -1853,11 +1857,11 @@
                       (get-buffer-create "*compilation*"))
                      (message "No Compilation Errors!")))))
      )
-   #+END_SRC
+   #+end_src
 
 ** calc
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package calc
       :general
       (:states
@@ -1952,21 +1956,21 @@
                  (calcFunc-hms (calcFunc-mul business-days worktime-per-day) 0 0)
                  (calcFunc-sub (calcFunc-time date1) (calcFunc-time date2))))
             0))))
-  #+END_SRC
+  #+end_src
 
 ** winner - window layout undo/redo
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package winner
       :config
       (winner-mode 1))
-  #+END_SRC
+  #+end_src
 
 ** eww
 
    [[info:eww#Top][info:eww#Top]]
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package eww
       :commands (eww)
       :init
@@ -1990,11 +1994,11 @@
       :config
       (add-to-list 'evil-motion-state-modes 'eww-bookmark-mode)
     )
-  #+END_SRC
+  #+end_src
 
 * nov.el
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package nov
       :general
       (:states '(motion)
@@ -2045,11 +2049,11 @@
 
     )
 
-  #+END_SRC
+  #+end_src
 
 * company auto-completion
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package pos-tip)
 
     (if window-system
@@ -2062,7 +2066,7 @@
           (company-quickhelp-mode 1)))
 
     (use-package company
-      :diminish ""
+      :diminish
       :init
       (setq company-idle-delay 0.2)
       (setq company-minimum-prefix-length 1)
@@ -2111,14 +2115,14 @@
     ;;   (setq company-shell-modes '(eshell-mode))
     ;;   :config
     ;;   (add-to-list 'company-backends 'company-shell))
-  #+END_SRC
+  #+end_src
 
 * key discovery
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package which-key
       :demand
-      :diminish ""
+      :diminish
       :init
       ;; (setq which-key-idle-delay 0.5)
       ;; (setq which-key-echo-keystrokes 0)
@@ -2128,11 +2132,11 @@
             which-key-show-prefix 'echo)
       :config
       (which-key-mode 1))
-  #+END_SRC
+  #+end_src
 
 * snippets
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package yasnippet
       ;; :commands (yankpad-expand yankpad-insert)
       :diminish yas-minor-mode
@@ -2148,11 +2152,11 @@
       :general
       (:states '(insert)
         "C-t" 'yankpad-expand))
-  #+END_SRC
+  #+end_src
 
 * wgrep
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package wgrep)
 
     (use-package wgrep-pt
@@ -2166,11 +2170,11 @@
       :config
       (autoload 'wgrep-ag-setup "wgrep-ag")
       (add-hook 'ag-search-mode-hook 'wgrep-ag-setup))
-  #+END_SRC
+  #+end_src
 
 * magit - version-control
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package magit
       :defer t
       :init
@@ -2205,7 +2209,7 @@
         (magit-commit (list "-a" "-m" "instant-update"))
         (magit-push-current-to-upstream))
     )
-  #+END_SRC
+  #+end_src
 
 ** transient
 
@@ -2213,27 +2217,27 @@
    - For user options see [[info:transient#Other%20Options][info:transient#Other Options]] or
      https://magit.vc/manual/transient/Other-Options.html#Other-Options
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package transient
        :init
        (setq transient-display-buffer-action
              '(display-buffer-below-selected))
        :config
        (transient-bind-q-to-quit))
-   #+END_SRC
+   #+end_src
 
 ** ediff
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package ediff
        :init
        (setq ediff-split-window-function 'split-window-horizontally))
-   #+END_SRC
+   #+end_src
 
 * spell checking
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package flyspell
-      :diminish ""
+      :diminish
       :commands (flyspell-mode)
       :init
       (setq flyspell-use-meta-tab nil)
@@ -2302,7 +2306,7 @@
 
     ;; (setq save-abbrevs 'silently)
     ;; (setq-default abbrev-mode t)
-  #+END_SRC
+  #+end_src
 
 * navigation
 
@@ -2310,8 +2314,9 @@
 
    This is replaced by ivy but kept here for reference.
 
-  #+BEGIN_SRC emacs-lisp :tangle no
+  #+begin_src emacs-lisp :tangle no
     (use-package ido
+      :disabled
       :init
       (setq ido-enable-prefix nil)
       (setq ido-use-virtual-buffers t)
@@ -2329,11 +2334,11 @@
       (setq ido-use-faces nil) ;; disable ido faces to see flx highlights.
       :config
       (flx-ido-mode 1))
-  #+END_SRC
+  #+end_src
 
 ** avy
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package avy
       :commands (avy-goto-char avy-goto-word-0 avy-goto-line)
       :config
@@ -2344,13 +2349,13 @@
         "g ." #'avy-goto-char
         "t"   #'avy-goto-word-0
         "T"   #'avy-goto-line))
-   #+END_SRC
+   #+end_src
 
 ** undo-tree
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package undo-tree
-      :diminish ""
+      :diminish
       :commands (undo-tree-visualize)
       :init
       (setq undo-tree-visualizer-timestamps t
@@ -2362,11 +2367,11 @@
         "h" 'undo-tree-visualize-switch-branch-left
         "l" 'undo-tree-visualize-switch-branch-right)
     )
-  #+END_SRC
+  #+end_src
 
 ** eyebrowse - tabs
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package eyebrowse
       :after (desktop hydra)
       :init
@@ -2413,11 +2418,11 @@
         ("8" eyebrowse-switch-to-window-config-8 nil)
         ("9" eyebrowse-switch-to-window-config-9 nil))
       (eyebrowse-mode t))
-  #+END_SRC
+  #+end_src
 
 ** ace-window
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package ace-window
       :commands (ace-window)
       :after (hydra)
@@ -2461,11 +2466,11 @@
 
         (add-to-list 'aw-dispatch-alist '(?w hydra-window-size/body) t)
         (add-to-list 'aw-dispatch-alist '(?f hydra-window-frame/body) t)))
-  #+END_SRC
+  #+end_src
 
 ** ace-link
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package ace-link
       :commands (ace-link-nov ace-link--eww-collect info Info-mode Custom-mode)
       :general
@@ -2497,13 +2502,13 @@
       :init
       :config
     )
-  #+END_SRC
+  #+end_src
 
 ** projectile
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package projectile
-      :diminish ""
+      :diminish
       :custom
       (projectile-completion-system 'ivy)
       (projectile-require-project-root t)  ;; require .git or similar to mark a project
@@ -2528,11 +2533,11 @@
       ;; (advice-add 'projectile-switch-project-by-name :around #'amd/projectile-switch-project)
       :config
       (projectile-global-mode t))
-  #+END_SRC
+  #+end_src
 
 ** shackle
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package shackle
       :custom
       (help-window-select t) ;; (not shackle) select new help windows when they open
@@ -2570,11 +2575,11 @@
          ('undo-tree-mode :align right :size 0.4)))
       :config
       (shackle-mode))
-  #+END_SRC
+  #+end_src
 
 ** ibuffer
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package ibuffer
       :custom
       (ibuffer-use-header-line t)
@@ -2646,39 +2651,40 @@
     ;;         (unless (eq ibuffer-sorting-mode 'alphabetic)
     ;;           (ibuffer-do-sort-by-alphabetic))))
     ;; )
-  #+END_SRC
+  #+end_src
 
 ** tmux-window-navigation
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package tmux-window-navigation
       :load-path "tmux-window-navigation"
       :config
       (global-tmux-window-navigation-mode 1))
-  #+END_SRC
+  #+end_src
 
 ** which-func
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     ;; (use-package which-func
     ;;   :config
     ;;   (which-function-mode t))
-  #+END_SRC
+  #+end_src
 
 ** ivy-xref
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package ivy-xref
        :init (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
-   #+END_SRC
+   #+end_src
 
 ** deprecated
 
 *** helm
 
-    #+BEGIN_SRC emacs-lisp :tangle no
+    #+begin_src emacs-lisp :tangle no
       ;; (use-package helm
-      ;;   :diminish ""
+      ;;   :disabled
+      ;;   :diminish
       ;;   :bind (("M-x" . helm-M-x))
       ;;   :init
       ;;   (setq
@@ -2782,11 +2788,11 @@
       ;;   (let* ((current-prefix-arg (not non-recursive))
       ;;          (helm-current-prefix-arg non-recursive))
       ;;     (call-interactively 'helm-do-grep)))
-    #+END_SRC
+    #+end_src
 
 * email
 
-  #+BEGIN_SRC emacs-lisp :tangle no
+  #+begin_src emacs-lisp :tangle no
     (eval-and-compile
       (defun amd/mu4e-load-path ()
         (list "~/apps/mu/share/emacs/site-lisp/mu4e"
@@ -2917,11 +2923,11 @@
 
       (setq message-kill-buffer-on-exit t)
     )
-  #+END_SRC
+  #+end_src
 
 * language major-modes
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     ;; (use-package eglot
     ;;   :init
     ;;   (add-hook 'c++-mode-hook 'eglot-ensure))
@@ -2962,7 +2968,7 @@
        "E" 'backward-sexp))
 
     (use-package lispy
-      :diminish ""
+      :diminish
       :commands (emacs-lisp-mode)
       :general
       (:keymaps '(lispy-mode-map)
@@ -2974,7 +2980,7 @@
       :config)
 
     (use-package lispyville
-      :diminish ""
+      :diminish
       :after lispy
       :general
       (:states '(motion)
@@ -2993,7 +2999,7 @@
          commentary)))
 
     (use-package eldoc
-      :diminish "")
+      :diminish)
 
     (use-package lua-mode
       :custom
@@ -3101,7 +3107,7 @@
     (add-hook 'rust-mode-hook 'amd/make-underscore-word-character)
 
     (use-package flycheck
-      :diminish ""
+      :diminish
       ;; :commands (flycheck-list-errors)
       :demand
       :custom
@@ -3281,7 +3287,7 @@
       (add-to-list 'auto-mode-alist '("\\.gn\\'" . gn-mode)))
 
     (use-package ninja-mode :defer t)
-  #+END_SRC
+  #+end_src
 
 * hydra
 
@@ -3293,7 +3299,7 @@
   | teal     | :foreign-keys warn :exit t |
   | pink     | :foreign-keys run          |
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package hydra
       :init
       (setq hydra-hint-display-type 'posframe)
@@ -3407,13 +3413,13 @@
     ;;                 (-map (lambda (i) (-select-column i amd/hydra-org-columns)))
     ;;                 (-flatten-n 1)
     ;;                 (-non-nil))))
-  #+END_SRC
+  #+end_src
 
 * hydra leader menus
 
 ** Main Leader Hydra
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (defun amd/pretty-hydra-strip-header (docstring)
        (replace-regexp-in-string "\n[^\n]+\n[-=─]+\n" "" docstring))
 
@@ -3540,11 +3546,11 @@
      ;;   "Doc"
      ;;   (format (format "%%%ds %%%ds" key-width (- -1 doc-width))
      ;;           key doc))
-   #+END_SRC
+   #+end_src
 
 ** Major Mode Leader Hydra Function
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (defun amd/major-mode-leader-hydra ()
       (interactive)
       (cond ((eq major-mode 'org-mode)
@@ -3560,11 +3566,11 @@
 
             (t
              (keyboard-quit))))
-  #+END_SRC
+  #+end_src
 
 ** Org Hydra
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (defun amd/toggle-org-edit-code-block ()
        "Start or finish editing an org code block."
        (interactive)
@@ -3641,11 +3647,11 @@
         ;;  ("e" org-shiftmetaup    "↑" :color pink))
 
         ))
-   #+END_SRC
+   #+end_src
 
 ** Emacs-Lisp Hydra
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (amd/define-hydra-with-columns
       'hydra-elisp-menu
       'blue
@@ -3657,13 +3663,13 @@
          )
         (("q"  keyboard-quit :exit t "close"))
         ))
-   #+END_SRC
+   #+end_src
 
 * ivy, swiper, and counsel
 
 ** ivy
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package ivy
       :custom
       (ivy-display-style 'fancy)
@@ -3713,11 +3719,11 @@
       (define-key hydra-ivy/keymap (kbd "n") 'hydra-ivy/ivy-next-line)
       (define-key hydra-ivy/keymap (kbd "e") 'hydra-ivy/ivy-previous-line)
     )
-    #+END_SRC
+    #+end_src
 
 ** swiper
 
-    #+BEGIN_SRC emacs-lisp
+    #+begin_src emacs-lisp
       (use-package swiper
         :diminish ivy-mode
         :general
@@ -3783,11 +3789,11 @@
         (advice-add 'counsel-grep-or-swiper :after #'amd/update-evil-search)
         ;; TODO: update swiper histor after evil-ex-search
       )
-    #+END_SRC
+    #+end_src
 
 ** counsel
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package amx
        :config
        (amx-mode)
@@ -3808,7 +3814,7 @@
                 (counsel-ag-base-command (concat ag-command " -G '" fileregex "' %s")))
            (counsel-ag)))
      )
-   #+END_SRC
+   #+end_src
 
 ** ivy-posframe
 
@@ -3841,7 +3847,7 @@
 
    Example of launching a hydra while ivy is active.
 
-   #+BEGIN_SRC emacs-lisp :tangle no
+   #+begin_src emacs-lisp :tangle no
      (defhydra hydra-ivy-switch-project (:color pink)
        "Buffer Actions"
        ("k" amd/ivy-remove-project)
@@ -3861,18 +3867,18 @@
              (--reject (string= ivy--current it) projectile-known-projects))
        (projectile-merge-known-projects)
        (ivy--reset-state ivy-last))
-   #+END_SRC
+   #+end_src
 
    =ivy-switch-buffer-map= now has a kill buffer action
 
-   #+BEGIN_SRC emacs-lisp :tangle no
+   #+begin_src emacs-lisp :tangle no
      (defun amd/ivy-kill-buffer ()
        (interactive)
        (kill-buffer ivy--current)
        (ivy--reset-state ivy-last))
-   #+END_SRC
+   #+end_src
 
-   #+BEGIN_SRC emacs-lisp :tangle no
+   #+begin_src emacs-lisp :tangle no
      (defhydra hydra-counsel-switch-buffer (:color pink)
        "Buffer Actions"
        ("k" amd/ivy-kill-buffer)
@@ -3884,11 +3890,11 @@
        ("C-g" keyboard-escape-quit :exit t)
        ("i" nil))
      (define-key ivy-switch-buffer-map (kbd "C-b") 'hydra-counsel-switch-buffer/body)
-   #+END_SRC
+   #+end_src
 
    counsel now has a builtin descbinds search
 
-   #+BEGIN_SRC emacs-lisp :tangle no
+   #+begin_src emacs-lisp :tangle no
      (defun amd/display-binds ()
        (interactive)
        (ivy-read "keys: "
@@ -3898,11 +3904,11 @@
                         (car keys)))
           (which-key--get-current-bindings))
        :action (lambda (key) (message key))))
-   #+END_SRC
+   #+end_src
 
    counsel now has a builtin pt search
 
-   #+BEGIN_SRC emacs-lisp :tangle no
+   #+begin_src emacs-lisp :tangle no
      (defun amd/counsel-pt-function (string &optional _pred &rest _unused)
        "Grep in the current directory for STRING."
        (if (< (length string) 3)
@@ -3928,11 +3934,11 @@
                  :unwind (lambda ()
                            (counsel-delete-process)
                            (swiper--cleanup))))
-   #+END_SRC
+   #+end_src
 
 * helpful
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package helpful
       :after counsel
       :bind (("C-h v"   . helpful-variable)
@@ -3948,11 +3954,11 @@
        'counsel-M-x
        '(("d" counsel--find-symbol "definition")
          ("h" (lambda (x) (helpful-function (intern x))) "helpful"))))
-  #+END_SRC
+  #+end_src
 
 * fun
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package zone
       :config
       ;; (zone-when-idle 180)
@@ -3978,7 +3984,7 @@
       :init
       :config
       (add-to-list 'evil-emacs-state-modes '2048-mode))
-  #+END_SRC
+  #+end_src
 
 * org
 
@@ -3992,7 +3998,7 @@
 
 ** use-package org
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package org
       :commands org-mode
       :init
@@ -4342,7 +4348,7 @@
       )
 
     )
-  #+END_SRC
+  #+end_src
 
 *** Easy Templates
 
@@ -4352,7 +4358,7 @@
 
 ** org exports
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package ox
        :after org
        :init
@@ -4381,14 +4387,14 @@
      (use-package ox-gfm
        :after ox
      )
-   #+END_SRC
+   #+end_src
 
 ** org-capture
 
    - [[info:org#Capture%20templates][info:org#Capture templates]]
    - [[info:org#Template%20expansion][info:org#Template expansion]]
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package all-the-icons)
 
      (use-package org-capture
@@ -4422,7 +4428,7 @@
                   (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
                   (all-the-icons-faicon "sticky-note-o" :face 'all-the-icons-green :v-adjust 0.01))
                 entry (file+headline org-default-notes-file "Inbox")
-                "* %^{Title}%?\n  Source: %u %a\n\n  #+BEGIN_SRC %^{language}\n    %i\n  #+END_SRC\n"
+                "* %^{Title}%?\n  Source: %u %a\n\n  #+begin_src %^{language}\n    %i\n  #+end_src\n"
                 :empty-lines 1)
 
                ("tt"
@@ -4434,49 +4440,49 @@
                 "* TODO %?\n  SCHEDULED: %t\n  %a\n\n  %i\n")
                ))
        (add-hook 'org-capture-mode-hook 'evil-insert-state))
-  #+END_SRC
+  #+end_src
 
 ** kanban.el
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package kanban
        :after org
        :init
        (setq kanban-max-column-width 80))
-   #+END_SRC
+   #+end_src
 
 ** toc-org
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package toc-org
        :after org
        :config
        (add-hook 'org-mode-hook 'toc-org-enable))
-   #+END_SRC
+   #+end_src
 
 ** org-protocol
 
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
      (use-package org-protocol
        :after org
      )
-   #+END_SRC
+   #+end_src
 
 *** Chrome bookmarks
 
 **** org-capture
 
-     #+BEGIN_SRC fundamental :tangle no
+     #+begin_src fundamental :tangle no
      javascript:location.href = 'org-protocol://capture://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection());
-     #+END_SRC
+     #+end_src
 
 **** org-store-link
 
-     #+BEGIN_SRC fundamental :tangle no
+     #+begin_src fundamental :tangle no
      javascript:location.href = 'org-protocol://store-link://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection());
-     #+END_SRC
+     #+end_src
 
 **** =emacs.desktop=
 
-     #+BEGIN_SRC fundamental :tangle (if (eq system-type 'gnu/linux) "~/.local/share/applications/emacs.desktop" "no")
+     #+begin_src fundamental :tangle (if (eq system-type 'gnu/linux) "~/.local/share/applications/emacs.desktop" "no")
        [Desktop Entry]
        Name=Emacs
        Exec=/home/chrx/apps/emacs/bin/emacs
@@ -4485,11 +4491,11 @@
        Categories=System;
        Icon=emacs.svg
        Comment=
-     #+END_SRC
+     #+end_src
 
 **** =org-protocol.desktop=
 
-     #+BEGIN_SRC fundamental :tangle (if (eq system-type 'gnu/linux) "~/.local/share/applications/org-protocol.desktop" "no")
+     #+begin_src fundamental :tangle (if (eq system-type 'gnu/linux) "~/.local/share/applications/org-protocol.desktop" "no")
        [Desktop Entry]
        Name=org-protocol
        Exec=emacsclient -n %u
@@ -4499,13 +4505,13 @@
        MimeType=x-scheme-handler/org-protocol
        Icon=emacs.svg
        Comment=
-     #+END_SRC
+     #+end_src
 
 **** xdg-mime
 
-     #+BEGIN_SRC sh
+     #+begin_src sh
        xdg-mime default org-protocol.desktop x-scheme-handler/org-protocol
-     #+END_SRC
+     #+end_src
 
 *** Org 9 New Style Links
 
@@ -4538,11 +4544,11 @@
      - Save it in /Application/ (not the default /Script/) File Format as
        =org-protocol.app=
 
-     #+BEGIN_SRC fundamental :tangle no
+     #+begin_src fundamental :tangle no
        on open location this_URL
          do shell script "/Applications/Emacs.app/Contents/MacOS/bin/emacsclient \"" & this_URL & "\""
        end open location
-     #+END_SRC
+     #+end_src
 
 **** Step 2. Configure the application
 
@@ -4553,7 +4559,7 @@
        key/string pairs intact:
 
 
-     #+BEGIN_SRC fundamental :tangle no
+     #+begin_src fundamental :tangle no
        <key>CFBundleURLTypes</key>
        <array>
          <dict>
@@ -4565,17 +4571,17 @@
            </array>
          </dict>
        </array>
-     #+END_SRC
+     #+end_src
 
 **** Notes
 
 ***** Emacs doesn't activate?
 
-      #+BEGIN_SRC fundamental :tangle no
+      #+begin_src fundamental :tangle no
         on open location this_URL
           do shell script "/Applications/Emacs.app/Contents/MacOS/bin/emacsclient \"" & this_URL & "\" && open -a Emacs"
         end open location
-      #+END_SRC
+      #+end_src
 
 * elisp links
 
@@ -4586,7 +4592,7 @@
   Still experimenting with the below, may switch to it instead of using an
   org-mode settings file.
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
 
     (eval-and-compile
       (defvar outline-minor-mode-prefix "\M-#"))
@@ -4601,7 +4607,7 @@
     ;;   :config
     ;;   (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
     ;;   (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode))
-  #+END_SRC
+  #+end_src
 
 * edit-with-emacs and cvim
 
@@ -4612,7 +4618,7 @@
   =amd/parse-json= will make this plugin work with [[https://chrome.google.com/webstore/detail/cvim/ihlenndgcmojhcghmfjfneahoeklbjjh?hl=en][cvim]].
   cvim sends a json payload to the edit server instead of the raw text.
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package edit-server
       :commands (edit-server-start)
       :init
@@ -4625,11 +4631,11 @@
           (insert (alist-get 'data parsed-json))))
       (add-hook 'edit-server-edit-mode-hook #'amd/parse-json)
     )
-  #+END_SRC
+  #+end_src
 
 * neotree
 
-  #+BEGIN_SRC emacs-lisp :tangle no
+  #+begin_src emacs-lisp :tangle no
     (use-package neotree
       :disabled
       :commands (neotree)
@@ -4637,13 +4643,13 @@
       (setq neo-smart-open t)
       :config
       (add-to-list 'evil-emacs-state-modes 'neotree-mode))
-  #+END_SRC
+  #+end_src
 
 * view large files
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package vlf-setup)
-  #+END_SRC
+  #+end_src
 
 * emacs and git on windows
 
@@ -4661,7 +4667,7 @@
 
   Launch emacs with this bat file.
 
-  #+BEGIN_SRC fundamental :tangle (if (eq system-type 'windows-nt) "C:/Users/anthony/runemacs.bat" "no")
+  #+begin_src fundamental :tangle (if (eq system-type 'windows-nt) "C:/Users/anthony/runemacs.bat" "no")
     SET GIT=PortableGit
     SET GIT_HOME=%CD%\%GIT%
     SET GIT_ASKPASS=git-gui--askpass
@@ -4669,20 +4675,20 @@
     SET PATH=%GIT_HOME%\bin;%GIT_HOME%\mingw64\bin;%GIT_HOME%\cmd;%GIT_HOME%\usr\bin;%GIT_HOME%\mingw64\libexec\git-core;%PATH%
     SET HOME=.\
     emacs\bin\runemacs.exe %*
-  #+END_SRC
+  #+end_src
 
   More info here https://github.com/magit/magit/wiki/Pushing-with-Magit-from-Windows
 
   With the above this isn't necessary.
 
-  #+BEGIN_SRC emacs-lisp :tangle no
+  #+begin_src emacs-lisp :tangle no
     (when (eq system-type 'windows-nt)
       (add-to-list 'exec-path "C:\\Users\\anthony\\PortableGit\\bin"))
-  #+END_SRC
+  #+end_src
 
 * tramp
 
-  #+BEGIN_SRC emacs-lisp
+  #+begin_src emacs-lisp
     (use-package tramp
       :defer t
       :init
@@ -4710,7 +4716,7 @@
              (concat "/sudo:root@localhost:" (buffer-file-name))))
           (goto-char position)))
     )
-  #+END_SRC
+  #+end_src
 
   #+begin_src emacs-lisp
     ;; (use-package gnus
