@@ -65,6 +65,7 @@
    - [[#ivy][ivy]]
    - [[#swiper][swiper]]
    - [[#counsel][counsel]]
+   - [[#ivy-posframe][ivy-posframe]]
    - [[#deprecated-functions][deprecated functions]]
  - [[#helpful][helpful]]
  - [[#fun][fun]]
@@ -3288,7 +3289,34 @@
   | pink     | :foreign-keys run          |
 
   #+BEGIN_SRC emacs-lisp
-    (use-package hydra)
+    (use-package hydra
+      :init
+      (setq hydra-hint-display-type 'posframe)
+      :config
+      (setq hydra-posframe-show-params
+            '(
+              :internal-border-width 1
+              :internal-border-color "red"
+              :poshandler
+              ;; posframe-poshandler-window-center
+              ;; posframe-poshandler-frame-center
+              ;; posframe-poshandler-frame-top-center
+              ;; posframe-poshandler-frame-top-left-corner
+              ;; posframe-poshandler-frame-top-right-corner
+              ;; posframe-poshandler-frame-bottom-center
+              posframe-poshandler-frame-bottom-left-corner
+              ;; posframe-poshandler-frame-bottom-right-corner
+              ;; posframe-poshandler-window-center
+              ;; posframe-poshandler-window-top-center
+              ;; posframe-poshandler-window-top-left-corner
+              ;; posframe-poshandler-window-top-right-corner
+              ;; posframe-poshandler-window-bottom-center
+              ;; posframe-poshandler-window-bottom-left-corner
+              ;; posframe-poshandler-window-bottom-right-corner
+              ;; posframe-poshandler-point-top-left-corner
+              ;; posframe-poshandler-point-bottom-left-corner
+              ))
+    )
 
     (defun amd/hydra-column-hint (column-groups)
       "Generate a hydra hint string from a list of COLUMN-GROUPS."
@@ -3776,6 +3804,30 @@
            (counsel-ag)))
      )
    #+END_SRC
+
+** ivy-posframe
+
+   #+begin_src emacs-lisp
+     (use-package ivy-posframe
+       :init
+       (setq
+        ivy-posframe-height-alist
+        '(;; (swiper . 20)
+          (t . 10)))
+       (setq
+        ivy-posframe-display-functions-alist
+        '(
+          (t . ivy-posframe-display-at-window-bottom-left)
+          ;; (t . ivy-posframe-display-at-window-center)
+          ;; (t . ivy-posframe-display-at-frame-bottom-left)
+          ;; (t . ivy-posframe-display-at-frame-top-center)
+          ;; (t . ivy-posframe-display-at-frame-center)
+          ;; (t . ivy-posframe-display)
+          ))
+       :config
+       (ivy-posframe-mode 1)
+       )
+   #+end_src
 
 ** deprecated functions
 
