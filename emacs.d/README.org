@@ -1548,6 +1548,8 @@
         (general-define-key
          :keymaps '(eshell-mode-map)
          :states '(insert)
+         ;; Use ivy for tab completion
+         ;; "<tab>" (lambda () (interactive) (pcomplete-std-complete))
          "<down>" 'eshell-next-matching-input-from-input
          "<up>" 'eshell-previous-matching-input-from-input)
         (general-define-key
@@ -1559,12 +1561,11 @@
       )
       (add-hook 'eshell-first-time-mode-hook 'eshell-set-keys)
 
-      ;; Use ivy for tab completion
-      (add-hook 'eshell-mode-hook
-                (lambda ()
-                  (define-key eshell-mode-map (kbd "<tab>")
-                    (lambda () (interactive)
-                      (pcomplete-std-complete)))))
+      ;; ;; Use ivy for tab completion
+      ;; (add-hook 'eshell-mode-hook
+      ;;           (lambda ()
+      ;;             (define-key eshell-mode-map (kbd "<tab>")
+      ;;               (lambda () (interactive) (pcomplete-std-complete)))))
 
       ;; C-M-i -> complete-symbol (used for elisp inside eshell)
       ;; See completion-at-point-functions for more info
@@ -1573,8 +1574,9 @@
       ;; Sources:
       ;;   https://github.com/Ambrevar/dotfiles/blob/master/.emacs.d/lisp/init-eshell.el
       ;;   https://www.reddit.com/r/emacs/comments/6y3q4k/yes_eshell_is_my_main_shell/
-      (when (executable-find "fish")
-        (setq eshell-default-completion-function 'eshell-fish-completion))
+
+      ;; (when (executable-find "fish")
+      ;;   (setq eshell-default-completion-function 'eshell-fish-completion))
 
       (defun amd/eshell-or-project-eshell ()
         "Launch projectile-run-eshell else eshell."
@@ -2953,6 +2955,15 @@
       ;;        ;; (c++-mode . lsp)
       ;;        )
       :config
+      (lsp-register-client
+       (make-lsp-client
+        :new-connection
+        (lsp-tramp-connection
+         'lsp-clients--clangd-command)
+        :major-modes '(c-mode c++-mode objc-mode)
+        :priority -1
+        :remote? t
+        :server-id 'clangd-remote))
       :commands lsp)
 
     (use-package lsp-ui :commands lsp-ui-mode)
@@ -4692,6 +4703,7 @@
     (use-package tramp
       :defer t
       :init
+      (setq enable-remote-dir-locals t)
       ;; (setq tramp-verbose 6)
       ;; (getenv "GIT_SSH")
       ;; (shell-command-to-string (concat (getenv "GIT_SSH") " -V"))
@@ -4736,3 +4748,4 @@
     (use-package escr
      :load-path "escr")
   #+end_src
+
