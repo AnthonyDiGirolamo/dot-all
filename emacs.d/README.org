@@ -1162,9 +1162,9 @@
        "K" 'evil-ex-search-previous
        ;; swap * and # to backward and forward respectively
        "*" (lambda () (interactive) (swiper (format "%s" (thing-at-point 'symbol t))))
-       "#" (lambda () (interactive) (swiper (format "%s" (thing-at-point 'symbol t))))
+       ;; "#" (lambda () (interactive) (swiper (format "%s" (thing-at-point 'symbol t))))
        ;; "*" (lambda () (interactive) (swiper (format "\\<%s\\>" (thing-at-point 'symbol t))))
-       ;; "#" (lambda () (interactive) (swiper (format "\\<%s\\>" (thing-at-point 'symbol t))))
+       "#" (lambda () (interactive) (swiper (format "\\<%s\\>" (thing-at-point 'symbol t))))
        ;; "*"   'evil-ex-search-word-backward
        ;; "#"   'evil-ex-search-word-forward
        "g *" 'evil-ex-search-unbounded-word-backward
@@ -2935,6 +2935,9 @@
     ;;   (add-hook 'c++-mode-hook 'eglot-ensure))
 
     (use-package lsp-mode
+      :custom
+      ;; (lsp-restart 'auto-restart)
+      (lsp-restart 'interactive)
       :init
       (setq lsp-keymap-prefix "s-l")
       (setq lsp-prefer-flymake nil)
@@ -3312,9 +3315,9 @@
 
   #+begin_src emacs-lisp
     (use-package hydra
-      :init
-      (when (display-graphic-p)
-        (setq hydra-hint-display-type 'posframe))
+      ;; :init
+      ;; (when (display-graphic-p)
+      ;;   (setq hydra-hint-display-type 'posframe))
       :config
       (setq hydra-posframe-show-params
             '(

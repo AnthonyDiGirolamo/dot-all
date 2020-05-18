@@ -92,5 +92,5 @@
 (setq gc-cons-threshold 16000000)
 
 ;; lastly, start a server
-(when (display-graphic-p)
+(unless (and (fboundp 'server-running-p) (server-running-p))
   (server-start))
