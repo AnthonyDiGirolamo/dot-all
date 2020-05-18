@@ -2555,7 +2555,7 @@
          ("*Async Shell Command*" :ignore t)
          ("*Flycheck error messages*" :ignore t)
          ;; Bottom popups
-         ("\\*[Ii]buffer\\*" :regexp t :popup t :align bottom :size 0.6)
+         ("\\*[Ii]buffer\\*" :regexp t :same t)
          (compilation-mode :select nil :size 0.3 :align bottom)
          ("*Help*" :size 0.5 :align bottom)
          ("\\*helpful.*\\*" :regexp t :size 0.5 :align bottom)
@@ -3313,7 +3313,8 @@
   #+begin_src emacs-lisp
     (use-package hydra
       :init
-      (setq hydra-hint-display-type 'posframe)
+      (when (display-graphic-p)
+        (setq hydra-hint-display-type 'posframe))
       :config
       (setq hydra-posframe-show-params
             '(
