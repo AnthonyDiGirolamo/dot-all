@@ -372,7 +372,7 @@
 
     # Qogir-manjaro: dark w/ text color highlight
     # class                 border  backgr. text    indicator child_border
-    client.focused          #282a33 #282a33 #2eb398 #2eb398   #2eb398
+    client.focused          #282a33 #282a33 #2eb398 #17f288   #2eb398
     client.focused_inactive #282a33 #282a33 #7c828d #282a33   #282a33
     client.unfocused        #282a33 #282a33 #7c828d #282a33   #282a33
     client.urgent           #282a33 #282a33 #ef5350 #282a33   #282a33

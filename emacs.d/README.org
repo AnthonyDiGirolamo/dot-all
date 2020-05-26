@@ -1367,8 +1367,9 @@
 
   #+begin_src emacs-lisp
     (use-package recentf
+      :defer 10
       :custom
-      (recentf-auto-cleanup 300)
+      ;; (recentf-auto-cleanup 300)
       (recentf-max-menu-items 30)
       :config
       (recentf-mode 1))
@@ -2179,11 +2180,12 @@
   #+begin_src emacs-lisp
     (use-package magit
       :defer t
+      :custom
+      (magit-section-initial-visibility-alist
+       '((stashes . show) (untracked . show) (unpushed . show)))
+      (magit-diff-expansion-threshold 10.0)
+      (magit-commit-show-diff nil)
       :init
-      (setq magit-last-seen-setup-instructions "1.4.0")
-      (setq magit-diff-expansion-threshold 10.0)
-      (setq magit-commit-show-diff nil)
-
       :general
       ;; (:keymaps '(magit-popup-mode-map)
       ;;  amd/leader-key 'amd/quit-magit-and-leader)
