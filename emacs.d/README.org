@@ -3058,17 +3058,7 @@
             python-shell-interpreter-args "-i"))
 
     ;; Python Settings
-    (use-package company-jedi
-      :commands python-mode
-      :general
-      (:states '(insert) :keymaps '(python-mode-map)
-        "C-." 'company-jedi)
-      :config
-      (add-hook 'python-mode-hook 'jedi:setup)
-      (add-hook 'python-mode-hook
-                (lambda ()
-                  (add-to-list (make-local-variable 'company-backends)
-                               'company-jedi))))
+    (use-package elpy)
 
     (use-package js2-mode
       :defer t
