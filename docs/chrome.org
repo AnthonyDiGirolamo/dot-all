@@ -32,6 +32,9 @@
      " Windows
      " let vimcommand="C:\Users\anthony\emacs\bin\emacsclientw.exe"
 
+     " unmap f and F for vimium
+     unmap f
+     unmap F
      let mapleader = ","
      map <Leader>v :settings<CR>
      map <Leader>n :tabnext<CR>
@@ -125,21 +128,6 @@
      }}
      map <Leader>oc :call org_capture<CR>
      map <Leader>os :call org_store_link<CR>
-     css_for_docs() -> {{
-       // document.addEventListener("DOMContentLoaded", function(event) {
-       document.styleSheets[0].insertRule(
-       ".kix-cursor-caret {\
-         display: block !important;\
-         border-color: #4285F4 !important;\
-         box-shadow: 0 0 0px #4285F4, 0 0 15px #3367D6, 0 0 50px #7BAAF7 !important; \
-       }",0);
-       document.styleSheets[0].insertRule(
-       ".kix-selection-overlay { \
-         display: block !important; \
-         box-shadow: 0 0 0px #4285F4, 0 0 15px #3367D6, 0 0 50px #7BAAF7 !important; \
-       }",0);
-       // });
-     }}
 
      css_for_bugs() -> {{
        document.styleSheets[0].insertRule(".codefont {font-family: PragmataPro, monospace !important;font-size: 1.2em !important;}",0);
@@ -167,22 +155,26 @@
        call css_for_youtube
      }
 
-     css_for_gmail() -> {{
-       document.styleSheets[0].insertRule(".Bu:nth-child(2), .Bu:nth-child(3) { display: none !important; }",0);
-       document.styleSheets[0].insertRule(".nK { margin-top: 16px !important; }",0);
+     css_for_source() -> {{
+       document.styleSheets[0].insertRule("format-code { font-family: Iosevka SS08 !important; }",0);
      }}
+     site '*://source/*' {
+       call css_for_source
+     }
 
      site '*://dashboards*' {
        unmapAll
        iunmapAll
      }
 
+     css_for_gmail() -> {{
+       document.styleSheets[0].insertRule(".Bu:nth-child(2), .Bu:nth-child(3) { display: none !important; }",0);
+       document.styleSheets[0].insertRule(".nK { margin-top: 16px !important; }",0);
+     }}
      site '*://mail.google.com/*' {
        call css_for_gmail
-
        unmapAll
        iunmapAll
-       map gp :call pinTab<CR>
        map f createHint
        map mf createMultiHint
        map A openLastHint
@@ -203,6 +195,23 @@
        map <Leader>ol :call orgmodeLink<CR>
        map <Leader>m :call markdownLink<CR>
      }
+
+     css_for_docs() -> {{
+       // cursor halo
+       // document.addEventListener("DOMContentLoaded", function(event) {
+       document.styleSheets[0].insertRule(
+       ".kix-cursor-caret {\
+         display: block !important;\
+         border-color: #4285F4 !important;\
+         box-shadow: 0 0 0px #4285F4, 0 0 15px #3367D6, 0 0 50px #7BAAF7 !important; \
+       }",0);
+       document.styleSheets[0].insertRule(
+       ".kix-selection-overlay { \
+         display: block !important; \
+         box-shadow: 0 0 0px #4285F4, 0 0 15px #3367D6, 0 0 50px #7BAAF7 !important; \
+       }",0);
+       // });
+     }}
 
      site '*://docs.google.com/*' {
        call css_for_docs

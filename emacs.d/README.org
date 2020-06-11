@@ -1198,7 +1198,7 @@
        "C-w o" 'delete-other-windows
        amd/leader-key-insert 'hydra-leader-menu/body)
       (:states '(motion visual)
-       ;; "RET" 'evil-ex ;; Enter opens : prompt
+       "RET" 'evil-ex ;; Enter opens : prompt
        ";" 'evil-ex)  ;; semicolon also enters : prompt
       (:states '(motion visual emacs)
        "M-t" 'ivy-switch-buffer
@@ -3288,7 +3288,6 @@
     (use-package forth-block-mode :defer t)
 
     (use-package gn-mode
-      :defer t
       :config
       (add-to-list 'auto-mode-alist '("\\.gn\\'" . gn-mode)))
 
