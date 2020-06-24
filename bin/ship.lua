@@ -1411,9 +1411,10 @@ function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
   --   print(index)
   --   pti(pixel)
   -- end
-  print(camera_angle)
-  print(px)
-  print(py)
+  --
+  -- print(camera_angle)
+  -- print(px)
+  -- print(py)
 end
 
 
@@ -1494,5 +1495,4 @@ planet_max_radius = floor(term.screen_width/2)
 -- COLORS_256 = true
 
 cmd_draw_planet_map()
-
--- cmd_draw_shipyard()
+cmd_draw_shipyard()
