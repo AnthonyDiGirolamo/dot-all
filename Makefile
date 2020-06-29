@@ -42,6 +42,8 @@ mkdirs:
 all: clean tangle symlinks  ## clean and tangle all
 tangle: mkdirs $(ORG_OUT_FILES) clean-removed-files  ## tangle all dotfiles
 
+tmux: mkdirs .cache/terminfo.out .cache/tmux.out
+
 .PHONY: symlinks
 .ONESHELL:
 symlinks:  ## symlink folders
