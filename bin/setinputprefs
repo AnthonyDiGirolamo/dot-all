@@ -5,7 +5,7 @@ xset r rate 200 30
 # xset r off
 
 DEVICE_NAME='anthony’s trackpad'
-xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
+xinput list --name-only | grep -iqs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
 then
     xinput set-prop "${DEVICE_NAME}" 'libinput Tapping Enabled' 1
@@ -14,15 +14,16 @@ then
 fi
 
 DEVICE_NAME='TPPS/2 Elan TrackPoint'
-xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
+xinput list --name-only | grep -iqs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
 then
     xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' .8
+    hostname | grep -iqs grover && xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' .1
     xinput set-prop "${DEVICE_NAME}" 'libinput Accel Profile Enabled' 1, 0
 fi
 
 DEVICE_NAME='SynPS/2 Synaptics TouchPad'
-xinput list --name-only | grep -i --color=auto -qs "${DEVICE_NAME}"
+xinput list --name-only | grep -iqs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
 then
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Two-Finger Scrolling' 1, 1

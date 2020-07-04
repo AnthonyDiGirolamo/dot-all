@@ -40,6 +40,7 @@ mkdirs:
 	@mkdir -p $(CACHEDIR)
 
 all: clean tangle symlinks  ## clean and tangle all
+t: tangle  ## tangle all dotfiles
 tangle: mkdirs $(ORG_OUT_FILES) clean-removed-files  ## tangle all dotfiles
 
 tmux: mkdirs .cache/terminfo.out .cache/tmux.out
