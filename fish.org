@@ -125,6 +125,9 @@
     function tlll --description "tree ls -l style with maxdepth of 3"
       tllll -L 3 $argv
     end
+    function tll4 --description "tree ls -l style with maxdepth of 4"
+      tllll -L 4 $argv
+    end
 
     # fish specific aliases
     alias o=prevd

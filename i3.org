@@ -75,6 +75,8 @@
     # screen lock
     # bindsym $mod+k exec i3lock -c 000000
     bindsym $mod+k exec xscreensaver-command -lock
+    # bindsym $mod+k exec xset s activate
+
     bindsym XF86MonBrightnessDown exec lux -s 5%
     bindsym XF86MonBrightnessUp exec lux -a 5%
     bindsym XF86AudioPrev exec lux -s 5%
@@ -441,7 +443,7 @@
 
     # exec cinnamon-settings-daemon # use lxappearance instead
 
-    exec xscreensaver
+    exec xscreensaver --no-splash
 
     # exec --no-startup-id xinput set-prop "anthony’s trackpad" "Synaptics Two-Finger Scrolling" 1, 1
     # exec --no-startup-id xinput set-prop "anthony’s trackpad" "Synaptics Scrolling Distance" -156, -156

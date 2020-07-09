@@ -1354,7 +1354,9 @@ function planet:render_planet(fullmap, render_far_side)
 end
 
 function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
-  print(term.screen_width)
+  if DEBUG then
+    print("Terminal width: "..term.screen_width)
+  end
 
   local camera_angle = random()
   local px = cos(camera_angle)*100
