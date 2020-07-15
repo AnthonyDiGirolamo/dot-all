@@ -3289,7 +3289,8 @@
 
     (use-package gn-mode
       :config
-      (add-to-list 'auto-mode-alist '("\\.gn\\'" . gn-mode)))
+      (add-to-list 'auto-mode-alist '("\\.gn\\'" . gn-mode))
+      (add-to-list 'auto-mode-alist '("\\.gni\\'" . gn-mode)))
 
     (use-package ninja-mode :defer t)
   #+end_src

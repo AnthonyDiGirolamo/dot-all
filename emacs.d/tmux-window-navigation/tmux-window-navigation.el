@@ -71,12 +71,13 @@
         (set-window-start  other-window this-start)))))
 
 (defun tmux-window-navigation/tmux-navigate (direction)
-  (let
-      ((cmd (concat "windmove-" direction)))
-    (condition-case nil
-        (funcall (read cmd))
-      (error
-       (tmux-window-navigation/tmux-command direction)))))
+  (unless (minibufferp)
+    (let
+        ((cmd (concat "windmove-" direction)))
+      (condition-case nil
+          (funcall (read cmd))
+        (error
+         (tmux-window-navigation/tmux-command direction))))))
 (defun tmux-window-navigation/tmux-command (direction)
   (shell-command-to-string
    (concat "tmux select-pane -"

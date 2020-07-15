@@ -18,19 +18,35 @@
    #+end_src
 
 ** s: src-block
-   #+BEGIN_SRC $1
+   #+begin_src $1
    $0
-   #+END_SRC
+   #+end_src
 ** se: src-block emacs-lisp
-   #+BEGIN_SRC emacs-lisp
+   #+begin_src emacs-lisp
    $0
-   #+END_SRC
+   #+end_src
 ** ta: org-mode table
    | $0 |  |
    |--+--|
    |  |  |
 
 * python-mode
+
+** rc: regex_compile
+    menu_regex = re.compile(
+        r'^menu\.' # starts with "menu"
+        r'(?P<menu_option_name>[^.]+)\.' # first token after .
+        r'(?P<menu_option_value>[^.]+)$', re.MULTILINE) # second (final) token after .
+
+** rm: regex.match
+    mmatch = self.menu_regex.match(moption)
+    if menu_match:
+        whole_match_string = mmatch[0]
+        first_group_matc_stringh = mmatch[1]
+        mmatch = menu_match.groupdict()
+        name = mmgd["menu_option_name"]
+        value = mmgd["menu_option_value"]
+
 ** commandline.docopt boilerplate
    #!/usr/bin/env python3
    # coding=utf-8
