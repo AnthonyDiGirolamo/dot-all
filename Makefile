@@ -174,6 +174,14 @@ lux: git-pull-lux
 .ONESHELL:
 clac: git-pull-clac
 
+.PHONY: pip
+.ONESHELL:
+pip:
+	@mkdir -p $(CACHEDIR)/pip
+	cd $(abspath $(CACHEDIR)/pip)
+	curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+	python3 get-pip.py
+
 .PHONY: clean-removed-files
 .ONESHELL:
 clean-removed-files:  ## rm files removed since last make tangle

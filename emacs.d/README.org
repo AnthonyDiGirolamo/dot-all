@@ -724,6 +724,7 @@
                emacs-lisp-mode-hook
                latex-mode-hook
                js2-mode-hook
+               makefile-mode
                ;; nxml-mode-hook
                ;; sql-mode-hook
                sh-mode-hook)))
