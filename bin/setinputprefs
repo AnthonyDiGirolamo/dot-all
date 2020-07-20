@@ -24,17 +24,13 @@ then
 fi
 
 # Thinkpad X1 carbon gen7 with Arch
-DEVICE_NAME='SynPS/2 Synaptics TouchPad'
+DEVICE_NAME='SYNA8004:00 06CB:CD8B Touchpad'
 xinput list --name-only | grep -iqs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
 then
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Two-Finger Scrolling' 1, 1
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Coasting Speed' 0, 50
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Scrolling Distance' -114, -114
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Detection' 1
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Dimensions' 4, 50
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Move Speed' 1.000000, 2.750000, 0.034880, 0.000000
-    # xinput list-props "${DEVICE_NAME}"
+    xinput set-prop "${DEVICE_NAME}" 'libinput Natural Scrolling Enabled' 1
+    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' 0.520000
+    xinput list-props "${DEVICE_NAME}"
 fi
 
 # Thinkpad X1 carbon gen6 with debian
@@ -48,5 +44,5 @@ then
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Detection' 1
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Dimensions' 4, 50
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Move Speed' 1.000000, 2.750000, 0.034880, 0.000000
-    # xinput list-props "${DEVICE_NAME}"
+    xinput list-props "${DEVICE_NAME}"
 fi
