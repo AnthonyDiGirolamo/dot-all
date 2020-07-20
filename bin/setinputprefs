@@ -4,6 +4,7 @@
 xset r rate 200 30
 # xset r off
 
+# Apple magic trackpad
 DEVICE_NAME='anthony’s trackpad'
 xinput list --name-only | grep -iqs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
@@ -22,6 +23,7 @@ then
     xinput set-prop "${DEVICE_NAME}" 'libinput Accel Profile Enabled' 1, 0
 fi
 
+# Thinkpad X1 carbon gen7 with Arch
 DEVICE_NAME='SynPS/2 Synaptics TouchPad'
 xinput list --name-only | grep -iqs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
@@ -32,7 +34,19 @@ then
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Detection' 1
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Dimensions' 4, 50
     xinput set-prop "${DEVICE_NAME}" 'Synaptics Move Speed' 1.000000, 2.750000, 0.034880, 0.000000
-    xinput list-props "${DEVICE_NAME}"
+    # xinput list-props "${DEVICE_NAME}"
 fi
 
-# xinput list-props "${DEVICE_NAME}"
+# Thinkpad X1 carbon gen6 with debian
+DEVICE_NAME='Synaptics TM3289-021'
+xinput list --name-only | grep -iqs "${DEVICE_NAME}"
+if [ $? -eq 0 ]
+then
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Two-Finger Scrolling' 1, 1
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Coasting Speed' 0, 50
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Scrolling Distance' -114, -114
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Detection' 1
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Dimensions' 4, 50
+    xinput set-prop "${DEVICE_NAME}" 'Synaptics Move Speed' 1.000000, 2.750000, 0.034880, 0.000000
+    # xinput list-props "${DEVICE_NAME}"
+fi

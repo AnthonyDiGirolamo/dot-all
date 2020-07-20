@@ -6,7 +6,7 @@
      ,#+AUTHOR: $2
      ,#+EMAIL: $3
      ,#+LANGUAGE: en
-     ,#+OPTIONS: title:nil toc:nil H:4 num:nil ^:nil ':nil
+     ,#+OPTIONS: title:t toc:nil H:4 num:nil ^:nil ':nil
      ,#+OPTIONS: html-style:nil html-preamble:t html-postamble:nil
      ,#+HTML_DOCTYPE: html5
      ,#+HTML_HEAD: <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono" rel="stylesheet">
