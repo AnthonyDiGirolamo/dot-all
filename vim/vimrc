@@ -6,21 +6,29 @@ execute pathogen#infect()
 " use bash for !commands and make/dispatch
 set shell=bash
 
+" let unameo = system('uname -o')
+
 " enable 256 colors in the terminal (use 'tmux -2' to enable 256 colors in tmux)
 set t_Co=256
 " enable truecolor terminal mode
 set termguicolors
 
-set background=dark
-" let g:airline_theme='behelit'
-" let g:airline_theme='aludin'
-
-" let g:one_allow_italics = 1
-colorscheme one
-" colorscheme distinguished
-" colorscheme ir_black-256
-" colorscheme molokai
-" colorscheme atomic
+if $HOME == "/data/data/com.termux/files/home"
+  set background=light
+  colorscheme bw
+else
+  set number          " line numbering
+  set relativenumber  " relative line numbering
+  set background=dark
+  " let g:airline_theme='behelit'
+  " let g:airline_theme='aludin'
+  " let g:one_allow_italics = 1
+  colorscheme one
+  " colorscheme distinguished
+  " colorscheme ir_black-256
+  " colorscheme molokai
+  " colorscheme atomic
+endif
 
 set noswapfile
 set nobackup  " do not keep a backup file (file~), use versions instead
@@ -28,8 +36,6 @@ set nobackup  " do not keep a backup file (file~), use versions instead
 set cursorline
 set hlsearch
 set autoindent
-set number          " line numbering
-set relativenumber  " relative line numbering
 
 set wildmode=list:longest " specifies how command line completion works
 set incsearch  " do incremental searching
