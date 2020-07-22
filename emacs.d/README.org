@@ -1203,6 +1203,7 @@
        ";" 'evil-ex)  ;; semicolon also enters : prompt
       (:states '(motion visual emacs)
        "M-t" 'ivy-switch-buffer
+       "M-T" 'counsel-ibuffer
        "M-b" 'ibuffer
        "M-d" (lambda() (interactive) (dired-other-window (projectile-project-root)))
        "M-D" (lambda() (interactive) (dired-jump t))
@@ -3727,6 +3728,11 @@
       (define-key hydra-ivy/keymap (kbd "n") 'hydra-ivy/ivy-next-line)
       (define-key hydra-ivy/keymap (kbd "e") 'hydra-ivy/ivy-previous-line)
     )
+
+    (use-package ivy-rich
+      :after ivy
+      :config
+      (ivy-rich-mode 1))
     #+end_src
 
 ** swiper
