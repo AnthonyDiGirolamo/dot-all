@@ -26,6 +26,7 @@
    - [[#dired][dired]]
    - [[#eshell][eshell]]
    - [[#shell][shell]]
+   - [[#vterm][vterm]]
    - [[#compilation][compilation]]
    - [[#calc][calc]]
    - [[#winner---window-layout-undoredo][winner - window layout undo/redo]]
@@ -1818,6 +1819,12 @@
        (when (executable-find "fish")
          (setq explicit-shell-file-name (executable-find "fish")))
      )
+   #+end_src
+
+** vterm
+   #+begin_src emacs-lisp
+     (use-package vterm
+       :commands (vterm))
    #+end_src
 
 ** compilation

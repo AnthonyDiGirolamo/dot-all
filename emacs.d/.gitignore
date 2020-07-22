@@ -39,3 +39,6 @@
 /abbrev_defs
 /elpy/
 /request/
+__pycache__
+/elpa/vterm*/build/
+/elpa/vterm*/*.so
