@@ -1353,7 +1353,7 @@ function planet:render_planet(fullmap, render_far_side)
   return self.rendered_terrain
 end
 
-function cmd_draw_planet_map(camera_x, camera_z, planet_count, starting_seed)
+function cmd_draw_planet_map(planet_count, starting_seed, camera_x, camera_z)
   if DEBUG then
     print("Terminal width: "..term.screen_width)
   end
@@ -1496,5 +1496,74 @@ planet_max_radius = floor(term.screen_width/2)
 -- DEBUG = true
 -- COLORS_256 = true
 
-cmd_draw_planet_map()
-cmd_draw_shipyard()
+function dir (prefix, tablename)
+  if not prefix then
+    prefix = ""
+  end
+  for i,v in pairs (tablename) do
+    if i ~= 'loaded' and i ~= '_G' then
+      if type(v) == 'table' then
+        dir(prefix .. '.' .. i, v)
+      elseif type(v) == 'function' then
+        print(prefix .. '.' .. i .. '()')
+      end
+    end
+  end
+end
+function globals ()
+  dir('_G',_G)
+end
+
+function locals(a)
+  for i,v in pairs(a) do
+    print(i, v)
+  end
+end
+
+-- print(locals(arg))
+
+-- check for command line flags
+ship_value_index = nil
+planet_value_index = nil
+for index, token in pairs(arg) do
+  if token == "--ships" then
+    ship_value_index = index + 1
+  elseif token == "--planets" then
+    planet_value_index = index + 1
+  end
+end
+
+if ship_value_index or planet_value_index then
+
+  -- if option '--ships 5' print 5 ships
+  if ship_value_index and arg[ship_value_index] then
+    v = tonumber(arg[ship_value_index])
+    if type(v) == "number" then
+      -- print("ship",  v, type(v))
+
+      for i=1,v do
+        cmd_draw_shipyard()
+      end
+    else
+      print("unknown number of ships: "..arg[ship_value_index])
+    end
+  end
+
+  -- if option '--planets 2' print 2 planets
+  if planet_value_index and arg[planet_value_index] then
+    v = tonumber(arg[planet_value_index])
+    if type(v) == "number" then
+      -- print("planet", v, type(v))
+      -- TODO make planet_count arg work as expected in cmd_draw_planet_map()
+      cmd_draw_planet_map(v)
+    else
+      print("unknown number of planets: "..arg[planet_value_index])
+    end
+  end
+
+else
+  -- if no options
+  cmd_draw_planet_map()
+  cmd_draw_shipyard()
+end
+

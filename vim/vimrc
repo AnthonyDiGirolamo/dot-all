@@ -124,7 +124,8 @@ nnoremap <leader>p :cprevious<cr>
 
 nnoremap <leader>u :UndotreeToggle<cr>
 nnoremap <leader>g :Gstatus<cr>
-nnoremap <leader>b :CtrlPBuffer<cr>
+nnoremap <leader>bb :CtrlPBuffer<cr>
+nnoremap <leader>bk :q<cr>
 nnoremap <leader>m :CtrlPBufTagAll<cr>
 nnoremap <leader>o :silent !ctags -R *.py kadc tests<cr>:CtrlPTag<cr>
 

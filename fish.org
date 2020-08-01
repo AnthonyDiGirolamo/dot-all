@@ -37,6 +37,7 @@
     end
 
     # Prepend PATH variable
+    add_directory_to_path $HOME/apps/bin
     add_directory_to_path $HOME/Android/Sdk/platform-tools
     add_directory_to_path $HOME/apps/fish/bin
     add_directory_to_path $HOME/apps/emacs/bin
