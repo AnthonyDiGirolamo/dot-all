@@ -23,10 +23,12 @@ fish_url := https://github.com/fish-shell/fish-shell/releases/download/3.1.0/fis
 fish_md5 := 8c9995a5a6d07ce05a1413ca24e16691
 emacs_url := http://ftpmirror.gnu.org/emacs/emacs-26.3.tar.xz
 emacs_md5 := 0a2e4b965d31a7cb1930eae3b79df793
+lua54_url := https://www.lua.org/ftp/lua-5.4.0.tar.gz
+lua54_md5 := dbf155764e5d433fc55ae80ea7060b60
 lua_url := https://www.lua.org/ftp/lua-5.3.5.tar.gz
 lua_md5 := 4f4b4f323fd3514a68e0ab3da8ce3455
-luarocks_url := https://luarocks.org/releases/luarocks-3.3.0.tar.gz
-luarocks_md5 := 202794e8f4945c6085963ecf908ae890
+luarocks_url := https://luarocks.org/releases/luarocks-3.3.1.tar.gz
+luarocks_md5 := 1dc12df0b4dc312625a0d36b194b76ef
 
 ORG_FILES := $(wildcard *.org)
 ORG_OUT_FILES := $(foreach f, $(ORG_FILES),$(CACHEDIR)/$(basename $(f)).out)
@@ -95,6 +97,16 @@ build-emacs: download-emacs
 
 .PHONY: build-%
 .ONESHELL:
+build-lua54: download-lua54
+	@echo "[BUILD] lua"
+	$(CD_TO_BUILD_DIR)
+	make linux -j 4
+	make INSTALL_TOP=$(abspath $(HOME)/apps/lua54) install
+	cd $(abspath $(CACHEDIR)/lua)
+	rm -rf $$D
+
+.PHONY: build-%
+.ONESHELL:
 build-lua: download-lua
 	@echo "[BUILD] lua"
 	$(CD_TO_BUILD_DIR)
@@ -108,7 +120,7 @@ build-lua: download-lua
 build-luarocks: download-luarocks
 	@echo "[BUILD] luarocks"
 	$(CD_TO_BUILD_DIR)
-	./configure --prefix=$$HOME/apps/lua
+	./configure --prefix=$$HOME/apps/lua --with-lua=$$HOME/apps/lua
 	make
 	make install
 	cd $(abspath $(CACHEDIR)/luarocks)
@@ -129,6 +141,10 @@ download-%:
 	echo [DOWNLOADED] $$md5hash
 	test "$$EXPECTED_MD5  $$F" != "$$md5hash" && echo "Invalid MD5" && echo "   Expected: $$EXPECTED_MD5" && exit 1
 	exit 0
+
+.PHONY: lua54
+.ONESHELL:
+lua54: build-lua54 ## download, compile and install lua 5.4
 
 .PHONY: lua
 .ONESHELL:
