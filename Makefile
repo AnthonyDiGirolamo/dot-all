@@ -21,12 +21,16 @@ CACHEDIR := ./.cache
 
 fish_url := https://github.com/fish-shell/fish-shell/releases/download/3.1.0/fish-3.1.0.tar.gz
 fish_md5 := 8c9995a5a6d07ce05a1413ca24e16691
+
 emacs_url := http://ftpmirror.gnu.org/emacs/emacs-26.3.tar.xz
 emacs_md5 := 0a2e4b965d31a7cb1930eae3b79df793
+
 lua54_url := https://www.lua.org/ftp/lua-5.4.0.tar.gz
 lua54_md5 := dbf155764e5d433fc55ae80ea7060b60
+
 lua_url := https://www.lua.org/ftp/lua-5.3.5.tar.gz
 lua_md5 := 4f4b4f323fd3514a68e0ab3da8ce3455
+
 luarocks_url := https://luarocks.org/releases/luarocks-3.3.1.tar.gz
 luarocks_md5 := 1dc12df0b4dc312625a0d36b194b76ef
 
@@ -95,17 +99,17 @@ build-emacs: download-emacs
 	cd $(abspath $(CACHEDIR)/emacs)
 	rm -rf $$D
 
-.PHONY: build-%
+.PHONY: build-lua54
 .ONESHELL:
 build-lua54: download-lua54
 	@echo "[BUILD] lua"
 	$(CD_TO_BUILD_DIR)
 	make linux -j 4
 	make INSTALL_TOP=$(abspath $(HOME)/apps/lua54) install
-	cd $(abspath $(CACHEDIR)/lua)
+	cd $(abspath $(CACHEDIR)/lua54)
 	rm -rf $$D
 
-.PHONY: build-%
+.PHONY: build-lua
 .ONESHELL:
 build-lua: download-lua
 	@echo "[BUILD] lua"
@@ -115,7 +119,7 @@ build-lua: download-lua
 	cd $(abspath $(CACHEDIR)/lua)
 	rm -rf $$D
 
-.PHONY: build-%
+.PHONY: build-luarocks
 .ONESHELL:
 build-luarocks: download-luarocks
 	@echo "[BUILD] luarocks"
@@ -169,30 +173,32 @@ clac_git_url := https://github.com/soveran/clac.git
 .PHONY: git-pull-%
 .ONESHELL:
 git-pull-%:
-	URL=$($(subst git-pull-,,$@)_git_url)
+	@URL=$($(subst git-pull-,,$@)_git_url)
 	GDIR=$$(basename -s .git $$URL)
+	pushd source
 	echo $$URL
 	echo "-> $${GDIR}"
 	rm -rf $$GDIR
 	git clone --depth=1 --branch=master $$URL
 	rm -rf $$GDIR/.git
 	git add -A $$GDIR
+	popd
 
 .PHONY: xcape
 .ONESHELL:
-xcape: git-pull-xcape
+xcape: git-pull-xcape  ## git pull xcape source
 
 .PHONY: lux
 .ONESHELL:
-lux: git-pull-lux
+lux: git-pull-lux  ## git pull lux source
 
 .PHONY: clac
 .ONESHELL:
-clac: git-pull-clac
+clac: git-pull-clac  ## git pull clac source
 
 .PHONY: pip
 .ONESHELL:
-pip:
+pip:  ## install python3 pip
 	@mkdir -p $(CACHEDIR)/pip
 	cd $(abspath $(CACHEDIR)/pip)
 	curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
