@@ -20,7 +20,7 @@
 
 ** PC modifiers
 
-  #+BEGIN_SRC conf :tangle (if (not (string-match "chip" (shell-command-to-string "uname -a"))) "~/.i3/config" "no")
+  #+BEGIN_SRC conf :tangle "~/.i3/config"
     # i3 config file (v4)
     # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
@@ -41,14 +41,14 @@
 
 ** PocketCHIP modifiers
 
-  #+BEGIN_SRC conf :tangle (if (string-match "chip" (shell-command-to-string "uname -a")) "~/.i3/config" "no")
+  #+BEGIN_SRC conf :tangle (if (string-match "chip" hostname) "~/.i3/config" "no")
     set $mod Mod4
     font pango:Roboto Medium 7
   #+END_SRC
 
 ** common config
 
-  #+BEGIN_SRC conf :tangle ~/.i3/config
+  #+BEGIN_SRC conf :tangle "~/.i3/config"
     # Use Mouse+$mod to drag floating windows to their wanted position
     floating_modifier $mod
 
@@ -432,7 +432,7 @@
 
 ** PC start-up apps
 
-  #+BEGIN_SRC conf :tangle (if (not (string-match "chip" (shell-command-to-string "uname -a"))) "~/.i3/config" "no")
+  #+BEGIN_SRC conf :tangle "~/.i3/config"
     exec --no-startup-id xset r rate 200 30
     exec --no-startup-id feh --bg-fill $HOME/Pictures/backgrounds/cliff.jpg
 
@@ -456,7 +456,7 @@
     ls /proc/sys/net/ipv4/conf/ | grep -v -E '(all|lo|default)' | head -n1
   #+END_SRC
 
-  #+BEGIN_SRC conf :tangle ~/.i3status.conf :noweb tangle
+  #+BEGIN_SRC conf :tangle "~/.i3status.conf" :noweb tangle
     # i3status configuration file.
     # see "man i3status" for documentation.
 

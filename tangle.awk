@@ -1,4 +1,4 @@
-# join an array into a string, ignore empty strings
+# join an array into a string (ignoring empty strings)
 function join(array, start, end, sep, result, i) {
     if (sep == "")
        sep = " "
@@ -27,7 +27,7 @@ function basename(path) {
 
 function dirname(path) {
     split(path, path_array, "/")
-    return join(path_array, 0, length(path_array)-1, "/")
+    return join(path_array, 1, length(path_array)-1, "/")
 }
 
 function init_block () {
@@ -48,13 +48,17 @@ function tangle_file_name () {
 
 BEGIN {
     IGNORECASE = 1
-    tangle_prop_regex = @/^\s*#\+property.*header-args.*:tangle ([^ ]+)/
+    tangle_prop_regex = @/^\s*#\+property.*header-args.*:tangle\s*(\S.*)$/
     begin_src_regex = @/^\s*#\+begin_src/
-    begin_src_tangle_regex = @/^\s*#\+begin_src.*:tangle (.*?)( :)?/
+    # need both variants as awk doesn't seem to have non-greedy regexes
+    begin_src_tangle_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*) :/
+    begin_src_tangle_to_end_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*)$/
+    begin_src_sh_eval_regex = @/^\s*#\+begin_src sh .*:eval "?yes"?/
     end_src_regex = @/^\s*#\+end_src/
 
     init_block()
     tangle_prop_file_name = 0
+    eval_block_count = 0
 }
 
 # check for a header-args :tangle property and save the filename
@@ -99,25 +103,38 @@ match($0, begin_src_regex, group) {
     init_block()
     in_block = 1
     # with tangle?
-    if (match($0, begin_src_tangle_regex, tanglegroup)) {
+    if (match($0, begin_src_tangle_regex, tanglegroup) || match($0, begin_src_tangle_to_end_regex, tanglegroup)) {
         file_name = tanglegroup[1]
-        # trim whitespace
-        sub(/^\s+/, "", file_name)
-        sub(/\s+$/, "", file_name)
+        # # trim whitespace
+        # sub(/^\s+/, "", file_name)
+        # sub(/\s+$/, "", file_name)
         # don't collect lines for :tangle "no" blocks
         if (match(file_name, /^['"]?(no|nil)['"]?/))
             in_block = 0
         else
-            current_block_filename = file_name
+            # can't handle noweb references yet
+            if (! match($0, /:noweb/))
+                current_block_filename = file_name
     }
 }
 
+match($0, begin_src_sh_eval_regex, group) {
+    init_block()
+    in_block = 1
+    eval_block_count += 1
+    current_block_filename = "eval-block-sh-"eval_block_count
+}
+
 END {
+    # print_array_indexes(tangled_files)
     for (file_name in tangled_files) {
+        if (match(file_name, /eval-block-sh-/)) {
+            print tangled_files[file_name] | "sh"
+        }
         # If file name doesn't start with:
         #   (  -> isn't an elisp expression
         #   no -> should not be tangled
-        if (! match(file_name, /^("?no"?|\s*\()/)) {
+        else if (! match(file_name, /^("?no"?|\s*\()/)) {
             expanded_file_name = file_name
             # remove any leading and trailing quotes
             sub(/^["]/, "", expanded_file_name)
