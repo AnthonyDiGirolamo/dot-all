@@ -12,29 +12,23 @@ function join(array, start, end, sep, result, i) {
 }
 
 function print_array_indexes(a) {
-    for (i in a) {
+    for (i in a)
         print "["i"]: "
-    }
 }
 function print_array(a) {
-    for (i in a) {
+    for (i in a)
         print "["i"]: '"a[i]"'"
-    }
 }
 
 function basename(path) {
     split(path, path_array, "/")
-    # print_array(path_array)
     return path_array[length(path_array)]
 }
 
 function dirname(path) {
     split(path, path_array, "/")
-    # print_array(path_array)
-    joined = join(path_array, 0, length(path_array)-1, "/")
-    return joined
+    return join(path_array, 0, length(path_array)-1, "/")
 }
-
 
 function init_block () {
     in_block = 0
@@ -73,10 +67,9 @@ match($0, tangle_prop_regex, group) {
 
 # should come before in_block so the end_src line isn't printed
 match($0, end_src_regex) {
-    if (in_block && tangle_file_name()) {
+    if (in_block && tangle_file_name())
         # output one extra line break for this block
         tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n"
-    }
     # start a new block
     init_block()
 }
@@ -87,10 +80,8 @@ in_block {
     # get starting indent length on the first line with text
     if (!current_block_indent) {
         # capture leading spaces substring
-        if (match(current_line, /^(\s+)\S/, spacegroup)) {
+        if (match(current_line, /^(\s+)\S/, spacegroup))
             current_block_indent = spacegroup[1]
-            # print length(current_block_indent), "[", current_block_indent, "]"
-        }
     }
     # if there is a filename and it isn't no
     if (tangle_file_name()) {
@@ -114,12 +105,10 @@ match($0, begin_src_regex, group) {
         sub(/^\s+/, "", file_name)
         sub(/\s+$/, "", file_name)
         # don't collect lines for :tangle "no" blocks
-        if (match(file_name, /^['"]?(no|nil)['"]?/)) {
+        if (match(file_name, /^['"]?(no|nil)['"]?/))
             in_block = 0
-        }
-        else {
+        else
             current_block_filename = file_name
-        }
     }
 }
 
@@ -135,13 +124,10 @@ END {
             sub(/["]$/, "", expanded_file_name)
             # expand ~ to $HOME
             sub(/~/, ENVIRON["HOME"], expanded_file_name)
-
             # print file being tangled
             print "  " expanded_file_name
             # always mkdir -p
-            # print "mkdir -v -p "dirname(expanded_file_name)
             system("mkdir -v -p "dirname(expanded_file_name))
-
             # output contents string to the file all at once
             print tangled_files[file_name] > expanded_file_name
             close(expanded_file_name)
