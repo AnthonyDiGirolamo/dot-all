@@ -11,6 +11,11 @@ function join(array, start, end, sep, result, i) {
     return result
 }
 
+function print_array_indexes(a) {
+    for (i in a) {
+        print "["i"]: "
+    }
+}
 function print_array(a) {
     for (i in a) {
         print "["i"]: '"a[i]"'"
@@ -68,8 +73,10 @@ match($0, tangle_prop_regex, group) {
 
 # should come before in_block so the end_src line isn't printed
 match($0, end_src_regex) {
-    # output one extra line break for this block
-    tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n"
+    if (in_block && tangle_file_name()) {
+        # output one extra line break for this block
+        tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n"
+    }
     # start a new block
     init_block()
 }
@@ -86,7 +93,7 @@ in_block {
         }
     }
     # if there is a filename and it isn't no
-    if (tangle_file_name() && tangle_file_name() != "no") {
+    if (tangle_file_name()) {
         # remove leading indentation
         sub(current_block_indent, "", current_line)
         # append the line and a linebreak
@@ -106,14 +113,13 @@ match($0, begin_src_regex, group) {
         # trim whitespace
         sub(/^\s+/, "", file_name)
         sub(/\s+$/, "", file_name)
-        if (file_name == "no" || file_name == "nil") {
-            current_block_filename = "no"
+        # don't collect lines for :tangle "no" blocks
+        if (match(file_name, /^['"]?(no|nil)['"]?/)) {
+            in_block = 0
         }
         else {
             current_block_filename = file_name
         }
-        # init the current file
-        tangled_files[tangle_file_name()] = ""
     }
 }
 
@@ -133,6 +139,7 @@ END {
             # print file being tangled
             print "  " expanded_file_name
             # always mkdir -p
+            # print "mkdir -v -p "dirname(expanded_file_name)
             system("mkdir -v -p "dirname(expanded_file_name))
 
             # output contents string to the file all at once
