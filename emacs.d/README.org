@@ -3504,7 +3504,8 @@
         (
          ("a" hydra-align-menu/body "align")
          ("G"  counsel-git-grep       "search git grep")
-         ("rg"  counsel-rg       "ripgrep")
+         ("rgg"  counsel-rg       "ripgrep")
+         ("rgo"  amd/counsel-rg-with-initial-directory  "ripgrep w/ dir")
          ("pa" counsel-ag             "search ag counsel")
          ("pf" amd/counsel-ag-with-filename-regex "search ag filename regex")
          ;; ("pt" counsel-pt             "search pt counsel")
@@ -3906,6 +3907,10 @@
          (let* ((ag-command (car (split-string counsel-ag-base-command "%s")))
                 (counsel-ag-base-command (concat ag-command " -G '" fileregex "' %s")))
            (counsel-ag)))
+
+       (defun amd/counsel-rg-with-initial-directory (initial-directory)
+         (interactive "DInitial Directory: ")
+         (counsel-rg nil initial-directory))
      )
    #+end_src
 
