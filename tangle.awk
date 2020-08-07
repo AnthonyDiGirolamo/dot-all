@@ -56,10 +56,14 @@ BEGIN {
     begin_src_tangle_to_end_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*)$/
     begin_src_sh_eval_regex = @/^\s*#\+begin_src sh .*:eval "?yes"?/
     end_src_regex = @/^\s*#\+end_src/
+}
 
+BEGINFILE {
+    printf "\033[36m[TANGLE]\033[0m %s\n", FILENAME
     init_block()
     tangle_prop_file_name = 0
     eval_block_count = 0
+    delete tangled_files
 }
 
 # check for a header-args :tangle property and save the filename
@@ -126,9 +130,14 @@ match($0, begin_src_sh_eval_regex, group) {
     current_block_filename = "eval-block-sh-"eval_block_count
 }
 
-END {
+ENDFILE {
+    outfile = ".cache/" FILENAME
+    sub(/\.org$/, ".out", outfile)
+
     # Traverse array ordered by indices in ascending order compared as strings
-    PROCINFO["sorted_in"] = "@ind_str_asc"
+    # PROCINFO["sorted_in"] = "@ind_str_asc"
+    # Need to traverse in original order in case any sh blocks expect previously
+    # tangled files to exist.
 
     # print_array_indexes(tangled_files)
     for (file_name in tangled_files) {
@@ -152,6 +161,10 @@ END {
             # output contents string to the file all at once
             print tangled_files[file_name] > expanded_file_name
             close(expanded_file_name)
+
+            # add tangled file path to outfile
+            print expanded_file_name > outfile
         }
     }
+    close(outfile)
 }

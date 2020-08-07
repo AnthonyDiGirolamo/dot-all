@@ -41,13 +41,11 @@ ORG_OUT_FILES := $(foreach f, $(ORG_FILES),$(CACHEDIR)/$(basename $(f)).out)
 clean:  ## delete .cache
 	rm -rf $(CACHEDIR)
 
-.PHONY: mkdirs
-mkdirs:
-	@mkdir -p $(CACHEDIR)
-
 all: clean tangle symlinks  ## clean and tangle all
 t: tangle  ## tangle all dotfiles
 tangle: mkdirs $(ORG_OUT_FILES) clean-removed-files  ## tangle all dotfiles
+tangleawk: mkdirs ## tangle all dotfiles using awk
+	@./tangle.awk *.org
 
 tmux: mkdirs .cache/terminfo.out .cache/tmux.out
 
@@ -247,9 +245,13 @@ $(CACHEDIR)/%.out: %.org
 	)" $(abspath $@) 2>/dev/null
 	@touch $@
 
+
+.PHONY: mkdirs
+mkdirs: $(CACHEDIR)/
+
 # rule to make a directory
 %/:
-	@mkdir -p $@
+	@mkdir -v -p $@
 
 # prevent intermediate files CACHEDIR and %.out from being deleted
 .PRECIOUS: $(CACHEDIR)/ $(CACHEDIR)/%.out
