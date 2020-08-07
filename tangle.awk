@@ -1,4 +1,5 @@
 #!/usr/bin/gawk -f
+
 # join an array into a string (ignoring empty strings)
 function join(array, start, end, sep, result, i) {
     if (sep == "")
@@ -16,6 +17,7 @@ function print_array_indexes(a) {
     for (i in a)
         print "["i"]: "
 }
+
 function print_array(a) {
     for (i in a)
         print "["i"]: '"a[i]"'"
@@ -66,7 +68,7 @@ BEGINFILE {
     delete tangled_files
 }
 
-# check for a header-args :tangle property and save the filename
+# Check for a header-args :tangle property and save the filename
 # E.g. #+PROPERTY: header-args :tangle "~/.emacs.d/README.el"
 match($0, tangle_prop_regex, group) {
     tangle_prop_file_name = group[1]
@@ -74,7 +76,8 @@ match($0, tangle_prop_regex, group) {
     tangled_files[tangle_file_name()] = ""
 }
 
-# should come before in_block so the end_src line isn't printed
+# Check for an end block line
+#   Should come before in_block so the end_src line isn't printed
 match($0, end_src_regex) {
     if (in_block && tangle_file_name())
         # output one extra line break for this block
@@ -83,6 +86,7 @@ match($0, end_src_regex) {
     init_block()
 }
 
+# If we are inside a src block, capture the current line
 in_block {
     current_line = $0
     current_block_line_number += 1
@@ -102,8 +106,8 @@ in_block {
     }
 }
 
-# start block line
-# should come after in_block so the end_src line isn't printed
+# Check for start block line
+#   Should come after in_block so the end_src line isn't printed
 match($0, begin_src_regex, group) {
     init_block()
     in_block = 1
@@ -123,6 +127,7 @@ match($0, begin_src_regex, group) {
     }
 }
 
+# Check for an sh block with :eval yes
 match($0, begin_src_sh_eval_regex, group) {
     init_block()
     in_block = 1
