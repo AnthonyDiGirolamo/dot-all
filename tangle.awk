@@ -1,3 +1,4 @@
+#!/usr/bin/gawk -f
 # join an array into a string (ignoring empty strings)
 function join(array, start, end, sep, result, i) {
     if (sep == "")
@@ -126,6 +127,9 @@ match($0, begin_src_sh_eval_regex, group) {
 }
 
 END {
+    # Traverse array ordered by indices in ascending order compared as strings
+    PROCINFO["sorted_in"] = "@ind_str_asc"
+
     # print_array_indexes(tangled_files)
     for (file_name in tangled_files) {
         if (match(file_name, /eval-block-sh-/)) {
