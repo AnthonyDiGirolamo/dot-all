@@ -20,8 +20,10 @@ https://github.com/gerardbm/vim-atomic.git
 https://github.com/vim-airline/vim-airline-themes.git
 https://github.com/vim-airline/vim-airline.git
 https://github.com/christoomey/vim-tmux-navigator.git
+https://github.com/jceb/vim-orgmode.git
 "
 urls="
+https://github.com/tpope/vim-speeddating.git
 "
 for URL in $urls
 do

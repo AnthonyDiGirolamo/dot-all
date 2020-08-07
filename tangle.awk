@@ -157,7 +157,7 @@ ENDFILE {
         # If file name doesn't start with:
         #   (  -> isn't an elisp expression
         #   no -> should not be tangled
-        else if (! match(file_name, /^("?no"?|\s*\()/)) {
+        else if (! match(file_name, /^\s*("?no"?|\()/)) {
             expanded_file_name = file_name
             # remove any leading and trailing quotes
             sub(/^["]/, "", expanded_file_name)
