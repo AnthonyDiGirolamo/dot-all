@@ -133,6 +133,9 @@ match($0, begin_src_sh_eval_regex, group) {
 ENDFILE {
     outfile = ".cache/" FILENAME
     sub(/\.org$/, ".out", outfile)
+    # Move existing .out file to .out.last
+    print "test -f "outfile" && cp "outfile" "outfile".last && rm "outfile | "sh"
+    close("sh")
 
     # Traverse array ordered by indices in ascending order compared as strings
     # PROCINFO["sorted_in"] = "@ind_str_asc"
@@ -142,7 +145,9 @@ ENDFILE {
     # print_array_indexes(tangled_files)
     for (file_name in tangled_files) {
         if (match(file_name, /eval-block-sh-/)) {
+            printf "  \033[36m[RUNSCRIPT]\033[0m sh\n"
             print tangled_files[file_name] | "sh"
+            close("sh")
         }
         # If file name doesn't start with:
         #   (  -> isn't an elisp expression
