@@ -1,0 +1,53 @@
+#!/usr/bin/gawk -f
+
+function print_tag_line(tag, text) {
+    printf "\033[36m[%s]\033[0m %s\n", tag, text
+}
+
+function run_command(cmdline) {
+    print_tag_line("RUN", cmdline)
+    system(cmdline)
+}
+
+BEGIN {
+    ethernet_interface_regex = @/^e.*/
+    wifi_interface_regex = @/^w.*/
+    selected_interface_regex = 0
+
+    interface_count = 0
+    command = "ip link"
+    # run command and process each line
+    while ((command |& getline line) > 0) {
+        if (match(line, /([0-9]+): ([ew][^ ]+):/, m)) {
+            interface_count += 1
+            interfaces[m[1]] = m[2]
+        }
+    }
+    close(command)
+
+    if (match(ARGV[1], wifi_interface_regex))
+        selected_interface_regex = wifi_interface_regex
+    else if (match(ARGV[1], ethernet_interface_regex))
+        selected_interface_regex = ethernet_interface_regex
+    else {
+        # print all interfaces in ascending order
+        PROCINFO["sorted_in"] = "@ind_num_asc"
+        for (i in interfaces)
+            # print i": "interfaces[i]
+            print interfaces[i]
+    }
+
+    if (selected_interface_regex) {
+        # traverse interfaces in descending order
+        PROCINFO["sorted_in"] = "@ind_num_desc"
+        for (i in interfaces) {
+            # restart the first one to match selected_interface_regex
+            if (match(interfaces[i], selected_interface_regex)) {
+                print_tag_line("RESTART", interfaces[i])
+                run_command("sudo systemctl restart dhcpcd@" interfaces[i])
+                run_command("sleep 2; systemctl status dhcpcd@" interfaces[i])
+                break
+            }
+        }
+    }
+}
