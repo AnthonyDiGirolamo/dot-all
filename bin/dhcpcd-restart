@@ -18,7 +18,7 @@ BEGIN {
     command = "ip link"
     # run command and process each line
     while ((command |& getline line) > 0) {
-        if (match(line, /([0-9]+): ([ew][^ ]+):/, m)) {
+        if (match(line, /([0-9]+): ([^ ]+):/, m)) {
             interface_count += 1
             interfaces[m[1]] = m[2]
         }
