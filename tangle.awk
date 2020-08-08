@@ -13,6 +13,10 @@ function join(array, start, end, sep, result, i) {
     return result
 }
 
+function print_tag_line(tag, text) {
+    printf "\033[36m[%s]\033[0m %s\n", tag, text
+}
+
 function print_array_indexes(a) {
     for (i in a)
         print "["i"]: "
@@ -61,7 +65,7 @@ BEGIN {
 }
 
 BEGINFILE {
-    printf "\033[36m[TANGLE]\033[0m %s\n", FILENAME
+    print_tag_line("TANGLE", FILENAME)
     init_block()
     tangle_prop_file_name = 0
     eval_block_count = 0
@@ -150,7 +154,8 @@ ENDFILE {
     # print_array_indexes(tangled_files)
     for (file_name in tangled_files) {
         if (match(file_name, /eval-block-sh-/)) {
-            printf "  \033[36m[RUNSCRIPT]\033[0m sh\n"
+            printf "  "
+            print_tag_line("RUNSCRIPT", "sh")
             print tangled_files[file_name] | "sh"
             close("sh")
         }
