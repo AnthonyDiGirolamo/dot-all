@@ -1,0 +1,12 @@
+#+TITLE: termux
+#+PROPERTY: header-args :mkdirp yes
+
+* =~/.termux/termux.properties=
+
+  #+begin_src sh :tangle ~/.termux/termux.properties
+    extra-keys = [ \
+      ['ESC','|','/','HOME','UP','END','PGUP','"','DEL'], \
+      ['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','-','BKSP'] \
+    ]
+  #+end_src
+
