@@ -16,7 +16,7 @@ CACHEDIR := ./.cache
 # First rule (help) is the default if make is run with no targets
 .PHONY: help
 help:  ## show help
-	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@grep -hE '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 # Help grep source: https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 
 fish_url := https://github.com/fish-shell/fish-shell/releases/download/3.1.0/fish-3.1.0.tar.gz
@@ -165,6 +165,7 @@ install-fish: build-fish ## download, compile and install fish
 xcape_git_url := https://github.com/alols/xcape.git
 lux_git_url := https://github.com/Ventto/lux.git
 clac_git_url := https://github.com/soveran/clac.git
+base16shell_git_url := https://github.com/chriskempson/base16-shell.git
 
 .PHONY: git-pull-%
 .ONESHELL:
@@ -191,6 +192,10 @@ update-lux: git-pull-lux  ## git pull lux source
 .PHONY: update-clac
 .ONESHELL:
 update-clac: git-pull-clac  ## git pull clac source
+
+.PHONY: update-base16shell
+.ONESHELL:
+update-base16shell: git-pull-base16shell  ## git pull base16-shell source
 
 .PHONY: pip
 .ONESHELL:

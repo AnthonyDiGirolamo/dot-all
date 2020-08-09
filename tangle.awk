@@ -61,6 +61,7 @@ BEGIN {
     begin_src_tangle_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*) :/
     begin_src_tangle_to_end_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*)$/
     begin_src_sh_eval_regex = @/^\s*#\+begin_src sh .*:eval "?yes"?/
+    org_escaped_asterix_regex = @/^(\s*,[*])/
     end_src_regex = @/^\s*#\+end_src/
 }
 
@@ -104,6 +105,12 @@ in_block {
     if (tangle_file_name()) {
         # remove leading indentation
         sub(current_block_indent, "", current_line)
+        # check for an escaped asterix and remove the comma
+        if (match(current_line, org_escaped_asterix_regex, mg)) {
+            replacement = mg[1]
+            sub(/,[*]/, "*", replacement)
+            sub(org_escaped_asterix_regex, replacement, current_line)
+        }
         # append the line and a linebreak
         tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n" current_line
         # print current_block_line_number,":",current_line
