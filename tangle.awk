@@ -22,6 +22,13 @@ function print_array_indexes(a) {
         print "["i"]: "
 }
 
+function find_index_matching(pattern, ary) {
+    for (i in ary)
+        if (match(i, pattern))
+            return i
+    return 0
+}
+
 function print_array(a) {
     for (i in a)
         print "["i"]: '"a[i]"'"
@@ -37,11 +44,30 @@ function dirname(path) {
     return join(path_array, 1, length(path_array)-1, "/")
 }
 
-function init_block () {
+function start_new_file() {
+    print_tag_line("TANGLE", FILENAME)
+
+    # per file vars
+    tangle_prop_file_name = 0
+    eval_block_count = 0
+    total_block_count = 0
+    delete tangled_files
+
+    reset_block_variables()
+}
+
+function reset_block_variables () {
+    # per block vars
     in_block = 0
     current_block_line_number = 0
     current_block_filename = 0
     current_block_indent = 0
+}
+
+function start_new_block() {
+    reset_block_variables()
+    in_block = 1
+    total_block_count += 1
 }
 
 function tangle_file_name () {
@@ -53,24 +79,32 @@ function tangle_file_name () {
         return 0
 }
 
+function make_block_name(count, name) {
+    # Check for existing block name and use that if found
+    # (so lines can continue to be appended to that file)
+    existing_name = find_index_matching(name, tangled_files)
+    if (existing_name)
+        return existing_name
+    return sprintf("BLOCK%03d %s", count, name)
+}
+
 BEGIN {
     IGNORECASE = 1
     tangle_prop_regex = @/^\s*#\+property.*header-args.*:tangle\s*(\S.*)$/
     begin_src_regex = @/^\s*#\+begin_src/
+
     # need both variants as awk doesn't seem to have non-greedy regexes
     begin_src_tangle_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*) :/
     begin_src_tangle_to_end_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*)$/
+
     begin_src_sh_eval_regex = @/^\s*#\+begin_src sh .*:eval "?yes"?/
-    org_escaped_asterix_regex = @/^(\s*,[*])/
     end_src_regex = @/^\s*#\+end_src/
+
+    org_escaped_asterix_regex = @/^(\s*,[*])/
 }
 
 BEGINFILE {
-    print_tag_line("TANGLE", FILENAME)
-    init_block()
-    tangle_prop_file_name = 0
-    eval_block_count = 0
-    delete tangled_files
+    start_new_file()
 }
 
 # Check for a header-args :tangle property and save the filename
@@ -87,8 +121,7 @@ match($0, end_src_regex) {
     if (in_block && tangle_file_name())
         # output one extra line break for this block
         tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n"
-    # start a new block
-    init_block()
+    reset_block_variables()
 }
 
 # If we are inside a src block, capture the current line
@@ -120,8 +153,7 @@ in_block {
 # Check for start block line
 #   Should come after in_block so the end_src line isn't printed
 match($0, begin_src_regex, group) {
-    init_block()
-    in_block = 1
+    start_new_block()
     # with tangle?
     if (match($0, begin_src_tangle_regex, tanglegroup) || match($0, begin_src_tangle_to_end_regex, tanglegroup)) {
         file_name = tanglegroup[1]
@@ -133,17 +165,17 @@ match($0, begin_src_regex, group) {
             in_block = 0
         else
             # can't handle noweb references yet
-            if (! match($0, /:noweb/))
-                current_block_filename = file_name
+            if (! match($0, /:noweb/)) {
+                current_block_filename = make_block_name(total_block_count, file_name)
+            }
     }
 }
 
 # Check for an sh block with :eval yes
 match($0, begin_src_sh_eval_regex, group) {
-    init_block()
-    in_block = 1
+    start_new_block()
     eval_block_count += 1
-    current_block_filename = "eval-block-sh-"eval_block_count
+    current_block_filename = make_block_name(total_block_count, sprintf("eval-block-sh %03d", eval_block_count))
 }
 
 ENDFILE {
@@ -154,38 +186,43 @@ ENDFILE {
     close("sh")
 
     # Traverse array ordered by indices in ascending order compared as strings
-    # PROCINFO["sorted_in"] = "@ind_str_asc"
-    # Need to traverse in original order in case any sh blocks expect previously
-    # tangled files to exist.
+    PROCINFO["sorted_in"] = "@ind_str_asc"
 
     # print_array_indexes(tangled_files)
     for (file_name in tangled_files) {
-        if (match(file_name, /eval-block-sh-/)) {
+        # run a script case
+        if (match(file_name, /(BLOCK[0-9]+) eval-block-sh/)) {
             printf "  "
             print_tag_line("RUNSCRIPT", "sh")
             print tangled_files[file_name] | "sh"
             close("sh")
         }
-        # If file name doesn't start with:
-        #   (  -> isn't an elisp expression
-        #   no -> should not be tangled
-        else if (! match(file_name, /^\s*("?no"?|\()/)) {
-            expanded_file_name = file_name
-            # remove any leading and trailing quotes
-            sub(/^["]/, "", expanded_file_name)
-            sub(/["]$/, "", expanded_file_name)
-            # expand ~ to $HOME
-            sub(/~/, ENVIRON["HOME"], expanded_file_name)
-            # print file being tangled
-            print "  " expanded_file_name
-            # always mkdir -p
-            system("mkdir -v -p "dirname(expanded_file_name))
-            # output contents string to the file all at once
-            print tangled_files[file_name] > expanded_file_name
-            close(expanded_file_name)
+        # file tangle case
+        else if (match(file_name, /^(BLOCK[0-9]+) (.*)$/, mg)) {
+            block_prefix = mg[1]
+            expanded_file_name = mg[2]
 
-            # add tangled file path to outfile
-            print expanded_file_name > outfile
+            # If file name doesn't start with:
+            #   (  -> isn't an elisp expression
+            #   no -> should not be tangled
+            if (! match(expanded_file_name, /^\s*("?no"?|\()/, mg)) {
+                # remove any leading and trailing quotes
+                sub(/^["]/, "", expanded_file_name)
+                sub(/["]$/, "", expanded_file_name)
+                # expand ~ to $HOME
+                sub(/~/, ENVIRON["HOME"], expanded_file_name)
+                # print file being tangled
+                print "  " expanded_file_name
+
+                # always mkdir -p
+                system("mkdir -v -p "dirname(expanded_file_name))
+                # output contents string to the file all at once
+                print tangled_files[file_name] > expanded_file_name
+                close(expanded_file_name)
+
+                # add tangled file path to outfile
+                print expanded_file_name > outfile
+            }
         }
     }
     close(outfile)

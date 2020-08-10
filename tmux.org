@@ -163,7 +163,7 @@
 
 ** blue
 
-   #+begin_src conf-space :tangle (tangle-file-if "~/.tmux.conf" (string-suffix-p "laptop" hostname))
+   #+begin_src conf-space :tangle (if (string-suffix-p "laptop" hostname) "~/.tmux.conf" "no")
      # Status Bar Colors
 
      # List current session on the left

@@ -1,4 +1,4 @@
-*  fonts.tar.xz
+* fonts.tar.xz
 
   Should be extracted to ~/.fonts
 

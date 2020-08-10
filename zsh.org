@@ -3,6 +3,7 @@
 
 * Table of Contents                                                     :TOC:
  - [[#zshrc][=~/.zshrc=]]
+ - [[#zshrclocal][=~/.zshrc.local=]]
 
 * =~/.zshrc=
 
