@@ -28,7 +28,6 @@ function print_array_indexes(a) {
 function find_index_ending_in(pattern, ary) {
     # check for patterns matching the end of the line
     p = pattern "$"
-    print p
     for (i in ary)
         if (i ~ p)
             return i
