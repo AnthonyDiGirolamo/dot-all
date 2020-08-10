@@ -29,7 +29,7 @@
 
   Only create this if it doesn't already exist.
 
-  #+begin_src text :tangle (if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig"))
+  #+begin_src text :tangle (if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")
     [include]
       path = ~/.gitconfig-local
   #+end_src

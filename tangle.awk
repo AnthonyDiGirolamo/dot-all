@@ -14,7 +14,10 @@ function join(array, start, end, sep, result, i) {
 }
 
 function print_tag_line(tag, text) {
-    printf "\033[36m[%s]\033[0m %s\n", tag, text
+    if (ENVIRON["TERM"] == "dumb")
+        printf "[%s] %s\n", tag, text
+    else
+        printf "\033[36m[%s]\033[0m %s\n", tag, text
 }
 
 function print_array_indexes(a) {
@@ -22,9 +25,12 @@ function print_array_indexes(a) {
         print "["i"]: "
 }
 
-function find_index_matching(pattern, ary) {
+function find_index_ending_in(pattern, ary) {
+    # check for patterns matching the end of the line
+    p = pattern "$"
+    print p
     for (i in ary)
-        if (match(i, pattern))
+        if (i ~ p)
             return i
     return 0
 }
@@ -82,9 +88,12 @@ function tangle_file_name () {
 function make_block_name(count, name) {
     # Check for existing block name and use that if found
     # (so lines can continue to be appended to that file)
-    existing_name = find_index_matching(name, tangled_files)
-    if (existing_name)
+    existing_name = find_index_ending_in(name, tangled_files)
+    if (existing_name) {
+        # print "found index " existing_name
         return existing_name
+    }
+    # print "new index for " name
     return sprintf("BLOCK%03d %s", count, name)
 }
 
@@ -101,6 +110,12 @@ BEGIN {
     end_src_regex = @/^\s*#\+end_src/
 
     org_escaped_asterix_regex = @/^(\s*,[*])/
+
+    # (if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")
+    elisp_file_exists_p_regex = @/\(if\s*\(file-exists-p\s*"([^"]+)"\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
+    # (if (string-match "chip" hostname) "~/.i3/config" "no")
+    elisp_string_suffix_p_regex = @/\(if\s*\(string-suffix-p\s*"([^"]+)"\s*([^)]+)\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
+
 }
 
 BEGINFILE {
@@ -199,6 +214,7 @@ ENDFILE {
         }
         # file tangle case
         else if (match(file_name, /^(BLOCK[0-9]+) (.*)$/, mg)) {
+            # capture block prefix and filename separately
             block_prefix = mg[1]
             expanded_file_name = mg[2]
 
@@ -222,6 +238,21 @@ ENDFILE {
 
                 # add tangled file path to outfile
                 print expanded_file_name > outfile
+            }
+            # elisp file-exists-p call
+            else if (match(expanded_file_name, elisp_file_exists_p_regex, mg)) {
+                existing_file = mg[1]
+                true_case = mg[2]
+                false_case = mg[3]
+                # print "file-exists-p", existing_file, true_case, false_case
+            }
+            # elisp string-suffix-p call
+            else if (match(expanded_file_name, elisp_string_suffix_p_regex, mg)) {
+                pattern = mg[1]
+                variable = mg[2]
+                true_case = mg[3]
+                false_case = mg[4]
+                # print "string-suffix-p", pattern, variable, true_case, false_case
             }
         }
     }
