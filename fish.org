@@ -108,6 +108,7 @@
     alias gll='git log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:\'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset\''
     alias gs='git status'
     alias ga='git add'
+    alias gb='git branch'
     alias gc='git commit'
     alias gca='git commit -a'
     alias gwd='git diff'
@@ -148,11 +149,10 @@
     alias v='vim'
     alias tmux='tmux -2'
 
-    # emacs aliases - not really using these
-    if string match -q -r 'Darwin' (uname -a)
-      alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
-    end
-
+    # emacs aliases
+    # if string match -q -r 'Darwin' (uname -a)
+    #   alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
+    # end
     alias e="env TERM=xterm-24bits emacs -nw"
     # alias ed="emacs --daemon"
     alias ec="env TERM=xterm-24bits emacsclient --alternate-editor='' -nw"
@@ -204,13 +204,13 @@
      set -x fish_color_history_current yellow
 
      # Prompt Setup
-     set using_android 0
-     if string match -q -r 'Android' (uname -a)
-       set using_android 1
-     end
+     # set using_android 0
+     # if string match -q -r 'Android' (uname -a)
+     #   set using_android 1
+     # end
 
      set powerline_right_arrow ''
-     if set -q INSIDE_EMACS; or set -q XTERM_VERSION; or string match -q -r 'raspberrypi|chip' (uname -n)
+     if set -q INSIDE_EMACS; or set -q XTERM_VERSION; or string match -q -r 'raspberrypi|chip' $hostname
        set powerline_right_arrow ''
      end
 
@@ -226,11 +226,11 @@
        end
 
        set_color -b $powerline_blue1 black
-       if test 1 != $using_android
-         printf ' %s@%s ' (whoami) (hostname|cut -d .  -f 1)
-       else
-         echo -n ' '
-       end
+       # if test 1 != $using_android
+       printf ' %s@%s ' $USER $hostname
+       # else
+       #   echo -n ' '
+       # end
 
        set_color -b $powerline_blue2 $powerline_blue1
        echo -n $powerline_right_arrow
@@ -238,7 +238,6 @@
        set_color -b $powerline_blue2 black
        echo -n '' (prompt_pwd) ''
 
-       # if test -e .git
        if set branch (git rev-parse --abbrev-ref HEAD 2>/dev/null)
          set_color -b $powerline_blue3 $powerline_blue2
          echo -n $powerline_right_arrow
