@@ -275,8 +275,8 @@ ENDFILE {
                     }
                     close("hostname")
                     # check for suffix match
-                    hostname_result = hostname_result"$"
-                    if (hostname_result ~ pattern)
+                    p = pattern"$"
+                    if (hostname_result ~ p)
                         write_tangled_file(outfile, file_name, true_case)
                     else
                         write_tangled_file(outfile, file_name, false_case)
