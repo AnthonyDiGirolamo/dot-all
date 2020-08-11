@@ -43,7 +43,7 @@ clean:  ## delete .cache
 
 all: clean t symlinks  ## clean and tangle all
 t: tangleorg  ## tangleorg
-tangleorg: mkdirs $(ORG_OUT_FILES) clean-removed-files  ## tangle all dotfiles with emacs+org-mode
+tangleorg: mkdirs $(ORG_OUT_FILES) rm-removed-files  ## tangle all dotfiles with emacs+org-mode
 tangleawk: mkdirs ## tangle all dotfiles with gawk
 	@./tangle.awk *.org
 
@@ -205,9 +205,9 @@ install-pip:  ## install python3 pip
 	curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 	python3 get-pip.py
 
-.PHONY: clean-removed-files
+.PHONY: rm-removed-files
 .ONESHELL:
-clean-removed-files:  ## rm files removed since last make tangle
+rm-removed-files:  ## rm files removed since last make tangle
 	@for f in $(ORG_OUT_FILES); do
 		! test -f $$f.last && continue
 		cat $$f.last | sort > $$f.1
@@ -216,6 +216,17 @@ clean-removed-files:  ## rm files removed since last make tangle
 			test -f $$removed && rm -i $$removed
 		done
 		rm $$f.1 $$f.2
+	done
+	exit 0
+
+.PHONY: rm-all-tangled-files
+.ONESHELL:
+rm-all-tangled-files:  ## rm all tangled files
+	@for outfile in $(ORG_OUT_FILES); do
+		for f in $$(test -f $$outfile && cat $$outfile); do
+			test -f $$f && rm -v $$f
+		done
+		rm -f $$outfile $$outfile.last
 	done
 	exit 0
 
