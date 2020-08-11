@@ -3,6 +3,9 @@
 
 * =~/.termux/termux.properties=
 
+  Contains extra keyboard key definitions.
+  Hold down on the keyboard button in drawer to toggle, or VolumeUp+Q.
+
   #+begin_src sh :tangle ~/.termux/termux.properties
     extra-keys = [ \
       ['ESC','|','/','HOME','UP','END','PGUP','"','DEL'], \

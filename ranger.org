@@ -32,7 +32,7 @@
     #     miller: Use miller columns which show multiple levels of the hierarchy
     #     multipane: Midnight-commander like multipane view showing all tabs next
     #                to each other
-    # set viewmode miller
+    set viewmode miller
     # set viewmode multipane
 
     # How many columns are there, and what are their relative widths?
@@ -52,7 +52,8 @@
     # Which script is used to generate file previews?
     # ranger ships with scope.sh, a script that calls external programs (see
     # README.md for dependencies) to preview images, archives, etc.
-    set preview_script ~/.config/ranger/scope.sh
+    # set preview_script ~/.config/ranger/scope.sh
+    set preview_script /usr/share/doc/ranger/config/scope.sh
 
     # Use the external preview script or display simple plain text or image previews?
     set use_preview_script true
