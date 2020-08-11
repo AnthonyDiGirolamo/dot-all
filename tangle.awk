@@ -202,22 +202,31 @@ function write_tangled_file(outfile, index_name, expanded_file_name) {
         sub(/["]$/, "", expanded_file_name)
         # expand ~ to $HOME
         sub(/~/, ENVIRON["HOME"], expanded_file_name)
-        # print file being tangled
-        print "  " expanded_file_name
 
-        # always mkdir -p
-        system("mkdir -v -p "dirname(expanded_file_name))
-        # output contents string to the file all at once
-        print tangled_files[index_name] > expanded_file_name
-        close(expanded_file_name)
-
-        # add tangled file path to outfile
-        print expanded_file_name > outfile
+        if (expanded_file_name in final_tangled_file_list) {
+            # append to the existing file
+            print tangled_files[index_name] >> expanded_file_name
+        }
+        else {
+            # first time we have tangled to this file
+            final_tangled_file_list[expanded_file_name] = 1
+            # print file being tangled
+            print "  " expanded_file_name
+            # always mkdir -p
+            system("mkdir -v -p "dirname(expanded_file_name))
+            # output contents string to the file all at once
+            print tangled_files[index_name] > expanded_file_name
+            # add tangled file path to outfile
+            print expanded_file_name > outfile
+        }
+        # close files in ENDFILE rule
     }
 }
 
 
 ENDFILE {
+    delete final_tangled_file_list
+
     outfile = ".cache/" FILENAME
     sub(/\.org$/, ".out", outfile)
     # Move existing .out file to .out.last
@@ -247,12 +256,10 @@ ENDFILE {
                 existing_file = mg[1]
                 true_case = mg[2]
                 false_case = mg[3]
-                # if (system("test -f " existing_file) == 0)
-                #     # FIXME: this just replaces the existing file content
-                #     write_tangled_file(outfile, file_name, true_case)
-                # else
-                #     # FIXME: this just replaces the existing file content
-                #     write_tangled_file(outfile, file_name, false_case)
+                if (system("test -f " existing_file) == 0)
+                    write_tangled_file(outfile, file_name, true_case)
+                else
+                    write_tangled_file(outfile, file_name, false_case)
             }
             # elisp string-suffix-p call
             else if (match(expanded_file_name, elisp_string_suffix_p_regex, mg)) {
@@ -260,30 +267,31 @@ ENDFILE {
                 variable = mg[2]
                 true_case = mg[3]
                 false_case = mg[4]
-                # if (variable == "hostname") {
-                #     # get hostname
-                #     hostname_result = ""
-                #     while (("hostname" |& getline line) > 0) {
-                #         hostname_result = line
-                #     }
-                #     close("hostname")
-                #     # check for suffix match
-                #     hostname_result = hostname_result"$"
-                #     print pattern, hostname_result
-                #     if (hostname_result ~ pattern) {
-                #         # FIXME: this just replaces the existing file content
-                #         write_tangled_file(outfile, file_name, true_case)
-                #     }
-                #     else {
-                #         # FIXME: this just replaces the existing file content
-                #         write_tangled_file(outfile, file_name, false_case)
-                #     }
-                # }
+                if (variable == "hostname") {
+                    # get hostname
+                    hostname_result = ""
+                    while (("hostname" |& getline line) > 0) {
+                        hostname_result = line
+                    }
+                    close("hostname")
+                    # check for suffix match
+                    hostname_result = hostname_result"$"
+                    if (hostname_result ~ pattern)
+                        write_tangled_file(outfile, file_name, true_case)
+                    else
+                        write_tangled_file(outfile, file_name, false_case)
+                }
             }
+            # standard tangle file
             else {
                 write_tangled_file(outfile, file_name, expanded_file_name)
             }
         }
     }
+
+    # close all final file names
+    for (file_name in final_tangled_file_list)
+        close(file_name)
+    # close .out file
     close(outfile)
 }
