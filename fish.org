@@ -14,6 +14,8 @@
    - [[#configfishfunctionsdlfish][~/.config/fish/functions/dl.fish]]
  - [[#bash-releated][bash releated]]
    - [[#configfishfunctionssource-bash-aliasesfish][~/.config/fish/functions/source-bash-aliases.fish]]
+ - [[#completions][completions]]
+   - [[#configfishcompletionsdhcpcd-restartfish][~/.config/fish/completions/dhcpcd-restart.fish]]
 
 * ~/.config/fish/config.fish
 
@@ -331,6 +333,7 @@
    #+END_SRC
 
 * bash releated
+
 ** ~/.config/fish/functions/source-bash-aliases.fish
 
   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/source-bash-aliases.fish"
@@ -351,3 +354,10 @@
     end
   #+END_SRC
 
+* completions
+
+** ~/.config/fish/completions/dhcpcd-restart.fish
+
+   #+BEGIN_SRC fish :tangle "~/.config/fish/completions/dhcpcd-restart.fish"
+     complete --command dhcpcd-restart --no-files --arguments "(dhcpcd-restart)"
+   #+END_SRC
