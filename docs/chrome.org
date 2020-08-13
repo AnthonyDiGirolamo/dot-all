@@ -444,27 +444,15 @@
 
 ** key mappings
    #+begin_src text
-     # # Insert your preferred key mappings here.
-     # #unmap yy
-     # #map Y copyCurrentUrl
-     # unmap X
-     # unmap h
-     # unmap l
-     # unmap gs
-     # unmap N
-     # unmap n
-     # unmap e
-     # # map n scrollDown
-     # # map e scrollUp
-     # map k performFind
-     # map K performBackwardsFind
-
      unmapAll
 
      # Open a link in the current tab
      map f LinkHints.activateMode
      # Open a link in a new tab
      map F LinkHints.activateModeToOpenInNewTab
+     map q LinkHints.activateMode action=hover
+     map Q LinkHints.activateMode action=focus
+
      # Open a link in a new tab & switch to it (LinkHints.activateModeToOpenInNewForegroundTab)
      # Open multiple links in a new tab
      # map <a-f> LinkHints.activateModeWithQueue
@@ -472,7 +460,45 @@
      # map LinkHints.activateModeToDownloadLink
      # Open a link in incognito window
      # map LinkHints.activateModeToOpenIncognito
+
      # Copy a link URL to the clipboard
      map yf LinkHints.activateModeToCopyLinkUrl
+
+     map H goBack
+     map L goForward
+
+     map o Vomnibar.activate
+     map t Vomnibar.activateTabSelection
+     map < moveTabLeft
+     map > moveTabRight
+
+     map / enterFindMode
+     map n performFind
+     map N performBackwardsFind
+
+     map j scrollDown
+     map k scrollUp
+     map gg scrollToTop
+     map G scrollToBottom
+
+     map i enterInsertMode
+     map v enterVisualMode
+
+     map yy copyCurrentUrl
+     map P openCopiedUrlInNewTab
+
+     # swap keys for colemak
+     mapkey n j
+     mapkey N J
+     mapkey e k
+     mapkey E K
+     # mapkey i l
+     # mapkey I L
+     mapkey k n
+     mapkey K N
+     # mapkey l i
+     # mapkey L I
+     mapkey j e
+     mapkey J E
    #+end_src
 
