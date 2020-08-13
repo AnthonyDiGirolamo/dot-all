@@ -535,8 +535,19 @@
           `(dired-header    ((t (:inherit minibuffer-prompt))))
 
           `(lsp-ui-doc-background ((t (:background "#4e4e4e"))))
-          )
-         ))
+
+          ;; used for ansi-term and vterm
+          `(term-color-black   ((t (:background "#303030" :foreground "#2d2d2d"))))
+          `(term-color-blue    ((t (:background "#303030" :foreground "#6699cc"))))
+          `(term-color-cyan    ((t (:background "#303030" :foreground "#66cccc"))))
+          `(term-color-green   ((t (:background "#303030" :foreground "#99cc99"))))
+          `(term-color-magenta ((t (:background "#303030" :foreground "#cc99cc"))))
+          `(term-color-red     ((t (:background "#303030" :foreground "#f2777a"))))
+          `(term-color-white   ((t (:background "#303030" :foreground "#f2f0ec"))))
+          `(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))))
+         )
+       )
+     )
    #+end_src
 
 ** doom-themes
