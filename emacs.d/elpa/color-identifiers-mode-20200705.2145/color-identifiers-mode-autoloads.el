@@ -1,16 +1,26 @@
 ;;; color-identifiers-mode-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory #$) (car load-path))))
+
 
 ;;;### (autoloads nil "color-identifiers-mode" "color-identifiers-mode.el"
-;;;;;;  (22564 60284 970094 208000))
+;;;;;;  (0 0 0 0))
 ;;; Generated autoloads from color-identifiers-mode.el
 
 (autoload 'color-identifiers-mode "color-identifiers-mode" "\
 Color the identifiers in the current buffer based on their names.
 
+If called interactively, enable Color-Identifiers mode if ARG is
+positive, and disable it if ARG is zero or negative.  If called
+from Lisp, also enable the mode if ARG is omitted or nil, and
+toggle it if ARG is `toggle'; disable the mode otherwise.
+
 \(fn &optional ARG)" t nil)
+
+(put 'global-color-identifiers-mode 'globalized-minor-mode t)
 
 (defvar global-color-identifiers-mode nil "\
 Non-nil if Global Color-Identifiers mode is enabled.
@@ -34,11 +44,14 @@ See `color-identifiers-mode' for more information on Color-Identifiers mode.
 
 \(fn &optional ARG)" t nil)
 
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "color-identifiers-mode" '("color-identifiers")))
+
 ;;;***
 
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
+;; coding: utf-8
 ;; End:
 ;;; color-identifiers-mode-autoloads.el ends here

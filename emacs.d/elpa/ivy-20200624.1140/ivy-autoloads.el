@@ -17,9 +17,11 @@
 ;;; Generated autoloads from ivy.el
 
 (autoload 'ivy-resume "ivy" "\
-Resume the last completion session.
+Resume the last completion session, or SESSION if non-nil.
+With a prefix arg, try to restore a recorded completion session,
+if one exists.
 
-\(fn)" t nil)
+\(fn &optional SESSION)" t nil)
 
 (autoload 'ivy-read "ivy" "\
 Read a string in the minibuffer, with completion.
@@ -80,8 +82,8 @@ list of candidates, and returns the list of matching candidates.
 DYNAMIC-COLLECTION is a boolean specifying whether the list of
 candidates is updated after each input by calling COLLECTION.
 
-EXTRA-PROPS can be used to store collection-specific
-session-specific data.
+EXTRA-PROPS is a plist that can be used to store
+collection-specific session-specific data.
 
 CALLER is a symbol to uniquely identify the caller to `ivy-read'.
 It is used, along with COLLECTION, to determine which
@@ -131,19 +133,13 @@ Minibuffer bindings:
 \(fn &optional ARG)" t nil)
 
 (autoload 'ivy-switch-buffer "ivy" "\
-Switch to another buffer.
-
-\(fn)" t nil)
+Switch to another buffer." t nil)
 
 (autoload 'ivy-switch-view "ivy" "\
-Switch to one of the window views stored by `ivy-push-view'.
-
-\(fn)" t nil)
+Switch to one of the window views stored by `ivy-push-view'." t nil)
 
 (autoload 'ivy-switch-buffer-other-window "ivy" "\
-Switch to another buffer in another window.
-
-\(fn)" t nil)
+Switch to another buffer in another window." t nil)
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "ivy" '("ivy-" "with-ivy-window")))
 
@@ -156,7 +152,8 @@ Switch to another buffer in another window.
 
 ;;;***
 
-;;;### (autoloads nil nil ("elpa.el" "ivy-pkg.el") (0 0 0 0))
+;;;### (autoloads nil nil ("elpa.el" "ivy-faces.el" "ivy-pkg.el")
+;;;;;;  (0 0 0 0))
 
 ;;;***
 

@@ -1,10 +1,11 @@
-;;; color-identifiers-mode.el --- Color identifiers based on their names
+;;; color-identifiers-mode.el --- Color identifiers based on their names -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 Ankur Dave
 
 ;; Author: Ankur Dave <ankurdave@gmail.com>
 ;; Url: https://github.com/ankurdave/color-identifiers-mode
-;; Package-Version: 20161019.1314
+;; Package-Version: 20200705.2145
+;; Package-Commit: dfca97595094fc192a04172d86cb4ba68cab984f
 ;; Created: 24 Jan 2014
 ;; Version: 1.1
 ;; Keywords: faces, languages
@@ -41,8 +42,13 @@
 (require 'dash)
 (require 'python)
 (require 'cl-lib)
+(require 'rx)
 
-(defvar color-identifiers:timer)
+(defgroup color-identifiers nil "Color identifiers based on their names."
+  :group 'faces)
+
+(defvar color-identifiers:timer nil
+  "Timer for running `color-identifiers:refresh'.")
 
 ;;;###autoload
 (define-minor-mode color-identifiers-mode
@@ -63,7 +69,8 @@
       (cancel-timer color-identifiers:timer))
     (setq color-identifiers:timer nil)
     (font-lock-remove-keywords nil '((color-identifiers:colorize . default)))
-    (ad-deactivate 'enable-theme))
+    (ad-deactivate 'enable-theme)
+    (run-hooks 'color-identifiers-mode-hook))
   (color-identifiers:refontify))
 
 ;;;###autoload
@@ -76,13 +83,31 @@
 
 ;;; USER-VISIBLE VARIABLES AND FUNCTIONS =======================================
 
+(defcustom color-identifiers-coloring-method 'sequential
+  "How to assign colors: sequentially or using the hash of the identifier.
+Sequential color assignment (the default) reduces collisions
+between adjacent identifiers. Hash-based color assignment ensures
+that a particular identifier is always assigned the same color
+across buffers."
+  :type '(choice
+          (const :tag "Sequential" sequential)
+          (const :tag "Hash-based" hash)))
+
+
+(defcustom color-identifiers-avoid-faces nil
+  "Which color faces to avoid: A list of faces whose foreground
+color should be avoided when generating colors, this can be warning colors,
+error colors etc."
+  :type '(repeat face))
+
 (defvar color-identifiers:modes-alist nil
   "Alist of major modes and the ways to distinguish identifiers in those modes.
 The value of each cons cell provides four constraints for finding identifiers.
 A word must match all four constraints to be colored as an identifier.  The
-value has the form (IDENTIFIER-CONTEXT-RE IDENTIFIER-RE IDENTIFIER-FACES
+cons cell has the form (MAJOR-MODE IDENTIFIER-CONTEXT-RE IDENTIFIER-RE IDENTIFIER-FACES
 IDENTIFIER-EXCLUSION-RE).
 
+MAJOR-MODE is the name of the mode in which this rule should be used.
 IDENTIFIER-CONTEXT-RE is a regexp matching the text that must precede an
 identifier.
 IDENTIFIER-RE is a regexp whose first capture group matches identifiers.
@@ -90,7 +115,11 @@ IDENTIFIER-FACES is a list of faces with which the major mode decorates
 identifiers or a function returning such a list.  If the list includes nil,
 unfontified words will be considered.
 IDENTIFIER-EXCLUSION-RE is a regexp that must not match identifiers,
-or nil.")
+or nil.
+
+If a scan function is registered for a mode, candidate
+identifiers will be further restricted to those returned by the
+scan function.")
 
 (defvar color-identifiers:num-colors 10
   "The number of different colors to generate.")
@@ -107,13 +136,31 @@ of the default face.")
 
 (defvar color-identifiers:mode-to-scan-fn-alist nil
   "Alist from major modes to their declaration scan functions, for internal use.
-Modify this using `color-identifiers:set-declaration-scan-fn'.")
+If no scan function is registered for a particular mode, all
+candidates matching the constraints in
+`color-identifiers:modes-alist' will be colored.
+
+Modify this variable using
+`color-identifiers:set-declaration-scan-fn'.")
+
+(defvar color-identifiers-mode-hook nil
+  "List of functions to run every time the mode enabled")
+
+(defvar color-identifiers:re-not-inside-class-access
+  (rx (or (not (any ".")) line-start)
+      (zero-or-more space))
+  "This regexp matches anything except inside a class instance
+  access, like foo.bar" )
 
 (defun color-identifiers:set-declaration-scan-fn (mode scan-fn)
   "Register SCAN-FN as the declaration scanner for MODE.
 SCAN-FN must scan the entire current buffer and return the
-identifiers to highlight as a list of strings. See
-`color-identifiers:elisp-get-declarations' for an example."
+identifiers to highlight as a list of strings. Only identifiers
+produced by SCAN-FN that also match all constraints in
+`color-identifiers:modes-alist' will be colored.
+
+See `color-identifiers:elisp-get-declarations' for an example
+SCAN-FN."
   (let ((entry (assoc mode color-identifiers:mode-to-scan-fn-alist)))
     (if entry
         (setcdr entry scan-fn)
@@ -125,7 +172,7 @@ identifiers to highlight as a list of strings. See
 ;; Scala
 (add-to-list
  'color-identifiers:modes-alist
- `(scala-mode . ("[^.][[:space:]]*"
+ `(scala-mode . (,color-identifiers:re-not-inside-class-access
                  "\\_<\\([[:lower:]]\\([_]??[[:lower:][:upper:]\\$0-9]+\\)*\\(_+[#:<=>@!%&*+/?\\\\^|~-]+\\|_\\)?\\)"
                  (nil scala-font-lock:var-face font-lock-variable-name-face))))
 
@@ -137,22 +184,20 @@ For cc-mode support within color-identifiers-mode."
     ;; Variables that cc-mode highlighted with font-lock-variable-name-face
     (save-excursion
       (goto-char (point-min))
-      (catch 'end-of-file
-        (while t
-          (let ((next-change (next-property-change (point))))
-            (if (not next-change)
-                (throw 'end-of-file nil)
-              (goto-char next-change)
-              (when (or (eq (get-text-property (point) 'face) 'font-lock-variable-name-face)
-                        ;; If we fontified it in the past, assume it should
-                        ;; continue to be fontified. This avoids alternating
-                        ;; between fontified and unfontified.
-                        (get-text-property (point) 'color-identifiers:fontified))
-                (push (substring-no-properties (symbol-name (symbol-at-point))) result)))))))
+      (let ((next-change (next-property-change (point))))
+        (while next-change
+          (goto-char next-change)
+          (when (or (eq (get-text-property (point) 'face) 'font-lock-variable-name-face)
+                    ;; If we fontified it in the past, assume it should
+                    ;; continue to be fontified. This avoids alternating
+                    ;; between fontified and unfontified.
+                    (get-text-property (point) 'color-identifiers:fontified))
+            (push (substring-no-properties (symbol-name (symbol-at-point))) result))
+          (setq next-change (next-property-change (point))))))
     (delete-dups result)
     result))
 
-(dolist (maj-mode '(c-mode c++-mode java-mode))
+(dolist (maj-mode '(c-mode c++-mode java-mode rust-mode rustic-mode meson-mode))
   (color-identifiers:set-declaration-scan-fn
    maj-mode 'color-identifiers:cc-mode-get-declarations)
   (add-to-list
@@ -164,31 +209,31 @@ For cc-mode support within color-identifiers-mode."
 ;;; JavaScript
 (add-to-list
  'color-identifiers:modes-alist
- `(js-mode . ("[^.][[:space:]]*"
+ `(js-mode . (,color-identifiers:re-not-inside-class-access
               "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
               (nil font-lock-variable-name-face))))
 
 (add-to-list
  'color-identifiers:modes-alist
- `(js2-mode . ("[^.][[:space:]]*"
+ `(js2-mode . (,color-identifiers:re-not-inside-class-access
                "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
                (nil font-lock-variable-name-face js2-function-param))))
 
 (add-to-list
  'color-identifiers:modes-alist
- `(js3-mode . ("[^.][[:space:]]*"
+ `(js3-mode . (,color-identifiers:re-not-inside-class-access
                "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
                (nil font-lock-variable-name-face js3-function-param-face))))
 
 (add-to-list
  'color-identifiers:modes-alist
- `(js-jsx-mode . ("[^.][[:space:]]*"
+ `(js-jsx-mode . (,color-identifiers:re-not-inside-class-access
                   "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
                   (nil font-lock-variable-name-face js2-function-param))))
 
 (add-to-list
  'color-identifiers:modes-alist
- `(js2-jsx-mode . ("[^.][[:space:]]*"
+ `(js2-jsx-mode . (,color-identifiers:re-not-inside-class-access
                    "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
                    (nil font-lock-variable-name-face js2-function-param))))
 
@@ -197,7 +242,7 @@ For cc-mode support within color-identifiers-mode."
 ;; (add-hook 'coffee-mode-hook (lambda () (modify-syntax-entry ?\@ "_"))) in .emacs
 (add-to-list
  'color-identifiers:modes-alist
- `(coffee-mode . ("[^.][[:space:]]*" "\\_<\\([a-zA-Z_$@]\\(?:\\s_\\|\\sw\\)*\\)" (nil font-lock-variable-name-face))))
+ `(coffee-mode . (,color-identifiers:re-not-inside-class-access "\\_<\\([a-zA-Z_$@]\\(?:\\s_\\|\\sw\\)*\\)" (nil font-lock-variable-name-face))))
 
 ;; Sgml mode and the like
 (dolist (maj-mode '(sgml-mode html-mode jinja2-mode))
@@ -210,22 +255,22 @@ For cc-mode support within color-identifiers-mode."
 ;; Ruby
 (add-to-list
  'color-identifiers:modes-alist
- `(ruby-mode . ("[^.][[:space:]]*" "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)" (nil))))
+ `(ruby-mode . (,color-identifiers:re-not-inside-class-access "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)" (nil))))
 
 ;; R
 (add-to-list
  'color-identifiers:modes-alist
- `(R-mode . ("[^.][[:space:]]*" "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)" (nil))))
+ `(R-mode . (,color-identifiers:re-not-inside-class-access "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)" (nil))))
 
 ;; SQL
 (add-to-list
  'color-identifiers:modes-alist
- `(sql-mode . ("[^.][[:space:]]*" "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)" (nil))))
+ `(sql-mode . (,color-identifiers:re-not-inside-class-access "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)" (nil))))
 
 ;; Groovy
 (add-to-list
  'color-identifiers:modes-alist
- `(groovy-mode . ("[^.][[:space:]]*"
+ `(groovy-mode . (,color-identifiers:re-not-inside-class-access
                   "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
                   (nil font-lock-variable-name-face))))
 
@@ -236,6 +281,13 @@ For cc-mode support within color-identifiers-mode."
                 "\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
                 (nil font-lock-variable-name-face)
                 "[a-zA-Z_$]\\(\\s_\\|\\sw\\)*\\s-*[(:]")))
+
+;; Golang
+(add-to-list
+ 'color-identifiers:modes-alist
+ `(go-mode . (,color-identifiers:re-not-inside-class-access
+              "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
+              (nil font-lock-variable-name-face))))
 
 ;; Python
 (when (fboundp 'python-nav-forward-defun)
@@ -259,25 +311,23 @@ arguments, loops (for .. in), or for comprehensions."
                                 (-filter (lambda (token) (and (listp token) (eq (car token) '\,))) rest)))
                          (args-filtered (cons first-arg rest-args))
                          (params (-map (lambda (token)
-                                         (car (split-string (symbol-name token) "=")))
+                                         (car (split-string (symbol-name token) "[=:]")))
                                        args-filtered)))
                     (setq result (append params result)))))
             (wrong-type-argument nil))))
       ;; Variables that python-mode highlighted with font-lock-variable-name-face
       (save-excursion
         (goto-char (point-min))
-        (catch 'end-of-file
-          (while t
-            (let ((next-change (next-property-change (point))))
-              (if (not next-change)
-                  (throw 'end-of-file nil)
-                (goto-char next-change)
-                (when (or (eq (get-text-property (point) 'face) 'font-lock-variable-name-face)
-                          ;; If we fontified it in the past, assume it should
-                          ;; continue to be fontified. This avoids alternating
-                          ;; between fontified and unfontified.
-                          (get-text-property (point) 'color-identifiers:fontified))
-                  (push (substring-no-properties (symbol-name (symbol-at-point))) result)))))))
+        (let ((next-change (next-property-change (point))))
+          (while next-change
+            (goto-char next-change)
+            (when (or (eq (get-text-property (point) 'face) 'font-lock-variable-name-face)
+                      ;; If we fontified it in the past, assume it should
+                      ;; continue to be fontified. This avoids alternating
+                      ;; between fontified and unfontified.
+                      (get-text-property (point) 'color-identifiers:fontified))
+              (push (substring-no-properties (symbol-name (symbol-at-point))) result))
+            (setq next-change (next-property-change (point))))))
       (delete-dups result)
       result))
   (color-identifiers:set-declaration-scan-fn
@@ -285,7 +335,7 @@ arguments, loops (for .. in), or for comprehensions."
 
 (add-to-list
  'color-identifiers:modes-alist
- `(python-mode . ("[^.][[:space:]]*"
+ `(python-mode . (,color-identifiers:re-not-inside-class-access
                   "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
                   (nil font-lock-type-face font-lock-variable-name-face))))
 
@@ -299,7 +349,7 @@ For Emacs Lisp support within color-identifiers-mode."
      (append (when (listp (car rest))
                (mapcar (lambda (var) (if (symbolp var) var (car var))) (car rest)))
              (color-identifiers:elisp-declarations-in-sexp rest)))
-    ((or `(defun ,- ,args . ,rest) `(lambda ,args . ,rest))
+    ((or `(defun ,_ ,args . ,rest) `(lambda ,args . ,rest))
      (append (when (listp args) args)
              (color-identifiers:elisp-declarations-in-sexp rest)))
     (`nil nil)
@@ -316,8 +366,7 @@ For Emacs Lisp support within color-identifiers-mode."
          (let ((ids (color-identifiers:elisp-declarations-in-sexp cons)))
            (when ids
              (setq result (append ids result)))))
-       result))
-    (other-object nil)))
+       result))))
 
 (defun color-identifiers:elisp-get-declarations ()
   "Extract a list of identifiers declared in the current buffer.
@@ -399,9 +448,9 @@ For Clojure support within color-identifiers-mode. "
        (append params (color-identifiers:clojure-declarations-in-sexp rest))))
     ;; (defn name doc-string? attr-map? [binding-form*] body)
     ;; (defn name doc-string? attr-map? ([binding-form*] body)+)
-    ((or `(defn ,- . ,rest)
-         `(defn- ,- . ,rest)
-         `(defmacro ,- . ,rest))
+    ((or `(defn ,_ . ,rest)
+         `(defn- ,_ . ,rest)
+         `(defmacro ,_ . ,rest))
      (let ((params (-mapcat (lambda (params+body)
                               (when (color-identifiers:clojure-contains-binding-forms-p params+body)
                                 (color-identifiers:clojure-extract-params params+body)))
@@ -423,8 +472,7 @@ For Clojure support within color-identifiers-mode. "
              (setq result (append ids result)))))
        result))
     ((pred arrayp)
-     (apply 'append (mapcar 'color-identifiers:clojure-declarations-in-sexp sexp)))
-    (other-object nil)))
+     (apply 'append (mapcar 'color-identifiers:clojure-declarations-in-sexp sexp)))))
 
 (defun color-identifiers:clojure-get-declarations ()
   "Extract a list of identifiers declared in the current buffer.
@@ -495,8 +543,7 @@ the left parenthesis, after `function' keyword."
                   (forward-sexp)
                   (point)))
            (str (color-identifiers:remove-string-or-comment
-                 (buffer-substring (1+ lend) (1- rend))))
-           (result))
+                 (buffer-substring (1+ lend) (1- rend)))))
       (mapcar (lambda (s) (replace-regexp-in-string "\\s *=.*" "" s))
               (split-string str "," t " "))))
 
@@ -515,7 +562,7 @@ For Emacs Lisp support within color-identifiers-mode."
                                    result))
             (let ((var-name (match-string-no-properties 1)))
               (unless (string= var-name "")
-                (add-to-list 'result var-name)))))))
+                (cl-pushnew var-name result)))))))
     (delete-dups result)
     result))
 
@@ -529,13 +576,6 @@ For Emacs Lisp support within color-identifiers-mode."
 
 
 ;;; PACKAGE INTERNALS ==========================================================
-
-(defvar color-identifiers:timer nil
-  "Timer for running `color-identifiers:refresh'.")
-
-(defvar color-identifiers:identifiers nil
-  "The set of identifiers in the current buffer, for internal use.")
-(make-variable-buffer-local 'color-identifiers:identifiers)
 
 (defvar color-identifiers:colors nil
   "List of generated hex colors for internal use.")
@@ -556,6 +596,7 @@ Colors are output to `color-identifiers:colors'."
          (min-saturation (float color-identifiers:min-color-saturation))
          (saturation-range (- (float color-identifiers:max-color-saturation) min-saturation))
          (bgcolor (color-identifiers:attribute-lab :background))
+         (avoidlist (mapcar 'color-identifiers:foreground-lab color-identifiers-avoid-faces))
          (candidates '())
          (chosens '())
          (n 8)
@@ -564,12 +605,12 @@ Colors are output to `color-identifiers:colors'."
     ;; converted to LAB
     (dotimes (h n)
       (dotimes (s n)
-        (add-to-list
-         'candidates
+        (cl-pushnew
          (apply 'color-srgb-to-lab
                 (color-hsl-to-rgb (/ h n-1)
                                   (+ min-saturation (* (/ s n-1) saturation-range))
-                                  luminance)))))
+                                  luminance))
+         candidates)))
     (let ((choose-candidate (lambda (candidate)
                               (delq candidate candidates)
                               (push candidate chosens))))
@@ -580,25 +621,28 @@ Colors are output to `color-identifiers:colors'."
                                   (cons candidate
                                         (-min (-map (lambda (chosen)
                                                       (color-cie-de2000 candidate chosen))
-                                                    (cons bgcolor chosens)))))
+                                                    (cons bgcolor (append chosens avoidlist))))))
                                 candidates))
                ;; Take the candidate with the highest min distance
                (best (-max-by (lambda (x y) (> (cdr x) (cdr y))) min-dists)))
           (funcall choose-candidate (car best))))
       (setq color-identifiers:colors
             (-map (lambda (lab)
-                    (apply 'color-rgb-to-hex (apply 'color-lab-to-srgb lab)))
+                    (let* ((srgb (apply 'color-lab-to-srgb lab))
+                           (rgb (mapcar 'color-clamp srgb)))
+                      (apply 'color-rgb-to-hex rgb)))
                   chosens)))))
 
-(defvar color-identifiers:color-index-for-identifier nil
+(defvar-local color-identifiers:color-index-for-identifier nil
   "Alist of identifier-index pairs for internal use.
-The index refers to `color-identifiers:colors'.")
-(make-variable-buffer-local 'color-identifiers:color-index-for-identifier)
+The index refers to `color-identifiers:colors'. Only used when
+`color-identifiers-coloring-method' is `sequential'.")
 
-(defvar color-identifiers:current-index 0
-  "Current color index for new identifiers, for internal use.
-The index refers to `color-identifiers:colors'.")
-(make-variable-buffer-local 'color-identifiers:current-index)
+(defvar-local color-identifiers:identifiers nil
+  "Set of identifiers in the current buffer.
+Only used when `color-identifiers-coloring-method' is `hash' and
+a declaration scan function is registered for the current major
+mode. This variable memoizes the result of the declaration scan function.")
 
 (defun color-identifiers:attribute-luminance (attribute)
   "Find the HSL luminance of the specified ATTRIBUTE on the default face."
@@ -614,34 +658,61 @@ The index refers to `color-identifiers:colors'.")
         (apply 'color-srgb-to-lab rgb)
       '(0.0 0.0 0.0))))
 
+(defun color-identifiers:foreground-lab (face)
+  "Find the LAB color value of the foreground attribute on the
+specified face."
+  (let ((rgb (color-name-to-rgb (face-attribute face :foreground))))
+    (if rgb
+        (apply 'color-srgb-to-lab rgb)
+      '(0.0 0.0 0.0))))
+
 (defun color-identifiers:refresh ()
-  "Refresh `color-identifiers:color-index-for-identifier' from current buffer."
+  "Refresh the set of identifiers in the current buffer.
+If `color-identifiers-coloring-method' is `sequential',
+identifiers and their corresponding color indexes are saved to
+`color-identifiers:color-index-for-identifier'.
+
+If `color-identifiers-coloring-method' is `hash' and a
+declaration scan function is registered for the current buffer's
+major mode, identifiers are saved to
+`color-identifiers:identifiers'."
   (interactive)
   (when color-identifiers-mode
-    (if (color-identifiers:get-declaration-scan-fn major-mode)
-        (progn
-          (setq color-identifiers:identifiers
-                (funcall (color-identifiers:get-declaration-scan-fn major-mode)))
-          (setq color-identifiers:color-index-for-identifier
-                (-map-indexed (lambda (i identifier)
-                                (cons identifier (% i color-identifiers:num-colors)))
-                              color-identifiers:identifiers)))
-      (save-excursion
-        (goto-char (point-min))
-        (catch 'input-pending
-          (let ((i 0)
-                (n color-identifiers:num-colors)
-                (result nil))
-            (color-identifiers:scan-identifiers
-             (lambda (start end)
-               (let ((identifier (buffer-substring-no-properties start end)))
-                 (unless (assoc-string identifier result)
-                   (push (cons identifier (% i n)) result)
-                   (setq i (1+ i)))))
-             (point-max)
-             (lambda () (if (input-pending-p) (throw 'input-pending nil) t)))
-            (setq color-identifiers:color-index-for-identifier result)))))
+    (cond
+     ((eq color-identifiers-coloring-method 'sequential)
+      (setq color-identifiers:color-index-for-identifier
+            (append (-map-indexed
+                     (lambda (i identifier)
+                       ;; to make sure subsequently added vars aren't colorized the same add a (point)
+                       (cons identifier (% (+ (point) i) color-identifiers:num-colors)))
+                     (-filter (lambda (e)
+                                (cl-notany (lambda (d) (equal e (car d)))
+                                           color-identifiers:color-index-for-identifier))
+                              (color-identifiers:list-identifiers)))
+                    color-identifiers:color-index-for-identifier)))
+     ((and (eq color-identifiers-coloring-method 'hash)
+           (color-identifiers:get-declaration-scan-fn major-mode))
+      (setq color-identifiers:identifiers
+            (color-identifiers:list-identifiers))))
     (color-identifiers:refontify)))
+
+(defun color-identifiers:list-identifiers ()
+  "Return all identifiers in the current buffer."
+  (if (color-identifiers:get-declaration-scan-fn major-mode)
+      (funcall (color-identifiers:get-declaration-scan-fn major-mode))
+    ;; When no scan function is registered, fall back to
+    ;; `color-identifiers:scan-identifiers', which returns all identifiers
+    (save-excursion
+      (goto-char (point-min))
+      (catch 'input-pending
+        (let ((result nil))
+          (color-identifiers:scan-identifiers
+           (lambda (start end)
+             (push (buffer-substring-no-properties start end) result))
+           (point-max)
+           (lambda () (if (input-pending-p) (throw 'input-pending nil) t)))
+          (delete-dups result)
+          result)))))
 
 (defun color-identifiers:refontify ()
   "Refontify the buffer using font-lock."
@@ -652,25 +723,32 @@ The index refers to `color-identifiers:colors'.")
         (font-lock-fontify-buffer)))))
 
 (defun color-identifiers:color-identifier (identifier)
-  "Look up or generate the hex color for IDENTIFIER.
-IDENTIFIER is looked up in `color-identifiers:color-index-for-identifier' and
-generated if not present there."
-  (unless (and (color-identifiers:get-declaration-scan-fn major-mode)
-               (not (member identifier color-identifiers:identifiers)))
+  "Return the hex color for IDENTIFIER, or nil if it should not
+be colored."
+  (cond
+   ((eq color-identifiers-coloring-method 'sequential)
     (let ((entry (assoc-string identifier color-identifiers:color-index-for-identifier)))
-      (if entry
-          (nth (cdr entry) color-identifiers:colors)
-        ;; If not present, make a temporary color using the rotating index
-        (push (cons identifier (% color-identifiers:current-index
-                                  (length color-identifiers:colors)))
-              color-identifiers:color-index-for-identifier)
-        (setq color-identifiers:current-index
-              (1+ color-identifiers:current-index))))))
+      (when entry
+        (nth (cdr entry) color-identifiers:colors))))
+   ((eq color-identifiers-coloring-method 'hash)
+    ;; If there is a declaration scan function for this major mode, the
+    ;; candidate identifier should only be colored if it is in the memoized list
+    ;; of identifiers. Otherwise, it should be colored unconditionally.
+    (when (or (not (color-identifiers:get-declaration-scan-fn major-mode))
+              (member identifier color-identifiers:identifiers))
+      (color-identifiers:hash-identifier identifier)))))
+
+(defun color-identifiers:hash-identifier (identifier)
+  "Return a color for IDENTIFIER based on its hash."
+  (nth (% (abs (sxhash identifier)) color-identifiers:num-colors)
+       color-identifiers:colors))
 
 (defun color-identifiers:scan-identifiers (fn limit &optional continue-p)
-  "Run FN on all identifiers from point up to LIMIT.
-Identifiers are defined by `color-identifiers:modes-alist'.
-If supplied, iteration only continues if CONTINUE-P evaluates to true."
+  "Run FN on all candidate identifiers from point up to LIMIT.
+Candidate identifiers are defined by
+`color-identifiers:modes-alist'. Declaration scan functions are
+not applied. If supplied, iteration only continues if CONTINUE-P
+evaluates to true."
   (let ((entry (assoc major-mode color-identifiers:modes-alist)))
     (when entry
       (let ((identifier-context-re (nth 1 entry))
@@ -689,7 +767,7 @@ If supplied, iteration only continues if CONTINUE-P evaluates to true."
                              (and flface-prop (memq flface-prop identifier-faces)))
                            (get-text-property (point) 'color-identifiers:fontified)))
                   (goto-char (next-property-change (point) nil limit))
-                (if (not (and (looking-back identifier-context-re)
+                (if (not (and (looking-back identifier-context-re (line-beginning-position))
                               (or (not identifier-exclusion-re) (not (looking-at identifier-exclusion-re)))
                               (looking-at identifier-re)))
                     (progn
