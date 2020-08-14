@@ -10,26 +10,23 @@
  '(doom-themes-enable-bold t)
  '(doom-themes-enable-italic t)
  '(elfeed-feeds
-   (quote
-    ("https://hackaday.com/blog/feed/" "http://planet.emacsen.org/atom.xml")))
+   '("https://hackaday.com/blog/feed/" "http://planet.emacsen.org/atom.xml"))
  '(inhibit-startup-screen nil)
  '(mac-mouse-wheel-smooth-scroll nil)
- '(magit-log-arguments (quote ("--graph" "--color" "--decorate")))
- '(magit-status-buffer-switch-function (quote switch-to-buffer))
+ '(magit-log-arguments '("--graph" "--color" "--decorate"))
+ '(magit-status-buffer-switch-function 'switch-to-buffer)
  '(package-selected-packages
-   (quote
-    (ivy-rich company-lsp flymake jsonrpc elpy posframe ivy-posframe amx evil counsel-gtags ggtags all-the-icons ibuffer-projectile highlight-indent-guides major-mode-hydra airline-themes hide-mode-line modus-operandi-theme modus-vivendi-theme markdown-mode+ markdown-mode yasnippet gif-screencast gn-mode ninja-mode gnuplot ox-gfm fennel-mode blimp use-package ob-async ivy-xref dts-mode forth-mode jinja2-mode mmm-jinja2 request fill-column-indicator sqlup-mode scad-mode scad-preview toc-org steam ssh-config-mode ssh-agency general ht paradox sql-indent pylint moonscript xterm-color fish-mode vimrc-mode company-shell vlf exec-path-from-shell edit-server json-mode expand-region yari yaml-mode wgrep-pt wgrep-ag subatomic256-theme scss-mode robe rainbow-delimiters pt pandoc-mode js2-mode htmlize haml-mode go-mode feature-mode evil-commentary esup emmet-mode edbi company-inf-ruby coffee-mode ag ace-link)))
+   '(ivy-rich company-lsp flymake jsonrpc elpy posframe ivy-posframe amx evil counsel-gtags ggtags all-the-icons ibuffer-projectile highlight-indent-guides major-mode-hydra airline-themes hide-mode-line modus-operandi-theme modus-vivendi-theme markdown-mode+ markdown-mode yasnippet gif-screencast gn-mode ninja-mode ox-gfm fennel-mode blimp use-package ob-async ivy-xref dts-mode forth-mode jinja2-mode mmm-jinja2 request fill-column-indicator sqlup-mode scad-mode scad-preview toc-org steam ssh-config-mode ssh-agency general ht paradox sql-indent pylint moonscript xterm-color fish-mode vimrc-mode company-shell vlf exec-path-from-shell edit-server json-mode yari yaml-mode wgrep-pt wgrep-ag subatomic256-theme scss-mode rainbow-delimiters pt pandoc-mode js2-mode htmlize haml-mode go-mode feature-mode evil-commentary esup emmet-mode edbi company-inf-ruby coffee-mode ag ace-link))
  '(paradox-github-token t)
- '(projectile-mode-line (quote (:eval (format " p[%s]" (projectile-project-name)))))
+ '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
  '(safe-local-variable-values
-   (quote
-    ((org-html-table-default-attributes :class "mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" :border "1" :cellspacing "0" :cellpadding "0" :rules "all" :frame "border")
+   '((org-html-table-default-attributes :class "mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" :border "1" :cellspacing "0" :cellpadding "0" :rules "all" :frame "border")
      (org-html-toplevel-hlevel . 1)
      (org-html-table-default-attributes :border "1" :cellspacing "0" :cellpadding "0" :rules "all" :frame "border")
      (org-html-table-data-tags "<td class=\"mdl-data-table__cell--non-numeric\" %s>" . "</td>")
      (org-html-table-header-tags "<th class=\"mdl-data-table__cell--non-numeric\" scope=\"%s\"%s>" . "</th>")
-     (org-html-todo-kwd-class-prefix . "mdl-chip mdl-chip--contact "))))
+     (org-html-todo-kwd-class-prefix . "mdl-chip mdl-chip--contact ")))
  '(scss-compile-at-save nil)
  '(yari-ri-program-name "~/.rbenv/shims/ri")
  '(yari-ruby-program-name "~/.rbenv/shims/ruby"))
