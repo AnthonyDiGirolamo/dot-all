@@ -2964,6 +2964,7 @@
     ;;   (add-hook 'c++-mode-hook 'eglot-ensure))
 
     (use-package lsp-mode
+      :commands lsp
       :custom
       ;; (lsp-restart 'auto-restart)
       (lsp-restart 'interactive)
@@ -2995,10 +2996,21 @@
         :major-modes '(c-mode c++-mode objc-mode)
         :priority -1
         :remote? t
-        :server-id 'clangd-remote))
-      :commands lsp)
+        :server-id 'clangd-remote)))
 
-    ;; (use-package lsp-ui :commands lsp-ui-mode)
+    (use-package lsp-ui
+      :commands lsp-ui-mode
+      :general
+      (:states '(motion) :keymaps '(lsp-ui-imenu-mode-map)
+       "RET" 'lsp-ui-imenu--view)
+      :config
+      (add-to-list 'evil-motion-state-modes 'lsp-ui-imenu-mode))
+
+    (use-package company-lsp
+      :commands company-lsp)
+    (use-package lsp-ivy
+      :commands lsp-ivy-workspace-symbol)
+
     (use-package company-lsp :commands company-lsp)
     (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
