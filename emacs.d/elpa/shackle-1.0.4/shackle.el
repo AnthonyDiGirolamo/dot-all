@@ -1,10 +1,11 @@
 ;;; shackle.el --- Enforce rules for popups
 
-;; Copyright (C) 2014-2016 Vasilij Schneidermann <v.schneidermann@gmail.com>
+;; Copyright (C) 2014 Vasilij Schneidermann <mail@vasilij.de>
 
-;; Author: Vasilij Schneidermann <v.schneidermann@gmail.com>
-;; URL: https://github.com/wasamasa/shackle
-;; Package-Version: 1.0.3
+;; Author: Vasilij Schneidermann <mail@vasilij.de>
+;; URL: https://depp.brause.cc/shackle
+;; Package-Version: 1.0.4
+;; Package-Commit: 171c3f437d853f34782b201d86ef765665b755e2
 ;; Version: 1.0.3
 ;; Keywords: convenience
 ;; Package-Requires: ((cl-lib "0.5"))
@@ -31,8 +32,7 @@
 ;; This global minor mode allows you to easily set up rules for
 ;; popups in Emacs.
 
-;; See the README for more info:
-;; https://github.com/wasamasa/shackle
+;; See the README for more info: https://depp.brause.cc/shackle
 
 ;;; Code:
 
@@ -87,8 +87,11 @@ determine side, must return one of the above four values."
   "Default size of aligned windows.
 A floating point number between 0 and 1 is interpreted as a
 ratio.  An integer equal or greater than 1 is interpreted as a
-number of lines."
-  :type 'number
+number of lines. If a function is specified, it is called with
+zero arguments and must return a number of the above two types."
+  :type '(choice (integer :tag "Number of lines")
+                 (float :tag "Number of lines (ratio)")
+                 (function :tag "Custom"))
   :group 'shackle)
 
 (defcustom shackle-rules nil
@@ -123,13 +126,14 @@ default for windows already displaying the buffer.
 :custom and a function name or lambda
 
 Override with a custom action.  Takes a function as argument
-which is called with BUFFER-OR-NAME, ALIST and PLIST as argument.
-This mode of operation allows you to pick one of the existing
-actions, but by your own conditions.
+which is called with BUFFER-OR-NAME, ALIST and PLIST as argument
+and must return the window to be displayed or nil to inhibit its
+display.  This mode of operation allows you to pick one of the
+existing actions, but by your own conditions.
 
 :inhibit-window-quit and t
 
-Modify the behaviour of `quit-window' to not delete the window.
+Modify the behavior of `quit-window' to not delete the window.
 This option is recommended in combination with :same, but can be
 used with other keys like :other as well.  Customize
 `shackle-inhibit-window-quit-on-same-windows' to make this the
@@ -398,7 +402,9 @@ the :size key with a number value."
              (old-size (window-size (frame-root-window) horizontal))
              (size (or (plist-get plist :ratio) ; yey, backwards compatibility
                        (plist-get plist :size)
-                       shackle-default-size))
+                       (if (functionp shackle-default-size)
+                           (funcall shackle-default-size)
+                         shackle-default-size)))
              (new-size (round (if (>= size 1)
                                   (- old-size size)
                                 (* (- 1 size) old-size)))))
@@ -420,7 +426,11 @@ the :size key with a number value."
 Displays BUFFER according to ALIST and PLIST."
   (cond
    ((plist-get plist :custom)
-    (funcall (plist-get plist :custom) buffer alist plist))
+    (let* ((action (plist-get plist :custom))
+           (window (funcall action buffer alist plist)))
+      (when (and window (not (windowp window)))
+        (user-error "Custom action didn't return window: %S %S" window action))
+      window))
    ((plist-get plist :ignore) 'fail)
    ((shackle--display-buffer-reuse buffer alist))
    ((or (plist-get plist :same)
