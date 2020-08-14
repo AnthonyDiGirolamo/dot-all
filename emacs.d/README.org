@@ -1143,10 +1143,10 @@
       (setq mwheel-scroll-down-function 'evil-scroll-down
             mwheel-scroll-up-function 'evil-scroll-up)
 
-
       (when amd/using-android ;; don't use the system clipboard
         (setq x-select-enable-clipboard nil))
 
+      (setq evil-regexp-search t)
       (setq evil-echo-state nil)
       (setq evil-auto-balance-windows nil)     ;; dont rebalance windows when deleting
       (setq evil-flash-delay .5)
@@ -1156,14 +1156,16 @@
       (setq evil-want-C-w-delete nil)          ;; make sure C-w is not a prefix key
       (setq evil-want-C-w-in-emacs-state 'yes)
       (setq evil-move-cursor-back nil)         ;; don't move back one charachter when exiting insert
-
       (setq evil-search-module 'evil-search)   ;; need to set this before loading evil and evil-visualstar
-      (setq-default evil-symbol-word-search t) ;; make * and # use the whole word
+      (setq-default evil-symbol-word-search t) ;; make * and # search for symbols (instead of words)
 
       ;; join inner paragraph macro
       (fset 'macro-join-inner-paragraph "vipJ^")
       (fset 'key-colon-to-as
-        (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ([94 100 102 58 36 65 32 97 115 32 escape 112 65 127 44 escape] 0 "%d")) arg)))
+            (lambda (&optional arg)
+              "Keyboard macro."
+              (interactive "p")
+              (kmacro-exec-ring-item (quote ([94 100 102 58 36 65 32 97 115 32 escape 112 65 127 44 escape] 0 "%d")) arg)))
 
       :general
       (:states '(motion)
@@ -1279,13 +1281,14 @@
       (define-key minibuffer-local-must-match-map [escape] 'amd/minibuffer-keyboard-quit)
       (define-key minibuffer-local-isearch-map    [escape] 'amd/minibuffer-keyboard-quit)
 
+      ;; TODO: this is failing with wrong number of arguments
       ;; Center Screen on search hit
-      (advice-add 'evil-ex-search-word-forward            :after #'recenter)
-      (advice-add 'evil-ex-search-word-backward           :after #'recenter)
-      (advice-add 'evil-ex-search-unbounded-word-forward  :after #'recenter)
-      (advice-add 'evil-ex-search-unbounded-word-backward :after #'recenter)
-      (advice-add 'evil-ex-search-next                    :after #'recenter)
-      (advice-add 'evil-ex-search-previous                :after #'recenter)
+      ;; (advice-add 'evil-ex-search-word-forward            :after #'recenter)
+      ;; (advice-add 'evil-ex-search-word-backward           :after #'recenter)
+      ;; (advice-add 'evil-ex-search-unbounded-word-forward  :after #'recenter)
+      ;; (advice-add 'evil-ex-search-unbounded-word-backward :after #'recenter)
+      ;; (advice-add 'evil-ex-search-next                    :after #'recenter)
+      ;; (advice-add 'evil-ex-search-previous                :after #'recenter)
 
       ;; (defadvice evil-ex-search-next (after advice-for-evil-ex-search-next activate)
       ;;   (evil-scroll-line-to-center (line-number-at-pos)))
@@ -3894,13 +3897,14 @@
               (push regex evil-ex-search-history))
             (evil-push-search-history regex (eq direction 'forward))
             ;; set the highlight
-            (evil-ex-search-activate-highlight evil-ex-search-pattern)))
+            (evil-ex-search-activate-highlight evil-ex-search-pattern))
+        )
 
         (advice-add 'swiper                 :after #'amd/update-evil-search)
         (advice-add 'counsel-git-grep       :after #'amd/update-evil-search)
         (advice-add 'counsel-grep           :after #'amd/update-evil-search)
         (advice-add 'counsel-grep-or-swiper :after #'amd/update-evil-search)
-        ;; TODO: update swiper histor after evil-ex-search
+        ;; TODO: update swiper history after evil-ex-search
       )
     #+end_src
 
