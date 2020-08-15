@@ -651,7 +651,8 @@ extending any keys already present."
                     ,(when (eq use-package-verbose 'debug)
                        `(message ,(format "Compiling package %s" name-string)))
                     ,(unless (plist-get args :no-require)
-                       `(load ,name-string nil t)))))))))
+                       `(unless (featurep ',name-symbol)
+                          (load ,name-string nil t))))))))))
 
     ;; Certain keywords imply :defer, if :demand was not specified.
     (when (and (not (plist-member args :demand))
@@ -1028,11 +1029,11 @@ meaning:
   "use-package statistics"
   "Show current statistics gathered about use-package declarations."
   (setq tabulated-list-format
-        ;; The sum of column width is 80 caracters:
-        #[("Package" 25 t)
-          ("Status" 13 t)
-          ("Last Event" 23 t)
-          ("Time" 10 t)])
+        ;; The sum of column width is 80 characters:
+        [("Package" 25 t)
+         ("Status" 13 t)
+         ("Last Event" 23 t)
+         ("Time" 10 t)])
   (tabulated-list-init-header))
 
 (defun use-package-statistics-gather (keyword name after)
@@ -1393,7 +1394,9 @@ no keyword implies `:all'."
               (comment (nth 2 def)))
           (unless (and comment (stringp comment))
             (setq comment (format "Customized with use-package %s" name)))
-          `(customize-set-variable (quote ,variable) ,value ,comment)))
+          `(funcall (or (get (quote ,variable) 'custom-set) #'set-default)
+                    (quote ,variable)
+                    ,value)))
     args)
    (use-package-process-keywords name rest state)))
 
@@ -1419,7 +1422,7 @@ no keyword implies `:all'."
 (defun use-package-handler/:custom-face (name _keyword args rest state)
   "Generate use-package custom-face keyword code."
   (use-package-concat
-   (mapcar #'(lambda (def) `(custom-set-faces (quote ,def))) args)
+   (mapcar #'(lambda (def) `(custom-set-faces (backquote ,def))) args)
    (use-package-process-keywords name rest state)))
 
 ;;;; :init
@@ -1467,7 +1470,7 @@ no keyword implies `:all'."
     (use-package-concat
      (when use-package-compute-statistics
        `((use-package-statistics-gather :config ',name nil)))
-     (if (or (null arg) (equal arg '(t)))
+     (if (and (or (null arg) (equal arg '(t))) (not use-package-inject-hooks))
          body
        (use-package-with-elapsed-timer
            (format "Configuring package %s" name-symbol)
@@ -1533,6 +1536,7 @@ this file.  Usage:
                  package.  This is useful if the package is being lazily
                  loaded, and you wish to conditionally call functions in your
                  `:init' block that are defined in the package.
+:hook            Specify hook(s) to attach this package to.
 
 :bind            Bind keys, and define autoloads for the bound commands.
 :bind*           Bind keys, and define autoloads for the bound commands,
@@ -1542,13 +1546,15 @@ this file.  Usage:
 :bind-keymap*    Like `:bind-keymap', but overrides all minor mode bindings
 
 :defer           Defer loading of a package -- this is implied when using
-                 `:commands', `:bind', `:bind*', `:mode', `:magic',
+                 `:commands', `:bind', `:bind*', `:mode', `:magic', `:hook',
                  `:magic-fallback', or `:interpreter'.  This can be an integer,
                  to force loading after N seconds of idle time, if the package
                  has not already been loaded.
-:after           Defer loading of a package until after any of the named
-                 features are loaded.
-:demand          Prevent deferred loading in all cases.
+:after           Delay the use-package declaration until after the named modules
+                 have loaded. Once load, it will be as though the use-package
+                 declaration (without `:after') had been seen at that moment.
+:demand          Prevent the automatic deferred loading introduced by constructs
+                 such as `:bind' (see `:defer' for the complete list).
 
 :if EXPR         Initialize and load only if EXPR evaluates to a non-nil value.
 :disabled        The package is ignored completely if this keyword is present.
@@ -1557,7 +1563,9 @@ this file.  Usage:
 :load-path       Add to the `load-path' before attempting to load the package.
 :diminish        Support for diminish.el (if installed).
 :delight         Support for delight.el (if installed).
-:custom          Call `customize-set-variable' with each variable definition.
+:custom          Call `custom-set' or `set-default' with each variable
+                 definition without modifying the Emacs `custom-file'.
+                 (compare with `custom-set-variables').
 :custom-face     Call `customize-set-faces' with each face definition.
 :ensure          Loads the package using package.el if necessary.
 :pin             Pin the package to an archive."
