@@ -1443,6 +1443,9 @@ function cmd_draw_shipyard()
   -- pilot:buildship(160921,2)
   -- pilot:buildship(131525,2)
 
+  -- pilot:buildship(16950,2)
+  -- pilot:buildship(25433,2)
+
   -- while true do
 
   pilot:buildship()

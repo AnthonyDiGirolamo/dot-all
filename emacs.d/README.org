@@ -207,6 +207,13 @@
 * fonts
 
   #+begin_src emacs-lisp
+    (defun amd/take-svg-screenshot ()
+      "Take a screenshot and save as an svg (requires cairo support)."
+      (interactive)
+      (with-temp-buffer
+        (insert (x-export-frames nil 'svg))
+        (save-buffer)))
+
     (defun amd/set-font ()
       "Set preferred GUI font."
       (interactive)
@@ -4600,13 +4607,13 @@
 **** org-capture
 
      #+begin_src fundamental :tangle no
-     javascript:location.href = 'org-protocol://capture://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection());
+       javascript:location.href = 'org-protocol://capture?url=' + encodeURIComponent(location.href) + '&title=' + encodeURIComponent(document.title) + '&body=' + encodeURIComponent(window.getSelection());
      #+end_src
 
 **** org-store-link
 
      #+begin_src fundamental :tangle no
-     javascript:location.href = 'org-protocol://store-link://'+encodeURIComponent(location.href)+'/'+encodeURIComponent(document.title)+'/'+encodeURIComponent(window.getSelection());
+       javascript:location.href = 'org-protocol://store-link?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title);
      #+end_src
 
 **** =emacs.desktop=
