@@ -3498,7 +3498,9 @@
      (pretty-hydra-define hydra-set-toggles (:color blue :quit-key "q" :formatter amd/pretty-hydra-strip-header)
        ("Line Endings"
         (("t" toggle-truncate-lines "truncate-lines" :toggle truncate-lines :color amaranth)
-         ("i" fci-mode "fill column indicator mode" :toggle t :color amaranth)
+         ;; ("i" fci-mode "fill column indicator mode" :toggle t :color amaranth)
+         ;; emacs27
+         ("i" display-fill-column-indicator-mode "fill column indicator mode" :toggle t :color amaranth)
          ("f" auto-fill-mode "auto-fill-mode" :toggle auto-fill-function :color amaranth)
          ("F" fringe-mode "fringe-mode" :toggle (not (eq fringe-mode 0)) :color amaranth))
         "Line Numbers"
@@ -3541,8 +3543,8 @@
         (
          ("a" hydra-align-menu/body "align")
          ("G"  counsel-git-grep       "search git grep")
-         ("rgg"  counsel-rg       "ripgrep")
-         ("rgo"  amd/counsel-rg-with-initial-directory  "ripgrep w/ dir")
+         ;; ("rgg"  counsel-rg       "ripgrep")
+         ("rg"  amd/counsel-rg-with-initial-directory  "ripgrep w/ dir")
          ("pa" counsel-ag             "search ag counsel")
          ("pf" amd/counsel-ag-with-filename-regex "search ag filename regex")
          ;; ("pt" counsel-pt             "search pt counsel")
