@@ -27,6 +27,7 @@
    - [[#eshell][eshell]]
    - [[#shell][shell]]
    - [[#vterm][vterm]]
+   - [[#ansi-color][ansi-color]]
    - [[#compilation][compilation]]
    - [[#calc][calc]]
    - [[#winner---window-layout-undoredo][winner - window layout undo/redo]]
@@ -1852,6 +1853,13 @@
        :commands (vterm))
    #+end_src
 
+** ansi-color
+   #+begin_src emacs-lisp
+     (use-package ansi-color
+      :custom
+      (ansi-color-for-comint-mode 'filter))
+   #+end_src
+
 ** compilation
    #+begin_src emacs-lisp
      (use-package compile
@@ -1893,6 +1901,15 @@
                       "2 sec" nil 'delete-windows-on
                       (get-buffer-create "*compilation*"))
                      (message "No Compilation Errors!")))))
+
+       ;; From http://endlessparentheses.com/ansi-colors-in-the-compilation-buffer-output.html
+       ;; (require 'ansi-color)
+       (defun endless/colorize-compilation ()
+         "Colorize from `compilation-filter-start' to `point'."
+         (let ((inhibit-read-only t))
+           (ansi-color-apply-on-region
+            compilation-filter-start (point))))
+       (add-hook 'compilation-filter-hook #'endless/colorize-compilation)
      )
    #+end_src
 
