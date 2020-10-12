@@ -10,6 +10,7 @@
    - [[#configfishfunctionsfish_promptfish][~/.config/fish/functions/fish_prompt.fish]]
    - [[#configfishfunctionsfish_mode_promptfish][~/.config/fish/functions/fish_mode_prompt.fish]]
  - [[#directory-navigation][directory navigation]]
+   - [[#configfishfunctionstarxzfish][~/.config/fish/functions/tarxz.fish]]
    - [[#configfishfunctionsufish][~/.config/fish/functions/u.fish]]
    - [[#configfishfunctionsdlfish][~/.config/fish/functions/dl.fish]]
  - [[#bash-releated][bash releated]]
@@ -320,6 +321,15 @@
    #+END_SRC
 
 * directory navigation
+
+** ~/.config/fish/functions/tarxz.fish
+
+   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/tarxz.fish"
+     function tarxz --description "tar c DIR | xz -0 -T 0 > DIR.tar.xz"
+       set dir_name $argv[1]
+       tar c $dir_name | xz -0 -T 0 > "$dir_name.tar.xz"
+     end
+   #+END_SRC
 
 ** ~/.config/fish/functions/u.fish
 
