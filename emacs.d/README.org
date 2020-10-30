@@ -3500,7 +3500,7 @@
 
    #+begin_src emacs-lisp
      (defun amd/pretty-hydra-strip-header (docstring)
-       (replace-regexp-in-string "\n[^\n]+\n[-=─]+\n" "" docstring))
+       (replace-regexp-in-string "\n\\([^\n]+\n\\)[-=─]+\n" "\\1" docstring))
 
      (pretty-hydra-define hydra-align-menu (:color blue)
        ("a: Align"
@@ -3515,19 +3515,19 @@
      (pretty-hydra-define hydra-set-toggles (:color blue :quit-key "q" :formatter amd/pretty-hydra-strip-header)
        ("Line Endings"
         (("t" toggle-truncate-lines "truncate-lines" :toggle truncate-lines :color amaranth)
-         ;; ("i" fci-mode "fill column indicator mode" :toggle t :color amaranth)
-         ;; emacs27
-         ("i" display-fill-column-indicator-mode "fill column indicator mode" :toggle t :color amaranth)
-         ("f" auto-fill-mode "auto-fill-mode" :toggle auto-fill-function :color amaranth)
+         ("a" auto-fill-mode "auto-fill-mode" :toggle auto-fill-function :color amaranth)
+         ;; ("f" fci-mode "fill column indicator mode" :toggle t :color amaranth) ;; emacs26
+         ("f" display-fill-column-indicator-mode "fill column indicator mode" :toggle t :color amaranth) ;; emacs27
          ("F" fringe-mode "fringe-mode" :toggle (not (eq fringe-mode 0)) :color amaranth))
         "Line Numbers"
-        (("ll" display-line-numbers-mode "display-line-numbers-mode" :toggle t :color amaranth)
-         ("hl" hl-line-mode "hl-line-mode" :toggle t :color amaranth)
-         ("hi" highlight-indent-guides-mode "highighlight-indent-guides-mode" :toggle t :color amaranth))
-        "Code"
-        (("d" rainbow-delimiters-mode "rainbow-delimiters-mode" :toggle t :color amaranth)
+        (("l" display-line-numbers-mode "display-line-numbers-mode" :toggle t :color amaranth)
+         ("h" hl-line-mode "hl-line-mode" :toggle t :color amaranth)
+         ("i" highlight-indent-guides-mode "highighlight-indent-guides-mode" :toggle t :color amaranth))
+        "Appearance"
+        (("r" rainbow-delimiters-mode "rainbow-delimiters-mode" :toggle t :color amaranth)
          ("c" color-identifiers-mode "color-identifiers-mode" :toggle t :color amaranth)
-         ("g" glasses-mode "glasses-mode" :toggle t :color amaranth))))
+         ("g" glasses-mode "glasses-mode" :toggle t :color amaranth)
+         ("w" whitespace-mode "whitespace-mode" :toggle t :color amaranth))))
 
      (amd/define-hydra-with-columns 'hydra-leader-menu 'blue
       `((
