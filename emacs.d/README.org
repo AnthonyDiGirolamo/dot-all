@@ -1492,6 +1492,8 @@
        "h" 'left-char
        "l" 'right-char
        "-" 'dired-hide-details-mode
+       "(" 'dired-hide-details-mode
+       ")" 'dired-omit-mode
        "e" 'dired-previous-line
        "N" 'dired-next-dirline
        "E" 'dired-prev-dirline)
@@ -1535,7 +1537,11 @@
       (defadvice dired-toggle-read-only (after advice-for-dired-toggle-read-only activate)
         (evil-normal-state)))
 
-    (use-package dired-x)
+    (use-package dired-x
+      :after dired
+      ;; Hide dotfiles
+      :config
+      (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")))
 
     (use-package dired-subtree
       :after dired
