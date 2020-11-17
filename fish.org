@@ -247,6 +247,7 @@
      set powerline_blue1 5f87ff
      set powerline_blue2 87afff
      set powerline_blue3 dfdfff
+     set -x fish_custom_prompt_show_hostname 0
 
      function fish_prompt
        if set -q INSIDE_EMACS
@@ -255,11 +256,11 @@
        end
 
        set_color -b $powerline_blue1 black
-       # if test 1 != $using_android
-       printf ' %s@%s ' $USER $hostname
-       # else
-       #   echo -n ' '
-       # end
+       if test 1 = $fish_custom_prompt_show_hostname
+         printf ' %s@%s ' $USER $hostname
+       else
+         printf ' %s ' $USER
+       end
 
        set_color -b $powerline_blue2 $powerline_blue1
        echo -n $powerline_right_arrow
