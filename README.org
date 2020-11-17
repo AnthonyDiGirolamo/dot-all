@@ -1,6 +1,7 @@
 * dot-all
   This repo contains all the dotfiles. Files are contained in ~*.org~ files and
-  can be put in place by running ~make tangle~.
+  can be put in place by running ~make tangle~. Running ~make~ with no target
+  displays the help:
 
   #+begin_src sh
     $ make
@@ -40,7 +41,15 @@
 ** ~make tangleawk~
 
    This will run the ~tangle.awk~ script which attempts to mimic emacs
-   `org-babel-tangle-file` but without emacs installed.
+   ~org-babel-tangle-file~ but without emacs installed.
+
+   - It will copy each source block in a given ~*.org~ file into it's respective
+     ~:tangle~ destination and create any parent directories.
+   - Any blocks with ~#+begin_src sh :eval yes~ will be executed as well.
+   - Some conditional ~:tangle~ checks are supported:
+     - ~(if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")~
+     - ~(if (string-match "chip" hostname) "~/.i3/config" "no")~
+       - Only supported variable is: ~hostname~
 
    #+begin_src text
      $ make tangleawk

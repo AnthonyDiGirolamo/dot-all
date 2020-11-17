@@ -45,7 +45,8 @@ clean:  ## delete .cache
 	rm -rf $(CACHEDIR)
 
 all: clean t symlinks  ## clean and tangle all
-t: tangleorg  ## tangleorg
+t: tangle  ## tangle alias
+tangle: tangleawk  ## tangleawk alias
 tangleorg: mkdirs $(ORG_OUT_FILES) rm-removed-files  ## tangle all dotfiles with emacs+org-mode
 tangleawk: mkdirs ## tangle all dotfiles with gawk
 	@./tangle.awk *.org
