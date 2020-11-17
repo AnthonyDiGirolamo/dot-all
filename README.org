@@ -34,8 +34,8 @@
 
    #+begin_src text
      [SYMLINKS]
-       '/home/$HOME/.vim'     -> '/home/$HOME/dot-all/vim'
-       '/home/$HOME/.emacs.d' -> '/home/$HOME/dot-all/emacs.d'
+       '~/.vim'     -> '~/dot-all/vim'
+       '~/.emacs.d' -> '~/dot-all/emacs.d'
    #+end_src
 
 ** ~make tangleawk~
@@ -54,56 +54,56 @@
    #+begin_src text
      $ make tangleawk
      [TANGLE] alacritty.org
-       /home/$HOME/.config/alacritty/alacritty.yml
+       ~/.config/alacritty/alacritty.yml
      [TANGLE] bash.org
-       /home/$HOME/.bashrc
-       /home/$HOME/.bash_profile
-       /home/$HOME/.aliases
+       ~/.bashrc
+       ~/.bash_profile
+       ~/.aliases
      [TANGLE] bookmarks.org
      [TANGLE] compton.org
-       /home/$HOME/.compton.conf
+       ~/.compton.conf
      [TANGLE] dunst.org
-       /home/$HOME/.config/dunst/dunstrc
+       ~/.config/dunst/dunstrc
      [TANGLE] fish.org
-       /home/$HOME/.config/fish/config.fish
-       /home/$HOME/.config/fish/conf.d/aliases.fish
-       /home/$HOME/.config/fish/conf.d/fish_user_key_bindings.fish
-       /home/$HOME/.config/fish/functions/fish_prompt.fish
-       /home/$HOME/.config/fish/functions/fish_mode_prompt.fish
-       /home/$HOME/.config/fish/functions/tarxz.fish
-       /home/$HOME/.config/fish/functions/u.fish
-       /home/$HOME/.config/fish/functions/dl.fish
-       /home/$HOME/.config/fish/functions/source-bash-aliases.fish
-       /home/$HOME/.config/fish/completions/dhcpcd-restart.fish
+       ~/.config/fish/config.fish
+       ~/.config/fish/conf.d/aliases.fish
+       ~/.config/fish/conf.d/fish_user_key_bindings.fish
+       ~/.config/fish/functions/fish_prompt.fish
+       ~/.config/fish/functions/fish_mode_prompt.fish
+       ~/.config/fish/functions/tarxz.fish
+       ~/.config/fish/functions/u.fish
+       ~/.config/fish/functions/dl.fish
+       ~/.config/fish/functions/source-bash-aliases.fish
+       ~/.config/fish/completions/dhcpcd-restart.fish
      [TANGLE] gdb.org
-       /home/$HOME/.gdbinit
+       ~/.gdbinit
      [TANGLE] gitconfig.org
-       /home/$HOME/.gitconfig-local
+       ~/.gitconfig-local
      [TANGLE] i3.org
-       /home/$HOME/.i3/config
+       ~/.i3/config
      [TANGLE] lxde.org
      [TANGLE] ranger.org
-       /home/$HOME/.config/ranger/rc.conf
+       ~/.config/ranger/rc.conf
      [TANGLE] README.org
      [TANGLE] ruby.org
-       /home/$HOME/.irbrc
-       /home/$HOME/.rdebugrc
-       /home/$HOME/.pryrc
-       /home/$HOME/.rubocop.yml
+       ~/.irbrc
+       ~/.rdebugrc
+       ~/.pryrc
+       ~/.rubocop.yml
      [TANGLE] terminfo.org
        .artifacts/terminfo-24bit.src
        [RUNSCRIPT] sh
        [PROCESS tic]
      [TANGLE] termux.org
-       /home/$HOME/.termux/termux.properties
+       ~/.termux/termux.properties
      [TANGLE] tmux.org
-       /home/$HOME/.tmux.conf
+       ~/.tmux.conf
      [TANGLE] xmodmap.org
      [TANGLE] xresources.org
-       /home/$HOME/.Xresources
+       ~/.Xresources
      [TANGLE] zsh.org
-       /home/$HOME/.zshrc
-       /home/$HOME/.zshrc.local
+       ~/.zshrc
+       ~/.zshrc.local
    #+end_src
 
 
