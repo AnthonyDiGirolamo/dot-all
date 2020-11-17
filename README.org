@@ -1,0 +1,103 @@
+* dot-all
+  This repo contains all the dotfiles. Files are contained in ~*.org~ files and
+  can be put in place by running ~make tangle~.
+
+  #+begin_src sh
+    $ make
+    all                  clean and tangle all
+    clean                delete .cache
+    help                 show help
+    install-emacs        download, compile and install emacs
+    install-fish         download, compile and install fish
+    install-gtk-themes   download and install gtk themes/icons
+    install-lua54        download, compile and install lua 5.4
+    install-lua          download, compile and install lua
+    install-luarocks     download, compile and install luarocks
+    install-pip          install python3 pip
+    rm-all-tangled-files rm all tangled files
+    rm-removed-files     rm files removed since last make tangle
+    symlinks             symlink folders
+    tangleawk            tangle all dotfiles with tangle.awk
+    tangleorg            tangle all dotfiles with emacs+org-mode
+    tangle               tangleawk alias
+    t                    tangle alias
+    update-base16shell   git pull base16-shell source
+    update-clac          git pull clac source
+    update-lux           git pull lux source
+    update-xcape         git pull xcape source
+  #+end_src
+
+** ~make symlinks~
+
+   This will symlink ~.vim~ and ~.emacs.d~.
+
+   #+begin_src text
+     [SYMLINKS]
+       '/home/$HOME/.vim'     -> '/home/$HOME/dot-all/vim'
+       '/home/$HOME/.emacs.d' -> '/home/$HOME/dot-all/emacs.d'
+   #+end_src
+
+** ~make tangleawk~
+
+   This will run the ~tangle.awk~ script which attempts to mimic emacs
+   `org-babel-tangle-file` but without emacs installed.
+
+   #+begin_src text
+     $ make tangleawk
+     [TANGLE] alacritty.org
+       /home/$HOME/.config/alacritty/alacritty.yml
+     [TANGLE] bash.org
+       /home/$HOME/.bashrc
+       /home/$HOME/.bash_profile
+       /home/$HOME/.aliases
+     [TANGLE] bookmarks.org
+     [TANGLE] compton.org
+       /home/$HOME/.compton.conf
+     [TANGLE] dunst.org
+       /home/$HOME/.config/dunst/dunstrc
+     [TANGLE] fish.org
+       /home/$HOME/.config/fish/config.fish
+       /home/$HOME/.config/fish/conf.d/aliases.fish
+       /home/$HOME/.config/fish/conf.d/fish_user_key_bindings.fish
+       /home/$HOME/.config/fish/functions/fish_prompt.fish
+       /home/$HOME/.config/fish/functions/fish_mode_prompt.fish
+       /home/$HOME/.config/fish/functions/tarxz.fish
+       /home/$HOME/.config/fish/functions/u.fish
+       /home/$HOME/.config/fish/functions/dl.fish
+       /home/$HOME/.config/fish/functions/source-bash-aliases.fish
+       /home/$HOME/.config/fish/completions/dhcpcd-restart.fish
+     [TANGLE] gdb.org
+       /home/$HOME/.gdbinit
+     [TANGLE] gitconfig.org
+       /home/$HOME/.gitconfig-local
+     [TANGLE] i3.org
+       /home/$HOME/.i3/config
+     [TANGLE] lxde.org
+     [TANGLE] ranger.org
+       /home/$HOME/.config/ranger/rc.conf
+     [TANGLE] README.org
+     [TANGLE] ruby.org
+       /home/$HOME/.irbrc
+       /home/$HOME/.rdebugrc
+       /home/$HOME/.pryrc
+       /home/$HOME/.rubocop.yml
+     [TANGLE] terminfo.org
+       .artifacts/terminfo-24bit.src
+       [RUNSCRIPT] sh
+       [PROCESS tic]
+     [TANGLE] termux.org
+       /home/$HOME/.termux/termux.properties
+     [TANGLE] tmux.org
+       /home/$HOME/.tmux.conf
+     [TANGLE] xmodmap.org
+     [TANGLE] xresources.org
+       /home/$HOME/.Xresources
+     [TANGLE] zsh.org
+       /home/$HOME/.zshrc
+       /home/$HOME/.zshrc.local
+   #+end_src
+
+
+** ~make tangleorg~
+
+   Alternative to ~tangleawk~ this uses emacs to tangle all ~*.org~ files.
