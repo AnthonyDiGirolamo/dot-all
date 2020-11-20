@@ -45,6 +45,7 @@
    - [[#ido-ido-vertical-flx-ido][ido, ido-vertical, flx-ido]]
    - [[#avy][avy]]
    - [[#undo-tree][undo-tree]]
+   - [[#tab-bar-mode][tab-bar-mode]]
    - [[#eyebrowse---tabs][eyebrowse - tabs]]
    - [[#ace-window][ace-window]]
    - [[#ace-link][ace-link]]
@@ -195,14 +196,6 @@
     ;; Enable narrowing and erasing buffers
     (put 'narrow-to-region 'disabled nil)
     (put 'erase-buffer 'disabled nil)
-
-    ;; emacs27 specific features
-    (when (>= emacs-major-version 27)
-      (defun amd/tab-bar-tab-name-current ()
-        "Generate tab name from the buffer of the selected window."
-        (format " %s " (buffer-name (window-buffer (minibuffer-selected-window)))))
-      (setq tab-bar-tab-name-function #'amd/tab-bar-tab-name-current)
-    )
   #+end_src
 
 * fonts
@@ -2430,6 +2423,33 @@
     )
   #+end_src
 
+** tab-bar-mode
+
+   #+begin_src emacs-lisp
+     (use-package tab-bar
+       :if (>= emacs-major-version 27)
+       :config
+       (defun amd/tab-bar-tab-name-current ()
+         "Generate tab name from the buffer of the selected window."
+         (format " %s " (buffer-name (window-buffer (minibuffer-selected-window)))))
+
+       (setq tab-bar-tab-name-function #'amd/tab-bar-tab-name-current)
+
+       (defhydra hydra-tab-bar (:color red :columns 3)
+         ("h"  tab-previous    "← prev")
+         ("l"  tab-next        "→ next/new")
+         ("N"  tab-bar-new-tab "new")
+
+         ("H" (lambda() (interactive) (tab-bar-move-tab -1)) "← move")
+         ("L"  tab-bar-move-tab "→ move")
+         ("c"  tab-bar-close-tab      "close")
+
+         ("."  tab-bar-switch-to-tab  "switch" :color blue)
+         ("r"  tab-rename             "rename")
+         ("RET" keyboard-escape-quit  "quit" :exit t))
+     )
+   #+end_src
+
 ** eyebrowse - tabs
 
   #+begin_src emacs-lisp
@@ -3542,7 +3562,7 @@
          ("s" hydra-set-toggles/body "set-toggles")
          ("u" undo-tree-visualize    "undo-tree")
          ("w" ace-window             "window ")
-         ("t" hydra-eyebrowse/body   "tabs   ")
+         ("t" hydra-tab-bar/body     "tabs   ")
          ("c" calc-dispatch          "calc")
          ("j" counsel-imenu          "jump-imenu")
          ("v" (find-file user-emacs-directory)  "open .emacs")
