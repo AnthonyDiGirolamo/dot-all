@@ -47,15 +47,15 @@ set mouse=a  " Enable the mouse
 
 set expandtab  " use spaces for tabs
 " Clear trailing whitespace and retab (remove tab characters) before saving
-autocmd BufWritePre * :%s/\s\+$//e | retab
+" autocmd BufWritePre * :%s/\s\+$//e | retab
 
 " h/l stay in default colemak locations
 " n/e remapped to down up
-nnoremap n gj|xnoremap n gj|onoremap n gj|
-nnoremap e gk|xnoremap e gk|onoremap e gk|
+nnoremap n gj|xnoremap n gj|onoremap n gj
+nnoremap e gk|xnoremap e gk|onoremap e gk
 " Use k/K for next/previous search hits
-nnoremap k n|xnoremap k n|onoremap k n|
-nnoremap K N|xnoremap K N|onoremap K N|
+nnoremap k n|xnoremap k n|onoremap k n
+nnoremap K N|xnoremap K N|onoremap K N
 " Bubble single lines
 nmap <C-e> [e
 nmap <C-n> ]e
@@ -95,8 +95,8 @@ nnoremap <leader>sp :set paste!<cr>
 " set truncate (nowrap) toggle
 nnoremap <leader>st :set wrap!<cr>
 " set line numbering toggles
-nnoremap <leader>sn :set number! relativenumber!<cr>
-nnoremap <leader>sN :set number!<cr>
+nnoremap <leader>sl :set number! relativenumber!<cr>
+nnoremap <leader>sL :set number!<cr>
 nnoremap <leader>sR :set relativenumber!<cr>
 " set whitespace visualization
 nnoremap <leader>sw :set list!<cr>
