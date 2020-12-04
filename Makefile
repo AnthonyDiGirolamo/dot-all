@@ -76,10 +76,12 @@ install-gtk-themes:  ## download and install gtk themes/icons
 
 CD_TO_BUILD_DIR=cd $(abspath $(CACHEDIR)/$(subst build-,,$@)) ; URL="$($(subst build-,,$@)_url)" ; F=`basename $$URL` ; D=`tar tf $$F | head -n 1` ; ! test -d $$D && tar xf $$F ; cd $$D
 
+ECHO_TAG_MESSAGE=printf "\033[36m[%s]\033[0m %s\n"
+
 .PHONY: build-fish
 .ONESHELL:
 build-fish: download-fish
-	@echo "[BUILD] fish"
+	@$(ECHO_TAG_MESSAGE) "BUILD" "fish"
 	$(CD_TO_BUILD_DIR)
 	mkdir -p build ; cd build
 	cmake -DCMAKE_INSTALL_PREFIX=~/apps/fish ..
@@ -91,7 +93,7 @@ build-fish: download-fish
 .PHONY: build-emacs
 .ONESHELL:
 build-emacs: download-emacs
-	@echo "[BUILD] emacs"
+	@$(ECHO_TAG_MESSAGE) "BUILD" "emacs"
 	$(CD_TO_BUILD_DIR)
 	./configure --prefix=$$HOME/apps/emacs --with-modules --with-cairo
 	make -j 4
@@ -102,7 +104,7 @@ build-emacs: download-emacs
 .PHONY: build-lua54
 .ONESHELL:
 build-lua54: download-lua54
-	@echo "[BUILD] lua"
+	@$(ECHO_TAG_MESSAGE) "BUILD" "lua"
 	$(CD_TO_BUILD_DIR)
 	make linux -j 4
 	make INSTALL_TOP=$(abspath $(HOME)/apps/lua54) install
@@ -112,7 +114,7 @@ build-lua54: download-lua54
 .PHONY: build-lua
 .ONESHELL:
 build-lua: download-lua
-	@echo "[BUILD] lua"
+	@$(ECHO_TAG_MESSAGE) "BUILD" "lua"
 	$(CD_TO_BUILD_DIR)
 	make linux -j 4
 	make INSTALL_TOP=$(abspath $(HOME)/apps/lua) install
@@ -122,7 +124,7 @@ build-lua: download-lua
 .PHONY: build-luarocks
 .ONESHELL:
 build-luarocks: download-luarocks
-	@echo "[BUILD] luarocks"
+	@$(ECHO_TAG_MESSAGE) "BUILD" "luarocks"
 	$(CD_TO_BUILD_DIR)
 	./configure --prefix=$$HOME/apps/lua --with-lua=$$HOME/apps/lua
 	make
@@ -133,16 +135,16 @@ build-luarocks: download-luarocks
 .PHONY: download-%
 .ONESHELL:
 download-%:
-	@echo "[DOWNLOAD] $*"
+	@$(ECHO_TAG_MESSAGE) "DOWNLOAD" "$*"
 	mkdir -p $(CACHEDIR)/$*
 	cd $(abspath $(CACHEDIR)/$*)
 	URL="$($*_url)"
 	EXPECTED_MD5="$($*_md5)"
 	F=`basename $$URL`
-	! test -f $$F && echo [CURL] $$URL && curl -L -O $$URL 2>/dev/null
+	! test -f $$F && $(ECHO_TAG_MESSAGE) CURL $$URL && curl -L -O $$URL 2>/dev/null
 	! test -f $$F && exit 1
 	md5hash=`md5sum $$F`
-	echo [DOWNLOADED] $$md5hash
+	$(ECHO_TAG_MESSAGE) DOWNLOADED $$md5hash
 	test "$$EXPECTED_MD5  $$F" != "$$md5hash" && echo "Invalid MD5" && echo "   Expected: $$EXPECTED_MD5" && exit 1
 	exit 0
 
@@ -236,7 +238,7 @@ rm-all-tangled-files:  ## rm all tangled files
 
 # Rule to convert a *.org file to a .cache/*.out
 $(CACHEDIR)/%.out: %.org
-	@echo "[TANGLE] $<"
+	@$(ECHO_TAG_MESSAGE) "TANGLE" "$<"
 	@test -f $@ && cp $@ $@.last
 	@rm -f $@
 	@emacs -Q --batch --eval "(progn \
