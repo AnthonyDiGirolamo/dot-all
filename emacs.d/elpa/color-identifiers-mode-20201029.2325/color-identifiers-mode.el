@@ -4,8 +4,8 @@
 
 ;; Author: Ankur Dave <ankurdave@gmail.com>
 ;; Url: https://github.com/ankurdave/color-identifiers-mode
-;; Package-Version: 20200705.2145
-;; Package-Commit: dfca97595094fc192a04172d86cb4ba68cab984f
+;; Package-Version: 20201029.2325
+;; Package-Commit: 09684e62f0d28b22e60f3f6f50c5941549315134
 ;; Created: 24 Jan 2014
 ;; Version: 1.1
 ;; Keywords: faces, languages
@@ -197,7 +197,7 @@ For cc-mode support within color-identifiers-mode."
     (delete-dups result)
     result))
 
-(dolist (maj-mode '(c-mode c++-mode java-mode rust-mode rustic-mode meson-mode))
+(dolist (maj-mode '(c-mode c++-mode java-mode rust-mode rustic-mode meson-mode typescript-mode))
   (color-identifiers:set-declaration-scan-fn
    maj-mode 'color-identifiers:cc-mode-get-declarations)
   (add-to-list

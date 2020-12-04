@@ -1,0 +1,2 @@
+;;; Generated package description from /home/tonymd/.emacs.d/elpa/color-identifiers-mode-20201029.2325/color-identifiers-mode.el  -*- no-byte-compile: t -*-
+(define-package "color-identifiers-mode" "20201029.2325" "Color identifiers based on their names" '((dash "2.5.0") (emacs "24")) :commit "09684e62f0d28b22e60f3f6f50c5941549315134" :keywords '("faces" "languages") :authors '(("Ankur Dave" . "ankurdave@gmail.com")) :maintainer '("Ankur Dave" . "ankurdave@gmail.com") :url "https://github.com/ankurdave/color-identifiers-mode")
