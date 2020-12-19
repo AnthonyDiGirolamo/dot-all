@@ -17,8 +17,8 @@ if $HOME == "/data/data/com.termux/files/home"
   set background=light
   colorscheme bw
 else
-  set number          " line numbering
-  set relativenumber  " relative line numbering
+  " set number          " line numbering
+  " set relativenumber  " relative line numbering
   set background=dark
   " let g:airline_theme='behelit'
   " let g:airline_theme='aludin'

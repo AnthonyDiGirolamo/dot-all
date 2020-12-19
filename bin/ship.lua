@@ -173,9 +173,12 @@ end
 
 Vector={}
 Vector.__index=Vector
+
 function Vector.new(x,y)
   return setmetatable({x=x or 0,y=y or 0},Vector)
 end
+
+setmetatable(Vector,{__call=function(_,...) return Vector.new(...) end})
 
 function Vector.__add(self, other)
   return Vector(self.x + other.x, self.y + other.y)
@@ -286,14 +289,14 @@ function Vector:draw_circle(radius,c,fill)
          ro(radius),c)
 end
 
-setmetatable(Vector,{__call=function(_,...) return Vector.new(...) end})
-
 EMPTY = ""
 WITH_TRANSPARENCY = true
 NO_TRANSPARENCY = false
 
 Canvas={}
 Canvas.__index=Canvas
+setmetatable(Canvas,{__call=function(_,...) return Canvas.new(...) end})
+
 function Canvas.new(r,c)
   local c=setmetatable(
     {canvas = {},
@@ -302,6 +305,7 @@ function Canvas.new(r,c)
   c:clear_canvas()
   return c
 end
+
 
 function Canvas:__tostring()
   return "Canvas [rows:" .. tostring(self.rows) .. ", cols:" .. tostring(self.cols) .. "]"
@@ -465,8 +469,6 @@ function Canvas:new_canvas_cropped_with_stroke()
   end
   return newcanvas
 end
-
-setmetatable(Canvas,{__call=function(_,...) return Canvas.new(...) end})
 
 function concat_canvases(sprite_canvases, separation)
   local offset = separation or 0
@@ -1567,6 +1569,6 @@ if ship_value_index or planet_value_index then
 else
   -- if no options
   cmd_draw_planet_map()
-  cmd_draw_shipyard()
+  -- cmd_draw_shipyard()
 end
 
