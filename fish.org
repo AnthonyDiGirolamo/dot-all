@@ -64,8 +64,10 @@
     add_directory_to_path $HOME/apps/lua/bin
     if which luarocks 1>/dev/null 2>/dev/null
       add_directory_to_path $HOME/.luarocks/bin
-      for line in (luarocks path --no-bin | sed -e 's/^export /set -x /' -e 's/=\'/ \'/')
-        eval $line
+      if status is-interactive
+        for line in (luarocks path --no-bin | sed -e 's/^export /set -x /' -e 's/=\'/ \'/')
+          eval $line
+        end
       end
     end
 
@@ -97,9 +99,11 @@
     test -f $config_local; and source $config_local
 
     function fish_greeting
-      if which lua 1>/dev/null 2>/dev/null
-        if test -f $HOME/dot-all/bin/ship.lua
-          $HOME/dot-all/bin/ship.lua
+      if status is-interactive
+        if which lua 1>/dev/null 2>/dev/null
+          if test -f $HOME/dot-all/bin/ship.lua
+            $HOME/dot-all/bin/ship.lua
+          end
         end
       end
     end
