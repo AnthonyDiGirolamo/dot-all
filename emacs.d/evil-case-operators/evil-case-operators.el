@@ -113,17 +113,19 @@
   (let* ((original-name  (buffer-substring-no-properties beg end))
          (possible-names (seq-uniq
                           (list
-                           (s-dashed-words         original-name)
                            (s-snake-case           original-name)
                            (s-upcase (s-snake-case original-name))
                            (s-lower-camel-case     original-name)
-                           (s-upper-camel-case     original-name))))
-         (original-index (cl-position original-name possible-names :test 'equal))
-         (new-index      (mod (+ 1 (or original-index 0)) (length possible-names))))
-    (save-excursion
-      (delete-region beg end)
-      (goto-char beg)
-      (insert (nth new-index possible-names)))
+                           (s-upper-camel-case     original-name)))))
+    ;; Add dashed case for emacs-lisp
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (push (s-dashed-words original-name) possible-names))
+    (let* ((original-index (cl-position original-name possible-names :test 'equal))
+           (new-index      (mod (+ 1 (or original-index 0)) (length possible-names))))
+      (save-excursion
+        (delete-region beg end)
+        (goto-char beg)
+        (insert (nth new-index possible-names))))
     )
   )
 
