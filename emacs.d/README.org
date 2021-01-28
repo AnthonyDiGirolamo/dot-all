@@ -2550,6 +2550,7 @@
       (when (fboundp 'defhydra)
         (defhydra hydra-window-size (:color red)
           "Windows size"
+          ("w" evil-window-set-height "maximize")
           ("h" shrink-window-horizontally "shrink horizontal")
           ("n" shrink-window "shrink vertical")
           ("e" enlarge-window "enlarge vertical")
