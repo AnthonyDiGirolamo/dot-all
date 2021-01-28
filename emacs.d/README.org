@@ -3955,8 +3955,8 @@
           "E" 'previous-error-no-select)
 
         :config
-        (add-to-list 'evil-motion-state-modes 'ivy-occur-grep-mode)
-        (add-to-list 'evil-motion-state-modes 'grep-mode)
+        (add-to-list 'evil-normal-state-modes 'ivy-occur-grep-mode)
+        (add-to-list 'evil-normal-state-modes 'grep-mode)
         (ivy-mode 1)
 
         (defun amd/update-evil-search (&optional arg1 &rest args)
