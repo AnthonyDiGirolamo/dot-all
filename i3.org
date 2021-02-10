@@ -443,7 +443,7 @@
     # exec nm-applet
     # exec blueman-applet
 
-    exec xfce4-clipman
+    # exec xfce4-clipman
 
     # exec cinnamon-settings-daemon # use lxappearance instead
 

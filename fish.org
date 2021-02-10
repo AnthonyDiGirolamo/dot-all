@@ -52,11 +52,12 @@
     add_directory_to_path $HOME/.npm-packages/bin
     add_directory_to_path $HOME/.rbenv/bin
 
-    if test -d $HOME/.pyenv
+    if status --is-interactive ; and test -d $HOME/.pyenv
         set -x PYENV_ROOT $HOME/.pyenv
         add_directory_to_path $PYENV_ROOT/bin
         if command -v pyenv 1>/dev/null 2>&1
             pyenv init - | source
+            pyenv virtualenv-init - | source
         end
     end
 
