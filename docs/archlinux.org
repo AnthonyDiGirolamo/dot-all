@@ -337,3 +337,33 @@
     # display configured sensors
     sensors
   #+END_SRC
+
+* luks cryptsetup
+
+** setup new partition
+
+   #+begin_src sh
+     # format luks
+     cryptsetup luksFormat /dev/nvme0n1p7
+     cryptsetup open /dev/nvme0n1p7 auxdata
+     cryptsetup status /dev/mapper/auxdata
+
+     # format btrfs
+     mkfs.btrfs -L auxdata /dev/mapper/auxdata
+     mount /dev/mapper/auxdata /mnt/auxdata
+     btrfs filesystem usage /mnt/auxdata
+   #+end_src
+
+** get info
+
+   #+begin_src sh
+     # list disks
+     lsblk -f
+
+     # get encryption info
+     cryptsetup status /dev/mapper/root
+     cryptsetup luksDump /dev/$PARTITON
+
+     # or
+     dmsetup table
+   #+end_src
