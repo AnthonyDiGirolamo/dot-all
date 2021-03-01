@@ -1,0 +1,22 @@
+#!/usr/bin/env fish
+
+function add_directory_to_path --argument-names fileprefix
+    set timestamp (date +%Y-%m-%d_%H%M)
+    if test -z "$fileprefix" # not set -q fileprefix
+        # echo "fileprefix is not set"
+        set fileprefix ./
+    end
+
+    set file_dmesg $fileprefix$timestamp"_dmesg.txt"
+    set file_logcat $fileprefix$timestamp"_logcat.txt"
+
+    echo $file_dmesg
+    echo $file_logcat
+
+    adb wait-for-device
+    adb root
+    adb shell 'dmesg -c -w' > $file_dmesg &
+    adb logcat > $file_logcat &
+end
+
+add_directory_to_path $argv
