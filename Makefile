@@ -168,6 +168,8 @@ install-emacs: build-emacs ## download, compile and install emacs
 .ONESHELL:
 install-fish: build-fish ## download, compile and install fish
 
+fd_git_url := https://github.com/sharkdp/fd.git
+fzf_git_url := https://github.com/junegunn/fzf.git
 xcape_git_url := https://github.com/alols/xcape.git
 lux_git_url := https://github.com/Ventto/lux.git
 clac_git_url := https://github.com/soveran/clac.git
@@ -182,10 +184,17 @@ git-pull-%:
 	echo $$URL
 	echo "-> $${GDIR}"
 	rm -rf $$GDIR
-	git clone --depth=1 --branch=master $$URL
-	rm -rf $$GDIR/.git
-	git add -A $$GDIR
+	git clone --depth=1 $$URL
+	rm -rf $$GDIR/.git #; git add -A $$GDIR
 	popd
+
+.PHONY: update-fd
+.ONESHELL:
+update-fd: git-pull-fd  ## git pull fd source
+
+.PHONY: update-fzf
+.ONESHELL:
+update-fzf: git-pull-fzf  ## git pull fzf source
 
 .PHONY: update-xcape
 .ONESHELL:
