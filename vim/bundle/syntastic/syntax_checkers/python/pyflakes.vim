@@ -1,6 +1,6 @@
 "============================================================================
 "File:        pyflakes.vim
-"Description: Syntax checking plugin for syntastic.vim
+"Description: Syntax checking plugin for syntastic
 "Authors:     Martin Grenfell <martin.grenfell@gmail.com>
 "             kstep <me@kstep.me>
 "             Parantapa Bhattacharya <parantapa@gmail.com>
@@ -45,8 +45,8 @@ function! SyntaxCheckers_python_pyflakes_GetLocList() dict
     let errorformat =
         \ '%E%f:%l: could not compile,'.
         \ '%-Z%p^,'.
-        \ '%E%f:%l:%c: %m,'.
-        \ '%E%f:%l: %m,'.
+        \ '%E%f:%l:%c:%\= %m,'.
+        \ '%E%f:%l:%\= %m,'.
         \ '%-G%.%#'
 
     let env = syntastic#util#isRunningWindows() ? {} : { 'TERM': 'dumb' }

@@ -1,6 +1,6 @@
 #!/usr/bin/env fish
 
-function add_directory_to_path --argument-names fileprefix
+function adb_pull_logs --argument-names fileprefix
     set timestamp (date +%Y-%m-%d_%H%M)
     if test -z "$fileprefix" # not set -q fileprefix
         # echo "fileprefix is not set"
@@ -19,4 +19,4 @@ function add_directory_to_path --argument-names fileprefix
     adb logcat > $file_logcat &
 end
 
-add_directory_to_path $argv
+adb_pull_logs $argv

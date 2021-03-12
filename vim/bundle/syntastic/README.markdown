@@ -41,6 +41,8 @@
 4.14. [What happened to the `rustc` checker?](#faqrust)  
 4.15. [What happened to the `tsc` checker?](#faqtsc)  
 4.16. [What happened to the `xcrun` checker?](#faqxcrun)  
+4.17. [What happened to the `valac` checker?](#faqvalac)  
+4.18. [What happened to the Julia `lint` checker?](#faqjulialint)  
 5. [Resources](#otherresources)  
 
 - - -
@@ -58,19 +60,20 @@ their script to find them.
 
 At the time of this writing, syntastic has checking plugins for ACPI
 Source Language, ActionScript, Ada, Ansible configurations, API Blueprint,
-AppleScript, AsciiDoc, Assembly languages, BEMHTML, Bro, Bourne shell, C,
-C++, C#, Cabal, Chef, CoffeeScript, Coco, Coq, CSS, Cucumber, CUDA, D, Dart,
+AppleScript, AsciiDoc, Assembly languages, BEMHTML, Bro, Bourne shell, C, C++,
+C#, Cabal, Chef, CMake, CoffeeScript, Coco, Coq, CSS, Cucumber, CUDA, D, Dart,
 DocBook, Dockerfile, Dust, Elixir, Erlang, eRuby, Fortran, Gentoo metadata,
 GLSL, Go, Haml, Haskell, Haxe, Handlebars, HSS, HTML, Java, JavaScript, JSON,
 JSX, LESS, Lex, Limbo, LISP, LLVM intermediate language, Lua, Markdown,
 MATLAB, Mercury, NASM, Nix, Objective-C, Objective-C++, OCaml, Perl, Perl
-POD, PHP, gettext Portable Object, OS X and iOS property lists, Pug (formerly
-Jade), Puppet, Python, QML, R, Racket, RDF TriG, RDF Turtle, Relax NG,
-reStructuredText, RPM spec, Ruby, SASS/SCSS, Scala, Slim, SML, Solidity,
-Sphinx, SQL, Stylus, Tcl, TeX, Texinfo, Twig, TypeScript, Vala, Verilog, VHDL,
-Vim help, VimL, xHtml, XML, XSLT, XQuery, YACC, YAML, YANG data models, z80,
-Zope page templates, and Zsh. See the [manual][checkers] for details about the
-corresponding supported checkers (`:help syntastic-checkers` in Vim).
+6, Perl POD, PHP, gettext Portable Object, OS X and iOS property lists, Pug
+(formerly Jade), Puppet, Python, QML, R, Racket, RDF TriG, RDF Turtle, Relax
+NG, reStructuredText, RPM spec, Ruby, SASS/SCSS, Scala, Slim, SML, Solidity,
+Sphinx, SQL, Stylus, Tcl, TeX, Texinfo, Twig, TypeScript, Verilog, VHDL, Vim
+help, VimL, Vue.js, xHtml, XML, XSLT, XQuery, YACC, YAML, YANG data models,
+YARA rules, z80, Zope page templates, and Zsh. See the [manual][checkers] for
+details about the corresponding supported checkers (`:help syntastic-checkers`
+in Vim).
 
 A number of third-party Vim plugins also provide checkers for syntastic, for
 example: [merlin][merlin], [omnisharp-vim][omnisharp], [rust.vim][rust],
@@ -101,10 +104,10 @@ enabled.
 Syntastic itself has rather relaxed requirements: it doesn't have any external
 dependencies, and it needs a version of [Vim][vim] compiled with a few common
 features: `autocmd`, `eval`, `file_in_path`, `modify_fname`, `quickfix`,
-`reltime`, and `user_commands`. Not all possible combinations of features that
-include the ones above make equal sense on all operating systems, but Vim
-version 7 or later with the "normal", "big", or "huge" feature sets should be
-fine.
+`reltime`, `statusline`, and `user_commands`. Not all possible combinations of
+features that include the ones above make equal sense on all operating systems,
+but Vim version 7 or later with the "normal", "big", or "huge" feature sets
+should be fine.
 
 Syntastic should work with any modern plugin managers for Vim, such as
 [NeoBundle][neobundle], [Pathogen][pathogen], [Vim-Addon-Manager][vam],
@@ -437,15 +440,15 @@ scripts.
 __4.12. Q. How can I check scripts written for different versions of Ruby?__
 
 A. Install a Ruby version manager such as [rvm][rvm] or [rbenv][rbenv],
-activate the environment for the relevant version of Ruby, and install in it
-the checkers you want to use.  Set `g:syntastic_ruby_checkers` accordingly in
-your `vimrc`, and run [Vim][vim] from the virtual environment.
+activate the relevant version of Ruby, and install in it the checkers you want
+to use.  Set `g:syntastic_ruby_checkers` accordingly in your `vimrc`, and run
+[Vim][vim] under the relevant Ruby version.
 
-If you're starting Vim from a desktop manager rather than from a terminal you
-might need to write wrapper scripts around your checkers, to activate the
-virtual environment before running the actual checks.  Then you'll need to
-point the relevant `g:syntastic_ruby_<checker>_exec` variables to the wrapper
-scripts.
+If you're starting Vim from a desktop manager rather than from a terminal
+and depending on the version manager you use you might need to write wrapper
+scripts around your checkers, to activate the relevant version of Ruby
+before running the actual checks.  Then you'll need to point the relevant
+`g:syntastic_ruby_<checker>_exec` variables to the wrapper scripts.
 
 <a name="faqperl"></a>
 
@@ -486,6 +489,20 @@ A. The `xcrun` checker used to have a security problem and it has been removed.
 A better checker for __Swift__ is part of the [vim-swift][swift] plugin. If you
 install this plugin the checker should be picked up automatically by syntastic.
 
+<a name="faqvalac"></a>
+
+__4.17. Q. What happened to the `valac` checker?__
+
+A. It is now part of the [vala.vim][vala] plugin. If you install this plugin the
+checker should be picked up automatically by syntastic.
+
+<a name="julialint"></a>
+
+__4.18. Q. What happened to the Julia `lint` checker?__
+
+A. It was removed, since the `Lint.jl` package [has been deprecated][julialint]
+and no longer works with recent Julia versions.
+
 <a name="otherresources"></a>
 
 ## 5\. Resources
@@ -513,6 +530,7 @@ a look at [ghcmod-vim][ghcmod], [jedi-vim][jedi], [python-mode][python_mode], [v
 [google_group]:     https://groups.google.com/group/vim-syntastic
 [guide]:            https://github.com/vim-syntastic/syntastic/wiki/Syntax-Checker-Guide
 [jedi]:             https://github.com/davidhalter/jedi-vim
+[julialint]:        https://github.com/tonyhffong/Lint.jl/issues/269
 [merlin]:           https://github.com/the-lambda-church/merlin
 [myint]:            https://github.com/myint/syntastic-extras
 [neobundle]:        https://github.com/Shougo/neobundle.vim
@@ -530,15 +548,13 @@ a look at [ghcmod-vim][ghcmod], [jedi-vim][jedi], [python-mode][python_mode], [v
 [swift]:            https://github.com/kballard/vim-swift
 [tsuquyomi]:        https://github.com/Quramy/tsuquyomi/
 [unimpaired]:       https://github.com/tpope/vim-unimpaired
+[vala]:             https://github.com/arrufat/vala.vim
 [vam]:              https://github.com/MarcWeber/vim-addon-manager
 [vim]:              http://www.vim.org/
 [vimgo]:            https://github.com/fatih/vim-go
 [virtualenv]:       https://virtualenv.pypa.io/en/stable/
-[vnu]:              http://about.validator.nu/
-[vnu_jar]:          https://github.com/validator/validator/releases/latest
-[vnu_server]:       http://validator.github.io/validator/#standalone
 [vundle]:           https://github.com/gmarik/Vundle.vim
-[ycm]:              http://valloric.github.io/YouCompleteMe/
+[ycm]:              https://github.com/ycm-core/YouCompleteMe
 
 <!--
 vim:tw=79:sw=4:

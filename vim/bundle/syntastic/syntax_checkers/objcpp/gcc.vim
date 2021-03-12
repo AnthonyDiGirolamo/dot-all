@@ -1,6 +1,6 @@
 "============================================================================
 "File:        objcpp.vim
-"Description: Syntax checking plugin for syntastic.vim
+"Description: Syntax checking plugin for syntastic
 "Maintainer:  Gregor Uhlenheuer <kongo2002 at gmail dot com>
 "License:     This program is free software. It comes without any warranty,
 "             to the extent permitted by applicable law. You can redistribute
@@ -23,7 +23,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! SyntaxCheckers_objcpp_gcc_IsAvailable() dict
-    if !exists('g:syntastic_c_compiler')
+    if !exists('g:syntastic_objcpp_compiler')
         let g:syntastic_objcpp_compiler = executable(self.getExec()) ? self.getExec() : 'clang'
     endif
     call self.log('g:syntastic_objcpp_compiler =', g:syntastic_objcpp_compiler)

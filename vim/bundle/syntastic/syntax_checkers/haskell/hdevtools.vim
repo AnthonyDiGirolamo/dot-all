@@ -1,6 +1,6 @@
 "============================================================================
 "File:        hdevtools.vim
-"Description: Syntax checking plugin for syntastic.vim
+"Description: Syntax checking plugin for syntastic
 "Maintainer:  Anthony Carapetis <anthony.carapetis at gmail dot com>
 "License:     This program is free software. It comes without any warranty,
 "             to the extent permitted by applicable law. You can redistribute
@@ -25,9 +25,10 @@ function! SyntaxCheckers_haskell_hdevtools_GetLocList() dict
         let g:syntastic_haskell_hdevtools_args = g:hdevtools_options
     endif
 
+    let buf = bufnr('')
     let makeprg = self.makeprgBuild({
         \ 'exe_after': 'check',
-        \ 'fname': syntastic#util#shexpand('%:p') })
+        \ 'fname': syntastic#util#shescape(fnamemodify(bufname(buf), ':p')) })
 
     let errorformat =
         \ '%-Z %#,'.

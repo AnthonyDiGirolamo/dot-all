@@ -1854,7 +1854,12 @@
 ** vterm
    #+begin_src emacs-lisp
      (use-package vterm
-       :commands (vterm))
+       :commands (vterm)
+       :general
+       (:states '(insert)
+        :keymaps '(vterm-mode-map)
+        "C-d" 'vterm-send-C-d)
+     )
    #+end_src
 
 ** ansi-color
@@ -1874,6 +1879,7 @@
        :general
        (:states '(motion)
         :keymaps '(compilation-mode-map)
+        "M-n" 'tmux-window-navigation/move-down
         "gg" 'evil-goto-first-line
         "G" 'evil-goto-line)
 

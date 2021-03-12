@@ -42,6 +42,11 @@ function! syntastic#util#system(command) abort " {{{2
     try
         let out = system(a:command)
     catch
+        if v:exception =~# '\m^Vim\%((\a\+)\)\=:\%(E145\|E484\|E684\)'
+            " XXX re-throwing unmodified v:exception triggers E608
+            throw substitute(v:exception, '.*:\(E145\|E484\|E684\).*', '\1', '')
+        endif
+
         let crashed = 1
         call syntastic#log#error('exception running system(' . string(a:command) . '): ' . v:exception)
         if syntastic#util#isRunningWindows()
@@ -76,7 +81,7 @@ function! syntastic#util#tmpdir() abort " {{{2
     if (has('unix') || has('mac')) && executable('mktemp') && !has('win32unix')
         " TODO: option "-t" to mktemp(1) is not portable
         let tmp = $TMPDIR !=# '' ? $TMPDIR : $TMP !=# '' ? $TMP : '/tmp'
-        let out = split(syntastic#util#system('mktemp -q -d ' . tmp . '/vim-syntastic-' . getpid() . '-XXXXXXXX'), "\n")
+        let out = split(syntastic#util#system('mktemp -q -d ' . tmp . '/vim-syntastic-' . s:_fuzz() . '-XXXXXXXX'), "\n")
         if v:shell_error == 0 && len(out) == 1
             let tempdir = out[0]
         endif
@@ -84,13 +89,13 @@ function! syntastic#util#tmpdir() abort " {{{2
 
     if tempdir ==# ''
         if has('win32') || has('win64')
-            let tempdir = $TEMP . syntastic#util#Slash() . 'vim-syntastic-' . getpid()
+            let tempdir = $TEMP . syntastic#util#Slash() . 'vim-syntastic-' . s:_fuzz()
         elseif has('win32unix')
-            let tempdir = syntastic#util#CygwinPath('/tmp/vim-syntastic-'  . getpid())
+            let tempdir = syntastic#util#CygwinPath('/tmp/vim-syntastic-'  . s:_fuzz())
         elseif $TMPDIR !=# ''
-            let tempdir = $TMPDIR . '/vim-syntastic-' . getpid()
+            let tempdir = $TMPDIR . '/vim-syntastic-' . s:_fuzz()
         else
-            let tempdir = '/tmp/vim-syntastic-' . getpid()
+            let tempdir = '/tmp/vim-syntastic-' . s:_fuzz()
         endif
 
         try
@@ -132,9 +137,9 @@ endfunction " }}}2
 " returns
 "
 " {'exe': '/usr/bin/perl', 'args': ['-f', '-bar']}
-function! syntastic#util#parseShebang() abort " {{{2
+function! syntastic#util#parseShebang(buf) abort " {{{2
     for lnum in range(1, 5)
-        let line = getline(lnum)
+        let line = get(getbufline(a:buf, lnum), 0, '')
         if line =~# '^#!'
             let line = substitute(line, '\v^#!\s*(\S+/env(\s+-\S+)*\s+)?', '', '')
             let exe = matchstr(line, '\m^\S*\ze')
@@ -253,7 +258,7 @@ endfunction " }}}2
 function! syntastic#util#findFileInParent(what, where) abort " {{{2
     let old_suffixesadd = &suffixesadd
     let &suffixesadd = ''
-    let file = findfile(a:what, escape(a:where, ' ') . ';')
+    let file = findfile(a:what, escape(a:where, ' ,') . ';')
     let &suffixesadd = old_suffixesadd
     return file
 endfunction " }}}2
@@ -307,8 +312,14 @@ function! syntastic#util#fname2buf(fname) abort " {{{2
 
     " this is a best-effort attempt to escape file patterns (cf. :h file-pattern)
     " XXX it fails for filenames containing something like \{2,3}
+    let buf = -1
     for md in [':~:.', ':~', ':p']
-        let buf = bufnr('^' . escape(fnamemodify(a:fname, md), '\*?,{}[') . '$')
+        try
+            " Older versions of Vim can throw E94 here
+            let buf = bufnr('^' . escape(fnamemodify(a:fname, md), '\*?,{}[') . '$')
+        catch
+            " catch everything
+        endtry
         if buf != -1
             break
         endif
@@ -400,9 +411,6 @@ endfunction " }}}2
 function! syntastic#util#setLastTick(buf) abort " {{{2
     call setbufvar(a:buf, 'syntastic_lasttick', getbufvar(a:buf, 'changedtick'))
 endfunction " }}}2
-
-let s:_wid_base = 'syntastic_' . getpid() . '_' . reltimestr(g:_SYNTASTIC_START) . '_'
-let s:_wid_pool = 0
 
 " Add unique IDs to windows
 function! syntastic#util#setWids() abort " {{{2
@@ -614,7 +622,17 @@ endfunction "}}}2
 let s:_getbufvar = function(v:version > 703 || (v:version == 703 && has('patch831')) ? 'getbufvar' : 's:_getbufvar_dumb')
 lockvar s:_getbufvar
 
+function! s:_fuzz_dumb() abort " {{{2
+    return 'tmp'
+endfunction " }}}2
+
+let s:_fuzz = function(exists('*getpid') ? 'getpid' : 's:_fuzz_dumb')
+lockvar s:_fuzz
+
 " }}}1
+
+let s:_wid_base = 'syntastic_' . s:_fuzz() . '_' . reltimestr(g:_SYNTASTIC_START) . '_'
+let s:_wid_pool = 0
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
