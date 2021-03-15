@@ -30,18 +30,23 @@ typedef struct ScrollbackLine {
   VTermScreenCell cells[];
 } ScrollbackLine;
 
-enum {
-  VTERM_PROP_CURSOR_BLOCK = VTERM_PROP_CURSORSHAPE_BLOCK,
-  VTERM_PROP_CURSOR_UNDERLINE = VTERM_PROP_CURSORSHAPE_UNDERLINE,
-  VTERM_PROP_CURSOR_BAR_LEFT = VTERM_PROP_CURSORSHAPE_BAR_LEFT,
-  VTERM_PROP_CURSOR_VISIBLE = 4,
-  VTERM_PROP_CURSOR_NOT_VISIBLE = 5,
-};
+typedef struct ElispCodeListNode {
+  char *code;
+  size_t code_len;
+  struct ElispCodeListNode *next;
+} ElispCodeListNode;
+
+/*  c , p , q , s , 0 , 1 , 2 , 3 , 4 , 5 , 6 , and 7  */
+/* clipboard, primary, secondary, select, or cut buffers 0 through 7 */
+#define SELECTION_TARGET_MAX 12
 
 typedef struct Cursor {
   int row, col;
   int cursor_type;
+  bool cursor_visible;
+  bool cursor_blink;
   bool cursor_type_changed;
+  bool cursor_blink_changed;
 } Cursor;
 
 typedef struct Term {
@@ -72,8 +77,16 @@ typedef struct Term {
   char *directory;
   bool directory_changed;
 
-  char *elisp_code;
-  bool elisp_code_changed;
+  // Single-linked list of elisp_code.
+  // Newer commands are added at the tail.
+  ElispCodeListNode *elisp_code_first;
+  ElispCodeListNode **elisp_code_p_insert; // pointer to the position where new
+                                           // node should be inserted
+
+  /*  c , p , q , s , 0 , 1 , 2 , 3 , 4 , 5 , 6 , and 7  */
+  /* clipboard, primary, secondary, select, or cut buffers 0 through 7 */
+  char selection_target[SELECTION_TARGET_MAX];
+  char *selection_data;
 
   /* the size of dirs almost = window height, value = directory of that line */
   LineInfo **lines;
@@ -85,6 +98,9 @@ typedef struct Term {
   bool disable_bold_font;
   bool disable_underline;
   bool disable_inverse_video;
+  bool ignore_blink_cursor;
+
+  char *cmd_buffer;
 
   int pty_fd;
 } Term;

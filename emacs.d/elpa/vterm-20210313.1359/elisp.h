@@ -29,6 +29,7 @@ extern emacs_value Qrear_nonsticky;
 extern emacs_value Qvterm_prompt;
 
 // Emacs functions
+extern emacs_value Fblink_cursor_mode;
 extern emacs_value Fsymbol_value;
 extern emacs_value Flength;
 extern emacs_value Flist;
@@ -57,6 +58,7 @@ extern emacs_value Fvterm_invalidate;
 extern emacs_value Feq;
 extern emacs_value Fvterm_get_color;
 extern emacs_value Fvterm_eval;
+extern emacs_value Fvterm_selection;
 
 // Utils
 void bind_function(emacs_env *env, const char *name, emacs_value Sfun);
@@ -76,6 +78,7 @@ void goto_char(emacs_env *env, int pos);
 void forward_line(emacs_env *env, int n);
 void goto_line(emacs_env *env, int n);
 void set_cursor_type(emacs_env *env, emacs_value cursor_type);
+void set_cursor_blink(emacs_env *env, bool blink);
 void delete_lines(emacs_env *env, int linenum, int count, bool del_whole_line);
 void recenter(emacs_env *env, emacs_value pos);
 void set_window_point(emacs_env *env, emacs_value win, emacs_value point);
@@ -90,5 +93,7 @@ void set_directory(emacs_env *env, emacs_value string);
 void vterm_invalidate(emacs_env *env);
 emacs_value vterm_get_color(emacs_env *env, int index);
 emacs_value vterm_eval(emacs_env *env, emacs_value string);
+emacs_value vterm_selection(emacs_env *env, emacs_value selection_target,
+                            emacs_value selection_data);
 
 #endif /* ELISP_H */

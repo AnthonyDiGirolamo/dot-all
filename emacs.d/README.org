@@ -26,12 +26,12 @@
    - [[#dired][dired]]
    - [[#eshell][eshell]]
    - [[#shell][shell]]
-   - [[#vterm][vterm]]
    - [[#ansi-color][ansi-color]]
    - [[#compilation][compilation]]
    - [[#calc][calc]]
    - [[#winner---window-layout-undoredo][winner - window layout undo/redo]]
    - [[#eww][eww]]
+ - [[#vterm][vterm]]
  - [[#novel][nov.el]]
  - [[#company-auto-completion][company auto-completion]]
  - [[#key-discovery][key discovery]]
@@ -1851,17 +1851,6 @@
      )
    #+end_src
 
-** vterm
-   #+begin_src emacs-lisp
-     (use-package vterm
-       :commands (vterm)
-       :general
-       (:states '(insert)
-        :keymaps '(vterm-mode-map)
-        "C-d" 'vterm-send-C-d)
-     )
-   #+end_src
-
 ** ansi-color
    #+begin_src emacs-lisp
      (use-package ansi-color
@@ -2057,6 +2046,21 @@
         "RET" 'eww-bookmark-browse)
       :config
       (add-to-list 'evil-motion-state-modes 'eww-bookmark-mode)
+    )
+  #+end_src
+
+* vterm
+  #+begin_src emacs-lisp
+    (use-package vterm
+      :commands (vterm)
+      :general
+      (:states '(normal)
+       :keymaps '(vterm-mode-map)
+       "u" 'vterm-undo)
+      (:states '(insert)
+       :keymaps '(vterm-mode-map)
+       "C-d" 'vterm-send-C-d
+       "C-y" 'vterm-yank)
     )
   #+end_src
 

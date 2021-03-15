@@ -56,11 +56,13 @@
 
 ;;; Code:
 
+(require 'term/xterm)
+
 (unless module-file-suffix
   (error "VTerm needs module support.  Please compile Emacs with
   the --with-modules option!"))
 
-;; Compilation of the module
+;;; Compilation of the module
 
 (defcustom vterm-module-cmake-args ""
   "Arguments given to CMake to compile vterm-module.
@@ -122,7 +124,9 @@ the executable."
              cd -"))
            (buffer (get-buffer-create vterm-install-buffer-name)))
       (pop-to-buffer buffer)
-      (if (zerop (call-process "sh" nil buffer t "-c" make-commands))
+      (compilation-mode)
+      (if (zerop (let ((inhibit-read-only t))
+                   (call-process "sh" nil buffer t "-c" make-commands)))
           (message "Compilation of `emacs-libvterm' module succeeded")
         (error "Compilation of `emacs-libvterm' module failed!")))))
 
@@ -135,8 +139,7 @@ the executable."
         (require 'vterm-module))
     (error "Vterm will not work until `vterm-module' is compiled!")))
 
-;; Silence compiler warnings by informing it of what functions are defined
-(declare-function display-line-numbers-update-width "display-line-numbers")
+;;; Dependencies
 
 ;; Generate this list with:
 ;; awk -F\" '/bind_function*/ {print "(declare-function", $2, "\"vterm-module\")"}' vterm-module.c
@@ -151,14 +154,29 @@ the executable."
 (declare-function vterm--get-icrnl "vterm-module")
 
 (require 'subr-x)
+(require 'find-func)
 (require 'cl-lib)
 (require 'term)
 (require 'color)
 (require 'compile)
 (require 'face-remap)
 
+;;; Options
+
 (defcustom vterm-shell shell-file-name
   "The shell that gets run in the vterm."
+  :type 'string
+  :group 'vterm)
+
+(defcustom vterm-buffer-name "*vterm*"
+  "The basename used for vterm buffers.
+This is the default name used when running `vterm' or
+`vterm-other-window'.
+
+With a numeric prefix argument to `vterm', the buffer name will
+be the value of this variable followed by the number.  For
+example, with the numeric prefix argument 2, the buffer would be
+named \"*vterm*<2>\"."
   :type 'string
   :group 'vterm)
 
@@ -212,14 +230,15 @@ If you use a keybinding with a prefix-key, add that prefix-key to
 this list.  Note that after doing so that prefix-key cannot be sent
 to the terminal anymore.
 
-The mapping is done by the macro `vterm-bind-key', and the
+The mapping is done by the macro `vterm-define-key', and the
 function `vterm--exclude-keys' removes the keybindings defined in
 `vterm-keymap-exceptions'."
   :type '(repeat string)
   :set (lambda (sym val)
          (set sym val)
-         (when (fboundp 'vterm--exclude-keys)
-           (vterm--exclude-keys val)))
+         (when (and (fboundp 'vterm--exclude-keys)
+            (boundp 'vterm-mode-map))
+           (vterm--exclude-keys vterm-mode-map val)))
   :group 'vterm)
 
 (defcustom vterm-exit-functions nil
@@ -265,6 +284,30 @@ information on the how to configure the shell."
   :type 'string
   :group 'vterm)
 
+(defcustom vterm-environment nil
+  "List of extra environment variables to the vterm shell processes only.
+
+demo: '(\"env1=v1\" \"env2=v2\")"
+  :type '(repeat string)
+  :group 'vterm)
+
+
+(defcustom vterm-enable-manipulate-selection-data-by-osc52 nil
+  "Support OSC 52 MANIPULATE SELECTION DATA.
+
+Support copy text to emacs kill ring and system clipboard by using OSC 52.
+For example: send base64 encoded 'foo' to kill ring: echo -en '\e]52;c;Zm9v\a',
+tmux can share its copy buffer to terminals by supporting osc52(like iterm2 xterm),
+you can enable this feature for tmux by :
+set -g set-clipboard on         #osc 52 copy paste share with iterm
+set -ga terminal-overrides ',xterm*:XT:Ms=\E]52;%p1%s;%p2%s\007'
+set -ga terminal-overrides ',screen*:XT:Ms=\E]52;%p1%s;%p2%s\007'
+
+The clipboard querying/clearing functionality offered by OSC 52 is not implemented here,
+And for security reason, this feature is disabled by default."
+  :type 'boolean
+  :group 'vterm)
+
 ;; TODO: Improve doc string, it should not point to the readme but it should
 ;;       be self-contained.
 (defcustom vterm-eval-cmds '(("find-file" find-file)
@@ -287,21 +330,37 @@ The need for an explicit map is to avoid arbitrary code execution."
   :group 'vterm)
 
 (defcustom vterm-disable-underline nil
-  "Disable underline for the cells with underline attribute."
+  "When not-nil, underline text properties are ignored.
+
+This means that vterm will render underlined text as if it was not
+underlined."
   :type  'boolean
   :group 'vterm)
 
 (defcustom vterm-disable-inverse-video nil
-  "Disable inverse video for the cells with inverse video attribute."
+  "When not-nil, inverse video text properties are ignored.
+
+This means that vterm will render reversed video text as if it was not
+such."
   :type  'boolean
   :group 'vterm)
 
-(defcustom vterm-disable-bold-font nil
-  "Disable bold fonts or not.
+(define-obsolete-variable-alias 'vterm-disable-bold-font
+  'vterm-disable-bold "0.0.1")
 
-When `vterm-disable-bold-font' is set to t, bold fonts are
-rendered as normal ones."
+(defcustom vterm-disable-bold-font nil
+  "When not-nil, bold text properties are ignored.
+
+This means that vterm will render bold with the default face weight."
   :type  'boolean
+  :group 'vterm)
+
+(defcustom vterm-ignore-blink-cursor t
+  "When t, vterm will ignore request from application to turn on or off cursor blink.
+
+If nil, cursor in any window may begin to blink or not blink because `blink-cursor-mode`
+is a global minor mode in Emacs, you can use `M-x blink-cursor-mode` to toggle."
+  :type 'boolean
   :group 'vterm)
 
 (defcustom vterm-copy-exclude-prompt t
@@ -326,12 +385,7 @@ not require any shell-side configuration. See
   :type 'boolean
   :group 'vterm)
 
-(defface vterm-color-default
-  `((t :inherit default))
-  "The default normal color and bright color.
-The foreground color is used as ANSI color 0 and the background
-color is used as ANSI color 7."
-  :group 'vterm)
+;;; Faces
 
 (defface vterm-color-black
   `((t :inherit term-color-black))
@@ -390,16 +444,18 @@ color is used as ansi color 15."
   :group 'vterm)
 
 (defface vterm-color-underline
-  `((t :inherit vterm-color-default))
+  `((t :inherit default))
   "Face used to render cells with underline attribute.
 Only foreground is used."
   :group 'vterm)
 
 (defface vterm-color-inverse-video
-  `((t :inherit vterm-color-default))
+  `((t :inherit default))
   "Face used to render cells with inverse video attribute.
 Only background is used."
   :group 'vterm)
+
+;;; Variables
 
 (defvar vterm-color-palette
   [vterm-color-black
@@ -422,13 +478,163 @@ Only background is used."
 (defvar-local vterm--redraw-immididately nil)
 (defvar-local vterm--linenum-remapping nil)
 (defvar-local vterm--prompt-tracking-enabled-p nil)
+(defvar-local vterm--insert-function (symbol-function #'insert))
+(defvar-local vterm--delete-char-function (symbol-function #'delete-char))
+(defvar-local vterm--delete-region-function (symbol-function #'delete-region))
+(defvar-local vterm--undecoded-bytes nil)
 
 (defvar vterm-timer-delay 0.1
   "Delay for refreshing the buffer after receiving updates from libvterm.
 
-Improves performance when receiving large bursts of data.
-If nil, never delay.
-The units are seconds.")
+A larger delary improves performance when receiving large bursts
+of data.  If nil, never delay.  The units are seconds.")
+
+;;; Keybindings
+
+;; We have many functions defined by vterm-define-key.  Later, we will bind some
+;; of the functions.  If the following is not evaluated during compilation, the compiler
+;; will complain that some functions are not defined (eg, vterm-send-C-c)
+(eval-and-compile
+  (defmacro vterm-define-key (key)
+    "Define a command that sends KEY with modifiers C and M to vterm."
+    (declare (indent defun)
+             (doc-string 3))
+    `(defun ,(intern (format "vterm-send-%s" key))()
+       ,(format "Sends %s to the libvterm."  key)
+       (interactive)
+       (vterm-send-key ,(char-to-string (get-byte (1- (length key)) key))
+                       ,(let ((case-fold-search nil))
+                          (or (string-match-p "[A-Z]$" key)
+                              (string-match-p "S-" key)))
+                       ,(string-match-p "M-" key)
+                       ,(string-match-p "C-" key))))
+
+  (mapc (lambda (key)
+          (eval `(vterm-define-key ,key)))
+        (cl-loop for prefix in '("M-")
+                 append (cl-loop for char from ?A to ?Z
+                                 for key = (format "%s%c" prefix char)
+                                 collect key)))
+  (mapc (lambda (key)
+          (eval `(vterm-define-key ,key)))
+        (cl-loop for prefix in '("C-" "M-" "C-S-")
+                 append (cl-loop for char from ?a to ?z
+                                 for key = (format "%s%c" prefix char)
+                                 collect key))))
+
+;; Function keys and most of C- and M- bindings
+(defun vterm--exclude-keys (map exceptions)
+  "Remove EXCEPTIONS from the keys bound by `vterm-define-keys'.
+
+Exceptions are defined by `vterm-keymap-exceptions'."
+  (mapc (lambda (key)
+          (define-key map (kbd key) nil))
+        exceptions)
+  (mapc (lambda (key)
+          (define-key map (kbd key) #'vterm--self-insert))
+        (cl-loop for number from 1 to 12
+                 for key = (format "<f%i>" number)
+                 unless (member key exceptions)
+                 collect key))
+  (mapc (lambda (key)
+          (define-key map (kbd key)
+            (intern (format "vterm-send-%s" key))))
+        (cl-loop for prefix in '("M-")
+                 append (cl-loop for char from ?A to ?Z
+                                 for key = (format "%s%c" prefix char)
+                                 unless (member key exceptions)
+                                 collect key)))
+  (mapc (lambda (key)
+          (define-key map (kbd key)
+            (intern (format "vterm-send-%s" key))))
+        (cl-loop for prefix in '("C-" "M-" "C-S-" )
+                 append (cl-loop for char from ?a to ?z
+                                 for key = (format "%s%c" prefix char)
+                                 unless (member key exceptions)
+                                 collect key))))
+
+(defun vterm-xterm-paste (event)
+  "Handle xterm paste EVENT in vterm."
+  (interactive "e")
+  (with-temp-buffer
+    (xterm-paste event)
+    (kill-new (buffer-string)))
+  (vterm-yank))
+
+(defvar vterm-mode-map
+  (let ((map (make-sparse-keymap)))
+    (vterm--exclude-keys map vterm-keymap-exceptions)
+    (define-key map (kbd "C-]")                 #'vterm--self-insert)
+    (define-key map (kbd "M-<")                 #'vterm--self-insert)
+    (define-key map (kbd "M->")                 #'vterm--self-insert)
+    (define-key map [tab]                       #'vterm-send-tab)
+    (define-key map (kbd "TAB")                 #'vterm-send-tab)
+    (define-key map [backtab]                   #'vterm--self-insert)
+    (define-key map [backspace]                 #'vterm-send-backspace)
+    (define-key map (kbd "DEL")                 #'vterm-send-backspace)
+    (define-key map [delete]                    #'vterm-send-delete)
+    (define-key map [M-backspace]               #'vterm-send-meta-backspace)
+    (define-key map (kbd "M-DEL")               #'vterm-send-meta-backspace)
+    (define-key map [C-backspace]               #'vterm-send-meta-backspace)
+    (define-key map [return]                    #'vterm-send-return)
+    (define-key map (kbd "RET")                 #'vterm-send-return)
+    (define-key map [C-left]                    #'vterm-send-M-b)
+    (define-key map [M-left]                    #'vterm-send-M-b)
+    (define-key map [C-right]                   #'vterm-send-M-f)
+    (define-key map [M-right]                   #'vterm-send-M-f)
+    (define-key map [C-up]                      #'vterm-send-up)
+    (define-key map [C-down]                    #'vterm-send-down)
+    (define-key map [left]                      #'vterm-send-left)
+    (define-key map [right]                     #'vterm-send-right)
+    (define-key map [up]                        #'vterm-send-up)
+    (define-key map [down]                      #'vterm-send-down)
+    (define-key map [prior]                     #'vterm-send-prior)
+    (define-key map [S-prior]                   #'scroll-down-command)
+    (define-key map [next]                      #'vterm-send-next)
+    (define-key map [S-next]                    #'scroll-up-command)
+    (define-key map [home]                      #'vterm--self-insert)
+    (define-key map [end]                       #'vterm--self-insert)
+    (define-key map [C-home]                    #'vterm--self-insert)
+    (define-key map [C-end]                     #'vterm--self-insert)
+    (define-key map [escape]                    #'vterm--self-insert)
+    (define-key map [remap yank]                #'vterm-yank)
+    (define-key map [remap xterm-paste]         #'vterm-xterm-paste)
+    (define-key map [remap yank-pop]            #'vterm-yank-pop)
+    (define-key map [remap mouse-yank-primary]  #'vterm-yank-primary)
+    (define-key map (kbd "C-SPC")               #'vterm--self-insert)
+    (define-key map (kbd "S-SPC")               #'vterm-send-space)
+    (define-key map (kbd "C-_")                 #'vterm--self-insert)
+    (define-key map (kbd "C-/")                 #'vterm-undo)
+    (define-key map (kbd "M-.")                 #'vterm-send-meta-dot)
+    (define-key map (kbd "M-,")                 #'vterm-send-meta-comma)
+    (define-key map (kbd "C-c C-y")             #'vterm--self-insert)
+    (define-key map (kbd "C-c C-c")             #'vterm-send-C-c)
+    (define-key map (kbd "C-c C-l")             #'vterm-clear-scrollback)
+    (define-key map (kbd "C-l")                 #'vterm-clear)
+    (define-key map (kbd "C-\\")                #'vterm-send-ctrl-slash)
+    (define-key map (kbd "C-c C-g")             #'vterm-send-C-g)
+    (define-key map (kbd "C-c C-u")             #'vterm-send-C-u)
+    (define-key map [remap self-insert-command] #'vterm--self-insert)
+    (define-key map (kbd "C-c C-r")             #'vterm-reset-cursor-point)
+    (define-key map (kbd "C-c C-n")             #'vterm-next-prompt)
+    (define-key map (kbd "C-c C-p")             #'vterm-previous-prompt)
+    (define-key map (kbd "C-c C-t")             #'vterm-copy-mode)
+    map))
+
+(defvar vterm-copy-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-t")        #'vterm-copy-mode)
+    (define-key map [return]               #'vterm-copy-mode-done)
+    (define-key map (kbd "RET")            #'vterm-copy-mode-done)
+    (define-key map (kbd "C-c C-r")        #'vterm-reset-cursor-point)
+    (define-key map (kbd "C-a")            #'vterm-beginning-of-line)
+    (define-key map (kbd "C-e")            #'vterm-end-of-line)
+    (define-key map (kbd "C-c C-n")        #'vterm-next-prompt)
+    (define-key map (kbd "C-c C-p")        #'vterm-previous-prompt)
+    map))
+
+
+;;; Mode
 
 (define-derived-mode vterm-mode fundamental-mode "VTerm"
   "Major mode for vterm buffer."
@@ -437,12 +643,17 @@ The units are seconds.")
        (let ((font-height (expt text-scale-mode-step text-scale-mode-amount)))
          (setq vterm--linenum-remapping
                (face-remap-add-relative 'line-number :height font-height))))
-  (let ((process-environment (append `(,(concat "TERM="
+  (let ((process-environment (append vterm-environment
+                                     `(,(concat "TERM="
                                                 vterm-term-environment-variable)
+                                       ,(concat "EMACS_VTERM_PATH="
+                                                (file-name-directory (find-library-name "vterm")))
                                        "INSIDE_EMACS=vterm"
                                        "LINES"
                                        "COLUMNS")
                                      process-environment))
+        (inhibit-eol-conversion t)
+        (coding-system-for-read 'binary)
         (process-adaptive-read-buffering nil)
         (width (max (- (window-body-width) (vterm--get-margin-width))
                     vterm-min-window-width)))
@@ -450,13 +661,19 @@ The units are seconds.")
                                   width vterm-max-scrollback
                                   vterm-disable-bold-font
                                   vterm-disable-underline
-                                  vterm-disable-inverse-video))
+                                  vterm-disable-inverse-video
+                                  vterm-ignore-blink-cursor))
     (setq buffer-read-only t)
     (setq-local scroll-conservatively 101)
     (setq-local scroll-margin 0)
     (setq-local hscroll-margin 0)
     (setq-local hscroll-step 1)
     (setq-local truncate-lines t)
+
+
+    ;; Disable all automatic fontification
+    (setq-local font-lock-defaults '(nil t))
+
     (add-function :filter-return
                   (local 'filter-buffer-substring-function)
                   #'vterm--filter-buffer-substring)
@@ -464,15 +681,25 @@ The units are seconds.")
           (make-process
            :name "vterm"
            :buffer (current-buffer)
-           :command `("/bin/sh" "-c"
-                      ,(format "stty -nl sane iutf8 erase ^? rows %d columns %d >/dev/null && exec %s"
-                               (window-body-height)
-                               width vterm-shell))
+           :command
+           `("/bin/sh" "-c"
+             ,(format
+           "stty -nl sane %s erase ^? rows %d columns %d >/dev/null && exec %s"
+               ;; Some stty implementations (i.e. that of *BSD) do not
+               ;; support the iutf8 option.  to handle that, we run some
+               ;; heuristics to work out if the system supports that
+               ;; option and set the arg string accordingly. This is a
+               ;; gross hack but FreeBSD doesn't seem to want to fix it.
+               ;;
+               ;; See: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=220009
+               (if (eq system-type 'berkeley-unix) "" "iutf8")
+               (window-body-height)
+               width vterm-shell))
            :coding 'no-conversion
            :connection-type 'pty
            :filter #'vterm--filter
            ;; The sentinel is needed if there are exit functions or if
-           ;; vterm-kill-buffer-on-exit is set to t. In this latter case,
+           ;; vterm-kill-buffer-on-exit is set to t.  In this latter case,
            ;; vterm--sentinel will kill the buffer
            :sentinel (when (or vterm-exit-functions
                                vterm-kill-buffer-on-exit)
@@ -519,110 +746,7 @@ Optional argument RESET clears all the errors."
     (goto-char pt)
     (compilation-next-error-function n reset)))
 
-;; We have many functions defined by vterm-define-key.  Later, we will bind some
-;; of the functions.  If the following is not evaluated during compilation, the compiler
-;; will complain that some functions are not defined (eg, vterm-send-C-c)
-(eval-and-compile
-  (defmacro vterm-define-key (key)
-    "Define a command that sends KEY with modifiers C and M to vterm."
-    (declare (indent defun)
-             (doc-string 3))
-    `(defun ,(intern (format "vterm-send-%s" key))()
-       ,(format "Sends %s to the libvterm."  key)
-       (interactive)
-       (vterm-send-key ,(char-to-string (get-byte (1- (length key)) key)) nil
-                       ,(string-prefix-p "M-" key)
-                       ,(string-prefix-p "C-" key))))
-
-  (mapc (lambda (key)
-          (eval `(vterm-define-key ,key)))
-        (cl-loop for prefix in '("C-" "M-")
-                 append (cl-loop for char from ?a to ?z
-                                 for key = (format "%s%c" prefix char)
-                                 collect key))))
-
-
-;; Function keys and most of C- and M- bindings
-(defun vterm--exclude-keys (exceptions)
-  "Remove EXCEPTIONS from the keys bound by `vterm-bind-keys'.
-
-Exceptions are defined by `vterm-keymap-exceptions'."
-  (mapc (lambda (key)
-          (define-key vterm-mode-map (kbd key) nil))
-        exceptions)
-  (mapc (lambda (key)
-          (define-key vterm-mode-map (kbd key) #'vterm--self-insert))
-        (cl-loop for number from 1 to 12
-                 for key = (format "<f%i>" number)
-                 unless (member key exceptions)
-                 collect key))
-  (mapc (lambda (key)
-          (define-key vterm-mode-map (kbd key)
-            (intern (format "vterm-send-%s" key))))
-        (cl-loop for prefix in '("C-" "M-")
-                 append (cl-loop for char from ?a to ?z
-                                 for key = (format "%s%c" prefix char)
-                                 unless (member key exceptions)
-                                 collect key))))
-
-(vterm--exclude-keys vterm-keymap-exceptions)
-
-;; Keybindings
-(define-key vterm-mode-map (kbd "M-<")                 #'vterm--self-insert)
-(define-key vterm-mode-map (kbd "M->")                 #'vterm--self-insert)
-(define-key vterm-mode-map [tab]                       #'vterm-send-tab)
-(define-key vterm-mode-map (kbd "TAB")                 #'vterm-send-tab)
-(define-key vterm-mode-map [backtab]                   #'vterm--self-insert)
-(define-key vterm-mode-map [backspace]                 #'vterm-send-backspace)
-(define-key vterm-mode-map (kbd "DEL")                 #'vterm-send-backspace)
-(define-key vterm-mode-map [delete]                    #'vterm-send-delete)
-(define-key vterm-mode-map [M-backspace]               #'vterm-send-meta-backspace)
-(define-key vterm-mode-map (kbd "M-DEL")               #'vterm-send-meta-backspace)
-(define-key vterm-mode-map [return]                    #'vterm-send-return)
-(define-key vterm-mode-map (kbd "RET")                 #'vterm-send-return)
-(define-key vterm-mode-map [left]                      #'vterm-send-left)
-(define-key vterm-mode-map [right]                     #'vterm-send-right)
-(define-key vterm-mode-map [up]                        #'vterm-send-up)
-(define-key vterm-mode-map [down]                      #'vterm-send-down)
-(define-key vterm-mode-map [prior]                     #'vterm-send-prior)
-(define-key vterm-mode-map [next]                      #'vterm-send-next)
-(define-key vterm-mode-map [home]                      #'vterm--self-insert)
-(define-key vterm-mode-map [end]                       #'vterm--self-insert)
-(define-key vterm-mode-map [escape]                    #'vterm--self-insert)
-(define-key vterm-mode-map [remap yank]                #'vterm-yank)
-(define-key vterm-mode-map [remap yank-pop]            #'vterm-yank-pop)
-(define-key vterm-mode-map [remap mouse-yank-primary]  #'vterm-yank-primary)
-(define-key vterm-mode-map (kbd "C-SPC")               #'vterm--self-insert)
-(define-key vterm-mode-map (kbd "S-SPC")               #'vterm-send-space)
-(define-key vterm-mode-map (kbd "C-_")                 #'vterm--self-insert)
-(define-key vterm-mode-map (kbd "C-/")                 #'vterm-undo)
-(define-key vterm-mode-map (kbd "M-.")                 #'vterm-send-meta-dot)
-(define-key vterm-mode-map (kbd "M-,")                 #'vterm-send-meta-comma)
-(define-key vterm-mode-map (kbd "C-c C-y")             #'vterm--self-insert)
-(define-key vterm-mode-map (kbd "C-c C-c")             #'vterm-send-C-c)
-(define-key vterm-mode-map (kbd "C-c C-l")             #'vterm-clear-scrollback)
-(define-key vterm-mode-map (kbd "C-l")                 #'vterm-clear)
-(define-key vterm-mode-map (kbd "C-\\")                #'vterm-send-ctrl-slash)
-(define-key vterm-mode-map (kbd "C-c C-g")             #'vterm-send-C-g)
-(define-key vterm-mode-map (kbd "C-c C-u")             #'vterm-send-C-u)
-(define-key vterm-mode-map [remap self-insert-command] #'vterm--self-insert)
-
-(define-key vterm-mode-map (kbd "C-c C-r")             #'vterm-reset-cursor-point)
-(define-key vterm-mode-map (kbd "C-c C-n")             #'vterm-next-prompt)
-(define-key vterm-mode-map (kbd "C-c C-p")             #'vterm-previous-prompt)
-
-(define-key vterm-mode-map (kbd "C-c C-t")             #'vterm-copy-mode)
-
-(defvar vterm-copy-mode-map (make-sparse-keymap))
-(define-key vterm-copy-mode-map (kbd "C-c C-t")        #'vterm-copy-mode)
-(define-key vterm-copy-mode-map [return]               #'vterm-copy-mode-done)
-(define-key vterm-copy-mode-map (kbd "RET")            #'vterm-copy-mode-done)
-(define-key vterm-copy-mode-map (kbd "C-c C-r")        #'vterm-reset-cursor-point)
-(define-key vterm-copy-mode-map (kbd "C-a")            #'vterm-beginning-of-line)
-(define-key vterm-copy-mode-map (kbd "C-e")            #'vterm-end-of-line)
-(define-key vterm-copy-mode-map (kbd "C-c C-n")        #'vterm-next-prompt)
-(define-key vterm-copy-mode-map (kbd "C-c C-p")        #'vterm-previous-prompt)
-
+;;; Copy Mode
 
 (define-minor-mode vterm-copy-mode
   "Toggle `vterm-copy-mode'.
@@ -672,26 +796,35 @@ will invert `vterm-copy-exclude-prompt' for that call."
   (kill-ring-save (region-beginning) (region-end))
   (vterm-copy-mode -1))
 
+;;; Commands
+
 (defun vterm--self-insert ()
   "Send invoking key to libvterm."
   (interactive)
   (when vterm--term
-    (let* ((modifiers (event-modifiers last-input-event))
+    (let* ((modifiers (event-modifiers last-command-event))
            (shift (memq 'shift modifiers))
            (meta (memq 'meta modifiers))
-           (ctrl (memq 'control modifiers)))
-      (when-let ((key (key-description (vector (event-basic-type last-input-event)))))
+           (ctrl (memq 'control modifiers))
+           (raw-key (event-basic-type last-command-event))
+           (ev-key (if input-method-function
+                       (let ((inhibit-read-only t))
+                         (funcall input-method-function raw-key))
+                     (vector raw-key))))
+      (when-let ((key (key-description ev-key)))
         (vterm-send-key key shift meta ctrl)))))
 
 (defun vterm-send-key (key &optional shift meta ctrl)
   "Send KEY to libvterm with optional modifiers SHIFT, META and CTRL."
+  (deactivate-mark)
   (when vterm--term
     (let ((inhibit-redisplay t)
           (inhibit-read-only t))
-      (when (and (not (symbolp last-input-event)) shift (not meta) (not ctrl))
+      (when (and (not (symbolp last-command-event)) shift (not meta) (not ctrl))
         (setq key (upcase key)))
       (vterm--update vterm--term key shift meta ctrl)
-      (setq vterm--redraw-immididately t))))
+      (setq vterm--redraw-immididately t)
+       (accept-process-output vterm--process vterm-timer-delay nil t))))
 
 (defun vterm-send (key)
   "Send KEY to libvterm.  KEY can be anything `kbd' understands."
@@ -716,6 +849,7 @@ will invert `vterm-copy-exclude-prompt' for that call."
 (defun vterm-send-return ()
   "Send `C-m' to the libvterm."
   (interactive)
+  (deactivate-mark)
   (when vterm--term
     (if (vterm--get-icrnl vterm--term)
         (process-send-string vterm--process "\C-j")
@@ -826,18 +960,19 @@ prefix argument ARG or with \\[universal-argument]."
 
 Argument ARG is passed to `yank'."
   (interactive "P")
+  (deactivate-mark)
+  (vterm-goto-char (point))
   (let ((inhibit-read-only t))
-    (cl-letf (((symbol-function 'insert-for-yank)
-               #'(lambda (str) (vterm-send-string str t))))
+    (cl-letf (((symbol-function 'insert-for-yank) #'vterm-insert))
       (yank arg))))
 
 (defun vterm-yank-primary ()
   "Yank text from the primary selection in vterm."
   (interactive)
+  (vterm-goto-char (point))
   (let ((inhibit-read-only t)
         (primary (gui-get-primary-selection)))
-    (cl-letf (((symbol-function 'insert-for-yank)
-               #'(lambda (str) (vterm-send-string str t))))
+    (cl-letf (((symbol-function 'insert-for-yank) #'vterm-insert))
       (insert-for-yank primary))))
 
 (defun vterm-yank-pop (&optional arg)
@@ -845,10 +980,10 @@ Argument ARG is passed to `yank'."
 
 Argument ARG is passed to `yank'"
   (interactive "p")
+  (vterm-goto-char (point))
   (let ((inhibit-read-only t)
         (yank-undo-function #'(lambda (_start _end) (vterm-undo))))
-    (cl-letf (((symbol-function 'insert-for-yank)
-               #'(lambda (str) (vterm-send-string str t))))
+    (cl-letf (((symbol-function 'insert-for-yank) #'vterm-insert))
       (yank-pop arg))))
 
 (defun vterm-send-string (string &optional paste-p)
@@ -856,12 +991,81 @@ Argument ARG is passed to `yank'"
 Optional argument PASTE-P paste-p."
   (when vterm--term
     (when paste-p
-      (vterm--update vterm--term "<start_paste>" nil nil nil))
+      (vterm--update vterm--term "<start_paste>" ))
     (dolist (char (string-to-list string))
-      (vterm--update vterm--term (char-to-string char) nil nil nil))
+      (vterm--update vterm--term (char-to-string char)))
     (when paste-p
-      (vterm--update vterm--term "<end_paste>" nil nil nil)))
-  (setq vterm--redraw-immididately t))
+      (vterm--update vterm--term "<end_paste>")))
+  (setq vterm--redraw-immididately t)
+  (accept-process-output vterm--process vterm-timer-delay nil t))
+
+(defun vterm-insert (&rest contents)
+  "Insert the arguments, either strings or characters, at point.
+
+Provide similar behavior as `insert' for vterm."
+  (when vterm--term
+    (vterm--update vterm--term "<start_paste>")
+    (dolist (c contents)
+      (if (characterp c)
+          (vterm--update vterm--term (char-to-string c))
+        (dolist (char (string-to-list c))
+          (vterm--update vterm--term (char-to-string char)))))
+    (vterm--update vterm--term "<end_paste>")
+    (setq vterm--redraw-immididately t)
+    (accept-process-output vterm--process vterm-timer-delay nil t)))
+
+(defun vterm-delete-region (start end)
+  "Delete the text between START and END for vterm. "
+  (when vterm--term
+    (if (vterm-goto-char start)
+        (cl-loop repeat (- end start) do
+                 (vterm-send-delete))
+      (let ((inhibit-read-only nil))
+        (vterm--delete-region start end)))))
+
+(defun vterm-goto-char (pos)
+  "Set point to POSITION for vterm.
+
+The return value is `t' when point moved successfully.
+It will reset to original position if it can't move there."
+  (when (and vterm--term
+             (vterm-cursor-in-command-buffer-p)
+             (vterm-cursor-in-command-buffer-p pos))
+    (let ((moved t)
+          (origin-point (point))
+          pt cursor-pos succ)
+      (vterm-reset-cursor-point)
+      (setq cursor-pos (point))
+      (setq pt cursor-pos)
+      (while (and (> pos pt) moved)
+        (vterm-send-right)
+        (setq moved (not (= pt (point))))
+        (setq pt (point)))
+      (setq pt (point))
+      (setq moved t)
+      (while (and (< pos pt) moved)
+        (vterm-send-left)
+        (setq moved (not (= pt (point))))
+        (setq pt (point)))
+      (setq succ (= pos (point)))
+      (unless succ
+        (vterm-goto-char cursor-pos)
+        (goto-char origin-point))
+      succ)))
+
+;;; Internal
+
+(defun vterm--delete-region(start end)
+  "A wrapper for `delete-region'."
+  (funcall vterm--delete-region-function start end))
+
+(defun vterm--insert(&rest content)
+  "A wrapper for `insert'."
+  (apply vterm--insert-function content))
+
+(defun vterm--delete-char(n &optional killflag)
+  "A wrapper for `delete-char'."
+  (funcall vterm--delete-char-function n killflag))
 
 (defun vterm--invalidate ()
   "The terminal buffer is invalidated, the buffer needs redrawing."
@@ -894,56 +1098,191 @@ Argument BUFFER the terminal buffer."
             (windows (get-buffer-window-list)))
         (setq vterm--redraw-timer nil)
         (when vterm--term
-          ;; Check is `display-line-numbers' is being used, in that case, update
-          ;; the width
-          (when (and (bound-and-true-p display-line-numbers)
-                     (require 'display-line-numbers nil 'noerror)
-                     (get-buffer-window buffer t)
-                     (ignore-errors (display-line-numbers-update-width)))
-            (window--adjust-process-windows))
           (vterm--redraw vterm--term)
           (unless (zerop (window-hscroll))
             (when (cl-member (selected-window) windows :test #'eq)
               (set-window-hscroll (selected-window) 0))))))))
 
+(defun vterm--selection (targets data)
+  "OSC 52 Manipulate Selection Data.
+Search Manipulate Selection Data in
+ https://invisible-island.net/xterm/ctlseqs/ctlseqs.html ."
+  (when vterm-enable-manipulate-selection-data-by-osc52
+    (unless (or (string-equal data "?")
+                (string-empty-p data))
+      (let* ((inhibit-eol-conversion t)
+            (decoded-data (decode-coding-string
+                           (base64-decode-string data) locale-coding-system))
+            (select-enable-clipboard select-enable-clipboard)
+            (select-enable-primary select-enable-primary))
+        ;; https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+        ;; c , p , q , s , 0 , 1 , 2 , 3 , 4 , 5 , 6 , and 7
+        ;; clipboard, primary, secondary, select, or cut buffers 0 through 7
+        (unless (string-empty-p targets)
+          (setq select-enable-clipboard nil)
+          (setq select-enable-primary nil))
+        (when (cl-find ?c targets)
+          (setq select-enable-clipboard t))
+        (when (cl-find ?p targets)
+          (setq select-enable-primary t))
+
+        (kill-new decoded-data)
+        (message "kill-ring is updated by vterm OSC 52(Manipulate Selection Data)")))))
+
+;;; Entry Points
+
 ;;;###autoload
-(defun vterm (&optional buffer-name)
-  "Create a new vterm.
+(defun vterm (&optional arg)
+  "Create an interactive Vterm buffer.
+Start a new Vterm session, or switch to an already active
+session.  Return the buffer selected (or created).
 
-If called with an argument BUFFER-NAME, the name of the new buffer will
-be set to BUFFER-NAME, otherwise it will be `vterm'"
-  (interactive)
-  (let ((buffer (generate-new-buffer (or buffer-name "vterm"))))
-    (with-current-buffer buffer
-      (vterm-mode))
-    (pop-to-buffer-same-window buffer)))
+With a nonnumeric prefix arg, create a new session.
+
+With a string prefix arg, create a new session with arg as buffer name.
+
+With a numeric prefix arg (as in `C-u 42 M-x vterm RET'), switch
+to the session with that number, or create it if it doesn't
+already exist.
+
+The buffer name used for Vterm sessions is determined by the
+value of `vterm-buffer-name'."
+  (interactive "P")
+  (vterm--internal #'pop-to-buffer-same-window arg))
 
 ;;;###autoload
-(defun vterm-other-window (&optional buffer-name)
-  "Create a new vterm in another window.
+(defun vterm-other-window (&optional arg)
+  "Create an interactive Vterm buffer in another window.
+Start a new Vterm session, or switch to an already active
+session.  Return the buffer selected (or created).
 
-If called with an argument BUFFER-NAME, the name of the new buffer will
-be set to BUFFER-NAME, otherwise it will be `vterm'"
-  (interactive)
-  (let ((buffer (generate-new-buffer (or buffer-name "vterm"))))
-    (with-current-buffer buffer
-      (vterm-mode))
-    (pop-to-buffer buffer)))
+With a nonnumeric prefix arg, create a new session.
+
+With a string prefix arg, create a new session with arg as buffer name.
+
+With a numeric prefix arg (as in `C-u 42 M-x vterm RET'), switch
+to the session with that number, or create it if it doesn't
+already exist.
+
+The buffer name used for Vterm sessions is determined by the
+value of `vterm-buffer-name'."
+  (interactive "P")
+  (vterm--internal #'pop-to-buffer arg))
+
+(defun vterm--internal (pop-to-buf-fun &optional arg)
+  (cl-assert vterm-buffer-name)
+  (let ((buf (cond ((numberp arg)
+                    (get-buffer-create (format "%s<%d>"
+                                               vterm-buffer-name
+                                               arg)))
+                   ((stringp arg) (generate-new-buffer arg))
+                   (arg (generate-new-buffer vterm-buffer-name))
+                   (t
+                    (get-buffer-create vterm-buffer-name)))))
+    (cl-assert (and buf (buffer-live-p buf)))
+    (with-current-buffer buf
+      (unless (derived-mode-p 'vterm-mode)
+        (vterm-mode)))
+    (funcall pop-to-buf-fun buf)))
+
+;;; Internal
 
 (defun vterm--flush-output (output)
   "Send the virtual terminal's OUTPUT to the shell."
   (process-send-string vterm--process output))
+;; Terminal emulation
+;; This is the standard process filter for term buffers.
+;; It emulates (most of the features of) a VT100/ANSI-style terminal.
+
+;; References:
+;; [ctlseqs]: http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+;; [ECMA-48]: https://www.ecma-international.org/publications/standards/Ecma-048.htm
+;; [vt100]: https://vt100.net/docs/vt100-ug/chapter3.html
+
+(defconst vterm-control-seq-regexp
+  (concat
+   ;; A control character,
+   "\\(?:[\r\n\000\007\t\b\016\017]\\|"
+   ;; a C1 escape coded character (see [ECMA-48] section 5.3 "Elements
+   ;; of the C1 set"),
+   "\e\\(?:[DM78c]\\|"
+   ;; another Emacs specific control sequence for term.el,
+   "AnSiT[^\n]+\n\\|"
+   ;; another Emacs specific control sequence for vterm.el
+   ;; printf "\e]%s\e\\"
+   "\\][^\e]+\e\\\\\\|"
+   ;; or an escape sequence (section 5.4 "Control Sequences"),
+   "\\[\\([\x30-\x3F]*\\)[\x20-\x2F]*[\x40-\x7E]\\)\\)")
+  "Regexp matching control sequences handled by term.el.")
+
+(defconst vterm-control-seq-prefix-regexp
+  "[\032\e]")
 
 (defun vterm--filter (process input)
   "I/O Event.  Feeds PROCESS's INPUT to the virtual terminal.
 
 Then triggers a redraw from the module."
   (let ((inhibit-redisplay t)
+        (inhibit-eol-conversion t)
         (inhibit-read-only t)
-        (buf (process-buffer process)))
+        (buf (process-buffer process))
+        (i 0)
+        (str-length (length input))
+        decoded-substring
+        funny)
     (when (buffer-live-p buf)
       (with-current-buffer buf
-        (vterm--write-input vterm--term input)
+        ;; borrowed from term.el
+        ;; Handle non-control data.  Decode the string before
+        ;; counting characters, to avoid garbling of certain
+        ;; multibyte characters (https://github.com/akermu/emacs-libvterm/issues/394).
+        ;; same bug of term.el https://debbugs.gnu.org/cgi/bugreport.cgi?bug=1006
+        (when vterm--undecoded-bytes
+          (setq input (concat vterm--undecoded-bytes input))
+          (setq vterm--undecoded-bytes nil)
+          (setq str-length (length input)))
+        (while (< i str-length)
+          (setq funny (string-match vterm-control-seq-regexp input i))
+          (let ((ctl-end (if funny (match-end 0)
+                           (setq funny (string-match vterm-control-seq-prefix-regexp input i))
+                           (if funny
+                               (setq vterm--undecoded-bytes
+                                     (substring input funny))
+                             (setq funny str-length))
+                           ;; The control sequence ends somewhere
+                           ;; past the end of this string.
+                           (1+ str-length))))
+            (when (> funny i)
+              ;; Handle non-control data.  Decode the string before
+              ;; counting characters, to avoid garbling of certain
+              ;; multibyte characters (emacs bug#1006).
+              (setq decoded-substring
+                    (decode-coding-string
+                     (substring input i funny)
+                     locale-coding-system t))
+              ;; Check for multibyte characters that ends
+              ;; before end of string, and save it for
+              ;; next time.
+              (when (= funny str-length)
+                (let ((partial 0)
+                      (count (length decoded-substring)))
+                  (while (and (< partial count)
+                              (eq (char-charset (aref decoded-substring
+                                                      (- count 1 partial)))
+                                  'eight-bit))
+                    (cl-incf partial))
+                  (when (> count partial 0)
+                    (setq vterm--undecoded-bytes
+                          (substring decoded-substring (- partial)))
+                    (setq decoded-substring
+                          (substring decoded-substring 0 (- partial)))
+                    (cl-decf str-length partial)
+                    (cl-decf funny partial))))
+              (ignore-errors (vterm--write-input vterm--term decoded-substring))
+              (setq i funny))
+            (when (<= ctl-end str-length)
+              (ignore-errors (vterm--write-input vterm--term (substring input i ctl-end))))
+            (setq i ctl-end)))
         (vterm--update vterm--term)))))
 
 (defun vterm--sentinel (process event)
@@ -975,6 +1314,11 @@ Argument EVENT process event."
   "Adjust width of window WINDOWS associated to process PROCESS.
 
 `vterm-min-window-width' determines the minimum width allowed."
+  ;; We want `vterm-copy-mode' to resemble a fundamental buffer as much as
+  ;; possible.  Hence, we must not call this function when the minor mode is
+  ;; enabled, otherwise the buffer would be redrawn, messing around with the
+  ;; position of the point.
+  (unless vterm-copy-mode
   (let* ((size (funcall window-adjust-process-window-size-function
                         process windows))
          (width (car size))
@@ -987,13 +1331,15 @@ Argument EVENT process event."
                (> width 0)
                (> height 0))
       (vterm--set-size vterm--term height width)
-      (cons width height))))
+      (cons width height)))))
 
 (defun vterm--get-margin-width ()
   "Get margin width of vterm buffer when `display-line-numbers-mode' is enabled."
-  (let ((width 0))
+  (let ((width 0)
+        (max-line-num (+ (frame-height) vterm-max-scrollback)))
     (when (bound-and-true-p display-line-numbers)
-      (setq width (+ width (or display-line-numbers-width 0) 4)))
+      (setq width (+ width 4
+                     (string-width (number-to-string max-line-num)))))
     width))
 
 (defun vterm--delete-lines (line-num count &optional delete-whole-line)
@@ -1003,10 +1349,10 @@ If option DELETE-WHOLE-LINE is non-nil, then this command kills
 the whole line including its terminating newline"
   (save-excursion
     (when (vterm--goto-line line-num)
-      (delete-region (point) (point-at-eol count))
+      (vterm--delete-region (point) (point-at-eol count))
       (when (and delete-whole-line
                  (looking-at "\n"))
-        (delete-char 1)))))
+        (vterm--delete-char 1)))))
 
 (defun vterm--goto-line (n)
   "Go to line N and return true on success.
@@ -1061,8 +1407,6 @@ If N is negative backward-line from end of buffer."
   "Get color by index from `vterm-color-palette'.
 Argument INDEX index of the terminal color.
 Special values for INDEX are:
--1 means default foreground.
--2 for default background.
 -11 foreground for cells with underline attribute, foreground of
 the `vterm-color-underline' face is used in this case.
 -12 background for cells with inverse video attribute, background
@@ -1072,18 +1416,16 @@ of the `vterm-color-inverse-video' face is used in this case."
     (face-foreground
      (elt vterm-color-palette index)
      nil 'default))
-   ((and (>= index 8 ) (< index 16))
+   ((and (>= index 8) (< index 16))
     (face-background
      (elt vterm-color-palette (% index 8))
      nil 'default))
-   ((= index -1)               ;-1 foreground
-    (face-foreground 'vterm-color-default nil 'default))
    ((= index -11)
     (face-foreground 'vterm-color-underline nil 'default))
    ((= index -12)
     (face-background 'vterm-color-inverse-video nil 'default))
-   (t                                   ;-2 background
-    (face-background 'vterm-color-default nil 'default))))
+   (t
+    nil)))
 
 (defun vterm--eval (str)
   "Check if string STR is `vterm-eval-cmds' and execute command.
@@ -1189,6 +1531,17 @@ More information see `vterm--prompt-tracking-enabled-p' and
   "Return t if the cursor position is at shell prompt."
   (= (point) (or (vterm--get-prompt-point) 0)))
 
+(defun vterm-cursor-in-command-buffer-p (&optional pt)
+  "Check whether cursor in command buffer area."
+  (save-excursion
+    (vterm-reset-cursor-point)
+    (let ((promp-pt (vterm--get-prompt-point))
+          eol)
+      (when promp-pt
+        (goto-char promp-pt)
+        (setq eol (vterm--get-end-of-line))
+        (<= promp-pt (or pt (vterm--get-cursor-point)) eol)))))
+
 (defun vterm-beginning-of-line ()
   "Move point to the beginning of the line.
 
@@ -1210,7 +1563,8 @@ Effectively toggle between the two positions."
   "Make sure the cursor at the right position."
   (interactive)
   (when vterm--term
-    (vterm--reset-point vterm--term)))
+    (let ((inhibit-read-only t))
+      (vterm--reset-point vterm--term))))
 
 (defun vterm--get-cursor-point ()
   "Get term cursor position."
@@ -1230,14 +1584,16 @@ can find them and remove them."
       (goto-char fake-newline)
       (cl-assert (eq ?\n (char-after)))
       (let ((inhibit-read-only t))
-        (delete-char 1)))))
+        (vterm--delete-char 1)))))
+
 
 (defun vterm--filter-buffer-substring (content)
   "Filter string CONTENT of fake/injected newlines."
   (with-temp-buffer
-    (insert content)
+    (vterm--insert content)
     (vterm--remove-fake-newlines)
     (buffer-string)))
+
 
 (provide 'vterm)
 ;;; vterm.el ends here
