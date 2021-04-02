@@ -3608,9 +3608,9 @@
          ("bi" ibuffer                 "buffer ibuffer")
          ("bk" kill-this-buffer        "buffer kill")
          ("br" revert-buffer           "buffer revert")
-         ("yb" amd/copy-buffer                  "yank buffer")
-         ("yxy" amd/x-yank                      "xsel yank")
-         ("yxp" amd/x-paste                     "xsel paste")
+         ("yb" amd/copy-buffer         "yank buffer")
+         ("yxy" amd/x-yank             "xsel yank")
+         ("yxp" amd/x-paste            "xsel paste")
          )
 
         (
