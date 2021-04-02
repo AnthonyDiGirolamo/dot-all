@@ -25,6 +25,7 @@ https://github.com/tpope/vim-speeddating.git
 "
 urls="
 https://github.com/vim-syntastic/syntastic.git
+https://github.com/ycm-core/YouCompleteMe.git
 "
 for URL in $urls
 do
