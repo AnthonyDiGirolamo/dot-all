@@ -35,7 +35,8 @@
 
     function add_directory_to_path --argument-names new_dir
       if test -d $new_dir
-        set -x PATH $new_dir $PATH
+        fish_add_path --move --path $new_dir
+        # set -x PATH $new_dir $PATH
       end
     end
 
@@ -47,7 +48,9 @@
     add_directory_to_path $HOME/dot-all/bin
 
     add_directory_to_path /usr/local/go/bin
-    add_directory_to_path $HOME/.local/bin
+    if not set -q VIRTUAL_ENV
+      add_directory_to_path $HOME/.local/bin
+    end
     add_directory_to_path $HOME/.cargo/bin
     add_directory_to_path $HOME/.npm-packages/bin
     add_directory_to_path $HOME/.rbenv/bin

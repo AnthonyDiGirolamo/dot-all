@@ -33,7 +33,7 @@ do
        echo $URL
        echo "-> ${GDIR}"
        rm -rf $GDIR
-       git clone --depth=1 --branch=master $URL
+       git clone --depth=1 --branch=master --recurse-submodules $URL
        rm -rf $GDIR/.git
        git add -A $GDIR
 done

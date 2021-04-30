@@ -19,8 +19,8 @@ help:  ## show help
 	@grep -hE '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 # Help grep source: https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 
-fish_url := https://github.com/fish-shell/fish-shell/releases/download/3.1.0/fish-3.1.0.tar.gz
-fish_md5 := 8c9995a5a6d07ce05a1413ca24e16691
+fish_url := https://github.com/fish-shell/fish-shell/releases/download/3.2.2/fish-3.2.2.tar.xz
+fish_md5 := 606253699ce41991b03a93bcc6047d51
 
 # emacs_url := http://ftpmirror.gnu.org/emacs/emacs-26.3.tar.xz
 # emacs_md5 := 0a2e4b965d31a7cb1930eae3b79df793
@@ -83,12 +83,9 @@ ECHO_TAG_MESSAGE=printf "\033[36m[%s]\033[0m %s\n"
 build-fish: download-fish
 	@$(ECHO_TAG_MESSAGE) "BUILD" "fish"
 	$(CD_TO_BUILD_DIR)
-	mkdir -p build ; cd build
-	cmake -DCMAKE_INSTALL_PREFIX=~/apps/fish ..
+	cmake -DCMAKE_INSTALL_PREFIX=~/apps/fish .
 	make -j 4
-	make install
-	cd $(abspath $(CACHEDIR)/fish)
-	rm -rf $$D
+	make install && cd $(abspath $(CACHEDIR)/fish) && rm -rf $$D
 
 .PHONY: build-emacs
 .ONESHELL:

@@ -100,6 +100,8 @@
 
     # Run fish if available
     if-shell 'which fish' 'set -g default-command "fish"'
+    # Use locally built fish if available
+    if-shell 'test -f $HOME/apps/fish/bin/fish' 'set -g default-command "$HOME/apps/fish/bin/fish"'
 
     set-option -g status on
     set-option -g status-interval 2
