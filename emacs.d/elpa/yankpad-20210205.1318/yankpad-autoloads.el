@@ -10,20 +10,14 @@
 ;;; Generated autoloads from yankpad.el
 
 (autoload 'yankpad-set-category "yankpad" "\
-Change the yankpad category.
-
-\(fn)" t nil)
+Change the yankpad category." t nil)
 
 (autoload 'yankpad-insert "yankpad" "\
 Insert an entry from the yankpad.
-Uses `yankpad-category', and prompts for it if it isn't set.
-
-\(fn)" t nil)
+Uses `yankpad-category', and prompts for it if it isn't set." t nil)
 
 (autoload 'yankpad-capture-snippet "yankpad" "\
-`org-capture' a snippet to current `yankpad-category' (prompts if not set).
-
-\(fn)" t nil)
+`org-capture' a snippet to current `yankpad-category' (prompts if not set)." t nil)
 
 (autoload 'yankpad-expand "yankpad" "\
 Replace symbol at point with a snippet.
@@ -35,14 +29,10 @@ This function can be added to `hippie-expand-try-functions-list'.
 \(fn &optional FIRST)" t nil)
 
 (autoload 'yankpad-edit "yankpad" "\
-Open the yankpad file for editing.
-
-\(fn)" t nil)
+Open the yankpad file for editing." t nil)
 
 (autoload 'yankpad-map "yankpad" "\
-Create and execute a keymap out of the last tags of snippets in `yankpad-category'.
-
-\(fn)" t nil)
+Create and execute a keymap out of the last tags of snippets in `yankpad-category'." t nil)
 
 (autoload 'company-yankpad "yankpad" "\
 Company backend for yankpad.

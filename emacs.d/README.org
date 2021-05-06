@@ -3177,6 +3177,7 @@
     ;; Python Settings
     (use-package elpy
       :custom
+      (elpy-rpc-python-command "python3")
       (elpy-modules '(elpy-module-sane-defaults
                       elpy-module-company
                       elpy-module-eldoc

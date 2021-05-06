@@ -99,13 +99,17 @@ in the Python shell."
   :type 'integer
   :group 'elpy)
 
-
 (defcustom elpy-shell-starting-directory 'project-root
   "Directory in which Python shells will be started.
 
 Can be `project-root' (default) to use the current project root,
 `current-directory' to use the buffer current directory, or a
-string indicating a specific path."
+string indicating a specific path.
+
+\\<elpy-mode-map>
+Running python interpeters need to be restarted (with
+\\[elpy-shell-kill] followed by \\[elpy-shell-switch-to-shell]) for
+this option to be taken into account."
   :type '(choice (const :tag "Project root" project-root)
                  (const :tag "Current directory" current-directory)
                  (string :tag "Specific directory"))
@@ -132,7 +136,11 @@ variable is set to nil, the current directory is used instead."
 of a cell (beginning or ending). By default, lines starting with
 ``##`` are treated as a cell boundaries, as are the boundaries in
 Python files exported from IPython or Jupyter notebooks (e.g.,
-``# <markdowncell>``, ``# In[1]:'', or ``# Out[1]:``)."
+``# <markdowncell>``, ``# In[1]:'', or ``# Out[1]:``).
+
+Note that `elpy-shell-cell-beginning-regexp' must also match
+the first boundary of the code cell."
+
   :type 'string
   :group 'elpy)
 
@@ -273,7 +281,12 @@ Python process. This allows the process to start up."
                       (expand-file-name elpy-shell-starting-directory)))
                     (t
                      (error "Wrong value for `elpy-shell-starting-directory', please check this variable documentation and set it to a proper value")))))
-        (run-python (python-shell-parse-command) nil t))
+        ;; We cannot use `run-python` directly, as it selects the new shell
+        ;; buffer. See https://github.com/jorgenschaefer/elpy/issues/1848
+        (python-shell-make-comint
+         (python-shell-parse-command)
+         (python-shell-get-process-name nil)
+         t))
       (when sit (sit-for sit))
       (get-buffer-process bufname))))
 

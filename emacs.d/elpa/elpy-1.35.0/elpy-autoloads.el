@@ -17,6 +17,11 @@ Enable Elpy in all future Python buffers.
 (autoload 'elpy-mode "elpy" "\
 Minor mode in Python buffers for the Emacs Lisp Python Environment.
 
+If called interactively, enable Elpy mode if ARG is positive, and
+disable it if ARG is zero or negative.  If called from Lisp, also
+enable the mode if ARG is omitted or nil, and toggle it if ARG is
+`toggle'; disable the mode otherwise.
+
 This mode fully supports virtualenvs. Once you switch a
 virtualenv using \\[pyvenv-workon], you can use
 \\[elpy-rpc-restart] to make the elpy Python process use your
@@ -30,14 +35,10 @@ virtualenv.
 Configure Elpy.
 
 This function will pop up a configuration buffer, which is mostly
-a customize buffer, but has some more options.
-
-\(fn)" t nil)
+a customize buffer, but has some more options." t nil)
 
 (autoload 'elpy-version "elpy" "\
-Display the version of Elpy.
-
-\(fn)" t nil)
+Display the version of Elpy." t nil)
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "elpy" '("elpy-")))
 
