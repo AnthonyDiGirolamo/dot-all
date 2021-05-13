@@ -1,3 +1,6 @@
 [submodule "emacs.d/airline-themes"]
 	path = emacs.d/airline-themes
 	url = https://github.com/AnthonyDiGirolamo/airline-themes.git
+[submodule "source/fzf"]
+	path = source/fzf
+	url = https://github.com/junegunn/fzf.git
