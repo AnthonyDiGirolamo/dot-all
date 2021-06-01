@@ -99,12 +99,14 @@
      import re
      import sys
      from datetime import datetime, date, time
+     from pathlib import Path
      pp = pprint.PrettyPrinter(indent=2).pprint
 
      def main():
        some_regex = re.compile(r'\n\n')
+       file_name = Path(os.path.expandvars(sys.argv[1])).absolute()
 
-       with open(sys.argv[1], 'r') as some_file:
+       with file_name.open('r') as some_file:
          for index, line in enumerate(some_file.readlines()):
            pass
 

@@ -1,6 +1,61 @@
 #!/usr/bin/gawk -f
+# Copyright 2021 Anthony DiGirolamo
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-# join an array into a string (ignoring empty strings)
+# Usage: tangle.awk *.org
+#
+# This script which attempts to mimic Emacs `org-babel-tangle-file`.
+#
+# - It will copy each source block in a given `*.org` file into it's respective
+#   `:tangle` destination and create any parent directories.
+# - Any blocks with `#+begin_src sh :eval yes` will be executed as well.
+# - Some conditional `:tangle` checks are supported:
+#   - `(if (file-exists-p "`/.gitconfig") "no" "`/.gitconfig")`
+#   - `(if (string-match "chip" hostname) "`/.i3/config" "no")`
+#     - Only supported variable is: `hostname`
+
+# Example Run with dotfiles from https://github.com/AnthonyDiGirolamo/dot-all
+#
+#   $ ./tangle.awk *.org
+#   [TANGLE] bash.org
+#     ~/.bashrc
+#     ~/.bash_profile
+#     ~/.aliases
+#   [TANGLE] fish.org
+#     ~/.config/fish/config.fish
+#     ~/.config/fish/conf.d/aliases.fish
+#     ~/.config/fish/conf.d/fish_user_key_bindings.fish
+#     ~/.config/fish/functions/fish_prompt.fish
+#     ~/.config/fish/functions/fish_mode_prompt.fish
+#     ~/.config/fish/functions/tarxz.fish
+#     ~/.config/fish/functions/u.fish
+#     ~/.config/fish/functions/dl.fish
+#     ~/.config/fish/functions/source-bash-aliases.fish
+#     ~/.config/fish/completions/dhcpcd-restart.fish
+#   [TANGLE] terminfo.org
+#     .artifacts/terminfo-24bit.src
+#     [RUNSCRIPT] sh
+#     [PROCESS tic]
+#   [TANGLE] tmux.org
+#     ~/.tmux.conf
+#   [TANGLE] zsh.org
+#     ~/.zshrc
+#     ~/.zshrc.local
+
+# Helper Fuctions
+
+# Join an array into a string (ignoring empty strings)
 function join(array, start, end, sep, result, i) {
     if (sep == "")
        sep = " "
@@ -49,6 +104,7 @@ function dirname(path) {
     return join(path_array, 1, length(path_array)-1, "/")
 }
 
+# Tangle.awk Specific Functions
 function start_new_file() {
     print_tag_line("TANGLE", FILENAME)
 
