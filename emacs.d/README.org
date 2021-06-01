@@ -721,6 +721,7 @@
       (use-package modus-operandi-theme
         :disabled
         :config
+        (load-theme 'modus-operandi t)
         (when (featurep 'airline-themes)
           (load-theme 'airline-qwq t)))
 
@@ -728,6 +729,7 @@
       (use-package modus-vivendi-theme
         :disabled
         :config
+        (load-theme 'modus-vivendi t)
         (when (featurep 'airline-themes)
           (load-theme 'airline-ouo t)))
     #+end_src
