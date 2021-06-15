@@ -4,7 +4,8 @@
 
 ;; Author: Florian Mounier aka paradoxxxzero
 ;; Version: 0.2
-;; Package-Version: 0.2
+;; Package-Version: 20200718.730
+;; Package-Commit: ecd19a40b7832bb00f0a2244e3b0713d0bf3850d
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -231,6 +232,8 @@
 (defvar jinja2-font-lock-keywords
   jinja2-font-lock-keywords-1)
 
+(defvar jinja2-enable-indent-on-save nil)
+
 (defun sgml-indent-line-num ()
   "Indent the current line as SGML."
   (let* ((savep (point))
@@ -264,7 +267,7 @@
 
 (defun jinja2-calculate-indent ()
   "Return indent column"
-  (if (bobp)  ; Check begining of buffer
+  (if (bobp)  ; Check beginning of buffer
       0
     (let ((indent-width sgml-basic-offset) (default (sgml-indent-line-num)))
       (if (looking-at "^[ \t]*{%-? *e\\(nd\\|lse\\|lif\\)") ; Check close tag
@@ -292,6 +295,10 @@
           (goto-char (+ (- indent old_indent) old_point)))
       indent)))
 
+(defun jinja2-indent-buffer()
+  (interactive)
+  (save-excursion
+    (indent-region (point-min) (point-max))))
 
 ;;;###autoload
 (define-derived-mode jinja2-mode html-mode  "Jinja2"
@@ -321,8 +328,15 @@
 (define-key jinja2-mode-map (kbd "C-c v") 'jinja2-insert-var)
 (define-key jinja2-mode-map (kbd "C-c #") 'jinja2-insert-comment)
 
+(when jinja2-enable-indent-on-save
+  (add-hook 'jinja2-mode-hook
+    (lambda ()
+      (add-hook 'after-save-hook 'jinja2-indent-buffer nil 'make-it-local))))
+
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . jinja2-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.j2\\'" . jinja2-mode))
 
 (provide 'jinja2-mode)
 

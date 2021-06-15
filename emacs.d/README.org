@@ -277,7 +277,8 @@
            ("lambda" . ?ƛ)
            ("ERROR" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
            ("DEBUG" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))))
-        (global-prettify-symbols-mode 1)))
+        ;; (global-prettify-symbols-mode 1)
+        ))
   #+end_src
 
 * libraries
@@ -3405,15 +3406,9 @@
             graphviz-dot-preview-extension "svg")
     )
 
-    (use-package mmm-mode :defer t)
-    (use-package mmm-jinja2
-      :after mmm-mode
+    (use-package jinja2-mode
       :config
-      (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . html-mode))
-      (mmm-add-mode-ext-class 'html-mode "\\.jinja2\\'" 'jinja2)
-      (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . fundamental-mode))
-      (mmm-add-mode-ext-class 'fundamental-mode "\\.tmpl\\'" 'jinja2)
-    )
+      (add-to-list 'auto-mode-alist '("\\.jinja\\'" . jinja2-mode)))
 
     (use-package forth-mode :defer t)
     (use-package forth-block-mode :defer t)
