@@ -3275,6 +3275,16 @@
       ;;         "/home/chrx/Arduino/libraries/Gameduino2"))
 
       :config
+      (setq flycheck-error-list-format
+            [("File" 16)
+             ("Line" 5 flycheck-error-list-entry-< :right-align t)
+             ("Col" 4 nil :right-align t)
+             ("Level" 8 flycheck-error-list-entry-level-<)
+             ("ID" 20 t)
+             (#("Message (Checker)" 9 16
+                (face flycheck-error-list-checker-name))
+              0 t)])
+
       (add-to-list 'evil-motion-state-modes 'flycheck-error-list-mode)
       ;; larger fringe on the left, no fringe on the right
       (add-to-list 'fringe-styles '("large" 17 . 0))
