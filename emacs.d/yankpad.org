@@ -119,3 +119,8 @@
 
 ** ipdb: ipdb breakpoint
    import ipdb; ipdb.set_trace()
+
+** termw: write string to pseudo terminal
+   with open('/dev/pts/2', 'w') as term:
+       term.write('value: {}\n'.format(value))
+       term.flush()

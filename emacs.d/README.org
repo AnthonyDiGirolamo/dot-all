@@ -208,7 +208,7 @@
         (insert (x-export-frames nil 'svg))
         (save-buffer)))
 
-    (defun amd/set-font ()
+    (defun amd/set-font (&optional fsize)
       "Set preferred GUI font."
       (interactive)
       (when (display-graphic-p)
@@ -232,6 +232,9 @@
          (t
           (setq amd/font-size 20
                 amd/font-name "PragmataPro-%d")))
+
+        (when fsize
+          (setq amd/font-size fsize))
 
         (set-frame-font (format amd/font-name amd/font-size))
         (add-to-list 'default-frame-alist `(font . ,(format amd/font-name amd/font-size)))
@@ -805,10 +808,13 @@
 *** display-line-numbers-mode
 
     #+begin_src emacs-lisp
-    (use-package display-line-numbers
-      :custom
-      (display-line-numbers-type 'relative)
-      (display-line-numbers-current-absolute t))
+      (use-package display-line-numbers
+        :custom
+        (display-line-numbers-type t ;; absolute
+                                   ;; 'relative
+                                   ;; 'visual
+                                   )
+        (display-line-numbers-current-absolute t))
     #+end_src
 
 *** deprecated
@@ -3251,6 +3257,7 @@
       :custom
       ;; (flycheck-display-errors-function 'flycheck-display-error-messages-unless-error-list)
       (flycheck-display-errors-function nil)
+      (flycheck-check-syntax-automatically '(save new-line mode-enabled)) ;; idle-change
       :general
       (:states '(motion) :keymaps '(flycheck-error-list-mode-map)
                "RET" 'flycheck-error-list-goto-error
