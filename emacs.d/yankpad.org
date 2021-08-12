@@ -30,7 +30,38 @@
    |--+--|
    |  |  |
 
+* rst-mode
+** defcheckbox: html checkbox input example                  :src:indent_nil:
+  #+begin_src rst-mode
+    .. |check| raw:: html
+
+        <input checked=""  type="checkbox">
+
+    .. |check_disabled| raw:: html
+
+        <input checked=""  disabled="" type="checkbox">
+
+    .. |uncheck| raw:: html
+
+        <input type="checkbox">
+
+    .. |uncheck_disabled| raw:: html
+
+        <input disabled="" type="checkbox">
+
+  #+end_src
+
+** uncheck: unchecked box                                    :src:indent_nil:
+  #+begin_src rst-mode
+    |uncheck|
+  #+end_src
+
 * python-mode
+
+** ppimport
+   import pprint
+   _pretty_print = pprint.PrettyPrinter(indent=1, width=120).pprint
+   _pretty_format = pprint.PrettyPrinter(indent=1, width=120).pformat
 
 ** rc: regex compile
     menu_regex = re.compile(

@@ -226,7 +226,7 @@
                 amd/font-name "-xos4-Terminus-normal-normal-normal-*-%d-*-*-*-c-60-iso10646-1"))
          ((eq system-type 'gnu/linux)
           (setq amd/font-size 16
-                amd/font-name "Iosevka Fixed SS08 Light-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintfull"
+                amd/font-name "Iosevka Term SS08 Light-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintfull"
                 ;; amd/font-name "PragmataPro-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintnone"
                 ))
          (t
@@ -256,6 +256,8 @@
               (floor (* 2.0
                         ;; pixel height from dpi and pt size
                         (* (/ amd/font-dpi 72.0) amd/font-size))))))
+
+    ;; (amd/set-font 25)
     (amd/set-font)
 
     (use-package prog-mode

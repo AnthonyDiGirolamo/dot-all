@@ -749,6 +749,7 @@ function Terminal:bg(r, g, b)
   -- return "\027[48;2;".. r .. ";" .. g .. ";" .. b .. "m"
 end
 function Terminal:write(s)
+  -- io.write(s:gsub("\x1B", "x1B"))
   io.write(s)
 end
 
@@ -1366,7 +1367,7 @@ function cmd_draw_planet_map(planet_count, starting_seed, camera_x, camera_z)
   -- local px = camera_x or 50 -- sector_position.x
   -- local py = camera_z or -100 -- sector_position.y
   local seed_value=starting_seed or random_int(262144)
-  randomseed(seed_value)
+  -- randomseed(seed_value)
   local pcount = planet_count or #planet_types
   local planets = {}
   local planet_sprites = {}
@@ -1374,6 +1375,7 @@ function cmd_draw_planet_map(planet_count, starting_seed, camera_x, camera_z)
 
   local max_rows = 0
   for i=1,pcount do
+  -- for i=5,6 do
     local ptype = 1
     local rad = 5
     if i <= 6 then
@@ -1493,7 +1495,11 @@ function cmd_draw_shipyard()
 end
 
 
-randomseed(os.time()+(os.clock()*1000000))
+sed = os.time()+(os.clock()*1000000)
+randomseed(sed)
+-- randomseed(1615252340.0)
+-- print(sed)
+
 
 _init()
 planet_max_radius = floor(term.screen_width/2)

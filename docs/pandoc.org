@@ -1,0 +1,52 @@
+#+TITLE: Pandoc Cookbook
+#+AUTHOR: Anthony DiGirolamo
+#+EMAIL:
+#+LANGUAGE: en
+#+OPTIONS: title:t toc:nil H:4 num:nil ^:nil ':nil
+#+OPTIONS: html-style:nil html-preamble:t html-postamble:nil
+#+HTML_DOCTYPE: html5
+#+HTML_HEAD: <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono" rel="stylesheet">
+#+HTML_HEAD: <link rel="stylesheet" href="styles/material.blue-indigo.min.css">
+#+HTML_HEAD: <link rel="stylesheet" href="styles/material_style.css">
+#+HTML_HEAD: <script defer src="styles/material.min.js"></script>
+#+PROPERTY: UNNUMBERED t
+
+* RST to MD with a Lua filter
+
+** ~batch_process.fish~
+
+   #+begin_src fish
+     for f in (git ls-files |grep '.*\.rst')
+         set docname (basename -s .rst $f)
+         set original_name (dirname $f)/$docname.md
+         set readme_name (dirname $f)/"README.md"
+         if string match -q "docs" $docname ; or string match -q "target_docs" $docname
+             set out $readme_name
+         else
+             set out $original_name
+         end
+         pandoc -f rst -t gfm --lua-filter link_filter.lua -o $out $f
+     end
+   #+end_src
+
+** ~lua_filter.lua~
+
+   #+begin_src lua
+     local function starts_with(str, start)
+        return str:sub(1, #start) == start
+     end
+
+     return {
+       {
+         Code = function(el)
+           if starts_with(el.text, "module-pw_") then
+             module_name = el.text:gsub("^module[-]", "")
+             link_target = "/"..module_name.."/README.md#"..module_name
+             return pandoc.Link(module_name, link_target)
+           else
+             return el
+           end
+         end,
+       }
+     }
+   #+end_src
