@@ -1574,7 +1574,7 @@ if ship_value_index or planet_value_index then
 
 else
   -- if no options
+  cmd_draw_shipyard()
   cmd_draw_planet_map()
-  -- cmd_draw_shipyard()
 end
 

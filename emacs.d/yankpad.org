@@ -155,3 +155,15 @@
    with open('/dev/pts/2', 'w') as term:
        term.write('value: {}\n'.format(value))
        term.flush()
+
+** inspect-configparser                                      :src:indent_nil:
+   #+begin_src python
+     config_dict = { name:dict(i.items()) for name, i in config.items() }
+     from rich import inspect
+     # inspect(inspect)
+     inspect(
+         obj=config_dict,
+         value=True,
+         docs=False,
+     )
+   #+end_src

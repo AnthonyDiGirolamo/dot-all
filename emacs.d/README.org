@@ -804,7 +804,7 @@
         (highlight-indent-guides-method 'character)
         (highlight-indent-guides-responsive 'top)
         ;; (highlight-indent-guides-delay 3)
-        (highlight-indent-guides-character ?\|))
+        (highlight-indent-guides-character ?\│))
     #+end_src
 
 *** display-line-numbers-mode
@@ -3433,6 +3433,8 @@
     (use-package forth-block-mode :defer t)
 
     (use-package gn-mode
+      :custom
+      (gn-indent-method 'gn-indent-line-inductive)
       :config
       (add-to-list 'auto-mode-alist '("\\.gn\\'" . gn-mode))
       (add-to-list 'auto-mode-alist '("\\.gni\\'" . gn-mode)))
