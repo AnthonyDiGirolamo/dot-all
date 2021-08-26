@@ -690,6 +690,7 @@
      )
 
      (use-package fast-scroll
+       :disabled
        :diminish fast-scroll-minor-mode
        :load-path "fast-scroll"
        :config
@@ -4348,7 +4349,7 @@
       ;; #+STARTUP: indent
       ;; #+STARTUP: hidestars
       (add-hook 'org-mode-hook 'org-bullets-mode)
-      ;; (add-hook 'org-mode-hook 'flyspell-mode)
+      (add-hook 'org-mode-hook 'flyspell-mode)
       ;; (add-hook 'org-mode-hook 'pandoc-mode)
 
       ;; Org Completion
@@ -4481,6 +4482,8 @@
            "xclip -selection clipboard -i -t text/html &> /dev/null")
           (delete-window)
           )
+          (recenter)
+          (evil-normal-state)
         )
 
 

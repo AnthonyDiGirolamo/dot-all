@@ -466,11 +466,17 @@
 
      map H goBack
      map L goForward
+     map r reload
+     map R reload hard
 
      map o Vomnibar.activate
      map t Vomnibar.activateTabSelection
+     map b Vomnibar.activateBookmarks
+     map B Vomnibar.activateBookmarksInNewTab
      map < moveTabLeft
      map > moveTabRight
+
+     map W moveTabToNewWindow
 
      map / enterFindMode
      map n performFind
