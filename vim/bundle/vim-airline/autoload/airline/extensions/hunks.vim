@@ -1,4 +1,4 @@
-" MIT License. Copyright (c) 2013-2019 Bailey Ling et al.
+" MIT License. Copyright (c) 2013-2021 Bailey Ling et al.
 " Plugin: vim-gitgutter, vim-signify, changesPlugin, quickfixsigns, coc-git
 " vim: et ts=2 sts=2 sw=2
 
@@ -16,24 +16,14 @@ let s:non_zero_only = get(g:, 'airline#extensions#hunks#non_zero_only', 0)
 let s:hunk_symbols = get(g:, 'airline#extensions#hunks#hunk_symbols', ['+', '~', '-'])
 
 function! s:coc_git_enabled() abort
-  if !exists("*CocAction")
+  if !exists("*CocAction") ||
+   \ !get(g:, 'airline#extensions#hunks#coc_git', 0)
+     " coc-git extension is disabled by default
+     " unless specifically being enabled by the user
+     " (as requested from coc maintainer)
     return 0
   endif
-  if exists("s:airline_coc_git_enabled")
-    return s:airline_coc_git_enabled
-  endif
-  let extensions=CocAction('extensionStats')
-  if type(extensions) != type([])
-    " not yet initialized? Assume it is available...
-    return 1
-  endif
-  let coc_git=filter(extensions, 'v:val.id is# "coc-git" && v:val.state is# "activated"')
-  if !empty(coc_git)
-    let s:airline_coc_git_enabled = 1
-  else
-    let s:airline_coc_git_enabled = 0
-  endif
-  return s:airline_coc_git_enabled
+  return 1
 endfunction
 
 function! s:get_hunks_signify() abort
@@ -128,6 +118,11 @@ function! airline#extensions#hunks#get_hunks() abort
       endif
     endfor
   endif
+  if index(airline#extensions#get_loaded_extensions(), 'branch') == -1 && string[-1:] == ' '
+    " branch extension not loaded, skip trailing whitespace
+    let string = string[0:-2]
+  endif
+
   let b:airline_hunks = string
   let b:airline_changenr = b:changedtick
   let s:airline_winwidth = airline#util#winwidth()

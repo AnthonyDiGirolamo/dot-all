@@ -1,7 +1,4 @@
 #!/bin/bash
-# Disabled
-# https://github.com/tpope/vim-flagship.git
-# https://github.com/itchyny/lightline.vim
 urls="
 https://github.com/tpope/vim-fugitive.git
 https://github.com/tpope/vim-sensible.git
@@ -20,13 +17,16 @@ https://github.com/gerardbm/vim-atomic.git
 https://github.com/vim-airline/vim-airline-themes.git
 https://github.com/vim-airline/vim-airline.git
 https://github.com/christoomey/vim-tmux-navigator.git
-https://github.com/jceb/vim-orgmode.git
 https://github.com/tpope/vim-speeddating.git
-"
-urls="
 https://github.com/vim-syntastic/syntastic.git
-https://github.com/ycm-core/YouCompleteMe.git
+https://github.com/junegunn/fzf.vim
 "
+# urls="
+# https://github.com/ycm-core/YouCompleteMe.git
+# https://github.com/tpope/vim-flagship.git
+# https://github.com/itchyny/lightline.vim
+# https://github.com/jceb/vim-orgmode.git
+# "
 for URL in $urls
 do
        GDIR=$(basename -s .git $URL)

@@ -1,0 +1,10 @@
+#+TITLE: vim
+#+PROPERTY: header-args :mkdirp yes
+
+* Symlink vim and emacs
+
+   #+begin_src sh :noweb tangle :eval yes :exports code :results silent output
+     echo '  [SYMLINKS]'
+     ln -snvf $(realpath ./vim) $HOME/.vim
+     ln -snvf $(realpath ./emacs.d) $HOME/.emacs.d
+   #+end_src

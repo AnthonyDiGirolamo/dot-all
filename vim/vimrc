@@ -1,6 +1,7 @@
 " disable old vi compatibility
 set nocompatible
 
+set rtp+=$HOME/dot-all/source/fzf
 execute pathogen#infect()
 
 " use bash for !commands and make/dispatch
