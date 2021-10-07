@@ -3159,6 +3159,13 @@
       (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
     )
 
+    (use-package rst-mode
+      :defer t
+      :init
+      (add-hook 'rst-mode-hook 'flyspell-mode)
+      (add-hook 'rst-mode-hook (lambda () (setq-local fill-column 80) (auto-fill-mode)))
+    )
+
     ;; Web Settings
     (use-package web-mode
       :defer t
