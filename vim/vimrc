@@ -48,8 +48,13 @@ set diffopt+=iwhite  " Ignore whitespace in vimdiff
 set mouse=a  " Enable the mouse
 
 set expandtab  " use spaces for tabs
+
+" Open files to last known position
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+endif
 " Clear trailing whitespace and retab (remove tab characters) before saving
-" autocmd BufWritePre * :%s/\s\+$//e | retab
+autocmd BufWritePre * :%s/\s\+$//e | retab
 
 " h/l stay in default colemak locations
 " n/e remapped to down up
@@ -70,6 +75,8 @@ vmap <C-n> ]egv
 nnoremap <c-s> :w<cr>
 inoremap <c-s> <esc>:w<cr>
 vnoremap <c-s> <esc>:w<cr>
+" C-g to escape insert mode
+inoremap <c-g> <esc>
 
 " Hit ; to do the same thing as :
 nnoremap ; :|xnoremap ; :|
@@ -125,7 +132,7 @@ nnoremap <leader>n :cnext<cr>
 nnoremap <leader>p :cprevious<cr>
 
 nnoremap <leader>u :UndotreeToggle<cr>
-nnoremap <leader>g :Gstatus<cr>
+nnoremap <leader>g :Git<cr>
 nnoremap <leader>bb :CtrlPBuffer<cr>
 nnoremap <leader>bk :q<cr>
 nnoremap <leader>m :CtrlPBufTagAll<cr>
@@ -137,13 +144,24 @@ let g:syntastic_rst_checkers = ['rstcheck'] " 'sphinx'
 " let g:syntastic_rst_sphinx_source_dir = ''
 " let g:syntastic_rst_sphinx_config_dir = ''
 
-" ignore some file types in ctrlp
+" Ctrlp: Use git ls-files
+let g:ctrlp_user_command = {
+      \ 'types': {
+        \ 1: ['.git', 'cd %s && git ls-files'],
+        \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+        \ },
+        \ 'fallback': 'find %s -type f'
+        \ }
+
+" Ignore some file types in ctrlp
 let g:ctrlp_custom_ignore = {
   \ 'dir':  '\v[\/](\.git|\.hg|\.svn)$',
   \ 'file': '\v\.(pyc|exe|so|dll)$',
   \ 'link': 'some_bad_symbolic_links',
   \ }
-let g:ctrlp_extensions = ['tag', 'buffertag', 'quickfix'] " , 'dir', 'rtscript', 'undo', 'line', 'changes', 'mixed', 'bookmarkdir']
+" Ctrlp: Enable extensions
+let g:ctrlp_extensions = [ 'tag', 'buffertag', 'quickfix' ]
+" 'dir', 'rtscript', 'undo', 'line', 'changes', 'mixed', 'bookmarkdir'
 
 " vim-flagship
 set laststatus=2
