@@ -1,23 +1,29 @@
-" disable old vi compatibility
+" Disable old vi compatibility
 set nocompatible
 
+" Plugin Init
+" -----------
+" Include fzf plugin to run-time-path
 set rtp+=$HOME/dot-all/source/fzf
+" Use pathogen to setup plugins in ~/.vim/bundle
 execute pathogen#infect()
 
-" use bash for !commands and make/dispatch
-set shell=bash
-
-" let unameo = system('uname -o')
-
-" enable 256 colors in the terminal (use 'tmux -2' to enable 256 colors in tmux)
+" Colors
+" ------
+" Enable 256 colors in the terminal.
+" (use 'tmux -2' to enable 256 colors in tmux)
 set t_Co=256
-" enable truecolor terminal mode
+" Enable truecolor terminal mode.
 set termguicolors
 
+" Themes
+" ------
+" If on Android termux
+" let unameo = system('uname -o')
 if $HOME == "/data/data/com.termux/files/home"
   set background=light
   colorscheme bw
-else
+else  " Desktop colors
   " set number          " line numbering
   " set relativenumber  " relative line numbering
   set background=dark
@@ -31,6 +37,19 @@ else
   " colorscheme molokai
   " colorscheme atomic
 endif
+
+" Vertical window separator character
+" -----------------------------------
+" Vertical bar
+execute "set fillchars+=vert:│"
+" Space
+" execute "set fillchars+=vert:\\ "
+
+" Standard Settings
+" -----------------
+
+" Use bash for !commands and make/dispatch
+set shell=bash
 
 set noswapfile
 set nobackup  " do not keep a backup file (file~), use versions instead
@@ -49,12 +68,17 @@ set mouse=a  " Enable the mouse
 
 set expandtab  " use spaces for tabs
 
+" File Open and Write Hooks
+" -------------------------
 " Open files to last known position
 if has("autocmd")
   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 endif
 " Clear trailing whitespace and retab (remove tab characters) before saving
 autocmd BufWritePre * :%s/\s\+$//e | retab
+
+" Key bindings
+" ------------
 
 " h/l stay in default colemak locations
 " n/e remapped to down up
@@ -138,6 +162,9 @@ nnoremap <leader>bk :q<cr>
 nnoremap <leader>m :CtrlPBufTagAll<cr>
 nnoremap <leader>o :silent !ctags -R *.py kadc tests<cr>:CtrlPTag<cr>
 
+" Plugin Settings
+" ---------------
+
 " Error Checking with Syntastic
 let g:syntastic_python_checkers = ['flake8', 'python']
 let g:syntastic_rst_checkers = ['rstcheck'] " 'sphinx'
@@ -163,12 +190,11 @@ let g:ctrlp_custom_ignore = {
 let g:ctrlp_extensions = [ 'tag', 'buffertag', 'quickfix' ]
 " 'dir', 'rtscript', 'undo', 'line', 'changes', 'mixed', 'bookmarkdir'
 
-" vim-flagship
+" vim-flagship recommended modeline settings
 set laststatus=2
 set showtabline=2
 set guioptions=-e
 set guifont=Iosevka\ SS08
-
 " autocmd User Flags call Hoist("buffer", "fugitive#statusline")
 
 " Tmux window split settings: Use Alt-hnel to move
@@ -185,7 +211,10 @@ nnoremap <silent> <M-n> :TmuxNavigateDown<cr>
 nnoremap <silent> <M-e> :TmuxNavigateUp<cr>
 nnoremap <silent> <M-l> :TmuxNavigateRight<cr>
 
-" Align text into columns by filtering throug align.awk
+" Custom Functions
+" ----------------
+
+" Align text into columns by filtering through align.awk
 
 " Normal mode with the cursor inside any paragraph press: glip
 nnoremap <silent> gl :set opfunc=RunAwk<cr>g@
