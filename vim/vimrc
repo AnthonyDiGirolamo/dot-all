@@ -30,8 +30,8 @@ else  " Desktop colors
   " let g:airline_theme='behelit'
   " let g:airline_theme='aludin'
   " let g:one_allow_italics = 1
-  colorscheme PaperColor
-  " colorscheme one
+  " colorscheme PaperColor
+  colorscheme one
   " colorscheme distinguished
   " colorscheme ir_black-256
   " colorscheme molokai
@@ -170,6 +170,12 @@ let g:syntastic_python_checkers = ['flake8', 'python']
 let g:syntastic_rst_checkers = ['rstcheck'] " 'sphinx'
 " let g:syntastic_rst_sphinx_source_dir = ''
 " let g:syntastic_rst_sphinx_config_dir = ''
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+
 
 " Ctrlp: Use git ls-files
 let g:ctrlp_user_command = {
@@ -195,7 +201,10 @@ set laststatus=2
 set showtabline=2
 set guioptions=-e
 set guifont=Iosevka\ SS08
+" This seems to happen automatically:
 " autocmd User Flags call Hoist("buffer", "fugitive#statusline")
+autocmd User Flags call Hoist("window", "SyntasticStatuslineFlag")
+
 
 " Tmux window split settings: Use Alt-hnel to move
 let g:tmux_navigator_no_mappings = 1
@@ -220,6 +229,7 @@ nnoremap <silent> <M-l> :TmuxNavigateRight<cr>
 nnoremap <silent> gl :set opfunc=RunAwk<cr>g@
 " Visual select something then press gl
 vnoremap <silent> gl :!align.awk<cr>
+vnoremap <silent> gt :!column -t -o ' '<cr>
 
 function! RunAwk(type)
     echom a:type
