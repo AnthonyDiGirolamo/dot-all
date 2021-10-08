@@ -24,7 +24,8 @@ else
   " let g:airline_theme='behelit'
   " let g:airline_theme='aludin'
   " let g:one_allow_italics = 1
-  colorscheme one
+  colorscheme PaperColor
+  " colorscheme one
   " colorscheme distinguished
   " colorscheme ir_black-256
   " colorscheme molokai
@@ -78,13 +79,6 @@ nnoremap q; q:|xnoremap q; q:|
 nnoremap <CR> :|xnoremap <CR> :|
 nnoremap g<CR> <CR>|xnoremap g<CR> <CR>|
 
-" file browser (netrw) options
-" start it by:
-" - opening a directory
-" - running :Ex
-" <leader>d binding
-let g:netrw_browse_split = 2 " open new files in vertical split
-
 " Leader key maps ------------------------------------------------------------
 let mapleader = ","
 
@@ -118,6 +112,13 @@ nnoremap <leader>rf :Dispatch ./%<CR>
 
 " open directory browser with ,d
 nnoremap <leader>d :Ex<cr>
+" file browser (netrw) options
+" start it by:
+" - opening a directory
+" - running :Ex
+" <leader>d binding
+" let g:netrw_browse_split = 2 " open new files in vertical split
+
 
 " jump to the next/prev quickfix errors
 nnoremap <leader>n :cnext<cr>
@@ -144,19 +145,27 @@ let g:ctrlp_custom_ignore = {
   \ }
 let g:ctrlp_extensions = ['tag', 'buffertag', 'quickfix'] " , 'dir', 'rtscript', 'undo', 'line', 'changes', 'mixed', 'bookmarkdir']
 
-" flagship
+" vim-flagship
 set laststatus=2
 set showtabline=2
 set guioptions=-e
-set guifont=PragmataPro\ Mono\ 16
+set guifont=Iosevka\ SS08
 
 " autocmd User Flags call Hoist("buffer", "fugitive#statusline")
 
+" Tmux window split settings: Use Alt-hnel to move
 let g:tmux_navigator_no_mappings = 1
-nnoremap <silent> <m-h> :TmuxNavigateLeft<cr>
-nnoremap <silent> <m-n> :TmuxNavigateDown<cr>
-nnoremap <silent> <m-e> :TmuxNavigateUp<cr>
-nnoremap <silent> <m-l> :TmuxNavigateRight<cr>
+" Set meta movement keys to use \e - thats what Alacritty sends.
+" Check what your terminal sends for a keypress by running `sed -n l`
+execute "set <M-h>=\eh"
+execute "set <M-n>=\en"
+execute "set <M-e>=\ee"
+execute "set <M-l>=\el"
+" Make the bindings
+nnoremap <silent> <M-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <M-n> :TmuxNavigateDown<cr>
+nnoremap <silent> <M-e> :TmuxNavigateUp<cr>
+nnoremap <silent> <M-l> :TmuxNavigateRight<cr>
 
 " Align text into columns by filtering throug align.awk
 

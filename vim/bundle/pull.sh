@@ -20,6 +20,7 @@ https://github.com/christoomey/vim-tmux-navigator.git
 https://github.com/tpope/vim-speeddating.git
 https://github.com/vim-syntastic/syntastic.git
 https://github.com/junegunn/fzf.vim
+https://github.com/NLKNguyen/papercolor-theme
 "
 # urls="
 # https://github.com/ycm-core/YouCompleteMe.git
