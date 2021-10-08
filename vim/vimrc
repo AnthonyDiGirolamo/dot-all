@@ -158,3 +158,27 @@ nnoremap <silent> <m-n> :TmuxNavigateDown<cr>
 nnoremap <silent> <m-e> :TmuxNavigateUp<cr>
 nnoremap <silent> <m-l> :TmuxNavigateRight<cr>
 
+" Align text into columns by filtering throug align.awk
+
+" Normal mode with the cursor inside any paragraph press: glip
+nnoremap <silent> gl :set opfunc=RunAwk<cr>g@
+" Visual select something then press gl
+vnoremap <silent> gl :!align.awk<cr>
+
+function! RunAwk(type)
+    echom a:type
+    let saved_unnamed_register = @@
+    if a:type ==# 'v'
+        exe ":'[,']!align.awk"
+    elseif a:type ==# 'line'
+        exe ":'[,']!align.awk"
+    else
+        " Do nothing for character mode
+        return
+    endif
+    let @@ = saved_unnamed_register
+endfunction
+" Sources:
+" https://learnvimscriptthehardway.stevelosh.com/chapters/33.html
+" https://stackoverflow.com/questions/18343471/using-external-commands-in-vim-map-operator-function
+
