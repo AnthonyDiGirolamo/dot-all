@@ -22,11 +22,8 @@ help:  ## show help
 fish_url := https://github.com/fish-shell/fish-shell/releases/download/3.2.2/fish-3.2.2.tar.xz
 fish_md5 := 606253699ce41991b03a93bcc6047d51
 
-# emacs_url := http://ftpmirror.gnu.org/emacs/emacs-26.3.tar.xz
-# emacs_md5 := 0a2e4b965d31a7cb1930eae3b79df793
-
-emacs_url := http://ftpmirror.gnu.org/emacs/emacs-27.1.tar.xz
-emacs_md5 := f1f25356b68ec69caccd41d95988d23d
+emacs_url := http://ftpmirror.gnu.org/emacs/emacs-27.2.tar.xz
+emacs_md5 := 4c3d9ff35b2ab2fe518dc7eb3951e128
 
 lua54_url := https://www.lua.org/ftp/lua-5.4.0.tar.gz
 lua54_md5 := dbf155764e5d433fc55ae80ea7060b60

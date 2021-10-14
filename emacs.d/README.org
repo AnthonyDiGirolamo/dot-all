@@ -3618,11 +3618,14 @@
          ("g" magit-status           "git")
          ("s" hydra-set-toggles/body "set-toggles")
          ("u" undo-tree-visualize    "undo-tree")
-         ("w" ace-window             "window ")
-         ("t" hydra-tab-bar/body     "tabs   ")
+         ("w" ace-window             "window")
+         ("t" hydra-tab-bar/body     "tabs")
          ("c" calc-dispatch          "calc")
          ("j" counsel-imenu          "jump-imenu")
-         ("v" (find-file user-emacs-directory)  "open .emacs")
+         ("v" (find-file
+               ;; user-emacs-directory
+               "~/dot-all/"
+               )  "open .emacs")
          ("V" (find-file amd/settings-org-file) "open README.org")
 
          )

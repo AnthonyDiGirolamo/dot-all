@@ -200,6 +200,10 @@
     #   alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
     # end
     alias e="env TERM=xterm-24bits emacs -nw"
+    function eg
+      env TERM=xterm-24bits emacs &
+    end
+
     # alias ed="emacs --daemon"
     alias ec="env TERM=xterm-24bits emacsclient --alternate-editor='' -nw"
     alias ecg="env TERM=xterm-24bits emacsclient --alternate-editor='' --no-wait --create-frame"
