@@ -116,9 +116,9 @@
 
     # Program launchers
     # bindsym $mod+d exec dmenu_run
-    bindsym $mod+d exec rofi -show run
+    bindsym $mod+d exec rofi -show run -show-icons
     bindsym $mod+a exec xfce4-appfinder --disable-server
-    bindsym $mod+space exec rofi -show drun
+    bindsym $mod+space exec rofi -show drun -show-icons
 
     # Alt+Tab to rofi window mode
     bindsym Mod1+Tab exec rofi -show window

@@ -26,11 +26,11 @@
     ! xterm*faceName: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
     URxvt*font:     xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
     URxvt*boldFont: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
-    ! xterm*faceName: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
+    xterm*faceName: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=120
     ! URxvt*font:     xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
     ! URxvt*boldFont: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
 
-    xterm*faceName: xft:Terminus
+    ! xterm*faceName: xft:Terminus
     xterm*faceSize: 16.0
     xterm*faceSize1: 7.0
     xterm*faceSize2: 8.0
@@ -248,10 +248,6 @@
     !*color15:                 S_base3
 
     Xcursor.size: 32
-
-    rofi.modi:       window,run,ssh,drun
-    rofi.font:       Iosevka Fixed SS08 32
-    rofi.show-icons: true
 
     ! SOLARIZED HEX     R   G   B   H   S   B  L*A*B      16/8 TERMCOL   XTERM HEX
     ! base03    #002b36 0   43  54  193 100 21 15 -12 -12 8/4  brblack   234   #1c1c1c

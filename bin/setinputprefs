@@ -28,6 +28,7 @@ DEVICE_NAME='SYNA8004:00 06CB:CD8B Touchpad'
 xinput list --name-only | grep -iqs "${DEVICE_NAME}"
 if [ $? -eq 0 ]
 then
+    xinput set-prop "${DEVICE_NAME}" 'libinput Disable While Typing Enabled' 0
     xinput set-prop "${DEVICE_NAME}" 'libinput Natural Scrolling Enabled' 1
     xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' 0.520000
     xinput list-props "${DEVICE_NAME}"
