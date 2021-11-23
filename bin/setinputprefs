@@ -1,49 +1,50 @@
-#!/bin/bash
+#!/usr/bin/env fish
 
 # keyboard
 xset r rate 200 30
 # xset r off
 
-# Apple magic trackpad
-DEVICE_NAME='anthony’s trackpad'
-xinput list --name-only | grep -iqs "${DEVICE_NAME}"
-if [ $? -eq 0 ]
-then
-    xinput set-prop "${DEVICE_NAME}" 'libinput Tapping Enabled' 1
-    xinput set-prop "${DEVICE_NAME}" 'libinput Natural Scrolling Enabled' 1
-    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' 0.7
-fi
+function xinput_set_prop --argument-names DEVICE_NAME PROPERTY
+  # echo "SET"
+  # # echo $DEVICE_NAME
+  # # echo $PROPERTY
+  # echo $argv[3..]
+  # set -e before
+  # xinput list-props $DEVICE_NAME | while read -l line; set -a before $line; end
+  xinput set-prop $DEVICE_NAME $PROPERTY $argv[3..]
+end
 
-DEVICE_NAME='TPPS/2 Elan TrackPoint'
-xinput list --name-only | grep -iqs "${DEVICE_NAME}"
-if [ $? -eq 0 ]
-then
-    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' .8
-    hostname | grep -iqs grover && xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' .1
-    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Profile Enabled' 1, 0
-fi
+xinput list --name-only | while read -l DEVICE_NAME
+  # Apple magic trackpad
+  if string match -q 'anthony’s trackpad' $DEVICE_NAME
+    echo "Device:" $DEVICE_NAME
+    xinput_set_prop "$DEVICE_NAME" 'libinput Tapping Enabled' 1
+    xinput_set_prop "$DEVICE_NAME" 'libinput Natural Scrolling Enabled' 1
+    xinput_set_prop "$DEVICE_NAME" 'libinput Accel Speed' 0.7
 
-# Thinkpad X1 carbon gen7 with Arch
-DEVICE_NAME='SYNA8004:00 06CB:CD8B Touchpad'
-xinput list --name-only | grep -iqs "${DEVICE_NAME}"
-if [ $? -eq 0 ]
-then
-    xinput set-prop "${DEVICE_NAME}" 'libinput Disable While Typing Enabled' 0
-    xinput set-prop "${DEVICE_NAME}" 'libinput Natural Scrolling Enabled' 1
-    xinput set-prop "${DEVICE_NAME}" 'libinput Accel Speed' 0.520000
-    xinput list-props "${DEVICE_NAME}"
-fi
+  else if string match -q 'TPPS/2 Elan TrackPoint' $DEVICE_NAME
+    echo "Device:" $DEVICE_NAME
+    xinput_set_prop "$DEVICE_NAME" 'libinput Accel Speed' .8
+    hostname | grep -iqs grover && xinput_set_prop "$DEVICE_NAME" 'libinput Accel Speed' .1
+    xinput_set_prop "$DEVICE_NAME" 'libinput Accel Profile Enabled' 1, 0
 
-# Thinkpad X1 carbon gen6 with debian
-DEVICE_NAME='Synaptics TM3289-021'
-xinput list --name-only | grep -iqs "${DEVICE_NAME}"
-if [ $? -eq 0 ]
-then
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Two-Finger Scrolling' 1, 1
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Coasting Speed' 0, 50
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Scrolling Distance' -114, -114
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Detection' 1
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Palm Dimensions' 4, 50
-    xinput set-prop "${DEVICE_NAME}" 'Synaptics Move Speed' 1.000000, 2.750000, 0.034880, 0.000000
-    xinput list-props "${DEVICE_NAME}"
-fi
+  # Thinkpad X1 carbon gen7 with Arch
+  else if string match -q 'SYNA8004:00 06CB:CD8B Touchpad' $DEVICE_NAME
+    echo "Device:" $DEVICE_NAME
+    xinput_set_prop "$DEVICE_NAME" 'libinput Disable While Typing Enabled' 0
+    xinput_set_prop "$DEVICE_NAME" 'libinput Natural Scrolling Enabled' 1
+    xinput_set_prop "$DEVICE_NAME" 'libinput Accel Speed' 0.520000
+
+  # Thinkpad X1 carbon gen6 with debian
+  else if string match -q 'Synaptics TM3289-021' $DEVICE_NAME
+    echo "Device:" $DEVICE_NAME
+    xinput_set_prop "$DEVICE_NAME" 'Synaptics Two-Finger Scrolling' 1, 1
+    xinput_set_prop "$DEVICE_NAME" 'Synaptics Coasting Speed' 0, 50
+    xinput_set_prop "$DEVICE_NAME" 'Synaptics Scrolling Distance' -114, -114
+    xinput_set_prop "$DEVICE_NAME" 'Synaptics Palm Detection' 1
+    xinput_set_prop "$DEVICE_NAME" 'Synaptics Palm Dimensions' 4, 50
+    xinput_set_prop "$DEVICE_NAME" 'Synaptics Move Speed' 1.000000, 2.750000, 0.034880, 0.000000
+  end
+end
+
+
