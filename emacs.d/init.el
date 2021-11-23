@@ -7,7 +7,7 @@
 
 (setq amd/settings-file (expand-file-name "~/.emacs.d/README.el")
       amd/settings-org-file (expand-file-name "~/.emacs.d/README.org"))
-(setq hostname (shell-command-to-string "hostname"))
+(setq hostname (string-trim (shell-command-to-string "hostname")))
 (setq amd/uname (shell-command-to-string "uname -a"))
 (setq amd/using-android (string-match "Android" amd/uname))
 (setq amd/using-pocketchip (string-match "chip" amd/uname))
