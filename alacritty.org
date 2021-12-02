@@ -60,13 +60,13 @@
     # * file:///usr/share/doc/fontconfig/fontconfig-user.html
     font:
       normal:
-        family: Iosevka SS08
+        family: Iosevka SS17
         style: Light
       bold:
-        family: Iosevka SS08
+        family: Iosevka SS17
         style: Bold
       italic:
-        family: Iosevka SS08
+        family: Iosevka SS17
         style: Italic
       # Point size of the font
       size: 16.0

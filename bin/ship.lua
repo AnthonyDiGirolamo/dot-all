@@ -1426,33 +1426,12 @@ end
 
 -- terminal output routines
 
-function cmd_draw_shipyard()
+function cmd_draw_shipyard(seed,type_index)
   pilot=ship.new()
-  -- some nice looking seeds
-  -- pilot:buildship(5725,2)
-  -- pilot:buildship(202915,2)
-  -- pilot:buildship(147828, 2)
-  -- pilot:buildship(30718,1)
-  -- pilot:buildship(9266,2)
-  -- pilot:buildship(122414,1)
-  -- pilot:buildship(174969,1)
-  -- pilot:buildship(97515,1)
-  -- pilot:buildship(160782,2)
-  -- pilot:buildship(70182,2)
-  -- pilot:buildship(19741,2)
-  -- pilot:buildship(157247,2)
-  -- pilot:buildship(50110,2)
-  -- pilot:buildship(63953,2)
-  -- pilot:buildship(35957,2)
-  -- pilot:buildship(160921,2)
-  -- pilot:buildship(131525,2)
-
-  -- pilot:buildship(16950,2)
-  -- pilot:buildship(25433,2)
 
   -- while true do
 
-  pilot:buildship()
+  pilot:buildship(seed,type_index)
 
 
   local rotation_start = 0
@@ -1574,7 +1553,30 @@ if ship_value_index or planet_value_index then
 
 else
   -- if no options
-  cmd_draw_shipyard()
   cmd_draw_planet_map()
+  cmd_draw_shipyard()
+
+  -- cmd_draw_shipyard(32132,5)
+  -- cmd_draw_shipyard(147828, 2)
+  -- cmd_draw_shipyard(30718,1)
+  -- cmd_draw_shipyard(122414,1)
+  -- cmd_draw_shipyard(174969,1)
+  -- cmd_draw_shipyard(160782,2)
+  -- cmd_draw_shipyard(70182,2)
+  -- cmd_draw_shipyard(35957,2)
+  -- cmd_draw_shipyard(160921,2)
+
+  -- cmd_draw_shipyard(19741,2)
+  -- cmd_draw_shipyard(157247,2)
+  -- cmd_draw_shipyard(50110,2)
+  -- cmd_draw_shipyard(63953,2)
+  -- cmd_draw_shipyard(5725,2)
+  -- cmd_draw_shipyard(202915,2)
+  -- cmd_draw_shipyard(9266,2)
+  -- cmd_draw_shipyard(97515,1)
+  -- cmd_draw_shipyard(131525,2)
+  -- cmd_draw_shipyard(16950,2)
+  -- cmd_draw_shipyard(25433,2)
+
 end
 

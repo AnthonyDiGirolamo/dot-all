@@ -149,8 +149,8 @@
     (add-hook 'before-save-hook 'delete-trailing-whitespace) ;; Erase trailing whitespace before save
 
     ;; Indentation
-    (setq-default c-basic-indent 4)
-    (setq-default tab-width 4)          ;; set tw=4
+    (setq-default c-basic-indent 2)
+    (setq-default tab-width 2)          ;; set tw=4
     (setq-default indent-tabs-mode nil) ;; set expandtab
 
     ;; Scroll just one line when hitting bottom of window
@@ -225,8 +225,9 @@
           (setq amd/font-size 12
                 amd/font-name "-xos4-Terminus-normal-normal-normal-*-%d-*-*-*-c-60-iso10646-1"))
          ((eq system-type 'gnu/linux)
-          (setq amd/font-size 16
-                amd/font-name "Iosevka Term SS17 Light-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintfull"
+          (setq amd/font-size 18
+                amd/font-name "Iosevka Term SS17 Light-%d:antialias=true:hinting=true:autohint=true:hintstyle=hintfull"
+                ;; amd/font-name "Iosevka Term SS08 Light-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintfull"
                 ;; amd/font-name "PragmataPro-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintnone"
                 ))
          (t
@@ -1376,6 +1377,10 @@
       :diminish
       :config
       (evil-commentary-mode))
+
+    (use-package pico8
+      :after evil
+      :load-path "pico8")
 
     (use-package evil-case-operators
       :after evil
@@ -3090,6 +3095,8 @@
 
     (use-package lsp-ui
       :commands lsp-ui-mode
+      :custom
+      (lsp-ui-doc-enable nil)
       :general
       (:states '(motion) :keymaps '(lsp-ui-imenu-mode-map)
        "RET" 'lsp-ui-imenu--view)
@@ -4066,7 +4073,7 @@
        (setq
         ivy-posframe-height-alist
         '(;; (swiper . 20)
-          (t . 10)))
+          (t . 9)))
        (setq
         ivy-posframe-display-functions-alist
         '(

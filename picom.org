@@ -1,14 +1,19 @@
-#+TITLE: compton
+#+TITLE: picom
 #+STARTUP: content
 
-* Compton
+* ~/.config/picom.conf
 
-  #+BEGIN_SRC yaml :tangle "~/.compton.conf"
+  #+BEGIN_SRC yaml :tangle "~/.config/picom.conf"
     backend = "glx";
-    paint-on-overlay = true;
     glx-no-stencil = true;
     glx-no-rebind-pixmap = true;
     vsync = "opengl-swc";
+
+    # Option `no-dock-shadow` is deprecated, and will be removed. Please use the wintype option `shadow` of `dock` instead.
+    # Option `no-dnd-shadow` is deprecated, and will be removed. Please use the wintype option `shadow` of `dnd` instead.
+    # vsync option will take a boolean from now on. "opengl-swc" is interpreted as "true" for compatibility, but this will stop working soon
+    # "clear-shadow" is removed as an option, and is always enabled now. Consider removing it from your config file
+
 
     # These are important. The first one enables the opengl backend. The last one is the vsync method. Depending on the driver you might need to use a different method.
     # The other options are smaller performance tweaks that work well in most cases.
@@ -16,13 +21,10 @@
 
 
     # Shadow
-    shadow = true;			# Enabled client-side shadows on windows.
-    no-dock-shadow = true;		# Avoid drawing shadows on dock/panel windows.
-    no-dnd-shadow = true;		# Don't draw shadows on DND windows.
-    clear-shadow = true;		# Zero the part of the shadow's mask behind the window (experimental).
-    shadow-radius = 7;		# The blur radius for shadows. (default 12)
-    shadow-offset-x = -7;		# The left offset for shadows. (default -15)
-    shadow-offset-y = -7;		# The top offset for shadows. (default -15)
+    shadow = true;                  # Enabled client-side shadows on windows.
+    shadow-radius = 7;              # The blur radius for shadows. (default 12)
+    shadow-offset-x = -7;           # The left offset for shadows. (default -15)
+    shadow-offset-y = -7;           # The top offset for shadows. (default -15)
     shadow-exclude = [
      "! name~=''",
      "n:e:Notification",
@@ -60,6 +62,7 @@
     {
       tooltip = { fade = true; shadow = false; focus = true };
     };
+
   #+END_SRC
 
 
