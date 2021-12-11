@@ -1,0 +1,300 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file ~/emacs.d/README.org
+
+
+* relative-line-numbers
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 09:51
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_OLPATH: appearance/appearance minor-modes/deprecated
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  No longer using ~relative-line-numbers~, ~nlinum-relative~ has better performance.
+
+  #+begin_src emacs-lisp :tangle no
+    ;; (use-package relative-line-numbers
+    ;;   :disabled
+    ;;   :diminish
+    ;;   :config
+    ;;   (--map (add-hook it 'relative-line-numbers-mode) amd/appearance-mode-hooks)
+    ;;   (defun abs-rel-numbers (offset)
+    ;;     (if (= offset 0)
+    ;;         ;; current line
+    ;;         (format "%4d " (line-number-at-pos))
+    ;;       ;; not the current line
+    ;;       (format "%4d " (abs offset))
+    ;;     )
+    ;;   )
+    ;;   (setq relative-line-numbers-format #'abs-rel-numbers)
+    ;; )
+  #+end_src
+
+
+* nlinum-relative
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 09:51
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_OLPATH: appearance/appearance minor-modes/deprecated
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  Relative line numbering using ~nlinum~ which is faster than the built-in
+  ~linum~ mode.
+
+  #+begin_src emacs-lisp :tangle no
+   (use-package nlinum-relative
+     :disabled
+     :commands (nlinum-relative-mode)
+     :init
+     ;; (setq nlinum-relative-redisplay-delay 0)   ;; delay
+     ;; (setq nlinum-relative-current-symbol "->") ;; or "" for display current line number
+     ;; (setq nlinum-relative-offset 0)            ;; 1 if you want 0, 2, 3...
+     :config
+     (nlinum-relative-setup-evil)
+     (unless (or amd/using-pocketchip amd/using-android)
+       (amd/add-appearance-mode 'nlinum-relative-mode)))
+  #+end_src
+
+
+* sublimity
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 09:52
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_OLPATH: appearance/appearance minor-modes/deprecated
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  #+begin_src emacs-lisp :tangle no
+    (use-package sublimity-map
+      :disabled
+      :init
+      (setq sublimity-map-size 20)
+      (setq sublimity-map-fraction 0.3)
+      (setq sublimity-map-text-scale -7)
+      :config
+      (sublimity-mode 1)
+      ;; (sublimity-map-set-delay 0)
+    )
+  #+end_src
+
+
+* helm
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 09:52
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_OLPATH: navigation/deprecated
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  #+begin_src emacs-lisp :tangle no
+    (use-package helm
+      :disabled
+      :diminish
+      :bind (("M-x" . helm-M-x))
+      :init
+      (setq
+       helm-mode-fuzzy-match t
+       helm-completion-in-region-fuzzy-match t
+       helm-recentf-fuzzy-match t
+       helm-buffers-fuzzy-matching t
+       helm-locate-fuzzy-match t
+       helm-M-x-fuzzy-match t
+       helm-semantic-fuzzy-match t
+       helm-imenu-fuzzy-match t
+       helm-apropos-fuzzy-match t
+       helm-lisp-fuzzy-completion t)
+      ;; open new helm split in current window
+      ;; (setq helm-split-window-in-side-p nil)
+      ;; buffer name length to be length of longest buffer name if nil
+      ;; helm-projectile seems to overwrite this for some reason if nil
+      (setq helm-buffer-max-length 50)
+      (setq helm-display-header-line t)
+      :config
+      (helm-mode t)
+      ;; (helm-adaptive-mode t)
+      ;; (helm-autoresize-mode 1)
+
+      (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebihnd tab to do persistent action
+      (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+      (define-key helm-map (kbd "C-z") 'helm-select-action) ; list actions using C-z
+
+      ;; ;; open helm split at the bottom of a frame
+      ;; ;; https://www.reddit.com/r/emacs/comments/345vtl/make_helm_window_at_the_bottom_without_using_any/
+      ;; (add-to-list 'display-buffer-alist
+      ;;              `(,(rx bos "*helm" (* not-newline) "*" eos)
+      ;;                (display-buffer-in-side-window)
+      ;;                (inhibit-same-window . t)
+      ;;                (window-height . 0.4)))
+
+      ;; Not compatible with above - using shackle instead
+      ;; Hydra normal mode in Helm
+      (defhydra helm-like-unite (:columns 6)
+        "Normal Mode"
+        ("m" helm-toggle-visible-mark "mark")
+        ("M" helm-toggle-all-marks "(un)mark all")
+        ("p" helm-execute-persistent-action "preview")
+        ("gg" helm-beginning-of-buffer "top")
+        ("G" helm-end-of-buffer "bottom")
+        ("k" helm-buffer-run-kill-persistent "kill")
+        ("h" helm-previous-source "next source")
+        ("l" helm-next-source "prev source")
+        ("n" helm-next-line "down")
+        ("e" helm-previous-line "up")
+        ("q" keyboard-escape-quit "exit" :color blue)
+        ("i" nil "insert"))
+      ;; (key-chord-define helm-map "ne" 'helm-like-unite/body)
+      (define-key helm-map (kbd "C-n") 'helm-like-unite/body)
+
+      ;; tame helm windows by aligning them at the bottom with a ratio of 40%:
+      (setq shackle-rules '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :ratio 0.4)))
+
+      ;; ;; disable popwin-mode in an active Helm session It should be disabled
+      ;; ;; otherwise it will conflict with other window opened by Helm persistent
+      ;; ;; action, such as *Help* window.
+      ;; (push '("^\*helm.+\*$" :regexp t) popwin:special-display-config)
+      ;; (add-hook 'helm-after-initialize-hook (lambda ()
+      ;;                                         (popwin:display-buffer helm-buffer t)
+      ;;                                         (popwin-mode -1)))
+      ;; ;;  Restore popwin-mode after a Helm session finishes.
+      ;; (add-hook 'helm-cleanup-hook (lambda () (popwin-mode 1)))
+    )
+
+    (use-package helm-config
+      :defer t
+    )
+    (use-package helm-projectile
+      ;; :defer t
+      :config
+      (helm-projectile-on)
+    )
+    (use-package helm-descbinds
+      :defer t
+      :bind (("C-h j" . helm-descbinds))
+      :config
+      (helm-descbinds-mode)
+    )
+    (use-package helm-flx
+      :defer t
+      :config
+      (helm-flx-mode +1)
+    )
+    (use-package helm-fuzzier
+      :defer t
+      :config
+      (helm-fuzzier-mode 1)
+    )
+
+    (defun helm-projectile-invalidate-cache ()
+      (interactive) (projectile-invalidate-cache (projectile-project-root)) (helm-projectile))
+
+    (defun helm-do-grep-recursive (&optional non-recursive)
+      "Like `helm-do-grep', but greps recursively by default."
+      (interactive "P")
+      (let* ((current-prefix-arg (not non-recursive))
+             (helm-current-prefix-arg non-recursive))
+        (call-interactively 'helm-do-grep)))
+  #+end_src
+
+
+* ivy and hydra deprecated functions
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 09:53
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_OLPATH: ivy, swiper, and counsel
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  Example of launching a hydra while ivy is active.
+
+  #+begin_src emacs-lisp :tangle no
+    (defhydra hydra-ivy-switch-project (:color pink)
+      "Buffer Actions"
+      ("k" amd/ivy-remove-project)
+      ("gg" ivy-beginning-of-buffer)
+      ("n" ivy-next-line)
+      ("e" ivy-previous-line)
+      ("G" ivy-end-of-buffer)
+      ("o" keyboard-escape-quit :exit t)
+      ("C-g" keyboard-escape-quit :exit t)
+      ("i" nil)
+      )
+    (define-key ivy-switch-project-map (kbd "C-b") 'hydra-ivy-switch-project/body)
+
+    (defun amd/ivy-remove-project ()
+      (interactive)
+      (setq projectile-known-projects
+            (--reject (string= ivy--current it) projectile-known-projects))
+      (projectile-merge-known-projects)
+      (ivy--reset-state ivy-last))
+  #+end_src
+
+  =ivy-switch-buffer-map= now has a kill buffer action
+
+  #+begin_src emacs-lisp :tangle no
+    (defun amd/ivy-kill-buffer ()
+      (interactive)
+      (kill-buffer ivy--current)
+      (ivy--reset-state ivy-last))
+  #+end_src
+
+  #+begin_src emacs-lisp :tangle no
+    (defhydra hydra-counsel-switch-buffer (:color pink)
+      "Buffer Actions"
+      ("k" amd/ivy-kill-buffer)
+      ("gg" ivy-beginning-of-buffer)
+      ("n" ivy-next-line)
+      ("e" ivy-previous-line)
+      ("G" ivy-end-of-buffer)
+      ("o" keyboard-escape-quit :exit t)
+      ("C-g" keyboard-escape-quit :exit t)
+      ("i" nil))
+    (define-key ivy-switch-buffer-map (kbd "C-b") 'hydra-counsel-switch-buffer/body)
+  #+end_src
+
+  counsel now has a builtin descbinds search
+
+  #+begin_src emacs-lisp :tangle no
+    (defun amd/display-binds ()
+      (interactive)
+      (ivy-read "keys: "
+      (mapcar
+       (lambda (keys) (cons
+                       (format "%16s  %s" (car keys) (cdr keys))
+                       (car keys)))
+         (which-key--get-current-bindings))
+      :action (lambda (key) (message key))))
+  #+end_src
+
+  counsel now has a builtin pt search
+
+  #+begin_src emacs-lisp :tangle no
+    (defun amd/counsel-pt-function (string &optional _pred &rest _unused)
+      "Grep in the current directory for STRING."
+      (if (< (length string) 3)
+          (counsel-more-chars 3)
+        (let ((default-directory counsel--git-grep-dir)
+              (regex (counsel-unquote-regex-parens
+                      (setq ivy--old-re
+                            (ivy--regex string)))))
+          (counsel--async-command
+           (format "pt -e --nocolor --nogroup -- %S" regex))
+          nil)))
+
+    (defun amd/counsel-pt (&optional initial-input initial-directory)
+      "Grep for a string in the current directory using pt.
+    INITIAL-INPUT can be given as the initial minibuffer input."
+      (interactive)
+      (setq counsel--git-grep-dir (or initial-directory default-directory))
+      (ivy-read "pt: " 'amd/counsel-pt-function
+                :initial-input initial-input
+                :dynamic-collection t
+                :history 'counsel-git-grep-history
+                :action #'counsel-git-grep-action
+                :unwind (lambda ()
+                          (counsel-delete-process)
+                          (swiper--cleanup))))
+  #+end_src
+
