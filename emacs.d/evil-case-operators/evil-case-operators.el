@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; evil-case-operators.el --- Evil operators for changing case
 
 ;; Author: Anthony DiGirolamo <anthony.digirolamo@gmail.com>

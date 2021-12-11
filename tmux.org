@@ -5,6 +5,7 @@
  - [[#tmuxconf][=~/.tmux.conf=]]
  - [[#colors][Colors]]
    - [[#purple][purple]]
+   - [[#purple-defaultbg][purple defaultbg]]
    - [[#blue][blue]]
    - [[#orange][orange]]
    - [[#green][green]]
@@ -121,7 +122,7 @@
 
 ** purple
 
-   #+begin_src conf-space :tangle (if (string-suffix-p "laptop" hostname) "no" "~/.tmux.conf")
+   #+begin_src conf-space :tangle "no"
      # Purple Status Bar Colors
 
      # List current session on the left
@@ -163,6 +164,53 @@
      set -g window-status-activity-style 'bg=colour46,fg=colour63'
      # Clipboard selection
      set -g mode-style                   'bg=colour63,fg=colour189'
+   #+end_src
+
+** purple defaultbg
+
+   #+begin_src conf-space :tangle (if (string-suffix-p "laptop" hostname) "no" "~/.tmux.conf")
+     # Purple Default bg Status Bar Colors
+
+     # List current session on the left
+     # SESSION NUMBER
+     #   bg white                           = colour255
+     #   fg purple text                     = colour63
+     # TAB/PANE NUMBER
+     #   bg very light purple almost purple = colour189
+     #   fg purple text                     = colour63
+     set-option -g status-left '#[bg=terminal,fg=colour63] #S #[bg=terminal,fg=colour63] #I.#P '
+
+     # Hostname, date and time on the right
+     # HOSTNAME
+     #   bg light purple                 = colour105
+     #   fg very light purple            = colour189
+     # DATE
+     #   bg slightly darker light purple = colour189
+     #   fg darker purple text           = colour63
+     set-option -g status-right '#[bg=terminal,fg=colour189] #h #[bg=terminal,fg=colour63] %F %R '
+
+     set -g display-panes-active-colour colour105  # big numbers shown by display-panes command
+     set -g display-panes-colour        colour63
+     set -g display-panes-time          12000
+
+     # Use default background colors - so they match terminal background
+
+     # tmux command line and prompts
+     set -g message-style                'bg=terminal,fg=default'
+     # Window pane highlight colors
+     set -g pane-border-style            'bg=terminal,fg=colour63'
+     set -g pane-active-border-style     'bg=terminal,fg=colour105'
+     # Center bar
+     set -g status-style                 'bg=terminal,fg=colour189'
+     # Inactive tab
+     set -g window-status-style          'bg=terminal,fg=colour189'
+     # Active tab
+     set -g window-status-current-style  'bg=terminal,fg=colour255,underscore'
+     # Window activity
+     set -g window-status-activity-style 'bg=colour46,fg=colour63'
+     # Clipboard selection
+     set -g mode-style                   'bg=colour63,fg=colour189'
+
    #+end_src
 
 ** blue
@@ -418,7 +466,7 @@
      15 peach       #ffccaa     #ffd7af    223
    #+end_src
 
-   #+begin_src conf-space :tangle "~/.tmux.conf"
+   #+begin_src conf-space :tangle no
      # DarkBG Green Status Bar Colors
 
      # List current session on the left

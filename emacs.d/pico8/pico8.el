@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (require 's)
 
 ;; (defconst pico8-colors

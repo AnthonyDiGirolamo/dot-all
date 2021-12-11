@@ -1,4 +1,4 @@
-
+;;; -*- lexical-binding: t; -*-
 
 ;; Author: Anthony DiGirolamo <anthony.digirolamo@gmail.com>
 ;; URL: http://github.com/AnthonyDiGirolamo/tmux-window-navigation

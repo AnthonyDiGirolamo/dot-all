@@ -89,6 +89,8 @@
 
 * top level settings
   #+begin_src emacs-lisp
+    ;;; -*- lexical-binding: t; -*-
+
     ;; Initial buffer to open
     (setq initial-buffer-choice t ;; Open *scratch* buffer by default
           ;; initial-major-mode 'fundamental-mode

@@ -279,6 +279,7 @@
 
     alias v=vim
     alias e="env TERM=xterm-24bits emacs -nw"
+    alias eg="emacs &"
     alias ec="env TERM=xterm-24bits emacsclient --alternate-editor='' -nw"
     alias ecg="env TERM=xterm-24bits emacsclient --alternate-editor='' --no-wait --create-frame"
 
