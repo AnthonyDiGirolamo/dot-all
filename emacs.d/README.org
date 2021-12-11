@@ -871,25 +871,34 @@
     (define-minor-mode amd-center-buffer-mode
       "Buffer local minor mode for amd-center-buffer"
       :init-value nil
-      :lighter " CENTER"
-      :keymap (make-sparse-keymap)          ; defines evil-org-mode-map
+      :lighter ""
+      :keymap (make-sparse-keymap) ;; defines amd-center-buffer-mode-map
       :group 'amd-center-buffer
-      (amd/center-buffer 120))
+      (if (bound-and-true-p amd-center-buffer-mode)
+          (amd/center-buffer 120)
+        (amd/center-buffer-disable)))
 
     ;; (defun amd-center-buffer-mode-install () (amd-center-buffer-mode 1))
     ;; (define-globalized-minor-mode global-amd-center-buffer-mode
     ;;   amd-center-buffer-mode amd-center-buffer-mode-install
     ;;   "Global minor mode of amd-center-buffer-mode.")
 
+    (defun amd/center-buffer-disable ()
+      (interactive)
+      (setq-local left-margin-width nil
+                  right-margin-width nil)
+      (set-window-buffer (selected-window) (current-buffer))
+    )
+
     (defun amd/center-buffer (width)
       (interactive "nBuffer width: ")
       (let* ((adj (- (window-text-width)
                      width))
              (total-margin (+ adj
-                              left-margin-width
-                              right-margin-width)))
-        (setq left-margin-width  (/ total-margin 2))
-        (setq right-margin-width (- total-margin left-margin-width)))
+                              (or 0 left-margin-width)
+                              (or 0 right-margin-width))))
+        (setq-local left-margin-width  (/ total-margin 2))
+        (setq-local right-margin-width (- total-margin left-margin-width)))
       (set-window-buffer (selected-window) (current-buffer)))
 
     (defun amd/run-lisp-love ()
@@ -3471,6 +3480,7 @@
         "Line Numbers"
         (("l" display-line-numbers-mode "display-line-numbers-mode" :toggle t :color amaranth)
          ("h" hl-line-mode "hl-line-mode" :toggle t :color amaranth)
+         ("C" amd-center-buffer-mode "amd-center-buffer-mode" :toggle t :color amaranth)
          ("i" highlight-indent-guides-mode "highighlight-indent-guides-mode" :toggle t :color amaranth))
         "Appearance"
         (("r" rainbow-delimiters-mode "rainbow-delimiters-mode" :toggle t :color amaranth)
