@@ -73,7 +73,7 @@
      Channel gmail-starred
    #+END_SRC
 
-** mu4e and emacs smtpmail
+** mu4e and emacs smtpmail example setup
 
    #+BEGIN_SRC emacs-lisp :tangle ~/.emacs.d/email-settings.el :noweb yes
      (setq mu4e-user-mail-address-list '("<<email-address>>"))
@@ -111,6 +111,141 @@
 
      (setq mu4e-compose-complete-ignore-address-regexp "no-?reply\|via RT")
    #+END_SRC
+
+** archived emacs-elisp email setup
+
+   #+begin_src emacs-lisp :tangle no
+     (eval-and-compile
+       (defun amd/mu4e-load-path ()
+         (list "~/apps/mu/share/emacs/site-lisp/mu4e"
+               "~/homebrew/share/emacs/site-lisp/mu4e"
+               "/usr/local/share/emacs/site-lisp/mu4e")))
+
+     (use-package mu4e
+       :commands (mu4e)
+       :load-path (lambda () (amd/mu4e-load-path))
+       :init
+       (let ((mbsync-bin (cl-find-if 'file-exists-p (list "~/apps/isync/bin/mbsync"
+                                                          "~/homebrew/bin/mbsync"
+                                                          "/usr/local/bin/mbsync"))))
+         (when mbsync-bin
+           (setq mu4e-get-mail-command (concat mbsync-bin " -V gmail"))))
+
+       ;; (setq mu4e-update-interval 120)
+       (setq mu4e-change-filenames-when-moving t) ;; needed for mbsync
+
+       (setq mu4e-confirm-quit nil)
+       (let ((mu4e-bin (cl-find-if 'file-exists-p (list "~/apps/mu/bin/mu"
+                                                        "~/homebrew/bin/mu"
+                                                        "/usr/local/bin/mu"))))
+         (when mu4e-bin
+           (setq mu4e-mu-binary mu4e-bin)))
+       :config
+       ;; (add-to-list 'evil-motion-state-modes 'mu4e-view-mode)
+
+       ;; when refiling from message view and hitting x
+       ;; the focus is on the header window instead of the message
+       (advice-add 'mu4e-mark-execute-all :after #'mu4e-select-other-view)
+
+       ;; (mapc (lambda (current-mode-map-name)
+       ;;         (define-key current-mode-map-name amd/leader-key 'hydra-leader-menu/body))
+       ;;       '(mu4e-headers-mode-map
+       ;;         mu4e-view-mode-map
+       ;;         mu4e-main-mode-map))
+
+       (define-key mu4e-headers-mode-map (kbd "e") 'mu4e-headers-prev)
+       (define-key mu4e-view-mode-map (kbd "n") 'next-line)
+       (define-key mu4e-view-mode-map (kbd "e") 'previous-line)
+       (define-key mu4e-view-mode-map (kbd "C-e") 'mu4e-view-headers-prev)
+       (define-key mu4e-view-mode-map (kbd "C-n") 'mu4e-view-headers-next)
+
+       (define-key mu4e-view-mode-map (kbd "C-d") 'mu4e-view-scroll-up-or-next)
+       (define-key mu4e-view-mode-map (kbd "C-u") 'scroll-down-command)
+
+       (setq mu4e-use-fancy-chars nil)
+       (setq mu4e-attachment-dir "~/Download")
+       (setq mu4e-view-show-images t)
+       (setq mu4e-view-show-addresses t)
+       (setq mu4e-view-scroll-to-next nil)
+
+       (when (fboundp 'imagemagick-register-types)
+         (imagemagick-register-types))
+
+       (load "~/.emacs.d/email-settings.el")
+
+       (add-to-list 'mu4e-bookmarks '("flag:flagged" "Flagged" ?f))
+
+       (defun amd/mu4e-open-docx-attachment-in-emacs (msg attachnum)
+         "Count the number of lines in an attachment."
+         (mu4e-view-pipe-attachment msg attachnum "cat > ~/Downloads/attachment.docx && pandoc -f docx -t org ~/Downloads/attachment.docx"))
+
+       (defun amd/mu4e-open-xlsx-attachment-in-emacs (msg attachnum)
+         "Count the number of lines in an attachment."
+         (mu4e-view-pipe-attachment msg attachnum "cat > ~/Downloads/attachment.xlsx && xlsx2csv ~/Downloads/attachment.xlsx"))
+
+       ;; defining 'n' as the shortcut
+       (add-to-list 'mu4e-view-attachment-actions
+         '("cview-docx" . amd/mu4e-open-docx-attachment-in-emacs) t)
+       (add-to-list 'mu4e-view-attachment-actions
+         '("xview-xlsx" . amd/mu4e-open-xlsx-attachment-in-emacs) t)
+
+       (defun amd/mu4e-view-org-message-in-emacs (msg)
+         "View a pandoc converted version of the message in emacs."
+         ;; (mu4e-view-pipe "cat > ~/Downloads/message.html && pandoc -f html -t org ~/Downloads/message.html"))
+         (mu4e-view-pipe "pandoc -f html -t org"))
+
+       (add-to-list 'mu4e-view-actions
+         '("emacs org view" . amd/mu4e-view-org-message-in-emacs) t)
+       (add-to-list 'mu4e-view-actions
+         '("browser view" . mu4e-action-view-in-browser) t)
+
+     )
+
+     ;; make sure eww is loaded before the below
+
+     (use-package mu4e-contrib
+       :commands (mu4e)
+       :load-path (lambda () (amd/mu4e-load-path))
+       :init
+       (setq shr-external-browser 'browse-url-generic) ;; this must be a function, not an external command
+       (setq mu4e-html2text-command 'mu4e-shr2text) ;; same as eww
+       ;; (setq shr-color-visible-luminance-min 1) ;; for dark theme?
+       ;; (setq mu4e-html2text-command "w3m -T text/html")
+       ;; (setq mu4e-html2text-command "pandoc -f html -t org")
+       :config
+       (defun amd/mu4e-open-link-in-browser ()
+         "Open a visible eww link in the web browser."
+         (interactive)
+         (let ((res (avy-with ace-link-eww
+                      (avy--process
+                       (mapcar #'cdr (ace-link--eww-collect))
+                       #'avy--overlay-post))))
+           (when res
+             (goto-char (1+ res))
+             (if (eww-follow-link t)
+                 ;; eww-follow-link retuns a "No link at point"
+                 ;; string when it cant open a link and nil if successful
+                 (org-open-at-point)))))
+
+       ;; (add-hook 'mu4e-view-mode-hook
+       ;;           (lambda()
+       ;;             (local-set-key (kbd "f") 'amd/mu4e-open-link-in-browser)))
+       (define-key mu4e-view-mode-map (kbd "f") 'amd/mu4e-open-link-in-browser)
+     )
+
+     (use-package org-mu4e
+       :commands (mu4e)
+       :init
+       (setq org-mu4e-link-query-in-headers-mode nil))
+
+     (use-package smtpmail
+       :config
+       (setq smtpmail-queue-mail t)
+       (setq smtpmail-queue-dir  "~/Mail/queue/cur")
+
+       (setq message-kill-buffer-on-exit t)
+     )
+  #+end_src
 
 ** smtpmail ~/.authinfo.gpg
 

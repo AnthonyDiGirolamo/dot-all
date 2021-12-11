@@ -42,7 +42,6 @@
    - [[#ediff][ediff]]
  - [[#spell-checking][spell checking]]
  - [[#navigation][navigation]]
-   - [[#ido-ido-vertical-flx-ido][ido, ido-vertical, flx-ido]]
    - [[#avy][avy]]
    - [[#undo-tree][undo-tree]]
    - [[#tab-bar-mode][tab-bar-mode]]
@@ -55,7 +54,6 @@
    - [[#tmux-window-navigation][tmux-window-navigation]]
    - [[#which-func][which-func]]
    - [[#ivy-xref][ivy-xref]]
- - [[#email][email]]
  - [[#language-major-modes][language major-modes]]
  - [[#hydra][hydra]]
  - [[#hydra-leader-menus][hydra leader menus]]
@@ -79,9 +77,7 @@
    - [[#toc-org][toc-org]]
    - [[#org-protocol][org-protocol]]
  - [[#elisp-links][elisp links]]
- - [[#outorg--outshine][outorg & outshine]]
  - [[#edit-with-emacs-and-cvim][edit-with-emacs and cvim]]
- - [[#neotree][neotree]]
  - [[#view-large-files][view large files]]
  - [[#emacs-and-git-on-windows][emacs and git on windows]]
  - [[#tramp][tramp]]
@@ -690,16 +686,6 @@
        ;; (setq airline-utf-glyph-linenumber          #xe0a1)
      )
 
-     (use-package fast-scroll
-       :disabled
-       :diminish fast-scroll-minor-mode
-       :load-path "fast-scroll"
-       :config
-       (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
-       (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
-       (fast-scroll-config)
-       (fast-scroll-minor-mode 1))
-
      (use-package powerline
        ;; :disabled
      )
@@ -842,20 +828,6 @@
        ;;                "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
        ;;                (nil font-lock-variable-name-face))))
      )
-   #+end_src
-
-*** rainbow-identifiers
-
-   #+begin_src emacs-lisp :tangle no
-     ;; (use-package rainbow-identifiers
-     ;;   :disabled
-     ;;   :commands (rainbow-identifiers-mode)
-     ;;   :init
-     ;;   (setq rainbow-identifiers-cie-l*a*b*-lightness 50
-     ;;         rainbow-identifiers-cie-l*a*b*-saturation 30)
-     ;;   ;; rainbow-identifiers-face-count 30
-     ;;   (amd/add-appearance-mode 'rainbow-identifiers-mode)
-     ;; )
    #+end_src
 
 *** rainbow-delimiters
@@ -2374,32 +2346,6 @@
 
 * navigation
 
-** ido, ido-vertical, flx-ido
-
-   This is replaced by ivy but kept here for reference.
-
-  #+begin_src emacs-lisp :tangle no
-    (use-package ido
-      :disabled
-      :init
-      (setq ido-enable-prefix nil)
-      (setq ido-use-virtual-buffers t)
-      (setq ido-enable-flex-matching t)
-      (setq ido-create-new-buffer 'always)
-      (setq ido-use-filename-at-point 'guess)
-      (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
-      :config
-      ;; (ido-mode t)
-      ;; (ido-everywhere t)
-      (ido-vertical-mode))
-
-    (use-package flx-ido
-      :init
-      (setq ido-use-faces nil) ;; disable ido faces to see flx highlights.
-      :config
-      (flx-ido-mode 1))
-  #+end_src
-
 ** avy
 
   #+begin_src emacs-lisp
@@ -2780,141 +2726,6 @@
      (use-package ivy-xref
        :init (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
    #+end_src
-
-* email
-
-  #+begin_src emacs-lisp :tangle no
-    (eval-and-compile
-      (defun amd/mu4e-load-path ()
-        (list "~/apps/mu/share/emacs/site-lisp/mu4e"
-              "~/homebrew/share/emacs/site-lisp/mu4e"
-              "/usr/local/share/emacs/site-lisp/mu4e")))
-
-    (use-package mu4e
-      :commands (mu4e)
-      :load-path (lambda () (amd/mu4e-load-path))
-      :init
-      (let ((mbsync-bin (cl-find-if 'file-exists-p (list "~/apps/isync/bin/mbsync"
-                                                         "~/homebrew/bin/mbsync"
-                                                         "/usr/local/bin/mbsync"))))
-        (when mbsync-bin
-          (setq mu4e-get-mail-command (concat mbsync-bin " -V gmail"))))
-
-      ;; (setq mu4e-update-interval 120)
-      (setq mu4e-change-filenames-when-moving t) ;; needed for mbsync
-
-      (setq mu4e-confirm-quit nil)
-      (let ((mu4e-bin (cl-find-if 'file-exists-p (list "~/apps/mu/bin/mu"
-                                                       "~/homebrew/bin/mu"
-                                                       "/usr/local/bin/mu"))))
-        (when mu4e-bin
-          (setq mu4e-mu-binary mu4e-bin)))
-      :config
-      ;; (add-to-list 'evil-motion-state-modes 'mu4e-view-mode)
-
-      ;; when refiling from message view and hitting x
-      ;; the focus is on the header window instead of the message
-      (advice-add 'mu4e-mark-execute-all :after #'mu4e-select-other-view)
-
-      ;; (mapc (lambda (current-mode-map-name)
-      ;;         (define-key current-mode-map-name amd/leader-key 'hydra-leader-menu/body))
-      ;;       '(mu4e-headers-mode-map
-      ;;         mu4e-view-mode-map
-      ;;         mu4e-main-mode-map))
-
-      (define-key mu4e-headers-mode-map (kbd "e") 'mu4e-headers-prev)
-      (define-key mu4e-view-mode-map (kbd "n") 'next-line)
-      (define-key mu4e-view-mode-map (kbd "e") 'previous-line)
-      (define-key mu4e-view-mode-map (kbd "C-e") 'mu4e-view-headers-prev)
-      (define-key mu4e-view-mode-map (kbd "C-n") 'mu4e-view-headers-next)
-
-      (define-key mu4e-view-mode-map (kbd "C-d") 'mu4e-view-scroll-up-or-next)
-      (define-key mu4e-view-mode-map (kbd "C-u") 'scroll-down-command)
-
-      (setq mu4e-use-fancy-chars nil)
-      (setq mu4e-attachment-dir "~/Download")
-      (setq mu4e-view-show-images t)
-      (setq mu4e-view-show-addresses t)
-      (setq mu4e-view-scroll-to-next nil)
-
-      (when (fboundp 'imagemagick-register-types)
-        (imagemagick-register-types))
-
-      (load "~/.emacs.d/email-settings.el")
-
-      (add-to-list 'mu4e-bookmarks '("flag:flagged" "Flagged" ?f))
-
-      (defun amd/mu4e-open-docx-attachment-in-emacs (msg attachnum)
-        "Count the number of lines in an attachment."
-        (mu4e-view-pipe-attachment msg attachnum "cat > ~/Downloads/attachment.docx && pandoc -f docx -t org ~/Downloads/attachment.docx"))
-
-      (defun amd/mu4e-open-xlsx-attachment-in-emacs (msg attachnum)
-        "Count the number of lines in an attachment."
-        (mu4e-view-pipe-attachment msg attachnum "cat > ~/Downloads/attachment.xlsx && xlsx2csv ~/Downloads/attachment.xlsx"))
-
-      ;; defining 'n' as the shortcut
-      (add-to-list 'mu4e-view-attachment-actions
-        '("cview-docx" . amd/mu4e-open-docx-attachment-in-emacs) t)
-      (add-to-list 'mu4e-view-attachment-actions
-        '("xview-xlsx" . amd/mu4e-open-xlsx-attachment-in-emacs) t)
-
-      (defun amd/mu4e-view-org-message-in-emacs (msg)
-        "View a pandoc converted version of the message in emacs."
-        ;; (mu4e-view-pipe "cat > ~/Downloads/message.html && pandoc -f html -t org ~/Downloads/message.html"))
-        (mu4e-view-pipe "pandoc -f html -t org"))
-
-      (add-to-list 'mu4e-view-actions
-        '("emacs org view" . amd/mu4e-view-org-message-in-emacs) t)
-      (add-to-list 'mu4e-view-actions
-        '("browser view" . mu4e-action-view-in-browser) t)
-
-    )
-
-    ;; make sure eww is loaded before the below
-
-    (use-package mu4e-contrib
-      :commands (mu4e)
-      :load-path (lambda () (amd/mu4e-load-path))
-      :init
-      (setq shr-external-browser 'browse-url-generic) ;; this must be a function, not an external command
-      (setq mu4e-html2text-command 'mu4e-shr2text) ;; same as eww
-      ;; (setq shr-color-visible-luminance-min 1) ;; for dark theme?
-      ;; (setq mu4e-html2text-command "w3m -T text/html")
-      ;; (setq mu4e-html2text-command "pandoc -f html -t org")
-      :config
-      (defun amd/mu4e-open-link-in-browser ()
-        "Open a visible eww link in the web browser."
-        (interactive)
-        (let ((res (avy-with ace-link-eww
-                     (avy--process
-                      (mapcar #'cdr (ace-link--eww-collect))
-                      #'avy--overlay-post))))
-          (when res
-            (goto-char (1+ res))
-            (if (eww-follow-link t)
-                ;; eww-follow-link retuns a "No link at point"
-                ;; string when it cant open a link and nil if successful
-                (org-open-at-point)))))
-
-      ;; (add-hook 'mu4e-view-mode-hook
-      ;;           (lambda()
-      ;;             (local-set-key (kbd "f") 'amd/mu4e-open-link-in-browser)))
-      (define-key mu4e-view-mode-map (kbd "f") 'amd/mu4e-open-link-in-browser)
-    )
-
-    (use-package org-mu4e
-      :commands (mu4e)
-      :init
-      (setq org-mu4e-link-query-in-headers-mode nil))
-
-    (use-package smtpmail
-      :config
-      (setq smtpmail-queue-mail t)
-      (setq smtpmail-queue-dir  "~/Mail/queue/cur")
-
-      (setq message-kill-buffer-on-exit t)
-    )
-  #+end_src
 
 * language major-modes
 
@@ -4616,28 +4427,6 @@
 
   [[info:elisp#Prefix%20Command%20Arguments][info:elisp#Prefix Command Arguments]]
 
-* outorg & outshine
-
-  Still experimenting with the below, may switch to it instead of using an
-  org-mode settings file.
-
-  #+begin_src emacs-lisp
-
-    (eval-and-compile
-      (defvar outline-minor-mode-prefix "\M-#"))
-
-    ;; (use-package outline)
-
-    ;; (use-package outorg
-    ;;   :after outline)
-
-    ;; (use-package outshine
-    ;;   :after outorg
-    ;;   :config
-    ;;   (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
-    ;;   (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode))
-  #+end_src
-
 * edit-with-emacs and cvim
 
   Chrome browser extensions:
@@ -4660,18 +4449,6 @@
           (insert (alist-get 'data parsed-json))))
       (add-hook 'edit-server-edit-mode-hook #'amd/parse-json)
     )
-  #+end_src
-
-* neotree
-
-  #+begin_src emacs-lisp :tangle no
-    (use-package neotree
-      :disabled
-      :commands (neotree)
-      :init
-      (setq neo-smart-open t)
-      :config
-      (add-to-list 'evil-emacs-state-modes 'neotree-mode))
   #+end_src
 
 * view large files
@@ -4746,11 +4523,6 @@
              (concat "/sudo:root@localhost:" (buffer-file-name))))
           (goto-char position)))
     )
-  #+end_src
-
-  #+begin_src emacs-lisp
-    ;; (use-package gnus
-    ;;   :defer t)
   #+end_src
 
 * screencast

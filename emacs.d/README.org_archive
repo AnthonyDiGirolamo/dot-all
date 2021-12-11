@@ -298,3 +298,124 @@ Archived entries from file ~/emacs.d/README.org
                           (swiper--cleanup))))
   #+end_src
 
+
+* fast-scroll
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 13:33
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_OLPATH: appearance
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  #+begin_src emacs-lisp
+    (use-package fast-scroll
+      :disabled
+      :diminish fast-scroll-minor-mode
+      :load-path "fast-scroll"
+      :config
+      (add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
+      (add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
+      (fast-scroll-config)
+      (fast-scroll-minor-mode 1))
+  #+end_src
+
+
+* rainbow-identifiers
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 13:34
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_OLPATH: appearance/appearance minor-modes
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+ #+begin_src emacs-lisp :tangle no
+   (use-package rainbow-identifiers
+     :disabled
+     :commands (rainbow-identifiers-mode)
+     :init
+     (setq rainbow-identifiers-cie-l*a*b*-lightness 50
+           rainbow-identifiers-cie-l*a*b*-saturation 30)
+     ;; rainbow-identifiers-face-count 30
+     (amd/add-appearance-mode 'rainbow-identifiers-mode)
+   )
+ #+end_src
+
+
+* ido, ido-vertical, flx-ido
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 13:34
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_OLPATH: navigation
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  This is replaced by ivy but kept here for reference.
+
+ #+begin_src emacs-lisp :tangle no
+   (use-package ido
+     :disabled
+     :init
+     (setq ido-enable-prefix nil)
+     (setq ido-use-virtual-buffers t)
+     (setq ido-enable-flex-matching t)
+     (setq ido-create-new-buffer 'always)
+     (setq ido-use-filename-at-point 'guess)
+     (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)
+     :config
+     ;; (ido-mode t)
+     ;; (ido-everywhere t)
+     (ido-vertical-mode))
+
+   (use-package flx-ido
+     :init
+     (setq ido-use-faces nil) ;; disable ido faces to see flx highlights.
+     :config
+     (flx-ido-mode 1))
+ #+end_src
+
+
+* neotree
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 13:34
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  #+begin_src emacs-lisp :tangle no
+    (use-package neotree
+      :disabled
+      :commands (neotree)
+      :init
+      (setq neo-smart-open t)
+      :config
+      (add-to-list 'evil-emacs-state-modes 'neotree-mode))
+  #+end_src
+
+
+* outorg & outshine
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-12-11 Sat 13:40
+  :ARCHIVE_FILE: ~/dot-all/emacs.d/README.org
+  :ARCHIVE_CATEGORY: README
+  :END:
+
+  Still experimenting with the below, may switch to it instead of using an
+  org-mode settings file.
+
+  #+begin_src emacs-lisp
+
+    (eval-and-compile
+      (defvar outline-minor-mode-prefix "\M-#"))
+
+    ;; (use-package outline)
+
+    ;; (use-package outorg
+    ;;   :after outline)
+
+    ;; (use-package outshine
+    ;;   :after outorg
+    ;;   :config
+    ;;   (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
+    ;;   (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode))
+  #+end_src
+
