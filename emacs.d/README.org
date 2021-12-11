@@ -570,8 +570,8 @@
          (amd/disable-loaded-themes)
          (load-theme 'doom-one t)
          ;; (load-theme 'doom-moonlight t)
-         (when (featurep 'airline-themes)
-           (load-theme 'airline-onedark t))
+         ;; (when (featurep 'airline-themes)
+         ;;   (load-theme 'airline-onedark t))
          ;; (custom-theme-set-faces
          ;;  'doom-moonlight
          ;;  `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
@@ -703,7 +703,6 @@
      )
 
      (use-package doom-modeline
-       :disabled
        :custom
        ;; TODO: change evil-*-state-tags to the full NAME
        (doom-modeline-bar-width 8) ;; fringe width/2
@@ -720,8 +719,12 @@
 
     #+begin_src emacs-lisp
       ;; (amd/leuven-light-theme)
-      (amd/doom-one-theme)
+      ;; (amd/doom-one-theme)
       ;; (amd/moe-dark-theme)
+
+      ;; (load-theme 'doom-palenight)
+      (load-theme 'doom-snazzy)
+      ;; (load-theme 'doom-zenburn)
 
       ;; modus light
       (use-package modus-operandi-theme

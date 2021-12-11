@@ -9,11 +9,24 @@
 ;;;### (autoloads nil "solaire-mode" "solaire-mode.el" (0 0 0 0))
 ;;; Generated autoloads from solaire-mode.el
 
+(defface solaire-default-face '((t :inherit default)) "\
+Alternative version of the `default' face." :group 'solaire-mode)
+
 (autoload 'solaire-mode "solaire-mode" "\
-Make source buffers grossly incandescent by remapping common faces (see
-`solaire-mode-remap-alist') to their solaire-mode variants.
+Make current buffer a different color so others can be grossly incandescent.
+
+If called interactively, enable Solaire mode if ARG is positive,
+and disable it if ARG is zero or negative.  If called from Lisp,
+also enable the mode if ARG is omitted or nil, and toggle it if
+ARG is `toggle'; disable the mode otherwise.
+
+Remaps faces in `solaire-mode-remap-alist', then runs `solaire-mode-hook', where
+additional mode-specific fixes may live. Lastly, adjusts the fringes for the
+current frame.
 
 \(fn &optional ARG)" t nil)
+
+(put 'solaire-global-mode 'globalized-minor-mode t)
 
 (defvar solaire-global-mode nil "\
 Non-nil if Solaire-Global mode is enabled.
@@ -43,44 +56,32 @@ Conditionally enable `solaire-mode' in the current buffer.
 Does nothing if the current buffer doesn't satisfy the function in
 `solaire-mode-real-buffer-fn'.
 
-\(fn)" t nil)
+\(fn &rest _)" t nil)
 
 (autoload 'turn-off-solaire-mode "solaire-mode" "\
 Disable `solaire-mode' in the current buffer.
 
-\(fn)" t nil)
-
-(autoload 'solaire-mode-in-minibuffer "solaire-mode" "\
-Highlight the minibuffer whenever it is active.
-
-\(fn)" nil nil)
+\(fn &rest _)" t nil)
 
 (autoload 'solaire-mode-reset "solaire-mode" "\
-Reset all buffers with `solaire-mode' enabled.
+Reset `solaire-mode' in all buffers where it is enabled.
 
-The purpose for this is to reset faces that cannot be buffer-local such as the
-fringe, which can be changed by loading a new theme or opening an Emacs client
-frame with a different display (via emacsclient).
+Use this in case solaire-mode has caused some sort of problem, e.g. after
+changing themes.  are more prelevant in Emacs 25 and 26, but far less so in 27+;
+particularly where the fringe is concerned.
 
 \(fn &rest _)" t nil)
 
-(autoload 'solaire-mode-swap-bg "solaire-mode" "\
-Swap the backgrounds of the following faces:
+(autoload 'solaire-mode-reset-buffer "solaire-mode" "\
+Reset `solaire-mode' incurrent buffer.
 
-+ `default' <-> `solaire-default-face'
-+ `hl-line' <-> `solaire-hl-line-face'
-+ `org-hide' <-> `solaire-org-hide-face'
+See `solaire-mode-reset' for details." nil nil)
 
-This is necessary for themes in the doom-themes package.
+(defun solaire-mode--prepare-for-theme-a (theme &rest _) "\
+Prepare solaire-mode for THEME.
+Meant to be used as a `load-theme' advice." (when (and (get theme 'theme-feature) (memq theme custom-enabled-themes)) (setq solaire-mode--supported-p (ignore-errors (let ((default1 (face-background 'default nil t)) (default2 (face-background 'solaire-default-face nil t))) (and default1 default2 (not (equal default1 default2))))) solaire-mode--swapped-p nil solaire-mode--theme theme) (when (bound-and-true-p solaire-global-mode) (if solaire-mode--supported-p (solaire-mode-swap-faces-maybe) (solaire-global-mode -1)))))
 
-\(fn)" nil nil)
-
-(autoload 'solaire-mode-restore-persp-mode-buffers "solaire-mode" "\
-Restore `solaire-mode' in buffers when `persp-mode' loads a session.
-
-\(fn &rest _)" nil nil)
-
-(advice-add #'load-theme :after (lambda (&rest _) (setq solaire-mode--pending-bg-swap (bound-and-true-p solaire-mode-auto-swap-bg))))
+(advice-add #'load-theme :after #'solaire-mode--prepare-for-theme-a)
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "solaire-mode" '("solaire-mode-")))
 

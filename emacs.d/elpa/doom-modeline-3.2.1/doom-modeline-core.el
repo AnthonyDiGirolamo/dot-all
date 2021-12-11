@@ -34,9 +34,9 @@
 (require 'all-the-icons)
 (require 'shrink-path)
 
-
+
 ;;
-;; Compatibilities
+;; Compatibility
 ;;
 
 (eval-and-compile
@@ -98,6 +98,9 @@ It returns a file name which can be used directly as argument of
           ;; Preview
           ?\xe8a0                      ; pageview
 
+          ;; REPL
+          ?\xf155                      ; dollar-sign
+
           ;; LSP
           ?\xf135                      ; rocket
 
@@ -121,11 +124,19 @@ It returns a file name which can be used directly as argument of
           ?\xf243                      ; battery-quarter
           ?\xf241                      ; battery-three-quarters
           ))))
-(doom-modeline--set-char-widths doom-modeline-rhs-icons-alist)
 
+(defun doom-modeline-set-char-widths (&rest _)
+  "Set char widths for the unicode icons."
+  (doom-modeline--set-char-widths doom-modeline-rhs-icons-alist))
 
+(if (and (daemonp)
+         (not (frame-parameter nil 'client)))
+    (add-hook 'after-make-frame-functions #'doom-modeline-set-char-widths)
+  (and (display-graphic-p) (doom-modeline-set-char-widths)))
+
+
 ;;
-;; Customizations
+;; Customization
 ;;
 
 (defgroup doom-modeline nil
@@ -135,42 +146,51 @@ It returns a file name which can be used directly as argument of
 
 (defcustom doom-modeline-height 25
   "How tall the mode-line should be. It's only respected in GUI.
-If the actual char height is larger, it respects the actual char height."
+If the actual char height is larger, it respects the actual char height.
+If `doom-modeline-height' is <= 0 the modeline will have default height."
   :type 'integer
-  :set (lambda (sym val)
-         (set sym (if (> val 0) val 1)))
   :group 'doom-modeline)
 
-(defcustom doom-modeline-bar-width (if (eq system-type 'darwin) 3 6)
+(defcustom doom-modeline-bar-width 4
   "How wide the mode-line bar should be. It's only respected in GUI."
   :type 'integer
   :set (lambda (sym val)
          (set sym (if (> val 0) val 1)))
   :group 'doom-modeline)
 
+(defcustom doom-modeline-hud nil
+  "Whether to use hud instead of default bar. It's only respected in GUI."
+  :type 'boolean
+  :group 'doom-modeline)
+
+(defcustom doom-modeline-hud-min-height 2
+  "Minimum height in pixels of the \"thumb\" of the hud.
+Only respected in GUI."
+  :type 'integer
+  :set (lambda (sym val)
+         (set sym (if (> val 1) val 1)))
+  :group 'doom-modeline)
+
 (defcustom doom-modeline-window-width-limit fill-column
   "The limit of the window width.
 
-If `window-width' is smaller than the limit, some information won't be displayed."
+If `window-width' is smaller than the limit, some information won't be
+displayed."
   :type '(choice integer
                  (const :tag "Disable" nil))
   :group 'doom-modeline)
 
-(defcustom doom-modeline-project-detection
-  (cond ((fboundp 'ffip-get-project-root-directory) 'ffip)
-        ((fboundp 'projectile-project-root) 'projectile)
-        ((fboundp 'project-current) 'project)
-        (t nil))
+(defcustom doom-modeline-project-detection 'auto
   "How to detect the project root.
 
-The default priority is `ffip' > `projectile' > `project'.
 nil means to use `default-directory'.
 
 The project management packages have some issues on detecting project root.
 e.g. `projectile' doesn't handle symlink folders well, while `project' is
-unable to hanle sub-projects.
+unable to handle sub-projects.
 Specify another one if you encounter the issue."
-  :type '(choice (const :tag "Find File in Project" ffip)
+  :type '(choice (const :tag "Auto-detect" auto)
+                 (const :tag "Find File in Project" ffip)
                  (const :tag "Projectile" projectile)
                  (const :tag "Built-in Project" project)
                  (const :tag "Disable" nil))
@@ -187,6 +207,7 @@ Given ~/Projects/FOSS/emacs/lisp/comint.el
   truncate-except-project => ~/P/F/emacs/l/comint.el
   truncate-upto-root => ~/P/F/e/lisp/comint.el
   truncate-all => ~/P/F/e/l/comint.el
+  truncate-nil => ~/Projects/FOSS/emacs/lisp/comint.el
   relative-from-project => emacs/lisp/comint.el
   relative-to-project => lisp/comint.el
   file-name => comint.el
@@ -199,16 +220,16 @@ Given ~/Projects/FOSS/emacs/lisp/comint.el
                  (const truncate-except-project)
                  (const truncate-upto-root)
                  (const truncate-all)
+                 (const truncate-nil)
                  (const relative-from-project)
                  (const relative-to-project)
                  (const file-name)
                  (const buffer-name))
   :group'doom-modeline)
 
-(defcustom doom-modeline-icon (display-graphic-p)
+(defcustom doom-modeline-icon t
   "Whether display the icons in the mode-line.
 
-It respects `all-the-icons-color-icons'.
 While using the server mode in GUI, should set the value explicitly."
   :type 'boolean
   :group 'doom-modeline)
@@ -223,7 +244,7 @@ It respects `doom-modeline-icon'."
 (defcustom doom-modeline-major-mode-color-icon t
   "Whether display the colorful icon for `major-mode'.
 
-It respects `doom-modeline-major-mode-icon'."
+It respects `all-the-icons-color-icons'."
   :type 'boolean
   :group'doom-modeline)
 
@@ -261,17 +282,141 @@ It respects `doom-modeline-icon' and `doom-modeline-buffer-state-icon'."
   "Major modes in which to display word count continuously.
 
 It respects `doom-modeline-enable-word-count'."
-  :type 'list
+  :type '(repeat (symbol :tag "Major-Mode") )
   :group 'doom-modeline)
 
 (defcustom doom-modeline-buffer-encoding t
   "Whether display the buffer encoding."
-  :type 'boolean
+  :type '(choice (const :tag "Always" t)
+                 (const :tag "When non-default" nondefault)
+                 (const :tag "Never" nil))
+  :group 'doom-modeline)
+
+(defcustom doom-modeline-default-coding-system 'utf-8
+  "Default coding system for `doom-modeline-buffer-encoding' `nondefault'."
+  :type 'coding-system
+  :group 'doom-modeline)
+
+(defcustom doom-modeline-default-eol-type 0
+  "Default EOL type for `doom-modeline-buffer-encoding' `nondefault'."
+  :type '(choice (const :tag "Unix-style LF" 0)
+                 (const :tag "DOS-style CRLF" 1)
+                 (const :tag "Mac-style CR" 2))
   :group 'doom-modeline)
 
 (defcustom doom-modeline-indent-info nil
   "Whether display the indentation information."
   :type 'boolean
+  :group 'doom-modeline)
+
+;; It is based upon `editorconfig-indentation-alist' but is used to read indentation levels instead
+;; of setting them. (https://github.com/editorconfig/editorconfig-emacs)
+(defcustom doom-modeline-indent-alist
+  '((apache-mode apache-indent-level)
+    (awk-mode c-basic-offset)
+    (bpftrace-mode c-basic-offset)
+    (c++-mode c-basic-offset)
+    (c-mode c-basic-offset)
+    (cmake-mode cmake-tab-width)
+    (coffee-mode coffee-tab-width)
+    (cperl-mode cperl-indent-level)
+    (crystal-mode crystal-indent-level)
+    (csharp-mode c-basic-offset)
+    (css-mode css-indent-offset)
+    (d-mode c-basic-offset)
+    (emacs-lisp-mode lisp-indent-offset)
+    (enh-ruby-mode enh-ruby-indent-level)
+    (erlang-mode erlang-indent-level)
+    (ess-mode ess-indent-offset)
+    (f90-mode f90-associate-indent
+              f90-continuation-indent
+              f90-critical-indent
+              f90-do-indent
+              f90-if-indent
+              f90-program-indent
+              f90-type-indent)
+    (feature-mode feature-indent-offset
+                  feature-indent-level)
+    (fsharp-mode fsharp-continuation-offset
+                 fsharp-indent-level
+                 fsharp-indent-offset)
+    (groovy-mode groovy-indent-offset)
+    (haskell-mode haskell-indent-spaces
+                  haskell-indent-offset
+                  haskell-indentation-layout-offset
+                  haskell-indentation-left-offset
+                  haskell-indentation-starter-offset
+                  haskell-indentation-where-post-offset
+                  haskell-indentation-where-pre-offset
+                  shm-indent-spaces)
+    (haxor-mode haxor-tab-width)
+    (idl-mode c-basic-offset)
+    (jade-mode jade-tab-width)
+    (java-mode c-basic-offset)
+    (js-mode js-indent-level)
+    (js-jsx-mode js-indent-level
+                 sgml-basic-offset)
+    (js2-mode js2-basic-offset)
+    (js2-jsx-mode js2-basic-offset
+                  sgml-basic-offset)
+    (js3-mode js3-indent-level)
+    (json-mode js-indent-level)
+    (julia-mode julia-indent-offset)
+    (kotlin-mode kotlin-tab-width)
+    (latex-mode tex-indent-basic)
+    (lisp-mode lisp-indent-offset)
+    (livescript-mode livescript-tab-width)
+    (lua-mode lua-indent-level)
+    (matlab-mode matlab-indent-level)
+    (mips-mode mips-tab-width)
+    (mustache-mode mustache-basic-offset)
+    (nasm-mode nasm-basic-offset)
+    (nginx-mode nginx-indent-level)
+    (nxml-mode nxml-child-indent)
+    (objc-mode c-basic-offset)
+    (octave-mode octave-block-offset)
+    (perl-mode perl-indent-level)
+    (php-mode c-basic-offset)
+    (pike-mode c-basic-offset)
+    (ps-mode ps-mode-tab)
+    (pug-mode pug-tab-width)
+    (puppet-mode puppet-indent-level)
+    (python-mode python-indent-offset)
+    (ruby-mode ruby-indent-level)
+    (rust-mode rust-indent-offset)
+    (rustic-mode rustic-indent-offset)
+    (scala-mode scala-indent:step)
+    (scss-mode css-indent-offset)
+    (sgml-mode sgml-basic-offset)
+    (sh-mode sh-basic-offset
+             sh-indentation)
+    (slim-mode slim-indent-offset)
+    (sml-mode sml-indent-level)
+    (tcl-mode tcl-indent-level
+              tcl-continued-indent-level)
+    (terra-mode terra-indent-level)
+    (typescript-mode typescript-indent-level)
+    (verilog-mode verilog-indent-level
+                  verilog-indent-level-behavioral
+                  verilog-indent-level-declaration
+                  verilog-indent-level-module
+                  verilog-cexp-indent
+                  verilog-case-indent)
+    (web-mode web-mode-attr-indent-offset
+              web-mode-attr-value-indent-offset
+              web-mode-code-indent-offset
+              web-mode-css-indent-offset
+              web-mode-markup-indent-offset
+              web-mode-sql-indent-offset
+              web-mode-block-padding
+              web-mode-script-padding
+              web-mode-style-padding)
+    (yaml-mode yaml-indent-offset))
+  "Indentation retrieving variables matched to major modes used
+  when `doom-modeline-indent-info' is non-nil. When multiple
+  variables are specified for a mode, they will be tried resolved
+  in the given order."
+  :type '(alist :key-type symbol :value-type sexp)
   :group 'doom-modeline)
 
 (defcustom doom-modeline-checker-simple-format t
@@ -289,6 +434,13 @@ It respects `doom-modeline-enable-word-count'."
   :type 'integer
   :group 'doom-modeline)
 
+(defcustom doom-modeline-workspace-name t
+  "Whether display the workspace name.
+
+Non-nil to display in the mode-line."
+  :type 'boolean
+  :group 'doom-modeline)
+
 (defcustom doom-modeline-persp-name t
   "Whether display the perspective name.
 
@@ -298,6 +450,18 @@ Non-nil to display in the mode-line."
 
 (defcustom doom-modeline-display-default-persp-name nil
   "If non nil the default perspective name is displayed in the mode-line."
+  :type 'boolean
+  :group 'doom-modeline)
+
+(defcustom doom-modeline-persp-icon t
+  "If non nil the perspective name is displayed alongside a folder icon."
+  :type 'boolean
+  :group 'doom-modeline)
+
+(defcustom doom-modeline-repl t
+  "Whether display the `repl' state.
+
+Non-nil to display in the mode-line."
   :type 'boolean
   :group 'doom-modeline)
 
@@ -340,7 +504,7 @@ It requires `mu4e-alert' package."
   :group 'doom-modeline)
 
 (defcustom doom-modeline-gnus nil
-  "Wheter to display notifications from gnus.
+  "Whether to display notifications from gnus.
 
 It requires `gnus' to be setup"
   :type 'boolean
@@ -351,6 +515,12 @@ It requires `gnus' to be setup"
 
 If nil, don't set up a hook."
   :type 'integer
+  :group 'doom-modeline)
+
+(defcustom doom-modeline-gnus-excluded-groups nil
+  "A list of groups to be excluded from the unread count.
+Groups' names list in `gnus-newsrc-alist'`"
+  :type '(repeat string)
   :group 'doom-modeline)
 
 (defcustom doom-modeline-irc t
@@ -370,7 +540,7 @@ It requires `circe' or `erc' package."
   :type 'function
   :group 'doom-modeline)
 
-
+
 ;;
 ;; Faces
 ;;
@@ -380,6 +550,16 @@ It requires `circe' or `erc' package."
   :group 'doom-modeline
   :group 'faces
   :link '(url-link :tag "Homepage" "https://github.com/seagle0128/doom-modeline"))
+
+(defface doom-modeline-spc-face
+  '((t (:inherit mode-line)))
+  "Face used for the white space."
+  :group 'doom-modeline-faces)
+
+(defface doom-modeline-vspc-face
+  '((t (:inherit variable-pitch)))
+  "Face used for the variable white space."
+  :group 'doom-modeline-faces)
 
 (defface doom-modeline-buffer-path
   '((t (:inherit (mode-line-emphasis bold))))
@@ -436,6 +616,16 @@ It requires `circe' or `erc' package."
   "Face for remote hosts in the mode-line."
   :group 'doom-modeline-faces)
 
+(defface doom-modeline-input-method
+  '((t (:inherit (mode-line-emphasis bold))))
+  "Face for input method in the mode-line."
+  :group 'doom-modeline-faces)
+
+(defface doom-modeline-input-method-alt
+  '((t (:inherit (font-lock-doc-face bold) :slant normal)))
+  "Alternative face for input method in the mode-line."
+  :group 'doom-modeline-faces)
+
 (defface doom-modeline-debug
   '((t (:inherit (font-lock-doc-face bold) :slant normal)))
   "Face for debug-level messages in the mode-line. Used by vcs, checker, etc."
@@ -456,6 +646,12 @@ It requires `circe' or `erc' package."
   "Face for errors in the mode-line. Used by vcs, checker, etc."
   :group 'doom-modeline-faces)
 
+(defface doom-modeline-notification
+  '((t (:inherit doom-modeline-warning)))
+  "Face for notifications in the mode-line. Used by GitHub, mu4e,
+etc. (also see the face `doom-modeline-unread-number')."
+  :group 'doom-modeline-faces)
+
 (defface doom-modeline-unread-number
   '((t (:slant italic :weight normal)))
   "Face for unread number in the mode-line. Used by GitHub, mu4e, etc."
@@ -472,7 +668,10 @@ It requires `circe' or `erc' package."
   :group 'doom-modeline-faces)
 
 (defface doom-modeline-debug-visual
-  `((t (:background ,(face-foreground 'all-the-icons-orange))))
+  `((((class color) (background light))
+     (:background ,(face-foreground 'all-the-icons-orange)))
+    (((class color) (background dark))
+     (:background ,(face-foreground 'all-the-icons-dorange))))
   "Face to use for the mode-line while debugging."
   :group 'doom-modeline)
 
@@ -519,6 +718,16 @@ It requires `circe' or `erc' package."
 (defface doom-modeline-persp-buffer-not-in-persp
   '((t (:inherit (font-lock-doc-face bold italic))))
   "Face for the buffers which are not in the persp."
+  :group 'doom-modeline-faces)
+
+(defface doom-modeline-repl-success
+  '((t (:inherit success :weight normal)))
+  "Face for REPL success state."
+  :group 'doom-modeline-faces)
+
+(defface doom-modeline-repl-warning
+  '((t (:inherit warning :weight normal)))
+  "Face for REPL warning state."
   :group 'doom-modeline-faces)
 
 (defface doom-modeline-lsp-success
@@ -572,11 +781,11 @@ It requires `circe' or `erc' package."
   :group 'doom-modeline-faces)
 
 (defface doom-modeline-buffer-timemachine
-  '((t (:inherit (doom-modeline-buffer-file italic underline))))
+  '((t (:inherit doom-modeline-buffer-file :slant italic)))
   "Face for timemachine status."
   :group 'doom-modeline-faces)
 
-
+
 ;;
 ;; Externals
 ;;
@@ -586,14 +795,14 @@ It requires `circe' or `erc' package."
 (declare-function project-roots 'project)
 (declare-function projectile-project-root 'projectile)
 
-
+
 ;;
 ;; Core helpers
 ;;
 
-;; FIXME #183: Force to caculate mode-line height
+;; FIXME #183: Force to calculate mode-line height
 ;; @see https://github.com/seagle0128/doom-modeline/issues/183
-(defvar-local doom-modeline--size-hacked-p nil)
+;; @see https://github.com/seagle0128/doom-modeline/issues/483
 (defun doom-modeline-redisplay (&rest _)
   "Call `redisplay' to trigger mode-line height calculations.
 
@@ -607,18 +816,16 @@ These calculations can be triggered by calling `redisplay'
 explicitly at the appropriate time and this functions purpose
 is to make it easier to do so.
 
-This function is like `redisplay' with non-nil FORCE argument.
-It accepts an arbitrary number of arguments making it suitable
-as a `:before' advice for any function.  If the current buffer
-has no mode-line or this function has already been calle in it,
-then this function does nothing."
+This function is like `redisplay' with non-nil FORCE argument,
+but it will only trigger a redisplay when there is a non nil
+`mode-line-format' and the height of the mode-line is different
+from that of the `default' face. This function is intended to be
+used as an advice to window creation functions."
   (when (and (bound-and-true-p doom-modeline-mode)
              mode-line-format
-             (not doom-modeline--size-hacked-p))
-    (setq doom-modeline--size-hacked-p t)
+             (/= (frame-char-height) (window-mode-line-height)))
     (redisplay t)))
-(advice-add #'fit-window-to-buffer :before #'doom-modeline-redisplay)
-(advice-add #'resize-temp-buffer-window :before #'doom-modeline-redisplay)
+(advice-add 'split-window :after #'doom-modeline-redisplay)
 
 ;; Keep `doom-modeline-current-window' up-to-date
 (defun doom-modeline--get-current-window (&optional frame)
@@ -631,38 +838,25 @@ then this function does nothing."
 
 (defun doom-modeline--active ()
   "Whether is an active window."
-  (and doom-modeline-current-window
-       (eq (doom-modeline--get-current-window) doom-modeline-current-window)))
+  (unless (and (bound-and-true-p mini-frame-frame)
+               (and (frame-live-p mini-frame-frame)
+                    (frame-visible-p mini-frame-frame)))
+    (and doom-modeline-current-window
+         (eq (doom-modeline--get-current-window) doom-modeline-current-window))))
 
 (defun doom-modeline-set-selected-window (&rest _)
   "Set `doom-modeline-current-window' appropriately."
-  (when-let ((win (doom-modeline--get-current-window)))
-    (unless (minibuffer-window-active-p win)
-      (setq doom-modeline-current-window win))))
+  (let ((win (doom-modeline--get-current-window)))
+    (setq doom-modeline-current-window
+          (if (minibuffer-window-active-p win)
+              (minibuffer-selected-window)
+            win))))
 
 (defun doom-modeline-unset-selected-window ()
   "Unset `doom-modeline-current-window' appropriately."
   (setq doom-modeline-current-window nil))
 
-(add-hook 'window-configuration-change-hook #'doom-modeline-set-selected-window)
-(add-hook 'buffer-list-update-hook #'doom-modeline-set-selected-window)
-(add-hook 'after-make-frame-functions #'doom-modeline-set-selected-window)
-(add-hook 'delete-frame-functions #'doom-modeline-set-selected-window)
-(advice-add #'handle-switch-frame :after #'doom-modeline-set-selected-window)
-(with-no-warnings
-  (if (boundp 'after-focus-change-function)
-      (progn
-        (defun doom-modeline-refresh-frame ()
-          (setq doom-modeline-current-window nil)
-          (cl-loop for frame in (frame-list)
-                   if (eq (frame-focus-state frame) t)
-                   return (setq doom-modeline-current-window
-                                (doom-modeline--get-current-window frame)))
-          (force-mode-line-update))
-        (add-function :after after-focus-change-function #'doom-modeline-refresh-frame))
-    (progn
-      (add-hook 'focus-in-hook #'doom-modeline-set-selected-window)
-      (add-hook 'focus-out-hook #'doom-modeline-unset-selected-window))))
+(add-hook 'pre-redisplay-functions #'doom-modeline-set-selected-window)
 
 ;; Ensure modeline is inactive when Emacs is unfocused (and active otherwise)
 (defvar doom-modeline-remap-face-cookie nil)
@@ -689,7 +883,7 @@ then this function does nothing."
       (add-hook 'focus-in-hook #'doom-modeline-focus)
       (add-hook 'focus-out-hook #'doom-modeline-unfocus))))
 
-
+
 ;;
 ;; Core
 ;;
@@ -735,11 +929,13 @@ then this function does nothing."
 (defvar doom-modeline--font-width-cache nil)
 (defun doom-modeline--font-width ()
   "Cache the font width."
-  (let ((attributes (face-all-attributes 'mode-line)))
-    (or (cdr (assoc attributes doom-modeline--font-width-cache))
-        (let ((width (window-font-width nil 'mode-line)))
-          (push (cons attributes width) doom-modeline--font-width-cache)
-          width))))
+  (if (display-graphic-p)
+      (let ((attributes (face-all-attributes 'mode-line)))
+        (or (cdr (assoc attributes doom-modeline--font-width-cache))
+            (let ((width (window-font-width nil 'mode-line)))
+              (push (cons attributes width) doom-modeline--font-width-cache)
+              width)))
+    1))
 
 ;; Refresh the font width after setting frame parameters
 ;; to ensure the font width is correct.
@@ -749,6 +945,8 @@ then this function does nothing."
   (doom-modeline--font-width))
 (add-hook 'window-setup-hook #'doom-modeline-refresh-font-width-cache)
 (add-hook 'after-make-frame-functions #'doom-modeline-refresh-font-width-cache)
+(add-hook 'after-setting-font-hook #'doom-modeline-refresh-font-width-cache)
+(add-hook 'server-after-make-frame-hook #'doom-modeline-refresh-font-width-cache)
 
 (defun doom-modeline-def-modeline (name lhs &optional rhs)
   "Defines a modeline format and byte-compiles it.
@@ -809,14 +1007,20 @@ If DEFAULT is non-nil, set the default mode-line for all buffers."
 (defsubst doom-modeline-spc ()
   "Text style with whitespace."
   (propertize " " 'face (if (doom-modeline--active)
-                            'mode-line
-                          'mode-line-inactive)))
+                            'doom-modeline-spc-face
+                          '(:inherit mode-line-inactive))))
+
+(defsubst doom-modeline-wspc ()
+  "Text style with wide whitespace."
+  (propertize "  " 'face (if (doom-modeline--active)
+                            'doom-modeline-spc-face
+                          '(:inherit mode-line-inactive))))
 
 (defsubst doom-modeline-vspc ()
   "Text style with icons in mode-line."
   (propertize " " 'face (if (doom-modeline--active)
-                            'variable-pitch
-                          '(:inherit (variable-pitch mode-line-inactive)))))
+                            'doom-modeline-vspc-face
+                          '(:inherit (doom-modeline-vspc-face mode-line-inactive)))))
 
 (defun doom-modeline--font-height ()
   "Calculate the actual char height of the mode-line."
@@ -824,13 +1028,25 @@ If DEFAULT is non-nil, set the default mode-line for all buffers."
     ;; WORKAROUND: Fix tall issue of 27 on Linux
     ;; @see https://github.com/seagle0128/doom-modeline/issues/271
     (round
-     (* (if (and (>= emacs-major-version 27)
-                 (not (eq system-type 'darwin)))
+     (* (if (or (<= doom-modeline-height 0)
+                (and (>= emacs-major-version 27)
+                     (not (eq system-type 'darwin))))
             1.0
           (if doom-modeline-icon 1.68 1.25))
         (cond ((integerp height) (/ height 10))
               ((floatp height) (* height (frame-char-height)))
               (t (frame-char-height)))))))
+
+(defun doom-modeline--original-value (sym)
+  "Return the original value for SYM, if any.
+
+If SYM has an original value, return it in a list. Return nil
+otherwise."
+  (let* ((orig-val-expr (get sym 'standard-value)))
+    (when (consp orig-val-expr)
+      (ignore-errors
+        (list
+         (eval (car orig-val-expr)))))))
 
 (defun doom-modeline-add-variable-watcher (symbol watch-function)
   "Cause WATCH-FUNCTION to be called when SYMBOL is set if possible.
@@ -846,38 +1062,30 @@ The face should be the first attribute, or the font family may be overridden.
 So convert the face \":family XXX :height XXX :inherit XXX\" to
 \":inherit XXX :family XXX :height XXX\".
 See https://github.com/seagle0128/doom-modeline/issues/301."
-  (when-let* ((props (and icon (get-text-property 0 'face icon)))
-              (family (plist-get props :family))
-              (height (plist-get props :height))
-              (face (or face (plist-get props :inherit)))
-              (new-face (append `(:inherit ,face)
-                                `(:family ,family)
-                                `(:height ,height))))
-    (propertize icon 'face new-face)))
+  (if (and doom-modeline-icon (display-graphic-p))
+      (when-let ((props (get-text-property 0 'face icon)))
+        (cl-destructuring-bind (&key family height inherit &allow-other-keys) props
+          (propertize icon 'face `(:inherit ,(or face inherit props)
+                                   :family  ,family
+                                   :height  ,height))))
+    (propertize icon 'face face)))
 
 (defun doom-modeline-icon (icon-set icon-name unicode text &rest args)
   "Display icon of ICON-NAME with ARGS in mode-line.
 
-ICON-SET includes `octicon', `faicon', `material', `alltheicons' and `fileicon'.
+ICON-SET includes `octicon', `faicon', `material', `alltheicons' and `fileicon',
+etc.
 UNICODE is the unicode char fallback. TEXT is the ASCII char fallback.
 ARGS is same as `all-the-icons-octicon' and others."
   (let ((face (or (plist-get args :face) 'mode-line)))
     (or
      ;; Icons
-     (when (and doom-modeline-icon
+     (when (and (display-graphic-p)
+                doom-modeline-icon
                 icon-name
                 (not (string-empty-p icon-name)))
-       (let ((icon (pcase icon-set
-                     ('octicon
-                      (apply #'all-the-icons-octicon icon-name args))
-                     ('faicon
-                      (apply #'all-the-icons-faicon icon-name args))
-                     ('material
-                      (apply #'all-the-icons-material icon-name args))
-                     ('alltheicon
-                      (apply #'all-the-icons-alltheicon icon-name args))
-                     ('fileicon
-                      (apply #'all-the-icons-fileicon icon-name args)))))
+       (when-let* ((func (all-the-icons--function-name icon-set))
+                   (icon (and (fboundp func) (apply func icon-name args))))
          (doom-modeline-propertize-icon icon face)))
      ;; Unicode fallback
      (and doom-modeline-unicode-fallback
@@ -886,43 +1094,59 @@ ARGS is same as `all-the-icons-octicon' and others."
           (char-displayable-p (string-to-char unicode))
           (propertize unicode 'face face))
      ;; ASCII text
-     (and text (propertize text 'face face)))))
+     (and text (propertize text 'face face))
+     "")))
 
-(defun doom-modeline--make-xpm (face width height)
-  "Create an XPM bitmap via FACE, WIDTH and HEIGHT. Inspired by `powerline''s `pl/make-xpm'."
+(defun doom-modeline--create-bar-image (face width height)
+  "Create the bar image.
+Use FACE1 for the bar, FACE2 for the background.
+WIDTH and HEIGHT are the image size in pixels."
   (when (and (display-graphic-p)
-             (image-type-available-p 'xpm))
+             (image-type-available-p 'pbm))
     (propertize
      " " 'display
-     (let ((data (make-list height (make-list width 1)))
-           (color (or (face-background face nil t) "None")))
+     (let ((color (or (face-background face nil t) "None")))
        (ignore-errors
          (create-image
-          (concat
-           (format
-            "/* XPM */\nstatic char * percent[] = {\n\"%i %i 2 1\",\n\". c %s\",\n\"  c %s\","
-            (length (car data)) (length data) color color)
-           (apply #'concat
-                  (cl-loop with idx = 0
-                           with len = (length data)
-                           for dl in data
-                           do (cl-incf idx)
-                           collect
-                           (concat
-                            "\""
-                            (cl-loop for d in dl
-                                     if (= d 0) collect (string-to-char " ")
-                                     else collect (string-to-char "."))
-                            (if (eq idx len) "\"};" "\",\n")))))
-          'xpm t :ascent 'center))))))
+          (concat (format "P1\n%i %i\n" width height)
+                  (make-string (* width height) ?1)
+                  "\n")
+          'pbm t :foreground color :ascent 'center))))))
 
-;; Check whether `window-width' is smaller than the limit
+(defun doom-modeline--create-hud-image
+    (face1 face2 width height top-margin bottom-margin)
+  "Create the hud image.
+Use FACE1 for the bar, FACE2 for the background.
+WIDTH and HEIGHT are the image size in pixels.
+TOP-MARGIN and BOTTOM-MARGIN are the size of the margin above and below the bar,
+respectively."
+  (when (and (display-graphic-p)
+             (image-type-available-p 'pbm))
+    (let ((min-height (min height doom-modeline-hud-min-height)))
+      (unless (> (- height top-margin bottom-margin) min-height)
+        (let ((margin (- height min-height)))
+          (setq top-margin (/ (* margin top-margin) (+ top-margin bottom-margin))
+                bottom-margin (- margin top-margin)))))
+    (propertize
+     " " 'display
+     (let ((color1 (or (face-background face1 nil t) "None"))
+           (color2 (or (face-background face2 nil t) "None")))
+       (create-image
+        (concat
+         (format "P1\n%i %i\n" width height)
+         (make-string (* top-margin width) ?0)
+         (make-string (* (- height top-margin bottom-margin) width) ?1)
+         (make-string (* bottom-margin width) ?0)
+         "\n")
+        'pbm t :foreground color1 :background color2 :ascent 'center)))))
+
+;; Check whether `window-total-width' is smaller than the limit
 (defvar-local doom-modeline--limited-width-p nil)
 (defun doom-modeline-window-size-change-function (&rest _)
   "Function for `window-size-change-functions'."
   (setq doom-modeline--limited-width-p
         (and (numberp doom-modeline-window-width-limit)
-             (<= (+ (window-width)
+             (<= (+ (window-total-width)
                     (or scroll-bar-width 0)
                     (or left-fringe-width 0)
                     (or right-fringe-width 0)
@@ -933,27 +1157,27 @@ ARGS is same as `all-the-icons-octicon' and others."
 (add-hook 'window-size-change-functions #'doom-modeline-window-size-change-function)
 (add-hook 'buffer-list-update-hook #'doom-modeline-window-size-change-function)
 
-(defvar-local doom-modeline--project-detected-p nil)
 (defvar-local doom-modeline--project-root nil)
 (defun doom-modeline--project-root ()
   "Get the path to the root of your project.
 Return nil if no project was found."
-  (unless doom-modeline--project-detected-p
-    (setq doom-modeline--project-root
-          (pcase doom-modeline-project-detection
-            ('ffip
-             (when (fboundp 'ffip-get-project-root-directory)
+  (or doom-modeline--project-root
+      (setq doom-modeline--project-root
+            (pcase (if (eq doom-modeline-project-detection 'auto)
+                       (cond
+                        ((fboundp 'ffip-get-project-root-directory)  'ffip)
+                        ((fboundp 'projectile-project-root) 'projectile)
+                        ((fboundp 'project-current)  'project)
+                        (t 'default))
+                     doom-modeline-project-detection)
+              ('ffip
                (let ((inhibit-message t))
-                 (ffip-get-project-root-directory))))
-            ('projectile
-             (when (fboundp 'projectile-project-root)
-               (projectile-project-root)))
-            ('project
-             (when (fboundp 'project-current)
+                 (ffip-get-project-root-directory)))
+              ('projectile
+               (projectile-project-root))
+              ('project
                (when-let ((project (project-current)))
-                 (car (project-roots project))))))
-          doom-modeline--project-detected-p t))
-  doom-modeline--project-root)
+                 (expand-file-name (cdr project))))))))
 
 (defun doom-modeline-project-p ()
   "Check if the file is in a project."
@@ -987,7 +1211,8 @@ directory too."
 (advice-add #'shrink-path--dirs-internal :override #'doom-modeline-shrink-path--dirs-internal)
 
 (defun doom-modeline-buffer-file-name ()
-  "Propertized variable `buffer-file-name' based on `doom-modeline-buffer-file-name-style'."
+  "Propertized variable `buffer-file-name' based on
+`doom-modeline-buffer-file-name-style'."
   (let* ((buffer-file-name (file-local-name (or (buffer-file-name (buffer-base-buffer)) "")))
          (buffer-file-truename (file-local-name
                                 (or buffer-file-truename (file-truename buffer-file-name) "")))
@@ -1009,6 +1234,8 @@ directory too."
              (doom-modeline--buffer-file-name-truncate buffer-file-name buffer-file-truename))
             ('truncate-all
              (doom-modeline--buffer-file-name-truncate buffer-file-name buffer-file-truename t))
+            ('truncate-nil
+             (doom-modeline--buffer-file-name buffer-file-name buffer-file-truename))
             ('relative-to-project
              (doom-modeline--buffer-file-name-relative buffer-file-name buffer-file-truename))
             ('relative-from-project
@@ -1016,9 +1243,8 @@ directory too."
             ('file-name
              (propertize (file-name-nondirectory buffer-file-name)
                          'face 'doom-modeline-buffer-file))
-            ('buffer-name
-             (propertize "%b" 'face 'doom-modeline-buffer-file))
-            (_ (user-error "invalid buffer-file-name-style")))))
+            ((or 'buffer-name _)
+             (propertize "%b" 'face 'doom-modeline-buffer-file)))))
     (propertize (if (string-empty-p file-name)
                     (propertize "%b" 'face 'doom-modeline-buffer-file)
                   file-name)
@@ -1046,7 +1272,8 @@ If TRUNCATE-TAIL is t also truncate the parent directory of the file."
                             'face 'doom-modeline-buffer-file))))))
 
 (defun doom-modeline--buffer-file-name-relative (_file-path true-file-path &optional include-project)
-  "Propertized variable `buffer-file-name' showing directories relative to project's root only."
+  "Propertized variable `buffer-file-name' showing directories relative to
+project's root only."
   (let ((root (file-local-name (doom-modeline-project-root))))
     (if (null root)
         (propertize "%b" 'face 'doom-modeline-buffer-file)
