@@ -868,6 +868,30 @@
 * amd/functions
 
   #+begin_src emacs-lisp
+    (define-minor-mode amd-center-buffer-mode
+      "Buffer local minor mode for amd-center-buffer"
+      :init-value nil
+      :lighter " CENTER"
+      :keymap (make-sparse-keymap)          ; defines evil-org-mode-map
+      :group 'amd-center-buffer
+      (amd/center-buffer 120))
+
+    ;; (defun amd-center-buffer-mode-install () (amd-center-buffer-mode 1))
+    ;; (define-globalized-minor-mode global-amd-center-buffer-mode
+    ;;   amd-center-buffer-mode amd-center-buffer-mode-install
+    ;;   "Global minor mode of amd-center-buffer-mode.")
+
+    (defun amd/center-buffer (width)
+      (interactive "nBuffer width: ")
+      (let* ((adj (- (window-text-width)
+                     width))
+             (total-margin (+ adj
+                              left-margin-width
+                              right-margin-width)))
+        (setq left-margin-width  (/ total-margin 2))
+        (setq right-margin-width (- total-margin left-margin-width)))
+      (set-window-buffer (selected-window) (current-buffer)))
+
     (defun amd/run-lisp-love ()
       (interactive)
       (run-lisp "love ."))
