@@ -317,68 +317,68 @@
      ;; For some reason this use-package cause leuven org faces
      ;; to be set that appear when other themes are loaded.
 
-     ;; (use-package leuven-theme
-     ;;   ;; :custom
-     ;;   ;; (leuven-scale-org-agenda-structure nil)
-     ;;   ;; (leuven-scale-outline-headlines nil)
-     ;;   :config)
+     (use-package leuven-theme
+       :custom
+       (leuven-scale-org-agenda-structure nil)
+       (leuven-scale-outline-headlines nil)
+     )
 
      (defun amd/leuven-light-theme ()
        "Light background theme"
        (interactive)
        (amd/disable-loaded-themes)
        (load-theme 'leuven t)
-       (when (featurep 'airline-themes)
-         ;; (load-theme 'airline-qwq t)
-         (load-theme 'airline-cobalt2 t))
+       ;;(when (featurep 'airline-themes)
+       ;;  ;; (load-theme 'airline-qwq t)
+       ;;  (load-theme 'airline-cobalt2 t))
        (custom-theme-set-faces
         'leuven
-        ;; `(org-level-1 ((t (:height 1.3 :weight bold :slant normal :foreground "#875fff" :underline nil))))
-        ;; `(org-level-2 ((t (:height 1.1 :weight bold :slant normal :foreground "#005fff" :underline nil))))
-        ;; `(org-level-3 ((t (:height 1.0 :weight bold :slant normal :foreground "#00875f" :underline nil))))
+        ;; '(org-level-1 ((t (:height 1.3 :weight bold :slant normal :foreground "#875fff" :underline nil))) t)
+        ;; '(org-level-2 ((t (:height 1.1 :weight bold :slant normal :foreground "#005fff" :underline nil))) t)
+        ;; '(org-level-3 ((t (:height 1.0 :weight bold :slant normal :foreground "#00875f" :underline nil))) t)
 
-        ;; `(magit-section-heading ((t (:foreground "#483d8b"))))
-        ;; `(magit-section-heading-selection ((t (:foreground "#6a5acd"))))
+        ;; '(magit-section-heading ((t (:foreground "#483d8b"))) t)
+        ;; '(magit-section-heading-selection ((t (:foreground "#6a5acd"))) t)
 
-        `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
-        `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
-        `(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))))
-        `(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))))
-        `(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))))
-        `(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))))
-        `(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))))
-        `(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))))
+        '(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))) t)
+        '(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))) t)
+        '(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))) t)
+        '(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))) t)
+        '(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))) t)
+        '(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))) t)
+        '(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))) t)
+        '(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))) t)
 
-        `(avy-lead-face ((t (:foreground "#ffaf00"))))
-        `(avy-lead-face-0 ((t (:foreground "#5fd7ff"))))
-        `(avy-background-face ((t (:background "#eeeeee" :foreground "#a2a2a2"))))
+        '(avy-lead-face ((t (:foreground "#ffaf00"))) t)
+        '(avy-lead-face-0 ((t (:foreground "#5fd7ff"))) t)
+        '(avy-background-face ((t (:background "#eeeeee" :foreground "#a2a2a2"))) t)
 
         ;; lavender experiment
-        ;; ;; `(default ((t (:foreground "#333333" :background "#F5F5F5"))))
-        ;; `(default ((t (:foreground "#E0CEED" :background "#29222E"))))
-        ;; `(org-block ((t (:foreground "#776385" :background "#160e1b"))))
-        ;; `(org-block-begin-line ((t (:foreground "#E0CEED" :background "#3A2F42"))))
-        ;; `(org-block-end-line   ((t (:foreground "#E0CEED" :background "#3A2F42"))))
-        ;; `(font-lock-keyword-face ((t (:foreground "#A29DFA"))))
-        ;; `(font-lock-comment-face           ((t (:foreground "#776385" :background "#160e1b"))))
-        ;; `(fringe ((t (:foreground "#776385" :background "#160e1b"))))
+        ;; ;; '(default ((t (:foreground "#333333" :background "#F5F5F5"))) t)
+        ;; '(default ((t (:foreground "#E0CEED" :background "#29222E"))) t)
+        ;; '(org-block ((t (:foreground "#776385" :background "#160e1b"))) t)
+        ;; '(org-block-begin-line ((t (:foreground "#E0CEED" :background "#3A2F42"))) t)
+        ;; '(org-block-end-line   ((t (:foreground "#E0CEED" :background "#3A2F42"))) t)
+        ;; '(font-lock-keyword-face ((t (:foreground "#A29DFA"))) t)
+        ;; '(font-lock-comment-face           ((t (:foreground "#776385" :background "#160e1b"))) t)
+        ;; '(fringe ((t (:foreground "#776385" :background "#160e1b"))) t)
 
         ;; 100% blue faces
-        ;; `(comint-highlight-input ((t (:foreground "#ff4500"))))
-        ;; `(comint-highlight-prompt ((t (:foreground "#ff4500"))))
-        ;; `(company-tooltip-annotation ((t (:foreground "#ff4500"))))
-        ;; `(dired-directory ((t (:foreground "#ff4500" :background "#ffffd2" :weight bold))))
-        ;; `(dired-header ((t (:foreground "#ff4500" :background "#ffffd2" :weight bold))))
-        ;; `(font-lock-keyword-face ((t (:foreground "#ff4500"))))
-        ;; `(hydra-face-blue ((t (:foreground "#ff4500" :weight bold))))
-        ;; '(info-node ((t (:foreground "#ff4500" :underline t))))
-        ;; `(ivy-subdir ((t (:foreground "#ff4500" :background "#ffffd2" :weight bold))))
-        ;; `(makey-key-mode-header-face ((t (:foreground "#ff4500"))))
-        ;; `(org-priority ((t (:foreground "#ff4500"))))
-        ;; `(wgrep-done-face ((t (:foreground "#ff4500"))))
-        ;; `(web-mode-keyword-face ((t (:foreground "#ff4500"))))
-        ;; `(web-mode-css-selector-face ((t (:foreground "#ff4500"))))
-        ;; `(which-key-group-description-face ((t (:foreground "#ff4500"))))
+        ;; '(comint-highlight-input ((t (:foreground "#ff4500"))) t)
+        ;; '(comint-highlight-prompt ((t (:foreground "#ff4500"))) t)
+        ;; '(company-tooltip-annotation ((t (:foreground "#ff4500"))) t)
+        ;; '(dired-directory ((t (:foreground "#ff4500" :background "#ffffd2" :weight bold))) t)
+        ;; '(dired-header ((t (:foreground "#ff4500" :background "#ffffd2" :weight bold))) t)
+        ;; '(font-lock-keyword-face ((t (:foreground "#ff4500"))) t)
+        ;; '(hydra-face-blue ((t (:foreground "#ff4500" :weight bold))) t)
+        ;; '(info-node ((t (:foreground "#ff4500" :underline t))) t)
+        ;; '(ivy-subdir ((t (:foreground "#ff4500" :background "#ffffd2" :weight bold))) t)
+        ;; '(makey-key-mode-header-face ((t (:foreground "#ff4500"))) t)
+        ;; '(org-priority ((t (:foreground "#ff4500"))) t)
+        ;; '(wgrep-done-face ((t (:foreground "#ff4500"))) t)
+        ;; '(web-mode-keyword-face ((t (:foreground "#ff4500"))) t)
+        ;; '(web-mode-css-selector-face ((t (:foreground "#ff4500"))) t)
+        ;; '(which-key-group-description-face ((t (:foreground "#ff4500"))) t)
      ))
    #+end_src
 
@@ -399,79 +399,79 @@
            (load-theme 'airline-owo t))
          (custom-theme-set-faces
           'moe-dark
-          ;; `(default ((t (:background "#000000"))))
-          `(region ((t (:background "#626262"))))
+          ;; '(default ((t (:background "#000000"))) t)
+          '(region ((t (:background "#626262"))) t)
 
           ;; No Terminal Italics (which is sometimes reverse video)
           ;; see: http://permalink.gmane.org/gmane.comp.terminal-emulators.tmux.user/2347
 
-          `(font-lock-string-face            ((t (:slant normal :foreground "#ffb86c"))))
-          `(font-lock-comment-delimiter-face ((t (:slant normal :foreground "#6c6c6c"))))
-          `(font-lock-comment-face           ((t (:slant normal :foreground "#6c6c6c"))))
+          '(font-lock-string-face            ((t (:slant normal :foreground "#ffb86c"))) t)
+          '(font-lock-comment-delimiter-face ((t (:slant normal :foreground "#6c6c6c"))) t)
+          '(font-lock-comment-face           ((t (:slant normal :foreground "#6c6c6c"))) t)
 
-          `(org-document-title
-            ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil)))) ;; purple
-          `(org-level-1 ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil)))) ;; purple
-          `(org-level-2 ((t (:height 1.0 :weight normal :slant normal :foreground "#88aaff" :underline nil)))) ;; blue
-          ;; `(org-level-1 ((t (:height 1.3 :weight bold   :slant normal :foreground "#aa88ff" :background "#3a3a3a" :underline nil :box (:line-width 4 :color "#3a3a3a" :style nil)))))
-          ;; `(org-level-2 ((t (:height 1.1 :weight bold   :slant normal :foreground "#88aaff" :background "#3a3a3a" :underline nil :box (:line-width 4 :color "#3a3a3a" :style nil)))))
-          `(org-level-3 ((t (:height 1.0 :weight normal :slant normal :foreground "#88ffff" :underline nil)))) ;; cyan
-          `(org-level-4 ((t (:height 1.0 :weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; sea-green
-          `(org-level-5 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffff66" :underline nil)))) ;; yellow
-          `(org-level-6 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffaa00" :underline nil)))) ;; orange
-          `(org-level-7 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff6666" :underline nil)))) ;; red
-          `(org-level-8 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff66aa" :underline nil)))) ;; pink
+          '(org-document-title
+            ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil))) t) ;; purple
+          '(org-level-1 ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil))) t) ;; purple
+          '(org-level-2 ((t (:height 1.0 :weight normal :slant normal :foreground "#88aaff" :underline nil))) t) ;; blue
+          ;; '(org-level-1 ((t (:height 1.3 :weight bold   :slant normal :foreground "#aa88ff" :background "#3a3a3a" :underline nil :box (:line-width 4 :color "#3a3a3a" :style nil))) t))
+          ;; '(org-level-2 ((t (:height 1.1 :weight bold   :slant normal :foreground "#88aaff" :background "#3a3a3a" :underline nil :box (:line-width 4 :color "#3a3a3a" :style nil))) t))
+          '(org-level-3 ((t (:height 1.0 :weight normal :slant normal :foreground "#88ffff" :underline nil))) t) ;; cyan
+          '(org-level-4 ((t (:height 1.0 :weight normal :slant normal :foreground "#66ffaa" :underline nil))) t) ;; sea-green
+          '(org-level-5 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffff66" :underline nil))) t) ;; yellow
+          '(org-level-6 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffaa00" :underline nil))) t) ;; orange
+          '(org-level-7 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff6666" :underline nil))) t) ;; red
+          '(org-level-8 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff66aa" :underline nil))) t) ;; pink
 
-          `(outshine-level-1 ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil)))) ;; purple
-          `(outshine-level-2 ((t (:height 1.0 :weight normal :slant normal :foreground "#88aaff" :underline nil)))) ;; blue
-          `(outshine-level-3 ((t (:height 1.0 :weight normal :slant normal :foreground "#88ffff" :underline nil)))) ;; cyan
-          `(outshine-level-4 ((t (:height 1.0 :weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; sea-green
-          `(outshine-level-5 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffff66" :underline nil)))) ;; yellow
-          `(outshine-level-6 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffaa00" :underline nil)))) ;; orange
-          `(outshine-level-7 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff6666" :underline nil)))) ;; red
-          `(outshine-level-8 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff66aa" :underline nil)))) ;; pink
+          '(outshine-level-1 ((t (:height 1.0 :weight normal :slant normal :foreground "#aa88ff" :underline nil))) t) ;; purple
+          '(outshine-level-2 ((t (:height 1.0 :weight normal :slant normal :foreground "#88aaff" :underline nil))) t) ;; blue
+          '(outshine-level-3 ((t (:height 1.0 :weight normal :slant normal :foreground "#88ffff" :underline nil))) t) ;; cyan
+          '(outshine-level-4 ((t (:height 1.0 :weight normal :slant normal :foreground "#66ffaa" :underline nil))) t) ;; sea-green
+          '(outshine-level-5 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffff66" :underline nil))) t) ;; yellow
+          '(outshine-level-6 ((t (:height 1.0 :weight normal :slant normal :foreground "#ffaa00" :underline nil))) t) ;; orange
+          '(outshine-level-7 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff6666" :underline nil))) t) ;; red
+          '(outshine-level-8 ((t (:height 1.0 :weight normal :slant normal :foreground "#ff66aa" :underline nil))) t) ;; pink
 
-          `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
-          `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
-          `(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))))
-          `(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))))
-          `(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))))
-          `(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))))
-          `(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))))
-          `(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))))
+          '(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))) t)
+          '(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))) t)
+          '(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))) t)
+          '(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))) t)
+          '(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))) t)
+          '(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))) t)
+          '(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))) t)
+          '(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))) t)
 
-          `(ace-jump-face-foreground ((t (:background "color-18" :foreground "#ff8700" :weight bold))))
+          '(ace-jump-face-foreground ((t (:background "color-18" :foreground "#ff8700" :weight bold))) t)
 
-          `(avy-lead-face ((t (:foreground "#ffaf00"))))
-          `(avy-lead-face-0 ((t (:foreground "#5fd7ff"))))
+          '(avy-lead-face ((t (:foreground "#ffaf00"))) t)
+          '(avy-lead-face-0 ((t (:foreground "#5fd7ff"))) t)
 
-          `(eyebrowse-mode-line-active ((t (:inherit mode-line-emphasis :foreground "#ffff87"))))
+          '(eyebrowse-mode-line-active ((t (:inherit mode-line-emphasis :foreground "#ffff87"))) t)
 
-          `(flycheck-error ((t (:inherit default :background "color-236" :foreground "#ff5f87" :underline t :weight bold))))
+          '(flycheck-error ((t (:inherit default :background "color-236" :foreground "#ff5f87" :underline t :weight bold))) t)
 
-          '(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
-          '(flyspell-incorrect ((t (:underline "yellow" :weight bold))))
-
-          ;; (if (display-graphic-p)
-          `(org-todo ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "#ff00ff" ))))
-          ;; `(org-todo ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "color-201" )))))
+          '(flyspell-duplicate ((t (:underline "yellow" :weight bold))) t)
+          '(flyspell-incorrect ((t (:underline "yellow" :weight bold))) t)
 
           ;; (if (display-graphic-p)
-          `(org-done ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "#00ffff"))))
-          ;; `(org-done ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "color-51")))))
+          '(org-todo ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "#ff00ff" ))) t)
+          ;; '(org-todo ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "color-201" ))) t))
 
-          `(org-link ((t (:foreground "#87d7ff" :underline t))))
+          ;; (if (display-graphic-p)
+          '(org-done ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "#00ffff"))) t)
+          ;; '(org-done ((t (:weight bold :box (:line-width 1 :color nil :style none) :foreground "color-51"))) t))
 
-          `(org-block-begin-line ((t (:foreground "#5a5a5a" :background "#2e2e2e"))))
-          `(org-block-end-line ((t (:foreground nil :background nil :inherit 'org-block-begin-line))))
-          `(org-block ((t (:foreground nil :background nil :inherit nil))))
+          '(org-link ((t (:foreground "#87d7ff" :underline t))) t)
 
-          `(dired-subtree-depth-1-face ((t (:background "#3a3a3a"))))
-          `(dired-subtree-depth-2-face ((t (:background "#444444"))))
-          `(dired-subtree-depth-3-face ((t (:background "#4e4e4e"))))
-          `(dired-subtree-depth-4-face ((t (:background "#585858"))))
-          `(dired-subtree-depth-5-face ((t (:background "#626262"))))
-          `(dired-subtree-depth-6-face ((t (:background "#6c6c6c"))))
+          '(org-block-begin-line ((t (:foreground "#5a5a5a" :background "#2e2e2e"))) t)
+          '(org-block-end-line ((t (:foreground nil :background nil :inherit 'org-block-begin-line))) t)
+          '(org-block ((t (:foreground nil :background nil :inherit nil))) t)
+
+          '(dired-subtree-depth-1-face ((t (:background "#3a3a3a"))) t)
+          '(dired-subtree-depth-2-face ((t (:background "#444444"))) t)
+          '(dired-subtree-depth-3-face ((t (:background "#4e4e4e"))) t)
+          '(dired-subtree-depth-4-face ((t (:background "#585858"))) t)
+          '(dired-subtree-depth-5-face ((t (:background "#626262"))) t)
+          '(dired-subtree-depth-6-face ((t (:background "#6c6c6c"))) t)
 
           ;; :overline "#A7A7A7" :foreground "#3C3C3C" :background "#F0F0F0"
           ;; :overline "#123555" :foreground "#123555" :background "#E5F4FB"
@@ -482,73 +482,73 @@
           ;; :foreground "#2EAE2C"
           ;; :foreground "#FD8008"
 
-          `(ediff-current-diff-A ((t (:foreground "gray33" :background "#FFDDDD"))))
-          `(ediff-current-diff-B ((t (:foreground "gray33" :background "#DDFFDD"))))
-          `(ediff-current-diff-C ((t (:foreground "black" :background "#00afff"))))
+          '(ediff-current-diff-A ((t (:foreground "gray33" :background "#FFDDDD"))) t)
+          '(ediff-current-diff-B ((t (:foreground "gray33" :background "#DDFFDD"))) t)
+          '(ediff-current-diff-C ((t (:foreground "black" :background "#00afff"))) t)
 
-          `(ediff-even-diff-A ((t (:background "#4e4e4e"))))
-          `(ediff-even-diff-B ((t (:background "#4e4e4e"))))
-          `(ediff-even-diff-C ((t (:background "#4e4e4e"))))
+          '(ediff-even-diff-A ((t (:background "#4e4e4e"))) t)
+          '(ediff-even-diff-B ((t (:background "#4e4e4e"))) t)
+          '(ediff-even-diff-C ((t (:background "#4e4e4e"))) t)
 
-          `(ediff-fine-diff-A ((t (:foreground "#af0000" :background "#FFAAAA"))))
-          `(ediff-fine-diff-B ((t (:foreground "#008000" :background "#55FF55"))))
+          '(ediff-fine-diff-A ((t (:foreground "#af0000" :background "#FFAAAA"))) t)
+          '(ediff-fine-diff-B ((t (:foreground "#008000" :background "#55FF55"))) t)
 
-          `(ediff-fine-diff-C ((t (:foreground "black" :background "#ffff5f"))))
-          `(ediff-odd-diff-A ((t (:background "#4e4e4e"))))
-          `(ediff-odd-diff-B ((t (:background "#4e4e4e"))))
-          `(ediff-odd-diff-C ((t (:background "#4e4e4e"))))
-          `(ediff-odd-diff-Ancestor ((t (:background "#4e4e4e"))))
+          '(ediff-fine-diff-C ((t (:foreground "black" :background "#ffff5f"))) t)
+          '(ediff-odd-diff-A ((t (:background "#4e4e4e"))) t)
+          '(ediff-odd-diff-B ((t (:background "#4e4e4e"))) t)
+          '(ediff-odd-diff-C ((t (:background "#4e4e4e"))) t)
+          '(ediff-odd-diff-Ancestor ((t (:background "#4e4e4e"))) t)
 
-          `(mu4e-unread-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; purple
+          '(mu4e-unread-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil))) t) ;; purple
 
-          `(mu4e-contact-face ((t (:weight normal :slant normal :foreground "#88aaff" :underline nil)))) ;; purple
-          `(mu4e-header-value-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; purple
-          `(mu4e-special-header-value-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil)))) ;; purple
+          '(mu4e-contact-face ((t (:weight normal :slant normal :foreground "#88aaff" :underline nil))) t) ;; purple
+          '(mu4e-header-value-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil))) t) ;; purple
+          '(mu4e-special-header-value-face ((t (:weight normal :slant normal :foreground "#66ffaa" :underline nil))) t) ;; purple
 
-          ;; `(header-line ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#4e4e4e" :underline nil))))
-          `(header-line ((t (:weight normal :slant normal :foreground "#6c6c6c" :background "#3a3a3a"))))
+          ;; '(header-line ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#4e4e4e" :underline nil))) t)
+          '(header-line ((t (:weight normal :slant normal :foreground "#6c6c6c" :background "#3a3a3a"))) t)
 
-          `(hl-line ((t (:background "#3a3a3a"))))
-          `(vline ((t (:background "#3a3a3a"))))
+          '(hl-line ((t (:background "#3a3a3a"))) t)
+          '(vline ((t (:background "#3a3a3a"))) t)
 
-          `(secondary-selection ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#5f87ff" :underline nil))))
-          `(magit-diff-file-heading-highlight ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#5f87ff" :underline nil))))
-          `(magit-section-highlight ((t (:weight bold :slant normal))))
+          '(secondary-selection ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#5f87ff" :underline nil))) t)
+          '(magit-diff-file-heading-highlight ((t (:weight normal :slant normal :foreground "#FFFFFF" :background "#5f87ff" :underline nil))) t)
+          '(magit-section-highlight ((t (:weight bold :slant normal))) t)
 
-          `(evil-ex-lazy-highlight ((t (:foreground "#FFFFFF" :background "#5f87ff"))))
+          '(evil-ex-lazy-highlight ((t (:foreground "#FFFFFF" :background "#5f87ff"))) t)
 
           ;; ;; ivy-mode
-          ;; `(ivy-current-match ((,class (:foreground ,orange-2 :bold t :inherit highlight))))
-          `(ivy-current-match ((t (:inherit highlight))))
-          ;; `(ivy-confirm-face ((,class (:foreground ,green-4 :background ,green-00 :bold t))))
-          ;; `(ivy-subdir ((,class (:foreground ,blue-1 :bold t))))
-          ;; `(ivy-virtual ((,class (:foreground ,magenta-3))))
+          ;; '(ivy-current-match ((,class (:foreground ,orange-2 :bold t :inherit highlight))) t)
+          '(ivy-current-match ((t (:inherit highlight))) t)
+          ;; '(ivy-confirm-face ((,class (:foreground ,green-4 :background ,green-00 :bold t))) t)
+          ;; '(ivy-subdir ((,class (:foreground ,blue-1 :bold t))) t)
+          ;; '(ivy-virtual ((,class (:foreground ,magenta-3))) t)
 
-          ;; `(ivy-minibuffer-match-face-1 ((,class (:background ,blue-1 :foreground ,white-0))))
-          ;; `(ivy-minibuffer-match-face-2 ((,class (:bold t :background ,green-2 :foreground ,white-0))))
-          ;; `(ivy-minibuffer-match-face-3 ((,class (:bold t :background ,magenta-2 :foreground ,white-0))))
-          ;; `(ivy-minibuffer-match-face-4 ((,class (:bold t :background ,cyan-3 :foreground ,white-0))))
+          ;; '(ivy-minibuffer-match-face-1 ((,class (:background ,blue-1 :foreground ,white-0))) t)
+          ;; '(ivy-minibuffer-match-face-2 ((,class (:bold t :background ,green-2 :foreground ,white-0))) t)
+          ;; '(ivy-minibuffer-match-face-3 ((,class (:bold t :background ,magenta-2 :foreground ,white-0))) t)
+          ;; '(ivy-minibuffer-match-face-4 ((,class (:bold t :background ,cyan-3 :foreground ,white-0))) t)
 
           ;; ;; swiper
-          ;; `(swiper-match-face-1 ((t (:inherit isearch-lazy-highlight-face))))
-          ;; `(swiper-match-face-2 ((t (:inherit isearch))))
-          ;; `(swiper-match-face-3 ((t (:inherit match))))
-          ;; `(swiper-match-face-4 ((t (:inherit isearch-fail))))
-          `(swiper-line-face    ((t (:inherit highlight))))
-          `(minibuffer-prompt ((t (:foreground nil :background nil :inherit 'wgrep-reject-face))))
-          `(dired-header    ((t (:inherit minibuffer-prompt))))
+          ;; '(swiper-match-face-1 ((t (:inherit isearch-lazy-highlight-face))) t)
+          ;; '(swiper-match-face-2 ((t (:inherit isearch))) t)
+          ;; '(swiper-match-face-3 ((t (:inherit match))) t)
+          ;; '(swiper-match-face-4 ((t (:inherit isearch-fail))) t)
+          '(swiper-line-face    ((t (:inherit highlight))) t)
+          '(minibuffer-prompt ((t (:foreground nil :background nil :inherit 'wgrep-reject-face))) t)
+          '(dired-header    ((t (:inherit minibuffer-prompt))) t)
 
-          `(lsp-ui-doc-background ((t (:background "#4e4e4e"))))
+          '(lsp-ui-doc-background ((t (:background "#4e4e4e"))) t)
 
           ;; used for ansi-term and vterm
-          `(term-color-black   ((t (:background "#303030" :foreground "#2d2d2d"))))
-          `(term-color-blue    ((t (:background "#303030" :foreground "#6699cc"))))
-          `(term-color-cyan    ((t (:background "#303030" :foreground "#66cccc"))))
-          `(term-color-green   ((t (:background "#303030" :foreground "#99cc99"))))
-          `(term-color-magenta ((t (:background "#303030" :foreground "#cc99cc"))))
-          `(term-color-red     ((t (:background "#303030" :foreground "#f2777a"))))
-          `(term-color-white   ((t (:background "#303030" :foreground "#f2f0ec"))))
-          `(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))))
+          '(term-color-black   ((t (:background "#303030" :foreground "#2d2d2d"))) t)
+          '(term-color-blue    ((t (:background "#303030" :foreground "#6699cc"))) t)
+          '(term-color-cyan    ((t (:background "#303030" :foreground "#66cccc"))) t)
+          '(term-color-green   ((t (:background "#303030" :foreground "#99cc99"))) t)
+          '(term-color-magenta ((t (:background "#303030" :foreground "#cc99cc"))) t)
+          '(term-color-red     ((t (:background "#303030" :foreground "#f2777a"))) t)
+          '(term-color-white   ((t (:background "#303030" :foreground "#f2f0ec"))) t)
+          '(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))) t)
          )
        )
      )
@@ -562,6 +562,19 @@
        (doom-themes-enable-bold t)
        (doom-themes-enable-italic t)
        :config
+       (defun amd/doom-snazzy-theme ()
+         "load snazzy"
+         (interactive)
+         (amd/disable-loaded-themes)
+         (load-theme 'doom-snazzy t)
+         (custom-theme-set-faces
+          'doom-snazzy
+          '(markdown-code-face ((t (:extend t :background "#242631"))) t t)
+          '(magit-diff-removed ((t (:foreground "#cc4945" :background "#433b3d"))) t t)
+          '(magit-diff-removed-highlight ((t (:foreground "#ff5c57" :background "#433b3d"))) t t)
+          )
+       )
+
        (defun amd/doom-one-theme ()
          "load doom-one-theme and override some colors"
          (interactive)
@@ -570,71 +583,60 @@
          ;; (load-theme 'doom-moonlight t)
          ;; (when (featurep 'airline-themes)
          ;;   (load-theme 'airline-onedark t))
-         ;; (custom-theme-set-faces
-         ;;  'doom-moonlight
-         ;;  `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
-         ;;  `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
-         ;;  `(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))))
-         ;;  `(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))))
-         ;;  `(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))))
-         ;;  `(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))))
-         ;;  `(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))))
-         ;;  `(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))))
-         ;; )
          (custom-theme-set-faces
           'doom-one
+          '(flyspell-duplicate ((t (:underline "yellow" :weight bold))) t)
+          '(flyspell-incorrect ((t (:underline "yellow" :weight bold))) t)
+          '(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))) t)
+          '(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))) t)
+          '(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))) t)
+          '(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))) t)
+          '(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))) t)
+          '(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))) t)
+          '(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))) t)
+          '(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))) t)
+          '(tab-bar-tab ((t (:foreground "#1B2229" :background "#51AFEF" :weight bold))) t)
+          '(tab-bar-tab-inactive ((t (:foreground "#ABB2BF" :background "#3E4452"))) t)
 
-          '(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
-          '(flyspell-incorrect ((t (:underline "yellow" :weight bold))))
-          `(rainbow-delimiters-depth-1-face ((t (:foreground "#aa88ff" :weight bold))))
-          `(rainbow-delimiters-depth-2-face ((t (:foreground "#88aaff" :weight bold))))
-          `(rainbow-delimiters-depth-3-face ((t (:foreground "#88ffff" :weight bold))))
-          `(rainbow-delimiters-depth-4-face ((t (:foreground "#66ffaa" :weight bold))))
-          `(rainbow-delimiters-depth-5-face ((t (:foreground "#ffff66" :weight bold))))
-          `(rainbow-delimiters-depth-6-face ((t (:foreground "#ffaa00" :weight bold))))
-          `(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))))
-          `(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))))
-          '(tab-bar-tab ((t (:foreground "#1B2229" :background "#51AFEF" :weight bold))))
-          '(tab-bar-tab-inactive ((t (:foreground "#ABB2BF" :background "#3E4452"))))
-
-          ;; `(org-level-1 ((t (:height 1.3 :weight normal :slant normal :foreground "#00B3EF" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
-          ;; `(org-level-2 ((t (:height 1.1 :weight normal :slant normal :foreground "#40D3FF" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
+          ;; '(org-level-1 ((t (:height 1.3 :weight normal :slant normal :foreground "#00B3EF" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
+          ;; '(org-level-2 ((t (:height 1.1 :weight normal :slant normal :foreground "#40D3FF" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
           ;; doom-one specific backgrounds
-          `(org-level-1 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#aa88ff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
-          `(org-level-2 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88aaff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))))
-          `(org-level-3 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88ffff" :underline nil)))) ;; cyan
-          `(org-level-4 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#66ffaa" :underline nil)))) ;; sea-green
-          `(org-level-5 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffff66" :underline nil)))) ;; yellow
-          `(org-level-6 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffaa00" :underline nil)))) ;; orange
-          `(org-level-7 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff6666" :underline nil)))) ;; red
-          `(org-level-8 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff66aa" :underline nil)))) ;; pink
-          ;; `(org-block ((t (:foreground nil :background nil :inherit 'org-block-begin-line))))
-          `(dired-subtree-depth-1-face ((t (:background "#23272e"))))
-          `(dired-subtree-depth-2-face ((t (:background "#363d47"))))
-          `(dired-subtree-depth-3-face ((t (:background "#4a5261"))))
-          `(dired-subtree-depth-4-face ((t (:background "#5d687a"))))
-          `(dired-subtree-depth-5-face ((t (:background "#717d94"))))
-          `(dired-subtree-depth-6-face ((t (:background "#8493ad"))))
-          `(ace-jump-face-foreground ((t (:background "color-18" :foreground "#ff8700" :weight bold))))
-          `(avy-lead-face ((t (:foreground "#ffaf00"))))
-          `(avy-lead-face-0 ((t (:foreground "#5fd7ff"))))
-          `(avy-lead-face-1 ((t (:foreground "#66ffaa"))))
-          `(avy-lead-face-2 ((t (:foreground "#ff6666"))))
-          `(eyebrowse-mode-line-active ((t (:foreground "#ECBE7B" :weight bold))))
-          `(flyspell-duplicate ((t (:underline "yellow" :weight bold))))
-          `(flyspell-incorrect ((t (:underline "yellow" :weight bold))))
-          ;; `(secondary-selection ((t (:foreground "#51afef" :background "#181e26"))))
-          `(lsp-ui-doc-background ((t (:background "#42444a"))))
-          `(term-color-black   ((t (:background "#303030" :foreground "#2d2d2d"))))
-          `(term-color-blue    ((t (:background "#303030" :foreground "#6699cc"))))
-          `(term-color-cyan    ((t (:background "#303030" :foreground "#66cccc"))))
-          `(term-color-green   ((t (:background "#303030" :foreground "#99cc99"))))
-          `(term-color-magenta ((t (:background "#303030" :foreground "#cc99cc"))))
-          `(term-color-red     ((t (:background "#303030" :foreground "#f2777a"))))
-          `(term-color-white   ((t (:background "#303030" :foreground "#f2f0ec"))))
-          `(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))))
+          '(org-level-1 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#aa88ff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
+          '(org-level-2 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88aaff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
+          '(org-level-3 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88ffff" :underline nil))) t) ;; cyan
+          '(org-level-4 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#66ffaa" :underline nil))) t) ;; sea-green
+          '(org-level-5 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffff66" :underline nil))) t) ;; yellow
+          '(org-level-6 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffaa00" :underline nil))) t) ;; orange
+          '(org-level-7 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff6666" :underline nil))) t) ;; red
+          '(org-level-8 ((t (:height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff66aa" :underline nil))) t) ;; pink
+          ;; '(org-block ((t (:foreground nil :background nil :inherit 'org-block-begin-line))) t)
+          '(dired-subtree-depth-1-face ((t (:background "#23272e"))) t)
+          '(dired-subtree-depth-2-face ((t (:background "#363d47"))) t)
+          '(dired-subtree-depth-3-face ((t (:background "#4a5261"))) t)
+          '(dired-subtree-depth-4-face ((t (:background "#5d687a"))) t)
+          '(dired-subtree-depth-5-face ((t (:background "#717d94"))) t)
+          '(dired-subtree-depth-6-face ((t (:background "#8493ad"))) t)
+          '(ace-jump-face-foreground ((t (:background "color-18" :foreground "#ff8700" :weight bold))) t)
+          '(avy-lead-face ((t (:foreground "#ffaf00"))) t)
+          '(avy-lead-face-0 ((t (:foreground "#5fd7ff"))) t)
+          '(avy-lead-face-1 ((t (:foreground "#66ffaa"))) t)
+          '(avy-lead-face-2 ((t (:foreground "#ff6666"))) t)
+          '(eyebrowse-mode-line-active ((t (:foreground "#ECBE7B" :weight bold))) t)
+          '(flyspell-duplicate ((t (:underline "yellow" :weight bold))) t)
+          '(flyspell-incorrect ((t (:underline "yellow" :weight bold))) t)
+          ;; '(secondary-selection ((t (:foreground "#51afef" :background "#181e26"))) t)
+          '(lsp-ui-doc-background ((t (:background "#42444a"))) t)
+          '(term-color-black   ((t (:background "#303030" :foreground "#2d2d2d"))) t)
+          '(term-color-blue    ((t (:background "#303030" :foreground "#6699cc"))) t)
+          '(term-color-cyan    ((t (:background "#303030" :foreground "#66cccc"))) t)
+          '(term-color-green   ((t (:background "#303030" :foreground "#99cc99"))) t)
+          '(term-color-magenta ((t (:background "#303030" :foreground "#cc99cc"))) t)
+          '(term-color-red     ((t (:background "#303030" :foreground "#f2777a"))) t)
+          '(term-color-white   ((t (:background "#303030" :foreground "#f2f0ec"))) t)
+          '(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))) t)
           )
-         (solaire-mode-swap-bg))
+         (solaire-mode-swap-faces-maybe)
+         )
      )
    #+end_src
 
@@ -649,7 +651,7 @@
        :init
        :config
        (solaire-global-mode +1)
-       ;; (solaire-mode-swap-bg)
+       ;; (solaire-mode-swap-faces-maybe)
      )
    #+end_src
 
@@ -709,10 +711,8 @@
       ;; (amd/leuven-light-theme)
       ;; (amd/doom-one-theme)
       ;; (amd/moe-dark-theme)
-
-      ;; (load-theme 'doom-palenight)
-      (load-theme 'doom-snazzy)
-      ;; (load-theme 'doom-zenburn)
+      ;; (amd/doom-snazzy-theme)
+      (load-theme 'doom-palenight)
 
       ;; modus light
       (use-package modus-operandi-theme
