@@ -14,20 +14,20 @@ https://github.com/tpope/vim-vividchalk.git
 https://github.com/ctrlpvim/ctrlp.vim.git
 https://github.com/rakr/vim-one.git
 https://github.com/gerardbm/vim-atomic.git
-https://github.com/vim-airline/vim-airline-themes.git
-https://github.com/vim-airline/vim-airline.git
 https://github.com/christoomey/vim-tmux-navigator.git
 https://github.com/tpope/vim-speeddating.git
 https://github.com/vim-syntastic/syntastic.git
 https://github.com/junegunn/fzf.vim
 https://github.com/NLKNguyen/papercolor-theme
+https://github.com/ycm-core/YouCompleteMe.git
+https://github.com/tpope/vim-flagship.git
+https://github.com/itchyny/lightline.vim
+https://github.com/jceb/vim-orgmode.git
 "
-# urls="
-# https://github.com/ycm-core/YouCompleteMe.git
-# https://github.com/tpope/vim-flagship.git
-# https://github.com/itchyny/lightline.vim
-# https://github.com/jceb/vim-orgmode.git
-# "
+urls="
+https://github.com/vim-airline/vim-airline-themes.git
+https://github.com/vim-airline/vim-airline.git
+"
 for URL in $urls
 do
        GDIR=$(basename -s .git $URL)

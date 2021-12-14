@@ -693,6 +693,7 @@
      )
 
      (use-package doom-modeline
+       :disabled
        :custom
        ;; TODO: change evil-*-state-tags to the full NAME
        (doom-modeline-bar-width 8) ;; fringe width/2
@@ -713,6 +714,7 @@
       ;; (amd/moe-dark-theme)
       ;; (amd/doom-snazzy-theme)
       (load-theme 'doom-palenight)
+      (load-theme 'airline-base16_material_palenight t)
 
       ;; modus light
       (use-package modus-operandi-theme
@@ -849,7 +851,7 @@
       :keymap (make-sparse-keymap) ;; defines amd-center-buffer-mode-map
       :group 'amd-center-buffer
       (if (bound-and-true-p amd-center-buffer-mode)
-          (amd/center-buffer 120)
+          (amd/center-buffer 100)
         (amd/center-buffer-disable)))
 
     ;; (defun amd-center-buffer-mode-install () (amd-center-buffer-mode 1))

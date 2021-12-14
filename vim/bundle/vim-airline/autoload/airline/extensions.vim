@@ -26,6 +26,7 @@ let s:filetype_overrides = {
       \ 'coc-explorer':  [ 'CoC Explorer', '' ],
       \ 'defx':  ['defx', '%{b:defx.paths[0]}'],
       \ 'fugitive': ['fugitive', '%{airline#util#wrap(airline#extensions#branch#get_head(),80)}'],
+      \ 'floggraph':  [ 'Flog', '%{get(b:, "flog_status_summary", "")}' ],
       \ 'gundo': [ 'Gundo', '' ],
       \ 'help':  [ 'Help', '%f' ],
       \ 'minibufexpl': [ 'MiniBufExplorer', '' ],
@@ -249,6 +250,10 @@ function! airline#extensions#load()
     call airline#extensions#tagbar#init(s:ext)
     call add(s:loaded_ext, 'tagbar')
   endif
+  if get(g:, 'airline#extensions#taglist#enabled', 1) && exists(':TlistShowTag')
+    call airline#extensions#taglist#init(s:ext)
+    call add(s:loaded_ext, 'taglist')
+  endif
 
   if get(g:, 'airline#extensions#vista#enabled', 1)
         \ && exists(':Vista')
@@ -467,6 +472,11 @@ function! airline#extensions#load()
     call add(s:loaded_ext, 'battery')
   endif
 
+  if (get(g:, 'airline#extensions#vim9lsp#enabled', 1) && exists('*lsp#errorCount'))
+    call airline#extensions#vim9lsp#init(s:ext)
+    call add(s:loaded_ext, 'vim9lsp')
+  endif
+
   if !get(g:, 'airline#extensions#disable_rtp_load', 0)
     " load all other extensions, which are not part of the default distribution.
     " (autoload/airline/extensions/*.vim outside of our s:script_path).
@@ -498,6 +508,11 @@ function! airline#extensions#load()
   if (get(g:, 'airline#extensions#omnisharp#enabled', 1) && get(g:, 'OmniSharp_loaded', 0))
     call airline#extensions#omnisharp#init(s:ext)
     call add(s:loaded_ext, 'omnisharp')
+  endif
+
+  if (get(g:, 'airline#extensions#rufo#enabled', 0) && get(g:, 'rufo_loaded', 0))
+    call airline#extensions#rufo#init(s:ext)
+    call add(s:loaded_ext, 'rufo')
   endif
 
 endfunction
