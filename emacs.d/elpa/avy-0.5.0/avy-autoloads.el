@@ -9,14 +9,6 @@
 ;;;### (autoloads nil "avy" "avy.el" (0 0 0 0))
 ;;; Generated autoloads from avy.el
 
-(autoload 'avy-process "avy" "\
-Select one of CANDIDATES using `avy-read'.
-Use OVERLAY-FN to visualize the decision overlay.
-CLEANUP-FN should take no arguments and remove the effects of
-multiple OVERLAY-FN invocations.
-
-\(fn CANDIDATES &optional OVERLAY-FN CLEANUP-FN)" nil nil)
-
 (autoload 'avy-goto-char "avy" "\
 Jump to the currently visible CHAR.
 The window scope is determined by `avy-all-windows' (ARG negates it).
@@ -59,14 +51,6 @@ Jump to one of the current isearch candidates." t nil)
 
 (autoload 'avy-goto-word-0 "avy" "\
 Jump to a word start.
-The window scope is determined by `avy-all-windows'.
-When ARG is non-nil, do the opposite of `avy-all-windows'.
-BEG and END narrow the scope where candidates are searched.
-
-\(fn ARG &optional BEG END)" t nil)
-
-(autoload 'avy-goto-whitespace-end "avy" "\
-Jump to the end of a whitespace sequence.
 The window scope is determined by `avy-all-windows'.
 When ARG is non-nil, do the opposite of `avy-all-windows'.
 BEG and END narrow the scope where candidates are searched.
