@@ -1,16 +1,17 @@
 ;;; dired-subtree-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory #$) (car load-path))))
+
 
-;;;### (autoloads nil "dired-subtree" "dired-subtree.el" (23001 13382
-;;;;;;  397749 243000))
-;;; Generated autoloads from dired-subtree.el
+;;;### (autoloads nil "dired-subtree" "../../../../.emacs.d/elpa/dired-subtree-20210105.1127/dired-subtree.el"
+;;;;;;  "730beb96decc299b30212ba7cffb1a36")
+;;; Generated autoloads from ../../../../.emacs.d/elpa/dired-subtree-20210105.1127/dired-subtree.el
 
 (autoload 'dired-subtree-narrow "dired-subtree" "\
-Narrow the buffer to this subtree.
-
-\(fn)" t nil)
+Narrow the buffer to this subtree." t nil)
 
 (autoload 'dired-subtree-up "dired-subtree" "\
 Jump up one directory.
@@ -33,14 +34,10 @@ Go to the previous sibling.
 \(fn &optional ARG)" t nil)
 
 (autoload 'dired-subtree-beginning "dired-subtree" "\
-Go to the first file in this subtree.
-
-\(fn)" t nil)
+Go to the first file in this subtree." t nil)
 
 (autoload 'dired-subtree-end "dired-subtree" "\
-Go to the first file in this subtree.
-
-\(fn)" t nil)
+Go to the first file in this subtree." t nil)
 
 (autoload 'dired-subtree-mark-subtree "dired-subtree" "\
 Mark all files in this subtree.
@@ -62,24 +59,16 @@ recursively.
 Revert the subtree.
 
 This means reinserting the content of this subtree and all its
-children.
-
-\(fn)" t nil)
+children." t nil)
 
 (autoload 'dired-subtree-insert "dired-subtree" "\
-Insert subtree under this directory.
-
-\(fn)" t nil)
+Insert subtree under this directory." t nil)
 
 (autoload 'dired-subtree-remove "dired-subtree" "\
-Remove subtree at point.
-
-\(fn)" t nil)
+Remove subtree at point." t nil)
 
 (autoload 'dired-subtree-toggle "dired-subtree" "\
-Insert subtree at point or remove it if it was not present.
-
-\(fn)" t nil)
+Insert subtree at point or remove it if it was not present." t nil)
 
 (autoload 'dired-subtree-cycle "dired-subtree" "\
 Org-mode like cycle visibility:
@@ -113,9 +102,22 @@ This depends on `dired-filter' package.
 
 It works exactly the same as global dired filters, only
 restricted to a subtree.  The global filter is also applied to
-the subtree.  The filter action is read from `dired-filter-map'.
+the subtree.  The filter action is read from `dired-filter-map'." t nil)
+
+;;;### (autoloads "actual autoloads are elsewhere" "dired-subtree"
+;;;;;;  "../../../../.emacs.d/elpa/dired-subtree-20210105.1127/dired-subtree.el"
+;;;;;;  (0 0 0 0))
+;;; Generated autoloads from ../../../../.emacs.d/elpa/dired-subtree-20210105.1127/dired-subtree.el
 
-\(fn)" t nil)
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "dired-subtree" '("dired-")))
+
+;;;***
+
+;;;***
+
+;;;### (autoloads nil nil ("../../../../.emacs.d/elpa/dired-subtree-20210105.1127/dired-subtree-autoloads.el"
+;;;;;;  "../../../../.emacs.d/elpa/dired-subtree-20210105.1127/dired-subtree.el")
+;;;;;;  (0 0 0 0))
 
 ;;;***
 
@@ -123,5 +125,6 @@ the subtree.  The filter action is read from `dired-filter-map'.
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
+;; coding: utf-8
 ;; End:
 ;;; dired-subtree-autoloads.el ends here

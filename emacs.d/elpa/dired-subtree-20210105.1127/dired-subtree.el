@@ -5,7 +5,8 @@
 ;; Author: Matúš Goljer <matus.goljer@gmail.com>
 ;; Maintainer: Matúš Goljer <matus.goljer@gmail.com>
 ;; Keywords: files
-;; Package-Version: 20170910.1521
+;; Package-Version: 20210105.1127
+;; Package-Commit: 7c0ef09d57a80068a11edc74c3568e5ead5cc15a
 ;; Version: 0.0.1
 ;; Created: 25th February 2014
 ;; Package-requires: ((dash "2.5.0") (dired-hacks-utils "0.0.1"))
@@ -464,12 +465,7 @@ children."
 
 Return a string suitable for insertion in `dired' buffer."
   (with-temp-buffer
-    (let ((insert-dir-fun  (if (and (featurep 'tramp)
-                                    (tramp-tramp-file-p dir-name)
-                                    (tramp-sh-handle-file-directory-p dir-name))
-                               #'tramp-handle-insert-directory
-                             #'insert-directory)))
-      (funcall insert-dir-fun dir-name dired-listing-switches nil t))
+    (insert-directory dir-name dired-listing-switches nil t)
     (delete-char -1)
     (goto-char (point-min))
     (delete-region
@@ -493,7 +489,7 @@ Return a string suitable for insertion in `dired' buffer."
   (when (and (dired-subtree--dired-line-is-directory-or-link-p)
              (not (dired-subtree--is-expanded-p)))
     (let* ((dir-name (dired-get-filename nil))
-           (listing (dired-subtree--readin dir-name))
+           (listing (dired-subtree--readin (file-name-as-directory dir-name)))
            beg end)
       (read-only-mode -1)
       (move-end-of-line 1)
@@ -570,8 +566,13 @@ Return a string suitable for insertion in `dired' buffer."
   (if (dired-subtree--is-expanded-p)
       (progn
         (dired-next-line 1)
-        (dired-subtree-remove))
-      (save-excursion (dired-subtree-insert))))
+        (dired-subtree-remove)
+        ;; #175 fixes the case of the first line in dired when the
+        ;; cursor jumps to the header in dired rather then to the
+        ;; first file in buffer
+        (when (bobp)
+          (dired-next-line 1)))
+    (save-excursion (dired-subtree-insert))))
 
 (defun dired-subtree--insert-recursive (depth max-depth)
   "Insert full subtree at point."
