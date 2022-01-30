@@ -162,6 +162,7 @@ install-emacs: build-emacs ## download, compile and install emacs
 .ONESHELL:
 install-fish: build-fish ## download, compile and install fish
 
+bass_git_url := https://github.com/edc/bass
 fd_git_url := https://github.com/sharkdp/fd.git
 fzf_git_url := https://github.com/junegunn/fzf.git
 xcape_git_url := https://github.com/alols/xcape.git
@@ -181,6 +182,10 @@ git-pull-%:
 	git clone --depth=1 $$URL
 	rm -rf $$GDIR/.git #; git add -A $$GDIR
 	popd
+
+.PHONY: update-bass
+.ONESHELL:
+update-bass: git-pull-bass  ## git pull bass source
 
 .PHONY: update-fd
 .ONESHELL:
