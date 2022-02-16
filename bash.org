@@ -13,6 +13,7 @@
     source ~/.aliases
     export EDITOR='vim'
     export PS1='\w $ '
+    # export PS1='\w $(git rev-parse --abbrev-ref HEAD 2>/dev/null) $ '
     export TERM='xterm-256color'
   #+end_src
 

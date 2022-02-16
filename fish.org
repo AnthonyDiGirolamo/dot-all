@@ -160,6 +160,7 @@
     alias gwd='git diff'
     alias gwdc='git diff --cached'
     alias gp='git pull'
+    alias gpr='git pull --recurse-submodules'
     alias gpp='git push'
     alias gco='git checkout'
 

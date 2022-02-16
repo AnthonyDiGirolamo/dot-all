@@ -23,10 +23,9 @@
     ! URxvt*font:     6x9
     ! URxvt*boldFont: 6x9
 
-    ! xterm*faceName: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
-    URxvt*font:     xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
-    URxvt*boldFont: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
-    xterm*faceName: xft:Iosevka\ Fixed\ SS08\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=120
+    URxvt*font:     xft:Iosevka\ Term\ SS17\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
+    URxvt*boldFont: xft:Iosevka\ Term\ SS17\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
+    xterm*faceName: xft:Iosevka\ Term\ SS17\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=120
     ! URxvt*font:     xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
     ! URxvt*boldFont: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
 

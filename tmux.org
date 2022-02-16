@@ -168,7 +168,9 @@
 
 ** purple defaultbg
 
-   #+begin_src conf-space :tangle (if (string-suffix-p "laptop" hostname) "no" "~/.tmux.conf")
+   ~(if (string-suffix-p "laptop" hostname) "no" "~/.tmux.conf")~
+
+   #+begin_src conf-space :tangle "~/.tmux.conf"
      # Purple Default bg Status Bar Colors
 
      # List current session on the left

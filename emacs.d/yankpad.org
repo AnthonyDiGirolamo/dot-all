@@ -146,10 +146,10 @@
    #+end_src
 
 ** pdb: pdb breakpoint
-   import pdb; pdb.set_trace()
+   import pdb; pdb.set_trace()  # type: ignore # pylint: disable=import-outside-toplevel,multiple-statements
 
 ** ipdb: ipdb breakpoint
-   import ipdb; ipdb.set_trace()
+   import ipdb; ipdb.set_trace()  # type: ignore # pylint: disable=import-outside-toplevel,multiple-statements
 
 ** termw: write string to pseudo terminal
    with open('/dev/pts/2', 'w') as term:
