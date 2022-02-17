@@ -70,12 +70,12 @@
 Currently, vterm defines the following flags (in addition to the
 ones already available in CMake):
 
-`USE_SYSTEM_LIBVTERM'.  Set it to `yes' to use the version of
-libvterm installed on your system.
+`USE_SYSTEM_LIBVTERM'.  Set it to `Off' to use the vendored version of
+libvterm instead of the one installed on your system.
 
 This string is given verbatim to CMake, so it has to have the
 correct syntax.  An example of meaningful value for this variable
-is `-DUSE_SYSTEM_LIBVTERM=yes'."
+is `-DUSE_SYSTEM_LIBVTERM=Off'."
   :type 'string
   :group 'vterm)
 
@@ -117,7 +117,7 @@ the executable."
              "cd " vterm-directory "; \
              mkdir -p build; \
              cd build; \
-             cmake "
+             cmake -G 'Unix Makefiles' "
              vterm-module-cmake-args
              " ..; \
              make; \
@@ -133,7 +133,7 @@ the executable."
 ;; If the vterm-module is not compiled yet, compile it
 (unless (require 'vterm-module nil t)
   (if (or vterm-always-compile-module
-            (y-or-n-p "Vterm needs `vterm-module' to work.  Compile it now? "))
+          (y-or-n-p "Vterm needs `vterm-module' to work.  Compile it now? "))
       (progn
         (vterm-module-compile)
         (require 'vterm-module))
@@ -160,12 +160,22 @@ the executable."
 (require 'color)
 (require 'compile)
 (require 'face-remap)
+(require 'tramp)
+(require 'bookmark)
 
 ;;; Options
 
 (defcustom vterm-shell shell-file-name
   "The shell that gets run in the vterm."
   :type 'string
+  :group 'vterm)
+
+(defcustom vterm-tramp-shells '(("docker" "/bin/sh"))
+  "The shell that gets run in the vterm for tramp.
+
+`vterm-tramp-shells' has to be a list of pairs of the format:
+\(TRAMP-METHOD SHELL)"
+  :type '(alist :key-type string :value-type string)
   :group 'vterm)
 
 (defcustom vterm-buffer-name "*vterm*"
@@ -223,7 +233,7 @@ the point up."
   :group 'vterm)
 
 (defcustom vterm-keymap-exceptions
-  '("C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-v" "M-v" "C-y" "M-y")
+  '("C-c" "C-x" "C-u" "C-g" "C-h" "C-l" "M-x" "M-o" "C-y" "M-y")
   "Exceptions for `vterm-keymap'.
 
 If you use a keybinding with a prefix-key, add that prefix-key to
@@ -237,7 +247,7 @@ function `vterm--exclude-keys' removes the keybindings defined in
   :set (lambda (sym val)
          (set sym val)
          (when (and (fboundp 'vterm--exclude-keys)
-            (boundp 'vterm-mode-map))
+                    (boundp 'vterm-mode-map))
            (vterm--exclude-keys vterm-mode-map val)))
   :group 'vterm)
 
@@ -297,14 +307,15 @@ demo: '(\"env1=v1\" \"env2=v2\")"
 
 Support copy text to emacs kill ring and system clipboard by using OSC 52.
 For example: send base64 encoded 'foo' to kill ring: echo -en '\e]52;c;Zm9v\a',
-tmux can share its copy buffer to terminals by supporting osc52(like iterm2 xterm),
-you can enable this feature for tmux by :
+tmux can share its copy buffer to terminals by supporting osc52(like iterm2
+ xterm) you can enable this feature for tmux by :
 set -g set-clipboard on         #osc 52 copy paste share with iterm
 set -ga terminal-overrides ',xterm*:XT:Ms=\E]52;%p1%s;%p2%s\007'
 set -ga terminal-overrides ',screen*:XT:Ms=\E]52;%p1%s;%p2%s\007'
 
-The clipboard querying/clearing functionality offered by OSC 52 is not implemented here,
-And for security reason, this feature is disabled by default."
+The clipboard querying/clearing functionality offered by OSC 52 is not
+implemented here,And for security reason, this feature is disabled
+by default."
   :type 'boolean
   :group 'vterm)
 
@@ -355,11 +366,17 @@ This means that vterm will render bold with the default face weight."
   :type  'boolean
   :group 'vterm)
 
-(defcustom vterm-ignore-blink-cursor t
-  "When t, vterm will ignore request from application to turn on or off cursor blink.
+(defcustom vterm-set-bold-hightbright nil
+  "When not-nil, using hightbright colors for bolded text, see #549."
+  :type  'boolean
+  :group 'vterm)
 
-If nil, cursor in any window may begin to blink or not blink because `blink-cursor-mode`
-is a global minor mode in Emacs, you can use `M-x blink-cursor-mode` to toggle."
+(defcustom vterm-ignore-blink-cursor t
+  "When t,vterm will ignore request from application to turn on/off cursor blink.
+
+If nil, cursor in any window may begin to blink or not blink because
+`blink-cursor-mode`is a global minor mode in Emacs,
+you can use `M-x blink-cursor-mode` to toggle."
   :type 'boolean
   :group 'vterm)
 
@@ -382,6 +399,11 @@ to change your shell prompt to print 51;A.
 The second method is using a regular expression. This method does
 not require any shell-side configuration. See
 `term-prompt-regexp', for more information."
+  :type 'boolean
+  :group 'vterm)
+
+(defcustom vterm-bookmark-check-dir t
+  "When set to non-nil, also restore directory when restoring a vterm bookmark."
   :type 'boolean
   :group 'vterm)
 
@@ -551,6 +573,13 @@ Exceptions are defined by `vterm-keymap-exceptions'."
                  append (cl-loop for char from ?a to ?z
                                  for key = (format "%s%c" prefix char)
                                  unless (member key exceptions)
+                                 collect key)))
+  (mapc (lambda (key)
+          (define-key map (kbd key) 'ignore))
+        (cl-loop for prefix in '("C-M-" "C-M-S-")
+                 append (cl-loop for char from ?a to ?z
+                                 for key = (format "%s%c" prefix char)
+                                 unless (member key exceptions)
                                  collect key))))
 
 (defun vterm-xterm-paste (event)
@@ -652,7 +681,8 @@ Exceptions are defined by `vterm-keymap-exceptions'."
                                        "LINES"
                                        "COLUMNS")
                                      process-environment))
-        (inhibit-eol-conversion t)
+        ;; TODO: Figure out why inhibit is needed for curses to render correctly.
+        (inhibit-eol-conversion nil)
         (coding-system-for-read 'binary)
         (process-adaptive-read-buffering nil)
         (width (max (- (window-body-width) (vterm--get-margin-width))
@@ -662,7 +692,8 @@ Exceptions are defined by `vterm-keymap-exceptions'."
                                   vterm-disable-bold-font
                                   vterm-disable-underline
                                   vterm-disable-inverse-video
-                                  vterm-ignore-blink-cursor))
+                                  vterm-ignore-blink-cursor
+                                  vterm-set-bold-hightbright))
     (setq buffer-read-only t)
     (setq-local scroll-conservatively 101)
     (setq-local scroll-margin 0)
@@ -684,7 +715,7 @@ Exceptions are defined by `vterm-keymap-exceptions'."
            :command
            `("/bin/sh" "-c"
              ,(format
-           "stty -nl sane %s erase ^? rows %d columns %d >/dev/null && exec %s"
+               "stty -nl sane %s erase ^? rows %d columns %d >/dev/null && exec %s"
                ;; Some stty implementations (i.e. that of *BSD) do not
                ;; support the iutf8 option.  to handle that, we run some
                ;; heuristics to work out if the system supports that
@@ -694,9 +725,10 @@ Exceptions are defined by `vterm-keymap-exceptions'."
                ;; See: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=220009
                (if (eq system-type 'berkeley-unix) "" "iutf8")
                (window-body-height)
-               width vterm-shell))
-           :coding 'no-conversion
+               width (vterm--get-shell)))
+           ;; :coding 'no-conversion
            :connection-type 'pty
+           :file-handler t
            :filter #'vterm--filter
            ;; The sentinel is needed if there are exit functions or if
            ;; vterm-kill-buffer-on-exit is set to t.  In this latter case,
@@ -710,14 +742,63 @@ Exceptions are defined by `vterm-keymap-exceptions'."
   ;; mode can break this, leading to segmentation faults.
   (add-hook 'change-major-mode-hook
             (lambda () (interactive)
-               (user-error "You cannot change major mode in vterm buffers")) nil t)
+              (user-error "You cannot change major mode in vterm buffers")) nil t)
 
   (vterm--set-pty-name vterm--term (process-tty-name vterm--process))
   (process-put vterm--process 'adjust-window-size-function
                #'vterm--window-adjust-process-window-size)
   ;; Support to compilation-shell-minor-mode
   ;; Is this necessary? See vterm--compilation-setup
-  (setq next-error-function 'vterm-next-error-function))
+  (setq next-error-function 'vterm-next-error-function)
+  (setq-local bookmark-make-record-function 'vterm--bookmark-make-record))
+
+(defun vterm--get-shell ()
+  "Get the shell that gets run in the vterm."
+  (if (ignore-errors (file-remote-p default-directory))
+      (with-parsed-tramp-file-name default-directory nil
+        (or (cadr (assoc method vterm-tramp-shells))
+            vterm-shell))
+    vterm-shell))
+
+(defun vterm--bookmark-make-record ()
+  "Create a vterm bookmark.
+
+Notes down the current directory and buffer name."
+  `(nil
+    (handler . vterm--bookmark-handler)
+    (thisdir . ,default-directory)
+    (buf-name . ,(buffer-name))
+    (defaults . nil)))
+
+
+;;;###autoload
+(defun vterm--bookmark-handler (bmk)
+  "Handler to restore a vterm bookmark BMK.
+
+If a vterm buffer of the same name does not exist, the function will create a
+new vterm buffer of the name. It also checks the current directory and sets
+it to the bookmarked directory if needed."
+  (let* ((thisdir (bookmark-prop-get bmk 'thisdir))
+         (buf-name (bookmark-prop-get bmk 'buf-name))
+         (buf (get-buffer buf-name))
+         (thismode (and buf (with-current-buffer buf major-mode))))
+    ;; create if no such vterm buffer exists
+    (when (or (not buf) (not (eq thismode 'vterm-mode)))
+      (setq buf (generate-new-buffer buf-name))
+      (with-current-buffer buf
+        (when vterm-bookmark-check-dir
+          (setq default-directory thisdir))
+        (vterm-mode)))
+    ;; check the current directory
+    (with-current-buffer buf
+      (when (and vterm-bookmark-check-dir
+                 (not (string-equal default-directory thisdir)))
+        (when vterm-copy-mode
+          (vterm-copy-mode-done nil))
+        (vterm-insert (concat "cd " thisdir))
+        (vterm-send-return)))
+    ;; set to this vterm buf
+    (set-buffer buf)))
 
 (defun vterm--compilation-setup ()
   "Function to enable the option `compilation-shell-minor-mode' for vterm.
@@ -807,14 +888,18 @@ will invert `vterm-copy-exclude-prompt' for that call."
            (meta (memq 'meta modifiers))
            (ctrl (memq 'control modifiers))
            (raw-key (event-basic-type last-command-event))
-           (ev-key (if input-method-function
-                       (let ((inhibit-read-only t))
-                         (funcall input-method-function raw-key))
-                     (vector raw-key))))
-      (when-let ((key (key-description ev-key)))
-        (vterm-send-key key shift meta ctrl)))))
+           (ev-keys))
+      (if input-method-function
+          (let ((inhibit-read-only t))
+            (setq ev-keys (funcall input-method-function raw-key))
+            (when (listp ev-keys)
+              (dolist (k ev-keys)
+                (when-let ((key (key-description (vector k))))
+                  (vterm-send-key key shift meta ctrl)))))
+        (when-let ((key (key-description (vector raw-key))))
+          (vterm-send-key key shift meta ctrl))))))
 
-(defun vterm-send-key (key &optional shift meta ctrl)
+(defun vterm-send-key (key &optional shift meta ctrl accept-proc-output)
   "Send KEY to libvterm with optional modifiers SHIFT, META and CTRL."
   (deactivate-mark)
   (when vterm--term
@@ -824,7 +909,8 @@ will invert `vterm-copy-exclude-prompt' for that call."
         (setq key (upcase key)))
       (vterm--update vterm--term key shift meta ctrl)
       (setq vterm--redraw-immididately t)
-       (accept-process-output vterm--process vterm-timer-delay nil t))))
+      (when accept-proc-output
+        (accept-process-output vterm--process vterm-timer-delay nil t)))))
 
 (defun vterm-send (key)
   "Send KEY to libvterm.  KEY can be anything `kbd' understands."
@@ -1019,7 +1105,7 @@ Provide similar behavior as `insert' for vterm."
   (when vterm--term
     (if (vterm-goto-char start)
         (cl-loop repeat (- end start) do
-                 (vterm-send-delete))
+                 (vterm-send-key "<delete>" nil nil nil t))
       (let ((inhibit-read-only nil))
         (vterm--delete-region start end)))))
 
@@ -1038,13 +1124,13 @@ It will reset to original position if it can't move there."
       (setq cursor-pos (point))
       (setq pt cursor-pos)
       (while (and (> pos pt) moved)
-        (vterm-send-right)
+        (vterm-send-key "<right>" nil nil nil t)
         (setq moved (not (= pt (point))))
         (setq pt (point)))
       (setq pt (point))
       (setq moved t)
       (while (and (< pos pt) moved)
-        (vterm-send-left)
+        (vterm-send-key "<left>" nil nil nil t)
         (setq moved (not (= pt (point))))
         (setq pt (point)))
       (setq succ (= pos (point)))
@@ -1111,10 +1197,10 @@ Search Manipulate Selection Data in
     (unless (or (string-equal data "?")
                 (string-empty-p data))
       (let* ((inhibit-eol-conversion t)
-            (decoded-data (decode-coding-string
-                           (base64-decode-string data) locale-coding-system))
-            (select-enable-clipboard select-enable-clipboard)
-            (select-enable-primary select-enable-primary))
+             (decoded-data (decode-coding-string
+                            (base64-decode-string data) locale-coding-system))
+             (select-enable-clipboard select-enable-clipboard)
+             (select-enable-primary select-enable-primary))
         ;; https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         ;; c , p , q , s , 0 , 1 , 2 , 3 , 4 , 5 , 6 , and 7
         ;; clipboard, primary, secondary, select, or cut buffers 0 through 7
@@ -1180,10 +1266,11 @@ value of `vterm-buffer-name'."
                    (t
                     (get-buffer-create vterm-buffer-name)))))
     (cl-assert (and buf (buffer-live-p buf)))
+    (funcall pop-to-buf-fun buf)
     (with-current-buffer buf
       (unless (derived-mode-p 'vterm-mode)
         (vterm-mode)))
-    (funcall pop-to-buf-fun buf)))
+    buf))
 
 ;;; Internal
 
@@ -1319,19 +1406,19 @@ Argument EVENT process event."
   ;; enabled, otherwise the buffer would be redrawn, messing around with the
   ;; position of the point.
   (unless vterm-copy-mode
-  (let* ((size (funcall window-adjust-process-window-size-function
-                        process windows))
-         (width (car size))
-         (height (cdr size))
-         (inhibit-read-only t))
-    (setq width (- width (vterm--get-margin-width)))
-    (setq width (max width vterm-min-window-width))
-    (when (and (processp process)
-               (process-live-p process)
-               (> width 0)
-               (> height 0))
-      (vterm--set-size vterm--term height width)
-      (cons width height)))))
+    (let* ((size (funcall window-adjust-process-window-size-function
+                          process windows))
+           (width (car size))
+           (height (cdr size))
+           (inhibit-read-only t))
+      (setq width (- width (vterm--get-margin-width)))
+      (setq width (max width vterm-min-window-width))
+      (when (and (processp process)
+                 (process-live-p process)
+                 (> width 0)
+                 (> height 0))
+        (vterm--set-size vterm--term height width)
+        (cons width height)))))
 
 (defun vterm--get-margin-width ()
   "Get margin width of vterm buffer when `display-line-numbers-mode' is enabled."
@@ -1596,4 +1683,7 @@ can find them and remove them."
 
 
 (provide 'vterm)
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
 ;;; vterm.el ends here

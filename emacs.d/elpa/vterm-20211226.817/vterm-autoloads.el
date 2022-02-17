@@ -12,6 +12,15 @@
 (autoload 'vterm-module-compile "vterm" "\
 Compile vterm-module." t nil)
 
+(autoload 'vterm--bookmark-handler "vterm" "\
+Handler to restore a vterm bookmark BMK.
+
+If a vterm buffer of the same name does not exist, the function will create a
+new vterm buffer of the name. It also checks the current directory and sets
+it to the bookmarked directory if needed.
+
+\(fn BMK)" nil nil)
+
 (autoload 'vterm-next-error-function "vterm" "\
 Advance to the next error message and visit the file where the error was.
 This is the value of `next-error-function' in Compilation

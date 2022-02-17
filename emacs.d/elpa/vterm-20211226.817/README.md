@@ -73,7 +73,7 @@ Before installing emacs-libvterm, you need to make sure you have installed
     (e.g., Arch, Debian, Fedora, Gentoo, openSUSE, Ubuntu). Typical names are
     `libvterm` (Arch, Fedora, Gentoo, openSUSE), or `libvterm-dev` (Debian,
     Ubuntu). If not available, `libvterm` will be downloaded during the
-    compilation process. Some distributions (e.g. Ubuntu < 20.04, Debian Stable)
+    compilation process. Some distributions (e.g. Ubuntu < 20.04, Debian < 11)
     have versions of `libvterm` that are too old. If you find compilation errors
     related to `VTERM_COLOR`, you should not use your system libvterm. See
     [FAQ](#frequently-asked-questions-and-problems) for more details.
@@ -427,7 +427,7 @@ add-zsh-hook -Uz chpwd (){ print -Pn "\e]2;%m:%2~\a" }
 ```
 For `bash`,
 ```bash
-PROMPT_COMMAND='echo -ne "\033]0;${HOSTNAME}:${PWD}\007"'
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }"'echo -ne "\033]0;${HOSTNAME}:${PWD}\007"'
 ```
 For `fish`,
 ```fish
@@ -799,7 +799,7 @@ add-zsh-hook -Uz chpwd (){ vterm_set_directory }
 For `bash`, append it to the prompt:
 
 ``` sh
-PROMPT_COMMAND="$PROMPT_COMMAND;vterm_set_directory"
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }vterm_set_directory"
 ```
 Finally, add `update-pwd` to the list of commands that Emacs
 is allowed to execute from vterm:

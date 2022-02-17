@@ -2031,6 +2031,8 @@
        "u" 'vterm-undo)
       (:states '(insert)
        :keymaps '(vterm-mode-map)
+       "C-a" 'vterm-send-C-a
+       "C-e" 'vterm-send-C-e
        "C-d" 'vterm-send-C-d
        "C-y" 'vterm-yank)
     )
