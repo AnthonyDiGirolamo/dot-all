@@ -1,0 +1,2 @@
+;;; Generated package description from ox-rst.el  -*- no-byte-compile: t -*-
+(define-package "ox-rst" "20200815.1511" "Export reStructuredText using org-mode." '((emacs "25.1") (org "8.3")) :commit "99fa790da55b57a3f2e9aa187493ba434a64250e" :authors '(("Masanao Igarashi" . "syoux2@gmail.com")) :maintainer '("Masanao Igarashi" . "syoux2@gmail.com") :keywords '("org" "rst" "rest" "restructuredtext") :url "https://github.com/msnoigrs/ox-rst")

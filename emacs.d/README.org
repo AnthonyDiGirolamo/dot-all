@@ -2872,6 +2872,31 @@
       :init
       (add-hook 'rst-mode-hook 'flyspell-mode)
       (add-hook 'rst-mode-hook (lambda () (setq-local fill-column 80) (auto-fill-mode)))
+      :config
+      (defun amd/move-rst-section (beg end &optional move-up)
+        "Move rst section."
+        (interactive "r")
+        (let ((text (delete-and-extract-region beg end)))
+          (if move-up
+              (call-interactively 'rst-backward-section)
+            (call-interactively 'rst-forward-section))
+          (insert text)
+          (call-interactively 'rst-backward-section)))
+      (defun amd/move-rst-section-down ()
+        (interactive)
+        (rst-mark-section)
+        (amd/move-rst-section (region-beginning) (region-end) nil))
+      (defun amd/move-rst-section-up ()
+        (interactive)
+        (rst-mark-section)
+        (amd/move-rst-section (region-beginning) (region-end) t))
+      :general
+      (:states '(motion) :keymaps '(rst-mode-map)
+       "E" 'rst-backward-section
+       "N" 'rst-forward-section
+       "M-<down>" 'amd/move-rst-section-down
+       "M-<up>" 'amd/move-rst-section-up
+      )
     )
 
     ;; Web Settings
