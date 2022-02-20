@@ -581,8 +581,8 @@
          (amd/disable-loaded-themes)
          (load-theme 'doom-one t)
          ;; (load-theme 'doom-moonlight t)
-         ;; (when (featurep 'airline-themes)
-         ;;   (load-theme 'airline-onedark t))
+         (when (featurep 'airline-themes)
+           (load-theme 'airline-onedark t))
          (custom-theme-set-faces
           'doom-one
           '(flyspell-duplicate ((t (:underline "yellow" :weight bold))) t)
@@ -711,9 +711,21 @@
     #+begin_src emacs-lisp
       ;; (amd/leuven-light-theme)
       ;; (amd/doom-one-theme)
+      ;; (load-theme 'airline-doom-one t)
       ;; (amd/moe-dark-theme)
       ;; (amd/doom-snazzy-theme)
       (load-theme 'doom-palenight)
+      (custom-theme-set-faces
+        'doom-palenight
+        '(org-level-1 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#aa88ff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
+        '(org-level-2 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88aaff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
+        '(org-level-3 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88ffff" :underline nil))) t) ;; cyan
+        '(org-level-4 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#66ffaa" :underline nil))) t) ;; sea-green
+        '(org-level-5 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffff66" :underline nil))) t) ;; yellow
+        '(org-level-6 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffaa00" :underline nil))) t) ;; orange
+        '(org-level-7 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff6666" :underline nil))) t) ;; red
+        '(org-level-8 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff66aa" :underline nil))) t) ;; pink
+      )
       (load-theme 'airline-base16_material_palenight t)
       (custom-theme-set-faces
         'airline-base16_material_palenight
@@ -1134,6 +1146,7 @@
 
       ;; join inner paragraph macro
       (fset 'macro-join-inner-paragraph "vipJ^")
+      (fset 'macro-join-inner-paragraph-reflow "vipJVgq^")
       (fset 'key-colon-to-as
             (lambda (&optional arg)
               "Keyboard macro."
@@ -1173,6 +1186,7 @@
        "g j" 'amd/join-to-end-of-next-line
        "g s" 'count-words
        "g W" 'macro-join-inner-paragraph
+       "g r" 'macro-join-inner-paragraph-reflow
        "C-l" (lambda() (interactive) (evil-ex-nohighlight) (redraw-display))
        "C-e" 'move-line-up
        "C-n" 'move-line-down)
