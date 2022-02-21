@@ -2623,7 +2623,7 @@
          ("*Shell Command Output*" :ignore t)
          ("*Async Shell Command*" :ignore t)
          ("*Flycheck error messages*" :ignore t)
-         ;; Bottom popups
+
          ("\\*[Ii]buffer\\*" :regexp t :same t)
          (compilation-mode :select nil :size 0.3 :align bottom)
          ("*Help*" :size 0.5 :align bottom)
@@ -2633,16 +2633,17 @@
          ('ivy-occur-grep-mode :align bottom :size 0.5)
          ('grep-mode :align bottom :size 0.5)
          ("*Warnings*" :select nil :inhibit-window-quit t :other t)
-         ;; Top popups
+
          ("\\*e?shell.*\\*" :regexp t :popup t :size 0.5 :align bottom)
-         ;; Full size popups
-         ('magit-status-mode :same t)
+
+         ('magit-status-mode :popup t :align right)
+         ('magit-log-mode :popup t :align right)
          ;; eww popups should just replace current buffer
          ('eww-bookmark-mode :same t)
          ('eww-history-mode :same t)
-         ;; left side
+
          ('dired-mode :other t :align left :size 0.3)
-         ;; right side
+
          ('undo-tree-mode :align right :size 0.4)))
       :config
       (shackle-mode))
