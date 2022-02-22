@@ -94,6 +94,22 @@
 ;; Loading done, restore gc-cons-threshold
 (setq gc-cons-threshold 16000000)
 
+;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+(setq read-process-output-max (* 1024 1024))
+
+;; https://www.masteringemacs.org/article/speed-up-emacs-libjansson-native-elisp-compilation
+(if (and (fboundp 'native-comp-available-p)
+         (native-comp-available-p))
+    (setq comp-deferred-compilation t
+          package-native-compile t)
+  (message "Native complation is *not* available"))
+
+(unless (functionp 'json-serialize)
+  (message "Native JSON is *not* available"))
+
+;; do not steal focus while doing async compilations
+(setq warning-suppress-types '((comp)))
+
 ;; lastly, start a server
 (unless (and (fboundp 'server-running-p) (server-running-p))
   (server-start))
