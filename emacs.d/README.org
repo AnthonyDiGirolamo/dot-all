@@ -1904,6 +1904,7 @@
 
   #+begin_src emacs-lisp
     (use-package calc
+      :after ivy
       :general
       (:states
        '(emacs)
@@ -3804,14 +3805,14 @@
        (setq
         ivy-posframe-height-alist '((swiper . 10)
                                     (t . 10))
-        ivy-posframe-width 80
+        ivy-posframe-width 100
         ivy-posframe-display-functions-alist
         '((swiper . ivy-posframe-display-at-window-bottom-left)
           ;; (t . ivy-posframe-display-at-window-bottom-left)
           ;; (t . ivy-posframe-display-at-window-center)
           ;; (t . ivy-posframe-display-at-frame-bottom-left)
-          ;; (t . ivy-posframe-display-at-frame-top-center)
-          (t . ivy-posframe-display-at-frame-center)
+          (t . ivy-posframe-display-at-frame-top-center)
+          ;; (t . ivy-posframe-display-at-frame-center)
           ;; (t . ivy-posframe-display)
           )
         ivy-posframe-parameters
@@ -4296,50 +4297,50 @@
    - [[info:org#Template%20expansion][info:org#Template expansion]]
 
    #+begin_src emacs-lisp
-     (use-package all-the-icons)
+     ;; (use-package all-the-icons)
 
      (use-package org-capture
        :after org
        :config
-       (setq org-capture-templates
-             `(("b"
-                ,(format "%s ~/dot-all/bookmarks.org & selected text"
-                         (all-the-icons-faicon "globe" :face 'all-the-icons-blue :v-adjust 0.01))
-                entry (file+olp+datetree "~/dot-all/bookmarks.org" "Bookmarks")
-                "* %U %a\n  %i\n"
-                :empty-lines 1)
+       ;; (setq org-capture-templates
+       ;;       `(("b"
+       ;;          ,(format "%s ~/dot-all/bookmarks.org & selected text"
+       ;;                   (all-the-icons-faicon "globe" :face 'all-the-icons-blue :v-adjust 0.01))
+       ;;          entry (file+olp+datetree "~/dot-all/bookmarks.org" "Bookmarks")
+       ;;          "* %U %a\n  %i\n"
+       ;;          :empty-lines 1)
 
-               ("t"
-                ,(format
-                  "%s Tasks"
-                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)))
+       ;;         ("t"
+       ;;          ,(format
+       ;;            "%s Tasks"
+       ;;            (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)))
 
-               ("th"
-                ,(format
-                  "%s %s headline w/ date+link & selected text"
-                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
-                  (all-the-icons-octicon "file-text" :face 'all-the-icons-purple :v-adjust 0.01))
-                entry (file+headline org-default-notes-file "Inbox")
-                "* %?\n  Source: %u %a\n\n  %i\n"
-                :empty-lines 1)
+       ;;         ("th"
+       ;;          ,(format
+       ;;            "%s %s headline w/ date+link & selected text"
+       ;;            (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
+       ;;            (all-the-icons-octicon "file-text" :face 'all-the-icons-purple :v-adjust 0.01))
+       ;;          entry (file+headline org-default-notes-file "Inbox")
+       ;;          "* %?\n  Source: %u %a\n\n  %i\n"
+       ;;          :empty-lines 1)
 
-               ("tc"
-                ,(format
-                  "%s %s code w/ date+link"
-                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
-                  (all-the-icons-faicon "sticky-note-o" :face 'all-the-icons-green :v-adjust 0.01))
-                entry (file+headline org-default-notes-file "Inbox")
-                "* %^{Title}%?\n  Source: %u %a\n\n  #+begin_src %^{language}\n    %i\n  #+end_src\n"
-                :empty-lines 1)
+       ;;         ("tc"
+       ;;          ,(format
+       ;;            "%s %s code w/ date+link"
+       ;;            (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
+       ;;            (all-the-icons-faicon "sticky-note-o" :face 'all-the-icons-green :v-adjust 0.01))
+       ;;          entry (file+headline org-default-notes-file "Inbox")
+       ;;          "* %^{Title}%?\n  Source: %u %a\n\n  #+begin_src %^{language}\n    %i\n  #+end_src\n"
+       ;;          :empty-lines 1)
 
-               ("tt"
-                ,(format
-                  "%s %s TODO"
-                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
-                  (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01))
-                entry (file+headline org-default-notes-file "Inbox")
-                "* TODO %?\n  SCHEDULED: %t\n  %a\n\n  %i\n")
-               ))
+       ;;         ("tt"
+       ;;          ,(format
+       ;;            "%s %s TODO"
+       ;;            (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01)
+       ;;            (all-the-icons-octicon "checklist" :face 'all-the-icons-yellow :v-adjust 0.01))
+       ;;          entry (file+headline org-default-notes-file "Inbox")
+       ;;          "* TODO %?\n  SCHEDULED: %t\n  %a\n\n  %i\n")
+       ;;         ))
        (add-hook 'org-capture-mode-hook 'evil-insert-state))
   #+end_src
 

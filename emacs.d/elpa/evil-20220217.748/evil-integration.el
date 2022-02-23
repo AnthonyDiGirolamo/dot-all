@@ -139,23 +139,8 @@
             (when (overlayp ov) (delete-overlay ov))))))))
 
 ;;; Undo tree
-(when (and (require 'undo-tree nil t)
-           (fboundp 'global-undo-tree-mode))
-  (global-undo-tree-mode 1))
-
 (eval-after-load 'undo-tree
   '(with-no-warnings
-     (defun evil-turn-on-undo-tree-mode ()
-       "Enable `undo-tree-mode' if evil is enabled.
-This function enables `undo-tree-mode' when Evil is activated in
-some buffer, but only if `global-undo-tree-mode' is also
-activated."
-       (when (and (boundp 'global-undo-tree-mode)
-                  global-undo-tree-mode)
-         (turn-on-undo-tree-mode)))
-
-     (add-hook 'evil-local-mode-hook #'evil-turn-on-undo-tree-mode)
-
      (defadvice undo-tree-visualize (after evil activate)
        "Initialize Evil in the visualization buffer."
        (when evil-local-mode
@@ -491,25 +476,12 @@ Based on `evil-enclose-ace-jump-for-motion'."
 
 ;; visual-line-mode integration
 (when evil-respect-visual-line-mode
-  (evil-define-command evil-digit-argument-or-evil-beginning-of-visual-line ()
-    :digit-argument-redirection evil-beginning-of-visual-line
-    :keep-visual t
-    :repeat nil
-    (interactive)
-    (cond
-     (current-prefix-arg
-      (setq this-command #'digit-argument)
-      (call-interactively #'digit-argument))
-     (t
-      (setq this-command 'evil-beginning-of-visual-line)
-      (call-interactively 'evil-beginning-of-visual-line))))
-
   (evil-define-minor-mode-key 'motion 'visual-line-mode
     "j" 'evil-next-visual-line
     "gj" 'evil-next-line
     "k" 'evil-previous-visual-line
     "gk" 'evil-previous-line
-    "0" 'evil-digit-argument-or-evil-beginning-of-visual-line
+    "0" 'evil-beginning-of-visual-line
     "g0" 'evil-beginning-of-line
     "$" 'evil-end-of-visual-line
     "g$" 'evil-end-of-line
@@ -527,6 +499,12 @@ Based on `evil-enclose-ace-jump-for-motion'."
 (eval-after-load 'eldoc
   '(when (fboundp 'eldoc-add-command-completions)
      (eldoc-add-command-completions "evil-window-")))
+
+;;; XRef
+(eval-after-load 'xref
+  '(progn
+     (evil-set-command-property 'xref-find-definitions :jump t)
+     (evil-set-command-property 'xref-find-references :jump t)))
 
 (provide 'evil-integration)
 

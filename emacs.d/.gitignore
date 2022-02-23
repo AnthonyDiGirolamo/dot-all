@@ -42,3 +42,4 @@
 __pycache__
 /elpa/vterm*/build/
 /elpa/vterm*/*.so
+/eln-cache

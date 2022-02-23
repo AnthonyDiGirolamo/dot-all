@@ -58,7 +58,10 @@ search module is used."
 ;; this customization is here because it requires
 ;; the knowledge of `evil-select-search-mode'
 (defcustom evil-search-module 'isearch
-  "The search module to be used."
+  "The search module to be used.  May be either `isearch', for
+Emacs' isearch module, or `evil-search', for Evil's own
+interactive search module.  N.b. changing this will not affect keybindings.
+To swap out relevant keybindings, see `evil-select-search-module' function."
   :type '(radio (const :tag "Emacs built-in isearch." :value isearch)
                 (const :tag "Evil interactive search." :value evil-search))
   :group 'evil
@@ -262,8 +265,10 @@ one more than the current position."
       ;; determine message for echo area
       (cond
        ((and forward (< (point) start))
+        (when evil-search-wrap-ring-bell (ding))
         (setq string "Search wrapped around BOTTOM of buffer"))
        ((and (not forward) (> (point) start))
+        (when evil-search-wrap-ring-bell (ding))
         (setq string "Search wrapped around TOP of buffer"))
        (t
         (setq string (evil-search-message string forward))))
@@ -890,6 +895,7 @@ message to be shown. This function does nothing if
   (remove-hook 'minibuffer-setup-hook #'evil-ex-search-start-session)
   (add-hook 'after-change-functions #'evil-ex-search-update-pattern nil t)
   (add-hook 'minibuffer-exit-hook #'evil-ex-search-stop-session)
+  (add-hook 'mouse-leave-buffer-hook #'evil-ex-search-exit)
   (evil-ex-search-activate-highlight nil))
 (put 'evil-ex-search-start-session 'permanent-local-hook t)
 
@@ -906,6 +912,7 @@ message to be shown. This function does nothing if
     (setq isearch-opened-overlays (delete-dups isearch-opened-overlays))
     (isearch-clean-overlays))
   (remove-hook 'minibuffer-exit-hook #'evil-ex-search-stop-session)
+  (remove-hook 'mouse-leave-buffer-hook #'evil-ex-search-exit)
   (remove-hook 'after-change-functions #'evil-ex-search-update-pattern t)
   (when evil-ex-search-overlay
     (delete-overlay evil-ex-search-overlay)
@@ -955,15 +962,16 @@ any error conditions."
       (let* ((res (evil-ex-split-search-pattern pattern-string direction))
              (pat (pop res))
              (offset (pop res))
-             (next-pat (pop res)))
-        ;; use last pattern of no new pattern has been specified
+             (next-pat (pop res))
+             (orig-pat pat))
+        ;; use last pattern if no new pattern has been specified
         (if (not (zerop (length pat)))
             (setq pat (evil-ex-make-search-pattern pat))
           (setq pat evil-ex-search-pattern
                 offset (or offset evil-ex-search-offset)))
         (when (zerop (length pat))
           (throw 'done (list 'empty-pattern pat offset)))
-        (let (search-result)
+        (let (new-dir repeat-last search-result)
           (while (> count 0)
             (let ((result (evil-ex-find-next pat direction
                                              (not evil-search-wrap))))
@@ -980,18 +988,24 @@ any error conditions."
            ((zerop (length next-pat))
             (evil-ex-search-goto-offset offset)
             (throw 'done (list search-result pat offset)))
-           ;; next pattern but empty
+           ;; single `?' or `/' means repeat last pattern and finish
            ((= 1 (length next-pat))
             (evil-ex-search-goto-offset offset)
-            (throw 'done (list 'empty-pattern pat offset)))
+            (setq new-dir (if (string= "/" next-pat) 'forward 'backward)
+                  count (if (eq direction new-dir) 1 2)
+                  pattern-string orig-pat
+                  direction new-dir))
            ;; next non-empty pattern, next search iteration
            (t
             (evil-ex-search-goto-offset offset)
-            (setq count 1
-                  pattern-string (substring next-pat 1)
-                  direction (if (= (aref next-pat 0) ?/)
-                                'forward
-                              'backward)))))))))
+            (setq new-dir (if (= (aref next-pat 0) ?/) 'forward 'backward)
+                  repeat-last (and (<= 2 (length next-pat))
+                                   (member (substring next-pat 0 2) '("//" "??")))
+                  count (if (or (eq direction new-dir) (not repeat-last)) 1 2)
+                  pattern-string (if repeat-last
+                                     (concat orig-pat (substring next-pat 1))
+                                   (substring next-pat 1))
+                  direction new-dir))))))))
 
 (defun evil-ex-search-update-pattern (_beg _end _range)
   "Update the current search pattern."
@@ -1105,7 +1119,9 @@ current search result."
                  (goto-char evil-ex-search-start-point)
                  (signal (car err) (cdr err))))))
         ;; pattern entered successful
-        (goto-char (1+ evil-ex-search-start-point))
+        (goto-char (if (eq evil-ex-search-direction 'forward)
+                       (1+ evil-ex-search-start-point)
+                     (1- evil-ex-search-start-point)))
         (let* ((result
                 (evil-ex-search-full-pattern search-string
                                              evil-ex-search-count
@@ -1149,7 +1165,8 @@ point."
         (setq evil-ex-search-count count
               evil-ex-search-direction direction
               evil-ex-search-pattern
-              (evil-ex-make-search-pattern regex)
+              (let (evil-ex-search-vim-style-regexp)
+                (evil-ex-make-search-pattern regex))
               evil-ex-search-offset nil
               evil-ex-last-was-search t)
         ;; update search history unless this pattern equals the

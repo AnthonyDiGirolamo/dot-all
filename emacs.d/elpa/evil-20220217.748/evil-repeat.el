@@ -50,9 +50,9 @@
 ;;                             \___/
 ;;
 ;; The recording of a repeat is started in one of two cases: Either a
-;; command is about being executed (in pre-command-hook) or normal
+;; command is about to be executed (in pre-command-hook) or normal
 ;; state is exited. The recording is stopped whenever a command has
-;; being completed and evil is in normal state afterwards. Therefore,
+;; been completed and evil is in normal state afterwards. Therefore,
 ;; a non-inserting command in normal-state is recorded as a single
 ;; repeat unit. In contrast, if the command leaves normal state and
 ;; starts insert-state, all commands that are executed until
@@ -63,7 +63,7 @@
 ;;
 ;; Not all commands are recorded. There are several commands that are
 ;; completely ignored and other commands that even abort the currently
-;; active recording, e.g., commands that change the current buffer.
+;; active recording, e.g., commands that switch buffer.
 ;;
 ;; During recording the repeat information is appended to the variable
 ;; `evil-repeat-info', which is cleared when the recording
@@ -399,8 +399,8 @@ If CHANGE is specified, it is added to `evil-repeat-changes'."
 
 (defun evil-repeat-insert-at-point (flag)
   "Repeation recording function for commands that insert text in region.
-This records text insertion when a command inserts some text in a
-buffer between (point) and (mark)."
+For example `mouse-yank-primary'. This records text insertion when a command
+inserts some text in a buffer between (point) and (mark)."
   (cond
    ((eq flag 'pre)
     (add-hook 'after-change-functions #'evil-repeat-insert-at-point-hook nil t))
@@ -553,6 +553,9 @@ and only if COUNT is non-nil."
      (t
       (evil-execute-repeat-info repeat-info)))))
 
+;; Keep the compiler happy - this is a buffer local var
+(defvar evil--execute-normal-return-state)
+
 (evil-define-command evil-repeat (count &optional save-point)
   "Repeat the last editing command with count replaced by COUNT.
 If SAVE-POINT is non-nil, do not move point."
@@ -568,7 +571,8 @@ If SAVE-POINT is non-nil, do not move point."
       (evil-repeat count)))
    (t
     (unwind-protect
-        (let ((confirm-kill-emacs t)
+        (let ((evil-last-find-temp evil-last-find)
+              (confirm-kill-emacs t)
               (kill-buffer-hook
                (cons #'(lambda ()
                          (user-error "Cannot delete buffer in repeat command"))
@@ -577,8 +581,11 @@ If SAVE-POINT is non-nil, do not move point."
           (evil-with-single-undo
             (setq evil-last-repeat (list (point) count undo-pointer))
             (evil-execute-repeat-info-with-count
-             count (ring-ref evil-repeat-ring 0))))
-      (evil-normal-state)))))
+             count (ring-ref evil-repeat-ring 0))
+            (setq evil-last-find evil-last-find-temp)))
+      (if (eq 'evil-execute-in-normal-state last-command)
+          (evil-change-state evil--execute-normal-return-state)
+        (evil-normal-state))))))
 
 ;; TODO: the same issue concering disabled undos as for `evil-paste-pop'
 (evil-define-command evil-repeat-pop (count &optional save-point)
