@@ -1,4 +1,4 @@
-;;; yankpad-autoloads.el --- automatically extracted autoloads
+;;; yankpad-autoloads.el --- automatically extracted autoloads  -*- lexical-binding: t -*-
 ;;
 ;;; Code:
 
@@ -39,7 +39,7 @@ Company backend for yankpad.
 
 \(fn COMMAND &optional ARG &rest IGNORED)" t nil)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "yankpad" '("company-yankpad--name-or-key" "yankpad-")))
+(register-definition-prefixes "yankpad" '("company-yankpad--name-or-key" "yankpad-"))
 
 ;;;***
 

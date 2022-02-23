@@ -1122,9 +1122,26 @@
   #+begin_src emacs-lisp
     (use-package evil
       :demand
+      :after undo-tree
+      :custom
+      (evil-undo-system 'undo-tree)
+      (x-select-enable-clipboard t)
+      (x-select-enable-clipboard-manager nil)
+      (evil-regexp-search t)  ;; Whether to use regular expressions for searching.
+      (evil-echo-state nil)  ;; Whether to signal the current state in the echo area.
+      (evil-auto-balance-windows nil)  ;; If non-nil window creation and deletion trigger rebalancing.
+      (evil-flash-delay .5) ;; Time in seconds to flash search matches after M-x evil-search-next and M-x evil-search-previous.
+      (evil-want-fine-undo 'no) ;; All changes made during insert state, including a possible delete after a change operation, are collected in a single undo step.
+      (evil-want-C-i-jump 'yes)
+      (evil-want-C-u-scroll 'yes)
+
+      ;; Make sure C-w is not a prefix key
+      (evil-want-C-w-delete nil)
+      (evil-want-C-w-in-emacs-state 'yes)
+      (evil-move-cursor-back nil)         ;; Don't move back one charachter when exiting insert
+      (evil-search-module 'evil-search)   ;; Need to set this before loading evil and evil-visualstar
       :init
-      (setq x-select-enable-clipboard t)
-      (setq x-select-enable-clipboard-manager nil)
+
 
       ;; Make mouse wheel use evil mode C-d and C-u
       (setq mwheel-scroll-down-function 'evil-scroll-down
@@ -1133,17 +1150,6 @@
       (when amd/using-android ;; don't use the system clipboard
         (setq x-select-enable-clipboard nil))
 
-      (setq evil-regexp-search t)
-      (setq evil-echo-state nil)
-      (setq evil-auto-balance-windows nil)     ;; dont rebalance windows when deleting
-      (setq evil-flash-delay .5)
-      (setq evil-want-fine-undo 'no)           ;; Make sure undos are done atomically
-      (setq evil-want-C-i-jump 'yes)
-      (setq evil-want-C-u-scroll 'yes)
-      (setq evil-want-C-w-delete nil)          ;; make sure C-w is not a prefix key
-      (setq evil-want-C-w-in-emacs-state 'yes)
-      (setq evil-move-cursor-back nil)         ;; don't move back one charachter when exiting insert
-      (setq evil-search-module 'evil-search)   ;; need to set this before loading evil and evil-visualstar
       (setq-default evil-symbol-word-search t) ;; make * and # search for symbols (instead of words)
 
       ;; join inner paragraph macro
@@ -1234,6 +1240,7 @@
        "gf" 'find-file-at-point)
 
       :config
+      (add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
       (evil-mode 1)
 
       ;; (defun amd/get-inner-symbol ()
@@ -1904,7 +1911,7 @@
 
   #+begin_src emacs-lisp
     (use-package calc
-      :after ivy
+      :after (hydra ivy)
       :general
       (:states
        '(emacs)
@@ -2014,6 +2021,7 @@
 
   #+begin_src emacs-lisp
     (use-package eww
+      :after evil
       :commands (eww)
       :init
       (when (eq system-type 'gnu/linux)
@@ -2110,6 +2118,7 @@
 
   #+end_src
 
+
 * company auto-completion
 
   #+begin_src emacs-lisp
@@ -2197,14 +2206,13 @@
 
   #+begin_src emacs-lisp
     (use-package yasnippet
-      ;; :commands (yankpad-expand yankpad-insert)
       :diminish yas-minor-mode
       :config
       (yas-global-mode) ;; seems to be needed for yankpad
     )
 
     (use-package yankpad
-      ;; :commands (yankpad-expand yankpad-insert)
+      :commands (yankpad-edit yankpad-set-category yankpad-expand yankpad-insert)
       :after yasnippet
       :init
       (setq yankpad-file "~/.emacs.d/yankpad.org")
@@ -2381,8 +2389,8 @@
       :general
       (:states '(normal)
         "g ." #'avy-goto-char
-        "t"   #'avy-goto-word-0
-        "T"   #'avy-goto-line))
+        "t"   #'avy-goto-char-timer
+        "T"   #'avy-goto-word-0))
    #+end_src
 
 ** undo-tree
@@ -2390,7 +2398,8 @@
   #+begin_src emacs-lisp
     (use-package undo-tree
       :diminish
-      :commands (undo-tree-visualize)
+      :demand
+      ;; :commands (undo-tree-visualize)
       :init
       (setq undo-tree-visualizer-timestamps t
             undo-tree-visualizer-diff t)
@@ -2400,6 +2409,8 @@
         "e" 'undo-tree-visualize-undo
         "h" 'undo-tree-visualize-switch-branch-left
         "l" 'undo-tree-visualize-switch-branch-right)
+      :config
+      (global-undo-tree-mode)
     )
   #+end_src
 
@@ -2932,6 +2943,8 @@
 
     ;; Python Settings
     (use-package elpy
+      ;; https://github.com/jorgenschaefer/elpy
+      :disabled
       :custom
       (elpy-rpc-python-command "python3")
       (elpy-modules '(elpy-module-sane-defaults
@@ -3358,7 +3371,7 @@
          ("s" hydra-set-toggles/body "set-toggles")
          ("u" undo-tree-visualize    "undo-tree")
          ("w" ace-window             "window")
-         ("t" hydra-eyebrowse/body   "tabs")
+         ("t" hydra-tab-bar/body     "tabs")
          ("c" calc-dispatch          "calc")
          ("j" counsel-imenu          "jump-imenu")
          ("v" (find-file
@@ -3800,6 +3813,7 @@
 
    #+begin_src emacs-lisp
      (use-package ivy-posframe
+       :disabled
        :diminish
        :init
        (setq
@@ -3809,9 +3823,9 @@
         ivy-posframe-display-functions-alist
         '((swiper . ivy-posframe-display-at-window-bottom-left)
           ;; (t . ivy-posframe-display-at-window-bottom-left)
+          (t . ivy-posframe-display-at-frame-top-center)
           ;; (t . ivy-posframe-display-at-window-center)
           ;; (t . ivy-posframe-display-at-frame-bottom-left)
-          (t . ivy-posframe-display-at-frame-top-center)
           ;; (t . ivy-posframe-display-at-frame-center)
           ;; (t . ivy-posframe-display)
           )

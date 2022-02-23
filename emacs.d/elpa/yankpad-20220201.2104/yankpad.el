@@ -5,8 +5,8 @@
 
 ;; Author: Erik Sjöstrand
 ;; URL: http://github.com/Kungsgeten/yankpad
-;; Package-Version: 20210205.1318
-;; Package-Commit: fb9cb7753af971701dcd96a51efb4d70e2b2a18f
+;; Package-Version: 20220201.2104
+;; Package-Commit: 927e6d26956ac7219b8a69d641acf486854fba16
 ;; Version: 2.30
 ;; Keywords: abbrev convenience
 ;; Package-Requires: ((emacs "25.1"))
@@ -225,6 +225,12 @@ If 'abbrev, the items will overwrite `local-abbrev-table'."
   :type 'string
   :group 'yankpad)
 
+(defcustom yankpad-use-yasnippet t
+  "If non-nil and yasnippet is available, use it when pasting
+snippets."
+  :type 'boolean
+  :group 'yankpad)
+
 (defun yankpad-active-snippets ()
   "Get the snippets in the current category."
   (or yankpad--active-snippets (yankpad-set-active-snippets)))
@@ -271,12 +277,10 @@ Also append major mode and/or projectile categories if `yankpad-category' is loc
   (mapc #'yankpad-append-category (yankpad--global-categories))
   yankpad--active-snippets)
 
-(defun yankpad-append-category (&optional category)
+(defun yankpad-append-category (category)
   "Add snippets from CATEGORY into the list of active snippets.
 Prompts for CATEGORY if it isn't provided."
-  (interactive)
-  (unless category
-    (setq category (completing-read "Category: " (yankpad--categories))))
+  (interactive (list (completing-read "Category: " (yankpad--categories))))
   (unless (equal category yankpad-category)
     (unless yankpad--active-snippets (yankpad-set-active-snippets))
     (dolist (x (yankpad--snippets category))
@@ -368,13 +372,21 @@ a snippet name in the current category."
                          (org-current-level))
                 (setq prepend-asterisks (org-current-level)))
               (replace-regexp-in-string
-               "^\\\\[*]" (make-string prepend-asterisks ?*) content)))))))))
+               "^\\\\?[*]" (make-string prepend-asterisks ?*) content)))))))))
+
+(defun yankpad--use-yasnippet ()
+  "Determine if we can use yasnippet for pasting snippets.
+
+The yasnippet package must be available and the setting
+`yankpad-use-yasnippet' (default t) must be non-nil."
+  (and yankpad-use-yasnippet
+       (require 'yasnippet nil t)))
 
 (defun yankpad--insert-snippet-text (text indent wrap)
   "Insert TEXT into buffer.  INDENT is whether/how to indent the snippet.
 WRAP is the value for `yas-wrap-around-region', if `yasnippet' is available.
 Use yasnippet and `yas-indent-line' if available."
-  (if (and (require 'yasnippet nil t)
+  (if (and (yankpad--use-yasnippet)
            yas-minor-mode)
       (if (region-active-p)
           (yas-expand-snippet text (region-beginning) (region-end)
@@ -402,7 +414,8 @@ Return the result of the function output as a string."
         (if (or (org-in-src-block-p)
                 (and (ignore-errors (org-next-block 1))
                      (org-in-src-block-p)))
-            (prin1-to-string (org-babel-execute-src-block))
+            (let ((result (org-babel-execute-src-block)))
+              (if (stringp result) result (prin1-to-string result)))
           (error "First block in snippet must be an org-mode src block"))))))
 
 (defun yankpad--run-snippet (snippet)
@@ -421,10 +434,10 @@ Return the result of the function output as a string."
                              'fixed)
                             ((member "indent_auto" tags)
                              'auto)
-                            ((and (require 'yasnippet nil t) yas-minor-mode)
+                            ((and (yankpad--use-yasnippet) yas-minor-mode)
                              yas-indent-line)
                             (t t)))
-              (wrap (cond ((or (not (and (require 'yasnippet nil t) yas-minor-mode))
+              (wrap (cond ((or (not (and (yankpad--use-yasnippet) yas-minor-mode))
                                (member "wrap_nil" tags))
                            nil)
                           ((member "wrap" tags)
@@ -472,6 +485,16 @@ Does not change `yankpad-category'."
       (message (concat "No snippet named " name))
       nil)))
 
+(defun yankpad-keyword-with-bounds-at-point ()
+  "Get current keyword and its bounds."
+  (save-excursion
+    (let (beg (end (point)))
+      (when (re-search-backward "\\([[:blank:]\n]\\|^\\)" nil t 1)
+        (setq beg (if (bolp)
+                      (point)
+                    (1+ (point))))
+        (cons (buffer-substring-no-properties beg end) (cons beg end))))))
+
 ;;;###autoload
 (defun yankpad-expand (&optional _first)
   "Replace symbol at point with a snippet.
@@ -483,9 +506,11 @@ This function can be added to `hippie-expand-try-functions-list'."
   (when (and (called-interactively-p 'any)
              (not yankpad-category))
     (yankpad-set-category))
-  (let* ((symbol (symbol-name (symbol-at-point)))
-         (bounds (bounds-of-thing-at-point 'symbol))
+  (let* ((symbol-with-bounds (yankpad-keyword-with-bounds-at-point))
+         (symbol (car symbol-with-bounds))
+         (bounds (cdr symbol-with-bounds))
          (snippet-prefix (concat symbol yankpad-expand-separator))
+         (possible-snippets '())
          (case-fold-search nil))
     (when (and symbol yankpad-category)
       (catch 'loop
@@ -504,13 +529,32 @@ This function can be added to `hippie-expand-try-functions-list'."
                    (delete-region (car bounds) (cdr bounds))
                    (yankpad--run-snippet snippet)
                    (throw 'loop snippet)))
+
              ;; Otherwise look for expand keyword
-             (when (string-match-p (concat "\\(\\b\\|" yankpad-expand-separator "\\)" snippet-prefix)
-                                   (car (split-string (car snippet) " ")))
+             (when (string-prefix-p snippet-prefix
+                                    (car (split-string (car snippet) " ")))
                (delete-region (car bounds) (cdr bounds))
                (yankpad--run-snippet snippet)
-               (throw 'loop snippet))))
+               (throw 'loop snippet))
+
+             ;; Collect suffix matches
+             (let ((snippet-keyword (car (split-string (car snippet) yankpad-expand-separator))))
+               (when (string-suffix-p snippet-keyword symbol)
+                 (add-to-list 'possible-snippets (cons snippet-keyword snippet))))))
          (yankpad-active-snippets))
+
+        ;; Find the longest suffix match and apply it, if we have one
+        (when possible-snippets
+          (let* ((snippet-info (seq-reduce
+                                (lambda (acc it)
+                                  (if (> (length (car it)) (length acc))
+                                      it acc))
+                                possible-snippets ""))
+                 (snippet (cdr snippet-info))
+                 (snippet-keyword (car snippet-info)))
+            (delete-region (- (cdr bounds) (length snippet-keyword)) (cdr bounds))
+            (yankpad--run-snippet (cdr snippet-info))
+            (throw 'loop snippet)))
         nil))))
 
 ;;;###autoload
