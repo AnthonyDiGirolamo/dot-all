@@ -1,5 +1,14 @@
 #!/usr/bin/gawk -f
 
+# Example of including this gawk file in a separate script
+
+# #!/usr/bin/gawk -f
+# @include "bin/uname"
+# BEGIN {
+#     print uname
+#     print platform
+# }
+
 BEGIN {
     IGNORECASE = 1
     # Example uname -a output
@@ -18,6 +27,4 @@ BEGIN {
         platform = "windows"
     else if (uname ~ uname_macos_regex)
         platform = "macos"
-
-    print platform
 }
