@@ -161,7 +161,7 @@ BEGIN {
     begin_src_tangle_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*) :/
     begin_src_tangle_to_end_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*)$/
 
-    begin_src_sh_eval_regex = @/^\s*#\+begin_src sh .*:eval "?yes"?/
+    begin_src_sh_eval_regex = @/^\s*#\+begin_src (sh|shell) .*:eval "?yes"?/
     end_src_regex = @/^\s*#\+end_src/
 
     org_escaped_asterix_regex = @/^(\s*,[*])/
@@ -170,7 +170,21 @@ BEGIN {
     elisp_file_exists_p_regex = @/\(if\s*\(file-exists-p\s*"([^"]+)"\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
     # (if (string-match "chip" hostname) "~/.i3/config" "no")
     elisp_string_suffix_p_regex = @/\(if\s*\(string-suffix-p\s*"([^"]+)"\s*([^)]+)\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
+    # (if (eq system-type 'windows-nt) "yes" "no")
+    elisp_system_type_regex = @/\(if\s*\(eq system-type\s*'([^)]+)\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
 
+    uname_macos_regex = @/(darwin)/
+    uname_msys_regex = @/(mingw|msys)/
+    uname = ""
+    while (("uname -a" |& getline line) > 0) {
+        uname = line
+    }
+    close("uname -a")
+    uname_system_type = "gnu/linux"
+    if (uname ~ uname_msys_regex)
+        uname_system_type = "windows-nt"
+    else if (uname ~ uname_macos_regex)
+        uname_system_type = "darwin"
 }
 
 BEGINFILE {
@@ -337,6 +351,16 @@ ENDFILE {
                     else
                         write_tangled_file(outfile, file_name, false_case)
                 }
+            }
+            # elisp eq system-type call
+            else if (match(expanded_file_name, elisp_system_type_regex, mg)) {
+                system_type = mg[1]
+                true_case = mg[2]
+                false_case = mg[3]
+                if (system_type == uname_system_type)
+                    write_tangled_file(outfile, file_name, true_case)
+                else
+                    write_tangled_file(outfile, file_name, false_case)
             }
             # standard tangle file
             else {

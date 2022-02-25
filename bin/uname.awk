@@ -22,9 +22,9 @@ BEGIN {
     }
     close("uname -a")
 
-    platform = "linux"
+    platform = "gnu/linux"
     if (uname ~ uname_msys_regex)
-        platform = "windows"
+        platform = "windows-nt"
     else if (uname ~ uname_macos_regex)
-        platform = "macos"
+        platform = "darwin"
 }
