@@ -157,11 +157,17 @@ BEGIN {
     tangle_prop_regex = @/^\s*#\+property.*header-args.*:tangle\s*(\S.*)$/
     begin_src_regex = @/^\s*#\+begin_src/
 
-    # need both variants as awk doesn't seem to have non-greedy regexes
-    begin_src_tangle_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*) :/
-    begin_src_tangle_to_end_regex = @/^\s*#\+begin_src.*:tangle\s*(\S.*)$/
+    # TODO: the capture groups for tangle and eval names here are too greedy if
+    # there are any additional header args appearing after.
 
-    begin_src_sh_eval_regex = @/^\s*#\+begin_src (sh|shell) .*:eval "?yes"?/
+    # Need both variants as awk doesn't seem to have non-greedy regexes
+    begin_src_tangle_regex         = @/^\s*#\+begin_src.*:tangle\s*(\S.*) :/
+    begin_src_tangle_to_end_regex  = @/^\s*#\+begin_src.*:tangle\s*(\S.*)$/
+
+    begin_src_sh_eval_only_regex   = @/^\s*#\+begin_src (sh|shell) .*:eval yes/
+    begin_src_sh_eval_regex        = @/^\s*#\+begin_src (sh|shell) .*:eval\s*(\S.*) :/
+    begin_src_sh_eval_to_end_regex = @/^\s*#\+begin_src (sh|shell) .*:eval\s*(\S.*)$/
+
     end_src_regex = @/^\s*#\+end_src/
 
     org_escaped_asterix_regex = @/^(\s*,[*])/
@@ -186,6 +192,7 @@ BEGIN {
     else if (uname ~ uname_macos_regex)
         uname_system_type = "darwin"
 }
+
 
 BEGINFILE {
     start_new_file()
@@ -256,11 +263,18 @@ match($0, begin_src_regex, group) {
 }
 
 # Check for an sh block with :eval yes
-match($0, begin_src_sh_eval_regex, group) {
+match($0, begin_src_sh_eval_only_regex, group) {
     start_new_block()
     eval_block_count += 1
     current_block_filename = make_block_name(total_block_count, sprintf("eval-block-sh %03d", eval_block_count))
+
+    # TODO make this work with elisp checks
+    # if (match($0, begin_src_sh_eval_regex, tanglegroup) || match($0, begin_src_sh_eval_to_end_regex, tanglegroup)) {
+    #     print tanglegroup[1]
+    #     print tanglegroup[2]
+    # }
 }
+
 
 function write_tangled_file(outfile, index_name, expanded_file_name) {
     # If file name doesn't start with:
