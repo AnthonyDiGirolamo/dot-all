@@ -45,11 +45,14 @@
 
    - It will copy each source block in a given ~*.org~ file into it's respective
      ~:tangle~ destination and create any parent directories.
-   - Any blocks with ~#+begin_src sh :eval yes~ will be executed as well.
-   - Some conditional ~:tangle~ checks are supported:
+   - Some conditional checks are supported for :tangle and :eval:
      - ~(if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")~
-     - ~(if (string-match "chip" hostname) "~/.i3/config" "no")~
+     - ~(if (eq system-type 'windows-nt) "yes" "no")~
+       - Valid types: ~'windows-nt~, ~'gnu/linux~, ~'darwin~
+     - ~(if (string-suffix-p "chip" hostname) "~/.i3/config" "no")~
        - Only supported variable is: ~hostname~
+   - Any blocks with ~#+begin_src sh :eval yes~ will be executed as well. The
+     above elisp checks are supported as well.
 
    #+begin_src text
      $ make tangleawk

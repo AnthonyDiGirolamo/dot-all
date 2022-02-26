@@ -19,11 +19,14 @@
 #
 # - It will copy each source block in a given `*.org` file into it's respective
 #   `:tangle` destination and create any parent directories.
-# - Any blocks with `#+begin_src sh :eval yes` will be executed as well.
-# - Some conditional `:tangle` checks are supported:
-#   - `(if (file-exists-p "`/.gitconfig") "no" "`/.gitconfig")`
-#   - `(if (string-match "chip" hostname) "`/.i3/config" "no")`
+# - Some conditional checks are supported for :tangle and :eval:
+#   - `(if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")`
+#   - `(if (eq system-type 'windows-nt) "yes" "no")`
+#     - Valid types: `'windows-nt`, `'gnu/linux`, `'darwin`
+#   - `(if (string-suffix-p "chip" hostname) "~/.i3/config" "no")`
 #     - Only supported variable is: `hostname`
+# - Any blocks with `#+begin_src sh :eval yes` will be executed as well. The
+#   above elisp checks are supported as well.
 
 # Example Run with dotfiles from https://github.com/AnthonyDiGirolamo/dot-all
 #
@@ -311,9 +314,7 @@ function handle_tangle_or_eval_line(src_line) {
             return
 
         start_new_block()
-
         # _DEBUG("EVAL-" shell_type ": " file_expression)
-
         eval_block_count += 1
         eval_block_title = sprintf("eval-%03d-" shell_type, eval_block_count)
         current_block_filename = make_block_name(total_block_count,
@@ -358,6 +359,7 @@ BEGIN {
     uname = ""
     uname_system_type = _get_uname_system_type()
 
+    # Src block condition attributes
     FILE_EXPRESSION = "file_expression"
     CONDITION_TYPE = "condition_type"
     # Expected values:
