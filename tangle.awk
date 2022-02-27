@@ -62,15 +62,16 @@
 # Helper Fuctions
 
 # Join an array into a string (ignoring empty strings)
-function join(array, start, end, sep, result, i) {
+function join(array, start, end, sep,
+              _result, _i) {
     if (sep == "")
        sep = " "
     else if (sep == SUBSEP) # magic value
        sep = ""
     result = array[start]
-    for (i = start + 1; i <= end; i++)
-        if (array[i] != "")
-            result = result sep array[i]
+    for (_i = start + 1; _i <= end; _i++)
+        if (array[_i] != "")
+            result = result sep array[_i]
     return result
 }
 
@@ -105,9 +106,9 @@ function print_tag_line(tag, text) {
         print wrap_cli_color(36, "[" tag "]"), text
 }
 
-function find_index_ending_in(pattern, ary) {
+function find_index_ending_in(index_pattern, ary) {
     # check for patterns matching the end of the line
-    p = pattern "$"
+    p = index_pattern"$"
     for (i in ary)
         if (i ~ p)
             return i
@@ -203,7 +204,7 @@ function start_new_block() {
     total_block_count += 1
 }
 
-function tangle_file_name () {
+function tangle_file_name() {
     if (current_block_filename)
         return current_block_filename
     else if (tangle_prop_file_name)
@@ -224,64 +225,64 @@ function make_block_name(count, name) {
     return sprintf("BLOCK%03d %s", count, name)
 }
 
-function parse_tangle_or_eval_file_expression(mode, file_expression, result_group) {
-    # Reset result_group values
-    result_group[FILE_EXPRESSION] = ""
-    result_group[CONDITION_TYPE] = ""
-    result_group[CONDITION_DATA1] = ""
-    result_group[CONDITION_DATA2] = ""
-    result_group[CONDITION_TRUE_CASE] = ""
-    result_group[CONDITION_FALSE_CASE] = ""
+function parse_tangle_or_eval_file_expression(mode, expression_text, condition_dict) {
+    # Reset condition_dict values
+    condition_dict[FILE_EXPRESSION] = ""
+    condition_dict[CONDITION_TYPE] = ""
+    condition_dict[CONDITION_DATA1] = ""
+    condition_dict[CONDITION_DATA2] = ""
+    condition_dict[CONDITION_TRUE_CASE] = ""
+    condition_dict[CONDITION_FALSE_CASE] = ""
 
-    if (match(file_expression, double_quoted_value_regex, match_group)) {
-        result_group[FILE_EXPRESSION] = match_group[0]
-        result_group[CONDITION_TYPE] = "raw_value"
-        result_group[CONDITION_TRUE_CASE]  = match_group[1]
-        result_group[CONDITION_FALSE_CASE] = match_group[1]
+    if (match(expression_text, double_quoted_value_regex, match_group)) {
+        condition_dict[FILE_EXPRESSION] = match_group[0]
+        condition_dict[CONDITION_TYPE] = "raw_value"
+        condition_dict[CONDITION_TRUE_CASE]  = match_group[1]
+        condition_dict[CONDITION_FALSE_CASE] = match_group[1]
     }
-    else if (match(file_expression, elisp_system_type_regex, match_group)) {
-        result_group[FILE_EXPRESSION] = match_group[0]
-        result_group[CONDITION_TYPE] = "system_type"
-        result_group[CONDITION_DATA1] = match_group[1]  # windows-nt or gnu/linux
-        result_group[CONDITION_DATA2] = ""  # No condition data 2
-        result_group[CONDITION_TRUE_CASE]  = match_group[2]  # true case
-        result_group[CONDITION_FALSE_CASE] = match_group[3]  # false case
+    else if (match(expression_text, elisp_system_type_regex, match_group)) {
+        condition_dict[FILE_EXPRESSION] = match_group[0]
+        condition_dict[CONDITION_TYPE] = "system_type"
+        condition_dict[CONDITION_DATA1] = match_group[1]  # windows-nt or gnu/linux
+        condition_dict[CONDITION_DATA2] = ""  # No condition data 2
+        condition_dict[CONDITION_TRUE_CASE]  = match_group[2]  # true case
+        condition_dict[CONDITION_FALSE_CASE] = match_group[3]  # false case
     }
-    else if (match(file_expression, elisp_file_exists_p_regex, match_group)) {
-        result_group[FILE_EXPRESSION] = match_group[0]
-        result_group[CONDITION_TYPE] = "file_exists_p"
-        result_group[CONDITION_DATA1] = match_group[1]
-        result_group[CONDITION_DATA2] = ""  # No condition data 2
-        result_group[CONDITION_TRUE_CASE]  = match_group[2]
-        result_group[CONDITION_FALSE_CASE] = match_group[3]
+    else if (match(expression_text, elisp_file_exists_p_regex, match_group)) {
+        condition_dict[FILE_EXPRESSION] = match_group[0]
+        condition_dict[CONDITION_TYPE] = "file_exists_p"
+        condition_dict[CONDITION_DATA1] = match_group[1]
+        condition_dict[CONDITION_DATA2] = ""  # No condition data 2
+        condition_dict[CONDITION_TRUE_CASE]  = match_group[2]
+        condition_dict[CONDITION_FALSE_CASE] = match_group[3]
     }
-    else if (match(file_expression, elisp_string_suffix_p_regex, match_group)) {
-        result_group[FILE_EXPRESSION] = match_group[0]
-        result_group[CONDITION_TYPE] = "string_suffix_p"
-        result_group[CONDITION_DATA1] = match_group[1]  # prefix text
-        result_group[CONDITION_DATA2] = match_group[2]  # variable
-        result_group[CONDITION_TRUE_CASE]  = match_group[3]  # true case
-        result_group[CONDITION_FALSE_CASE] = match_group[4]  # false case
+    else if (match(expression_text, elisp_string_suffix_p_regex, match_group)) {
+        condition_dict[FILE_EXPRESSION] = match_group[0]
+        condition_dict[CONDITION_TYPE] = "string_suffix_p"
+        condition_dict[CONDITION_DATA1] = match_group[1]  # prefix text
+        condition_dict[CONDITION_DATA2] = match_group[2]  # variable
+        condition_dict[CONDITION_TRUE_CASE]  = match_group[3]  # true case
+        condition_dict[CONDITION_FALSE_CASE] = match_group[4]  # false case
     }
-    else if (match(file_expression, yes_or_no_regex, match_group)) {
-        result_group[FILE_EXPRESSION] = match_group[0]
-        result_group[CONDITION_TYPE] = "raw_value"
-        result_group[CONDITION_TRUE_CASE]  = match_group[1]
-        result_group[CONDITION_FALSE_CASE] = match_group[1]
+    else if (match(expression_text, yes_or_no_regex, match_group)) {
+        condition_dict[FILE_EXPRESSION] = match_group[0]
+        condition_dict[CONDITION_TYPE] = "raw_value"
+        condition_dict[CONDITION_TRUE_CASE]  = match_group[1]
+        condition_dict[CONDITION_FALSE_CASE] = match_group[1]
     }
-    else if (match(file_expression, unquoted_value_regex, match_group)) {
-        result_group[FILE_EXPRESSION] = match_group[0]
-        result_group[CONDITION_TYPE] = "raw_value"
-        result_group[CONDITION_TRUE_CASE]  = match_group[1]
-        result_group[CONDITION_FALSE_CASE] = match_group[1]
+    else if (match(expression_text, unquoted_value_regex, match_group)) {
+        condition_dict[FILE_EXPRESSION] = match_group[0]
+        condition_dict[CONDITION_TYPE] = "raw_value"
+        condition_dict[CONDITION_TRUE_CASE]  = match_group[1]
+        condition_dict[CONDITION_FALSE_CASE] = match_group[1]
     }
     else {
         print "----------------------- "
-        print cli_warning("[WARNING] Unknown " mode " format: ") file_expression
-        print "  " file_expression
+        print cli_warning("[WARNING] Unknown " mode " format: ") expression_text
+        print "  " expression_text
         print "----------------------- "
     }
-    # _DEBUG_ARRAY(result_group)
+    # _DEBUG_ARRAY(condition_dict)
 }
 
 # function get_parsed_file_expression(mode, text) {
@@ -289,9 +290,9 @@ function parse_tangle_or_eval_file_expression(mode, file_expression, result_grou
 #     return result_group[FILE_EXPRESSION]
 # }
 
-function save_block_filename_condition(block_filename, result_group) {
-    for (i in result_group) {
-        block_conditions[block_filename][i] = result_group[i]
+function save_block_filename_condition(block_filename, _condition_dict, _i) {
+    for (_i in _condition_dict) {
+        block_conditions[block_filename][_i] = _condition_dict[_i]
     }
 }
 
@@ -337,6 +338,17 @@ function handle_tangle_or_eval_line(src_line) {
         current_block_filename = make_block_name(total_block_count,
                                                  eval_block_title " " file_expression)
         save_block_filename_condition(current_block_filename, result_group)
+    }
+    else if (tangle_file_name()) {
+        parse_tangle_or_eval_file_expression("tangle", tangle_file_name(), result_group)
+        file_expression = result_group[FILE_EXPRESSION]
+        if (file_expression == "")
+            return
+        start_new_block()
+        current_block_filename = make_block_name(total_block_count,
+                                                 file_expression)
+        save_block_filename_condition(current_block_filename, result_group)
+        # _DEBUG_ARRAY(result_group)
     }
     else {
         print cli_error("[ERROR] Unknown src block format.")
@@ -450,95 +462,95 @@ in_block {
 
 # Check for start block line
 #   Should come after in_block so the end_src line isn't printed
-match($0, begin_src_tangle_or_eval_regex) {
+match($0, begin_src_regex) {
     handle_tangle_or_eval_line($0)
 }
 
-function write_tangled_file(outfile, index_name, expanded_file_name) {
-    if (expanded_file_name == "")
+function write_tangled_file(_outfile, _index_name, _expanded_file_name) {
+    if (_expanded_file_name == "")
         return
     # If file name doesn't start with:
     #   (  -> isn't an elisp expression
     #   no -> should not be tangled
-    if (match(expanded_file_name, /^\s*("?no"?|\()/, mg))
+    if (match(_expanded_file_name, /^\s*("?no"?|\()/, mg))
         return
 
     # remove any leading and trailing quotes
-    sub(/^["]/, "", expanded_file_name)
-    sub(/["]$/, "", expanded_file_name)
+    sub(/^["]/, "", _expanded_file_name)
+    sub(/["]$/, "", _expanded_file_name)
     # expand ~ to $HOME
-    sub(/~/, ENVIRON["HOME"], expanded_file_name)
+    sub(/~/, ENVIRON["HOME"], _expanded_file_name)
 
-    if (expanded_file_name in final_tangled_file_list) {
+    if (_expanded_file_name in final_tangled_file_list) {
         # append to the existing file
-        print tangled_files[index_name] >> expanded_file_name
+        print tangled_files[_index_name] >> _expanded_file_name
     }
     else {
         # first time we have tangled to this file
-        final_tangled_file_list[expanded_file_name] = 1
+        final_tangled_file_list[_expanded_file_name] = 1
         # print file being tangled
-        print "  " expanded_file_name
+        print "  " _expanded_file_name
 
         if (DRYRUN)
             return
         # always mkdir -p
-        system("mkdir -v -p "dirname(expanded_file_name))
+        system("mkdir -v -p "dirname(_expanded_file_name))
         # output contents string to the file all at once
-        print tangled_files[index_name] > expanded_file_name
+        print tangled_files[_index_name] > _expanded_file_name
         # add tangled file path to outfile
-        print expanded_file_name > outfile
+        print _expanded_file_name > _outfile
     }
     # close files in ENDFILE rule
 }
 
-function run_script(shell_type, script_text) {
+function run_script(_shell_type, _script_text) {
     if (DRYRUN)
         return
-    if (shell_type == "sh") {
+    if (_shell_type == "sh") {
         print cli_debug("[EVAL]"), "sh"
-        _DEBUG(shell_type)
-        print script_text | "sh"
+        _DEBUG(_shell_type)
+        print _script_text | "sh"
         close("sh")
     }
 }
 
-function get_destination_file_name(file_name) {
+function get_destination_file_name(_file_name) {
     destination_expression = ""
 
-    if (block_conditions[file_name][CONDITION_TYPE] == "file_exists_p") {
-        existing_file = block_conditions[file_name][CONDITION_DATA1]
+    if (block_conditions[_file_name][CONDITION_TYPE] == "file_exists_p") {
+        existing_file = block_conditions[_file_name][CONDITION_DATA1]
         if (system("test -f " existing_file) == 0)
-            destination_expression = block_conditions[file_name][CONDITION_TRUE_CASE]
+            destination_expression = block_conditions[_file_name][CONDITION_TRUE_CASE]
         else
-            destination_expression = block_conditions[file_name][CONDITION_FALSE_CASE]
+            destination_expression = block_conditions[_file_name][CONDITION_FALSE_CASE]
     }
 
     # elisp string-suffix-p call
-    else if (block_conditions[file_name][CONDITION_TYPE] == "string_suffix_p") {
-        pattern = block_conditions[file_name][CONDITION_DATA1]
-        variable = block_conditions[file_name][CONDITION_DATA2]
+    else if (block_conditions[_file_name][CONDITION_TYPE] == "string_suffix_p") {
+        pattern = block_conditions[_file_name][CONDITION_DATA1]
+        variable = block_conditions[_file_name][CONDITION_DATA2]
         if (variable == "hostname") {
             # check for suffix match
             p = pattern"$"
             if (hostname ~ p)
-                destination_expression = block_conditions[file_name][CONDITION_TRUE_CASE]
+                destination_expression = block_conditions[_file_name][CONDITION_TRUE_CASE]
             else
-                destination_expression = block_conditions[file_name][CONDITION_FALSE_CASE]
+                destination_expression = block_conditions[_file_name][CONDITION_FALSE_CASE]
         }
     }
 
     # elisp eq system-type call
-    else if (block_conditions[file_name][CONDITION_TYPE] == "system_type") {
-        system_type = block_conditions[file_name][CONDITION_DATA1]
+    else if (block_conditions[_file_name][CONDITION_TYPE] == "system_type") {
+        system_type = block_conditions[_file_name][CONDITION_DATA1]
         if (system_type == uname_system_type)
-            destination_expression = block_conditions[file_name][CONDITION_TRUE_CASE]
+            destination_expression = block_conditions[_file_name][CONDITION_TRUE_CASE]
         else
-            destination_expression = block_conditions[file_name][CONDITION_FALSE_CASE]
+            destination_expression = block_conditions[_file_name][CONDITION_FALSE_CASE]
     }
 
     # standard tangle file
     else {
-        destination_expression = block_conditions[file_name][CONDITION_TRUE_CASE]
+        destination_expression = block_conditions[_file_name][CONDITION_TRUE_CASE]
     }
 
     return destination_expression
@@ -573,7 +585,7 @@ ENDFILE {
         # file tangle case
         else if (match(file_name, /^(BLOCK[0-9]+) (.*)$/, mg)) {
             _DEBUG_ARRAY(block_conditions[file_name])
-            block_prefix = mg[1]
+            block_prefix = mg[1]  # unused
             expanded_file_name = mg[2]
             _DEBUG("[TANGLE] " expanded_file_name)
 
