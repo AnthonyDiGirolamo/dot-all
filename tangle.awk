@@ -27,7 +27,7 @@
 #     - Only supported variable is: `hostname`
 # - Any blocks with `#+begin_src sh :eval yes` will be executed as well. The
 #   above elisp checks are supported as well.
-
+#
 # Example Run with dotfiles from https://github.com/AnthonyDiGirolamo/dot-all
 #
 #   $ ./tangle.awk *.org
@@ -55,6 +55,9 @@
 #   [TANGLE] zsh.org
 #     ~/.zshrc
 #     ~/.zshrc.local
+#
+# To lint this file, run:
+#   gawk --lint=no-ext -f tangle.awk *.org
 
 # Helper Fuctions
 
@@ -69,13 +72,6 @@ function join(array, start, end, sep, result, i) {
         if (array[i] != "")
             result = result sep array[i]
     return result
-}
-
-function trim_whitespace(text) {
-    trimmed_text = text
-    sub(/^\s+/, "", trimmed_text)
-    sub(/\s+$/, "", trimmed_text)
-    return trimmed_text
 }
 
 # Terminal color wrap functions
@@ -109,11 +105,6 @@ function print_tag_line(tag, text) {
         print wrap_cli_color(36, "[" tag "]"), text
 }
 
-function print_array_indexes(a) {
-    for (i in a)
-        print "["i"]: "
-}
-
 function find_index_ending_in(pattern, ary) {
     # check for patterns matching the end of the line
     p = pattern "$"
@@ -123,25 +114,37 @@ function find_index_ending_in(pattern, ary) {
     return 0
 }
 
-function print_array(a) {
-    for (i in a)
-        print "["i"]: '"a[i]"'"
-}
+# function print_array_indexes(a) {
+#     for (i in a)
+#         print "["i"]: "
+# }
+
+# function print_array(a) {
+#     for (i in a)
+#         print "["i"]: '"a[i]"'"
+# }
 
 function _DEBUG_ARRAY(a) {
     for (i in a)
         _DEBUG("[" i "]: '" a[i] "'")
 }
 
-function basename(path) {
-    split(path, path_array, "/")
-    return path_array[length(path_array)]
-}
+# function basename(path) {
+#     split(path, path_array, "/")
+#     return path_array[length(path_array)]
+# }
 
 function dirname(path) {
     split(path, path_array, "/")
     return join(path_array, 1, length(path_array)-1, "/")
 }
+
+# function trim_whitespace(text) {
+#     trimmed_text = text
+#     sub(/^\s+/, "", trimmed_text)
+#     sub(/\s+$/, "", trimmed_text)
+#     return trimmed_text
+# }
 
 function _get_uname_system_type() {
     while (("uname -a" |& getline line) > 0) {
@@ -267,10 +270,10 @@ function parse_tangle_or_eval_file_expression(mode, file_expression, result_grou
     # _DEBUG_ARRAY(result_group)
 }
 
-function get_parsed_file_expression(mode, text) {
-    parse_tangle_or_eval_file_expression(mode, text, result_group)
-    return result_group[FILE_EXPRESSION]
-}
+# function get_parsed_file_expression(mode, text) {
+#     parse_tangle_or_eval_file_expression(mode, text, result_group)
+#     return result_group[FILE_EXPRESSION]
+# }
 
 function save_block_filename_condition(block_filename, result_group) {
     for (i in result_group) {
@@ -412,7 +415,13 @@ in_block {
             sub(org_escaped_asterix_regex, replacement, current_line)
         }
         # append the line and a linebreak
-        tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n" current_line
+        if (tangle_file_name() in tangled_files) {
+            tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n" current_line
+        }
+        # If this is the first line
+        else {
+            tangled_files[tangle_file_name()] = current_line
+        }
         # print current_block_line_number,":",current_line
     }
 }
