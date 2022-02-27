@@ -129,22 +129,25 @@ function _DEBUG_ARRAY(a) {
         _DEBUG("[" i "]: '" a[i] "'")
 }
 
-# function basename(path) {
-#     split(path, path_array, "/")
-#     return path_array[length(path_array)]
-# }
-
-function dirname(path) {
-    split(path, path_array, "/")
-    return join(path_array, 1, length(path_array)-1, "/")
+function basename(path,
+                  _path_array) {
+    split(path, _path_array, "/")
+    return _path_array[length(_path_array)]
 }
 
-# function trim_whitespace(text) {
-#     trimmed_text = text
-#     sub(/^\s+/, "", trimmed_text)
-#     sub(/\s+$/, "", trimmed_text)
-#     return trimmed_text
-# }
+function dirname(path,
+                 _path_array) {
+    split(path, _path_array, "/")
+    return join(_path_array, 1, length(_path_array)-1, "/")
+}
+
+function trim_whitespace(text,
+                         _trimmed_text) {
+    trimmed_text = text
+    sub(/^\s+/, "", trimmed_text)
+    sub(/\s+$/, "", trimmed_text)
+    return trimmed_text
+}
 
 function _get_uname_system_type() {
     while (("uname -a" |& getline line) > 0) {
