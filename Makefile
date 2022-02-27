@@ -41,6 +41,14 @@ ORG_OUT_FILES := $(foreach f, $(ORG_FILES),$(CACHEDIR)/$(basename $(f)).out)
 clean:  ## delete .cache
 	rm -rf $(CACHEDIR)
 
+.PHONY: test
+test: ## tangle_test.awk
+	@gawk -f ./tangle_test.awk
+
+.PHONY: lint
+lint: ## Lint: tangle.awk
+	@env TANGLEAWK_DRYRUN=1 gawk --lint=no-ext -f ./tangle.awk *.org 1>/dev/null
+
 all: clean t symlinks  ## clean and tangle all
 t: tangle  ## tangle alias
 tangle: tangleawk  ## tangleawk alias

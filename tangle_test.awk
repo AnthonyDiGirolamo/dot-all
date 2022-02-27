@@ -12,7 +12,7 @@ function assert(condition, string)
         # exit 1
     }
     else {
-        # printf "." > "/dev/stderr"
+        printf "." > "/dev/stderr"
     }
 }
 
@@ -35,6 +35,7 @@ BEGIN {
     assertEqual(basename("/c/Users/test/something"),
                 "something")
 
+    printf "\n" > "/dev/stderr"
     exit _assert_exit
 }
 

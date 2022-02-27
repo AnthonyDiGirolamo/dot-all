@@ -149,19 +149,30 @@ function trim_whitespace(text,
     return trimmed_text
 }
 
-function _get_uname_system_type() {
+function _get_uname_system_type(_system_type) {
     while (("uname -a" |& getline line) > 0) {
         uname = line
     }
     close("uname -a")
     _DEBUG("uname = " uname)
-    system_type = "gnu/linux"
+    _system_type = "gnu/linux"
     if (uname ~ uname_msys_regex)
-        system_type = "windows-nt"
+        _system_type = "windows-nt"
     else if (uname ~ uname_macos_regex)
-        system_type = "darwin"
-    _DEBUG("uname_system_type = " system_type)
-    return system_type
+        _system_type = "darwin"
+    _system_type = trim_whitespace(_system_type)
+    _DEBUG("uname_system_type = " _system_type)
+    return _system_type
+}
+
+function _get_hostname(_hostname) {
+    while (("hostname" |& getline line) > 0) {
+        _hostname = line
+    }
+    close("hostname")
+    _hostname = trim_whitespace(_hostname)
+    _DEBUG("hostname = " _hostname)
+    return _hostname
 }
 
 # Tangle.awk Specific Functions
@@ -335,7 +346,14 @@ function handle_tangle_or_eval_line(src_line) {
 }
 
 BEGIN {
-    LOG_DEBUG = ENVIRON["TANGLEAWK_LOG"] != ""
+    LOG_DEBUG = 0
+    DRYRUN = 0
+    if ("TANGLEAWK_LOG" in ENVIRON &&
+        ENVIRON["TANGLEAWK_LOG"] != "")
+        LOG_DEBUG = 1
+    if ("TANGLEAWK_DRYRUN" in ENVIRON &&
+        ENVIRON["TANGLEAWK_DRYRUN"] != "")
+        DRYRUN = 1
 
     IGNORECASE = 1
     tangle_prop_regex = @/^\s*#\+property.*header-args.*:tangle\s*(\S.*)$/
@@ -364,6 +382,7 @@ BEGIN {
     uname_msys_regex = @/(mingw|msys)/
     uname = ""
     uname_system_type = _get_uname_system_type()
+    hostname = _get_hostname()
 
     # Src block condition attributes
     FILE_EXPRESSION = "file_expression"
@@ -459,6 +478,9 @@ function write_tangled_file(outfile, index_name, expanded_file_name) {
         final_tangled_file_list[expanded_file_name] = 1
         # print file being tangled
         print "  " expanded_file_name
+
+        if (DRYRUN)
+            return
         # always mkdir -p
         system("mkdir -v -p "dirname(expanded_file_name))
         # output contents string to the file all at once
@@ -467,6 +489,17 @@ function write_tangled_file(outfile, index_name, expanded_file_name) {
         print expanded_file_name > outfile
     }
     # close files in ENDFILE rule
+}
+
+function run_script(shell_type, script_text) {
+    if (DRYRUN)
+        return
+    if (shell_type == "sh") {
+        print cli_debug("[EVAL]"), "sh"
+        _DEBUG(shell_type)
+        print script_text | "sh"
+        close("sh")
+    }
 }
 
 function get_destination_file_name(file_name) {
@@ -485,15 +518,9 @@ function get_destination_file_name(file_name) {
         pattern = block_conditions[file_name][CONDITION_DATA1]
         variable = block_conditions[file_name][CONDITION_DATA2]
         if (variable == "hostname") {
-            # get hostname
-            hostname_result = ""
-            while (("hostname" |& getline line) > 0) {
-                hostname_result = line
-            }
-            close("hostname")
             # check for suffix match
             p = pattern"$"
-            if (hostname_result ~ p)
+            if (hostname ~ p)
                 destination_expression = block_conditions[file_name][CONDITION_TRUE_CASE]
             else
                 destination_expression = block_conditions[file_name][CONDITION_FALSE_CASE]
@@ -523,8 +550,11 @@ ENDFILE {
     outfile = ".cache/" FILENAME
     sub(/\.org$/, ".out", outfile)
     # Move existing .out file to .out.last
-    print "test -f "outfile" && cp "outfile" "outfile".last && rm "outfile | "sh"
-    close("sh")
+
+    if (!DRYRUN) {
+        print "test -f "outfile" && cp "outfile" "outfile".last && rm "outfile | "sh"
+        close("sh")
+    }
 
     # Traverse array ordered by indices in ascending order compared as strings
     PROCINFO["sorted_in"] = "@ind_str_asc"
@@ -537,12 +567,7 @@ ENDFILE {
             shell_type = mg[3]
             # _DEBUG_ARRAY(block_conditions[file_name])
             if (get_destination_file_name(file_name) == "yes") {
-                if (shell_type == "sh") {
-                    print cli_debug("[EVAL]"), "sh"
-                    _DEBUG(shell_type)
-                    print tangled_files[file_name] | "sh"
-                    close("sh")
-                }
+                run_script(shell_type, tangled_files[file_name])
             }
         }
         # file tangle case
@@ -557,9 +582,11 @@ ENDFILE {
         }
     }
 
-    # close all final file names
-    for (file_name in final_tangled_file_list)
-        close(file_name)
-    # close .out file
-    close(outfile)
+    if (!DRYRUN) {
+        # close all final file names
+        for (file_name in final_tangled_file_list)
+            close(file_name)
+        # close .out file
+        close(outfile)
+    }
 }
