@@ -83,15 +83,11 @@ function wrap_cli_color(colorcode, text) {
     else
         return sprintf("\033[%dm%s\033[0m", colorcode, text)
 }
-function cli_warning(text) {
-    return wrap_cli_color(33, text)
-}
-function cli_error(text) {
-    return wrap_cli_color(31, text)
-}
-function cli_debug(text) {
-    return wrap_cli_color(35, text)
-}
+
+function cli_green(text) { return wrap_cli_color(32, text) }
+function cli_warning(text) { return wrap_cli_color(33, text) }
+function cli_error(text) { return wrap_cli_color(31, text) }
+function cli_debug(text) { return wrap_cli_color(35, text) }
 
 # Print a log message if TANGLEAWK_LOG is env var is set.
 function _DEBUG(text) {
@@ -213,16 +209,16 @@ function tangle_file_name() {
         return 0
 }
 
-function make_block_name(count, name) {
+function make_block_name(block_count, block_name,
+                         _existing_name) {
     # Check for existing block name and use that if found
     # (so lines can continue to be appended to that file)
-    existing_name = find_index_ending_in(name, tangled_files)
-    if (existing_name) {
-        # erint "found index " existing_name
-        return existing_name
+    _existing_name = find_index_ending_in(block_name, tangled_files)
+    if (_existing_name) {
+        return _existing_name
     }
     # print "new index for " name
-    return sprintf("BLOCK%03d %s", count, name)
+    return sprintf("BLOCK%03d %s", block_count, block_name)
 }
 
 function parse_tangle_or_eval_file_expression(mode, expression_text, condition_dict) {
@@ -311,8 +307,8 @@ function handle_tangle_or_eval_line(src_line) {
 
         # Can't handle noweb references yet
         if (match(src_line, /:noweb/)) {
-            print cli_warning("[WARNING] :noweb references are not handled.")
-            print cli_warning("[WARNING] " FILENAME ":" FNR ":"), src_line
+            print "  " cli_warning("[WARNING] :noweb references are not handled.")
+            print "  " cli_warning("[WARNING] ") cli_green(FILENAME ":" FNR) ":", src_line
         }
 
         start_new_block()
@@ -351,9 +347,9 @@ function handle_tangle_or_eval_line(src_line) {
         # _DEBUG_ARRAY(result_group)
     }
     else {
-        print cli_error("[ERROR] Unknown src block format.")
-        print cli_error("[ERROR] " FILENAME ":" FNR ":"), src_line
-        # TODO: exit here?
+        # Non-tangled blocks
+        # TODO: should probably assume no tangling required and not print this warning.
+        print "  " cli_warning("[NO-OP] ") cli_green(FILENAME ":" FNR) ":", src_line
     }
 }
 
@@ -416,6 +412,8 @@ BEGINFILE {
 match($0, tangle_prop_regex, group) {
     tangle_prop_file_name = group[1]
     # init the file contents
+
+    # current_block_filename = make_block_name(total_block_count, tangle_file_name())
     tangled_files[tangle_file_name()] = ""
 }
 
@@ -574,7 +572,7 @@ ENDFILE {
     # print_array_indexes(tangled_files)
     for (file_name in tangled_files) {
         _DEBUG(cli_warning(file_name))
-        # run a script case
+        # run script blocks
         if (match(file_name, /(BLOCK[0-9]+) eval-([0-9]+)-(sh|shell) (.*)$/, mg)) {
             shell_type = mg[3]
             # _DEBUG_ARRAY(block_conditions[file_name])
@@ -582,13 +580,20 @@ ENDFILE {
                 run_script(shell_type, tangled_files[file_name])
             }
         }
-        # file tangle case
+        # specific :tangle blocks
         else if (match(file_name, /^(BLOCK[0-9]+) (.*)$/, mg)) {
             _DEBUG_ARRAY(block_conditions[file_name])
             block_prefix = mg[1]  # unused
             expanded_file_name = mg[2]
             _DEBUG("[TANGLE] " expanded_file_name)
 
+            write_tangled_file(outfile, file_name,
+                               get_destination_file_name(file_name))
+        }
+        # header-args blocks
+        else {
+            _DEBUG_ARRAY(block_conditions[file_name])
+            _DEBUG("[TANGLE] " file_name)
             write_tangled_file(outfile, file_name,
                                get_destination_file_name(file_name))
         }
