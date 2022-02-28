@@ -12,9 +12,6 @@ BEGIN {
     cli::LOG_DEBUG = 0
     make::DRYRUN = 0
 
-    # Traverse array ordered by indices in ascending order compared as strings
-    # PROCINFO["sorted_in"] = "@ind_str_asc"
-
     _myshortopts = "vdh"
     _mylongopts = "verbose,dry-run,help"
 
@@ -66,6 +63,23 @@ BEGIN {
     exit 0
 }
 
+
+function print_known_targets(_original_sort) {
+    _original_sort = PROCINFO["sorted_in"]
+
+    # Traverse array ordered by indices in ascending order compared as strings
+    PROCINFO["sorted_in"] = "@ind_str_asc"
+    print "Available Targets:"
+    for (i in FUNCTAB) {
+        if (match(i, /^make_targets::(.*)$/, mg)) {
+            print "  " mg[1]
+        }
+    }
+
+    PROCINFO["sorted_in"] = _original_sort
+}
+
+
 function print_help(name, help_text,
                     max_length, target_length, format_string, i) {
     max_length = 0
@@ -80,6 +94,7 @@ function print_help(name, help_text,
     printf(format_string, cli::cyan(name), help_text)
 }
 
+
 function _run_target(target_name) {
     # Indirect call args as functions
     the_function = "make_targets::" target_name
@@ -90,8 +105,11 @@ function _run_target(target_name) {
     }
     else {
         print cli::error("[ERROR]"), "Unknown target:", target_name
+        print_known_targets()
+        exit 1
     }
 }
+
 
 function usage() {
     print "usage: make.awk [-v] [-d] TARGET ..."
@@ -100,6 +118,7 @@ function usage() {
     print "  -d, --dry-run     don't run any system commands"
     exit 1
 }
+
 
 function run(command,
              _return_value) {
@@ -111,6 +130,7 @@ function run(command,
     }
     return _return_value == 0
 }
+
 
 function compile(source_archive, commands,
                   # local vars
@@ -156,6 +176,7 @@ function compile(source_archive, commands,
     # cd to original dir
     path::popd()
 }
+
 
 function download(tool_name, url, expected_md5hash, cachedir,
                   # local vars

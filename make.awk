@@ -10,6 +10,7 @@ function help() {
     make::print_help("test",          "run awk unit tests")
     make::print_help("lint",          "run linting on tangle.awk")
     make::print_help("install_emacs", "download, compile and install emacs")
+    make::print_help("install_lua54", "download, compile and install lua 5.4")
 }
 
 function build() {
@@ -39,5 +40,14 @@ function install_emacs(_source_archive) {
                   "./configure --prefix=$HOME/apps/emacs --with-modules --with-cairo\n" \
                   "make -j 4\n" \
                   "make install\n")
+}
+
+function install_lua54() {
+    _source_archive = make::download("lua54",
+                                     "https://www.lua.org/ftp/lua-5.4.0.tar.gz",
+                                     "dbf155764e5d433fc55ae80ea7060b60")
+    make::compile(_source_archive,
+                  "make linux -j 4\n" \
+                  "make INSTALL_TOP=$HOME/apps/lua54 install\n")
 }
 
