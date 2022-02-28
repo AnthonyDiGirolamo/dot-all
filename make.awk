@@ -8,9 +8,6 @@ BEGIN {
     LOG_DEBUG = 0
     DRYRUN = 0
 
-    uname_system_type = _get_uname_system_type()
-    hostname = _get_hostname()
-
     _myshortopts = "vdh"
     _mylongopts = "verbose,dry-run,help"
 
@@ -37,6 +34,9 @@ BEGIN {
     for (i = 1; i < Optind; i++)
         ARGV[i] = ""
 
+    uname_system_type = _get_uname_system_type()
+    hostname = _get_hostname()
+
     _DEBUG("Non-option arguments:")
     for (; Optind < ARGC; Optind++) {
         _DEBUG(sprintf("\tARGV[%d] = <%s>", Optind, ARGV[Optind]))
@@ -55,6 +55,12 @@ function usage() {
 }
 
 # TARGET functions
+
+function target_all() {
+    target_test()
+    target_lint()
+}
+
 function target_test() {
     print "Run test"
 }
@@ -88,9 +94,14 @@ function _DEBUG_ARRAY(a) {
         _DEBUG("[" i "]: '" a[i] "'")
 }
 
-function _get_uname_system_type(_system_type) {
-    while (("uname -a" |& getline line) > 0) {
-        uname = line
+function _get_uname_system_type(_system_type,
+                                _line) {
+    uname_macos_regex = @/(darwin)/
+    uname_msys_regex = @/(mingw|msys)/
+    uname = ""
+
+    while (("uname -a" |& getline _line) > 0) {
+        uname = _line
     }
     close("uname -a")
     _DEBUG("uname = " uname)
@@ -104,7 +115,8 @@ function _get_uname_system_type(_system_type) {
     return _system_type
 }
 
-function _get_hostname(_hostname) {
+function _get_hostname(_hostname,
+                       _line) {
     while (("hostname" |& getline line) > 0) {
         _hostname = line
     }
