@@ -1,89 +1,100 @@
 #!/usr/bin/gawk -f
 @namespace "cli"
 
-function color(colorcode, text) {
+function wrap_color(colorcode, text) {
     if (ENVIRON["TERM"] == "dumb")
         return text
     else
-        return sprintf("\033[%dm%s\033[0m", colorcode, text)
+        return sprintf("\x1b[%dm%s\x1b[0m", colorcode, text)
 }
 
-function reset()       { return "\033[0m" }
-function black(text)   { return color(30, text) }
-function red(text)     { return color(31, text) }
-function green(text)   { return color(32, text) }
-function yellow(text)  { return color(33, text) }
-function blue(text)    { return color(34, text) }
-function magenta(text) { return color(35, text) }
-function cyan(text)    { return color(36, text) }
-function white(text)   { return color(37, text) }
 
-# Bright Black:   30;1
-# Bright Red:     31;1
-# Bright Green:   32;1
-# Bright Yellow:  33;1
-# Bright Blue:    34;1
-# Bright Magenta: 35;1
-# Bright Cyan:    36;1
-# Bright White:   37;1
+function fg_color_256(color_index) { return "\x1b[38;5;" color_index "m" }
+function bg_color_256(color_index) { return "\x1b[48;5;" color_index "m" }
+
+function reset() { return "\x1b[m" }
+
+function black(text)   { return wrap_color(30, text) }
+function red(text)     { return wrap_color(31, text) }
+function green(text)   { return wrap_color(32, text) }
+function yellow(text)  { return wrap_color(33, text) }
+function blue(text)    { return wrap_color(34, text) }
+function magenta(text) { return wrap_color(35, text) }
+function cyan(text)    { return wrap_color(36, text) }
+function white(text)   { return wrap_color(37, text) }
+function rgb(red, green, blue) { return "" }
+
+function bright_black(text)   { return wrap_color("30;1", text) }
+function bright_red(text)     { return wrap_color("31;1", text) }
+function bright_green(text)   { return wrap_color("32;1", text) }
+function bright_yellow(text)  { return wrap_color("33;1", text) }
+function bright_blue(text)    { return wrap_color("34;1", text) }
+function bright_magenta(text) { return wrap_color("35;1", text) }
+function bright_cyan(text)    { return wrap_color("36;1", text) }
+function bright_white(text)   { return wrap_color("37;1", text) }
 
 function debug(text)   { return magenta(text) }
 function error(text)   { return red(text)     }
 function info(text)    { return blue(text)    }
 function warning(text) { return yellow(text)  }
+function success(text) { return green(text)   }
 
 function print_debug(text) {
     if (LOG_DEBUG)
         print debug("[DEBUG] ") text
 }
 
-function print_debug_array(a) {
+function print_debug_array(a, prefix,
+                           _pattern, i) {
+    if (!prefix)
+        _pattern = ".*"
+    else
+        _pattern = "^"prefix".*"
+
     for (i in a) {
-        # if (awk::isarray(a[i])) {
-        #     print_debug_array(a[i])
-        # }
-        # else {
-        print_debug("[" i "]: '" a[i] "'")
-        # }
+        if (i ~ _pattern) {
+            if (awk::isarray(a[i])) {
+                print_debug(i " = array, " length(a[i]) " elements")
+                # print_debug_array(a[i])
+            }
+            else {
+            print_debug("[" i "]: '" a[i] "'")
+            }
+        }
     }
 }
 
-function get_uname_system_type(_system_type,
-                                _line) {
+function get_uname_a(_result) {
+    # Return previously fetched uname
+    if (uname_a != "")
+        return uname_a
+    "uname -a" | getline _result
+    close("uname -a")
+    uname_a = _result
+    return uname_a
+}
+
+function get_uname_system_type(system_type, uname,
+                               uname_macos_regex, uname_msys_regex) {
     uname_macos_regex = @/(darwin)/
     uname_msys_regex = @/(mingw|msys)/
-    uname = ""
+    uname = get_uname_a()
 
-    while (("uname -a" |& getline _line) > 0) {
-        uname = _line
-    }
-    close("uname -a")
-    print_debug("uname = " uname)
-    _system_type = "gnu/linux"
+    system_type = "gnu/linux"
     if (uname ~ uname_msys_regex)
-        _system_type = "windows-nt"
+        system_type = "windows-nt"
     else if (uname ~ uname_macos_regex)
-        _system_type = "darwin"
-    _system_type = _trim_whitespace(_system_type)
-    print_debug("uname_system_type = " _system_type)
-    return _system_type
+        system_type = "darwin"
+    return system_type
 }
 
-function get_hostname(_hostname,
-                       _line) {
-    while (("hostname" |& getline line) > 0) {
-        _hostname = line
-    }
+function get_hostname(_result) {
+    # Return previously fetched hostname
+    if (hostname != "")
+        return hostname
+    "hostname" | getline _result
     close("hostname")
-    _hostname = _trim_whitespace(_hostname)
-    print_debug("hostname = " _hostname)
-    return _hostname
+    hostname = _result
+    return hostname
 }
 
-function _trim_whitespace(text,
-                         _trimmed_text) {
-    trimmed_text = text
-    sub(/^\s+/, "", trimmed_text)
-    sub(/\s+$/, "", trimmed_text)
-    return trimmed_text
-}
