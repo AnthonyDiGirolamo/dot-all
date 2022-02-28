@@ -8,20 +8,16 @@ function color(colorcode, text) {
         return sprintf("\033[%dm%s\033[0m", colorcode, text)
 }
 
-function green(text) { return color(32, text) }
-function cyan(text) { return color(36, text) }
-function warning(text) { return color(33, text) }
-function error(text) { return color(31, text) }
-function debug(text) { return color(35, text) }
+function reset()       { return "\033[0m" }
+function black(text)   { return color(30, text) }
+function red(text)     { return color(31, text) }
+function green(text)   { return color(32, text) }
+function yellow(text)  { return color(33, text) }
+function blue(text)    { return color(34, text) }
+function magenta(text) { return color(35, text) }
+function cyan(text)    { return color(36, text) }
+function white(text)   { return color(37, text) }
 
-# Black:   30
-# Red:     31
-# Green:   32
-# Yellow:  33
-# Blue:    34
-# Magenta: 35
-# Cyan:    36
-# White:   37
 # Bright Black:   30;1
 # Bright Red:     31;1
 # Bright Green:   32;1
@@ -30,7 +26,11 @@ function debug(text) { return color(35, text) }
 # Bright Magenta: 35;1
 # Bright Cyan:    36;1
 # Bright White:   37;1
-# Reset:   0
+
+function debug(text)   { return magenta(text) }
+function error(text)   { return red(text)     }
+function info(text)    { return blue(text)    }
+function warning(text) { return yellow(text)  }
 
 function print_debug(text) {
     if (LOG_DEBUG)
@@ -64,7 +64,7 @@ function get_uname_system_type(_system_type,
         _system_type = "windows-nt"
     else if (uname ~ uname_macos_regex)
         _system_type = "darwin"
-    _system_type = trim_whitespace(_system_type)
+    _system_type = _trim_whitespace(_system_type)
     print_debug("uname_system_type = " _system_type)
     return _system_type
 }
@@ -75,12 +75,12 @@ function get_hostname(_hostname,
         _hostname = line
     }
     close("hostname")
-    _hostname = trim_whitespace(_hostname)
+    _hostname = _trim_whitespace(_hostname)
     print_debug("hostname = " _hostname)
     return _hostname
 }
 
-function trim_whitespace(text,
+function _trim_whitespace(text,
                          _trimmed_text) {
     trimmed_text = text
     sub(/^\s+/, "", trimmed_text)
