@@ -37,13 +37,21 @@ BEGIN {
     uname_system_type = _get_uname_system_type()
     hostname = _get_hostname()
 
+    targets_run = 0
     _DEBUG("Non-option arguments:")
     for (; Optind < ARGC; Optind++) {
         _DEBUG(sprintf("\tARGV[%d] = <%s>", Optind, ARGV[Optind]))
         # Indirect call args as functions
         the_function = "target_" ARGV[Optind]
+
+        print( cli_green("[TARGET] ") ARGV[Optind] )
+
         _result = @the_function()
+        targets_run += 1
     }
+
+    if (targets_run == 0)
+        usage()
 }
 
 function usage() {
@@ -62,11 +70,20 @@ function target_all() {
 }
 
 function target_test() {
-    print "Run test"
+    run_command("gawk -f ./tangle_test.awk")
 }
 
 function target_lint() {
-    print "Run lint"
+    run_command("env TANGLEAWK_DRYRUN=1 gawk --lint=no-ext -f ./tangle.awk *.org 1>/dev/null")
+}
+
+function target_t() {
+    run_command("./tangle.awk *.org")
+}
+
+function run_command(_command) {
+    _DEBUG("[RUN] " _command)
+    system(_command)
 }
 
 # Functions from tangle.awk
@@ -83,6 +100,13 @@ function cli_green(text) { return wrap_cli_color(32, text) }
 function cli_warning(text) { return wrap_cli_color(33, text) }
 function cli_error(text) { return wrap_cli_color(31, text) }
 function cli_debug(text) { return wrap_cli_color(35, text) }
+
+function print_tag_line(tag, text) {
+    if (ENVIRON["TERM"] == "dumb")
+        print "[" tag "]", text
+    else
+        print wrap_cli_color(36, "[" tag "]"), text
+}
 
 function _DEBUG(text) {
     if (LOG_DEBUG)
