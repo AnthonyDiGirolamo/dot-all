@@ -3,6 +3,26 @@
 @include "cli"
 
 BEGIN {
+    assert::set_keep_going()
+
+    print_test()
+    run_tests()
+
+    exit assert::get_exit_code()
+}
+
+function run_tests() {
+    assert::NotEmpty(cli::get_uname_a())
+    assert::NotEmpty(cli::get_hostname())
+    assert::NotEmpty(cli::get_uname_system_type())
+    print ""
+
+    cli::LOG_DEBUG = 1
+    # Print all cli namespace variables
+    cli::print_debug_array(SYMTAB, "cli::")
+}
+
+function print_test() {
     printf "Colors: "
     text = "#"
     printf cli::black(text)
@@ -42,11 +62,4 @@ BEGIN {
         }
     }
     printf cli::reset()
-
-    cli::LOG_DEBUG = 1
-    cli::get_uname_a()
-    cli::get_hostname()
-    cli::get_uname_system_type()
-    cli::print_debug_array(SYMTAB, "cli::")
 }
-
