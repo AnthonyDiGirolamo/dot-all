@@ -100,8 +100,13 @@ function usage() {
     exit 1
 }
 
-function run(_command) {
+function run(command,
+             _return_value) {
+    _return_value = 0
     cli::print_debug("[RUN] " _command)
-    if (!make::DRYRUN)
-        system(_command)
+    if (!make::DRYRUN) {
+        _return_value = system(_command)
+        system("")  # flush output
+    }
+    return _return_value == 0
 }
