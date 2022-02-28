@@ -71,7 +71,7 @@ function is_dir(target_path,
  }
 
 function md5sum(target_path,
-                _result_hash) {
+                _result_hash, _command) {
     _command = "md5sum " target_path
     _command | getline _result_hash
     close(_command)
@@ -96,9 +96,9 @@ function _join(array, start, end, sep,
        sep = " "
     else if (sep == SUBSEP) # magic value
        sep = ""
-    result = array[start]
+    _result = array[start]
     for (_i = start + 1; _i <= end; _i++)
         if (array[_i] != "")
-            result = result sep array[_i]
-    return result
+            _result = _result sep array[_i]
+    return _result
 }

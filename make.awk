@@ -22,6 +22,7 @@ function test() {
     path::pushd("awklib")
     make::run("gawk -f cli_test.awk")
     make::run("gawk -f tangle_test.awk")
+    make::run("gawk -f path_test.awk")
     path::popd()
 }
 
