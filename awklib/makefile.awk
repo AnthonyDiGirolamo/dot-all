@@ -58,8 +58,8 @@ BEGIN {
     if (targets_run == 0) {
         if ("make_targets::help" in FUNCTAB)
             make_targets::help()
-        # cli::print_debug_array(FUNCTAB)
-        # usage()
+        else
+            usage()
     }
 
     exit 0
