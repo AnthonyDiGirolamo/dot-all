@@ -5,10 +5,10 @@
 @namespace "make_targets"
 
 function help() {
-    make::print_help("t",             "run tangle.awk on all org files")
+    make::print_help("t",             "tangle all org files")
     make::print_help("build",         "run test & lint")
-    make::print_help("test",          "run awk unit tests")
-    make::print_help("lint",          "run linting on tangle.awk")
+    make::print_help("test",          "awk unit tests")
+    make::print_help("lint",          "awk linting")
     make::print_help("install_emacs", "download, compile and install emacs")
     make::print_help("install_lua54", "download, compile and install lua 5.4")
 }
@@ -19,17 +19,20 @@ function build() {
 }
 
 function test() {
-    make::run("gawk -f ./tangle_test.awk")
+    path::pushd("awklib")
+    make::run("gawk -f cli_test.awk")
+    make::run("gawk -f tangle_test.awk")
+    path::popd()
 }
 
 function lint() {
     make::run("env TANGLEAWK_DRYRUN=1 " \
-              "gawk --lint=no-ext -f ./tangle.awk *.org " \
+              "gawk --lint=no-ext -f ./awklib/tangle.awk *.org " \
               "1>/dev/null")
 }
 
 function t() {
-    make::run("./tangle.awk *.org")
+    make::run("./awklib/tangle.awk *.org")
 }
 
 function install_emacs() {

@@ -1,6 +1,6 @@
 #!/usr/bin/gawk -f
 @include "tangle"
-@include "awklib/assert"
+@include "assert"
 
 BEGIN {
     _assert_exit = 0

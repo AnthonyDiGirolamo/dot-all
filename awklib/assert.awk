@@ -2,6 +2,7 @@
 @namespace "assert"
 
 # assert::assert --- assert that a condition is true. Otherwise, exit.
+# Based on:
 # https://www.gnu.org/software/gawk/manual/gawk.html#Assert-Function
 function assert(condition, string)
 {
@@ -28,14 +29,6 @@ function get_exit_code() {
         return 0
 }
 
-# Create human readable string representations of variables
-function _human_readable(var) {
-    if (awk::typeof(var) != "string")
-        return "" var
-    else
-        return "\"" var "\""
-}
-
 # assert::Equal --- assert two expressions are equal.
 function Equal(result, expected,
                _result_string, _expected_string) {
@@ -53,4 +46,14 @@ function Equal(result, expected,
 function NotEmpty(result) {
     assert(result != "",
            _human_readable(result) " != \"\"")
+}
+
+# Private functions
+
+# Create human readable string representations of variables
+function _human_readable(var) {
+    if (awk::typeof(var) != "string")
+        return "" var
+    else
+        return "\"" var "\""
 }
