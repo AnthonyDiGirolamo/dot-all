@@ -32,22 +32,22 @@ function t() {
     make::run("./tangle.awk *.org")
 }
 
-function install_emacs(_source_archive) {
-    _source_archive = make::download("emacs",
+function install_emacs() {
+    tarfile = make::download("emacs",
         "http://ftpmirror.gnu.org/emacs/emacs-27.2.tar.xz",
         "4c3d9ff35b2ab2fe518dc7eb3951e128")
-    make::compile(_source_archive,
-                  "./configure --prefix=$HOME/apps/emacs --with-modules --with-cairo\n" \
-                  "make -j 4\n" \
-                  "make install\n")
+    make::compile(tarfile,
+        "./configure --prefix=$HOME/apps/emacs --with-modules --with-cairo\n" \
+        "make -j 4\n" \
+        "make install\n")
 }
 
 function install_lua54() {
-    _source_archive = make::download("lua54",
-                                     "https://www.lua.org/ftp/lua-5.4.0.tar.gz",
-                                     "dbf155764e5d433fc55ae80ea7060b60")
-    make::compile(_source_archive,
-                  "make linux -j 4\n" \
-                  "make INSTALL_TOP=$HOME/apps/lua54 install\n")
+    tarfile = make::download("lua54",
+        "https://www.lua.org/ftp/lua-5.4.0.tar.gz",
+        "dbf155764e5d433fc55ae80ea7060b60")
+    make::compile(tarfile,
+        "make linux -j 4\n" \
+        "make INSTALL_TOP=$HOME/apps/lua54 install\n")
 }
 
