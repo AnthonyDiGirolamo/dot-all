@@ -41,7 +41,7 @@ BEGIN {
     for (; Optind < ARGC; Optind++) {
         _DEBUG(sprintf("\tARGV[%d] = <%s>", Optind, ARGV[Optind]))
         # Indirect call args as functions
-        the_function = ARGV[Optind]
+        the_function = "target_" ARGV[Optind]
         _result = @the_function()
     }
 }
@@ -52,6 +52,15 @@ function usage() {
     print "  -v, --verbose     show debug output"
     print "  -d, --dry-run     don't write any files"
     exit 1
+}
+
+# TARGET functions
+function target_test() {
+    print "Run test"
+}
+
+function target_lint() {
+    print "Run lint"
 }
 
 # Functions from tangle.awk

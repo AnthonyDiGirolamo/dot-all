@@ -86,43 +86,33 @@ function getopt(argc, argv, options, longopts,
     }
 }
 
-function test() {
-    print "function test"
-}
-function lint() {
-    print "function lint"
-}
-
-BEGIN {
-    Opterr = 1    # default is to diagnose
-    Optind = 1    # skip ARGV[0]
-    # _getopt_test = 1
-
-    # test program
-    if (_getopt_test) {
-        _myshortopts = "ab:cd"
-        _mylongopts = "longa,longb:,otherc,otherd"
-
-        # Debug print
-        # for (i = 0; i < ARGC; i++)
-        #     printf("\tARGV[%d] = <%s>\n", i, ARGV[i])
-
-        while ((_go_c = getopt(ARGC, ARGV, _myshortopts, _mylongopts)) != -1)
-            printf("c = <%s>, Optarg = <%s>\n", _go_c, Optarg)
-
-        # Erase handled args
-        for (i = 1; i < Optind; i++)
-            ARGV[i] = ""
-        # Debug print
-        # for (i = 1; i < ARGC; i++)
-        #     printf("\tARGV[%d] = <%s>\n", i, ARGV[i])
-
-        printf("non-option arguments:\n")
-        for (; Optind < ARGC; Optind++) {
-            printf("\tARGV[%d] = <%s>\n", Optind, ARGV[Optind])
-            # Indirect call args as functions
-            the_function = ARGV[Optind]
-            _result = @the_function()
-        }
-    }
-}
+# BEGIN {
+#     Opterr = 1    # default is to diagnose
+#     Optind = 1    # skip ARGV[0]
+#     # _getopt_test = 1
+#
+#     # test program
+#     if (_getopt_test) {
+#         _myshortopts = "ab:cd"
+#         _mylongopts = "longa,longb:,otherc,otherd"
+#
+#         # Debug print
+#         # for (i = 0; i < ARGC; i++)
+#         #     printf("\tARGV[%d] = <%s>\n", i, ARGV[i])
+#
+#         while ((_go_c = getopt(ARGC, ARGV, _myshortopts, _mylongopts)) != -1)
+#             printf("c = <%s>, Optarg = <%s>\n", _go_c, Optarg)
+#
+#         # Erase handled args
+#         for (i = 1; i < Optind; i++)
+#             ARGV[i] = ""
+#         # Debug print
+#         # for (i = 1; i < ARGC; i++)
+#         #     printf("\tARGV[%d] = <%s>\n", i, ARGV[i])
+#
+#         printf("non-option arguments:\n")
+#         for (; Optind < ARGC; Optind++) {
+#             printf("\tARGV[%d] = <%s>\n", Optind, ARGV[Optind])
+#         }
+#     }
+# }
