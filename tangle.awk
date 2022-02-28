@@ -59,118 +59,172 @@
 # To lint this file, run:
 #   gawk --lint=no-ext -f tangle.awk *.org
 
-# Helper Fuctions
+# Set some globals
+BEGIN {
+    LOG_DEBUG = 0
+    DRYRUN = 0
+    if ("TANGLEAWK_LOG" in ENVIRON &&
+        ENVIRON["TANGLEAWK_LOG"] != "")
+        LOG_DEBUG = 1
+    if ("TANGLEAWK_DRYRUN" in ENVIRON &&
+        ENVIRON["TANGLEAWK_DRYRUN"] != "")
+        DRYRUN = 1
 
-# Join an array into a string (ignoring empty strings)
-function join(array, start, end, sep,
-              _result, _i) {
-    if (sep == "")
-       sep = " "
-    else if (sep == SUBSEP) # magic value
-       sep = ""
-    result = array[start]
-    for (_i = start + 1; _i <= end; _i++)
-        if (array[_i] != "")
-            result = result sep array[_i]
-    return result
+    IGNORECASE = 1
+    tangle_prop_regex = @/^\s*#\+property.*header-args.*:tangle\s*(\S.*)$/
+
+    begin_src_regex = @/^\s*#\+begin_src/
+    end_src_regex = @/^\s*#\+end_src/
+    begin_src_tangle_or_eval_regex = @/^\s*#\+begin_src.*(:tangle|:eval)/
+
+    begin_src_tangle_to_end_regex  = @/^\s*#\+begin_src.*:tangle\s*(\S.*)$/
+    begin_src_eval_to_end_regex = @/^\s*#\+begin_src (sh|shell) .*:eval\s*(\S.*)$/
+
+    double_quoted_value_regex = @/^"([^"]+)"/
+    unquoted_value_regex = @/\s*(\S+)\s*.*/
+    yes_or_no_regex = @/^['"]?(yes|t|no|nil)['"]?/
+    no_or_nil_regex = @/^['"]?(no|nil)['"]?/
+    org_escaped_asterix_regex = @/^(\s*,[*])/
+
+    # (if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")
+    elisp_file_exists_p_regex = @/\(if\s*\(file-exists-p\s*"([^"]+)"\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
+    # (if (string-suffix-p "chip" hostname) "~/.i3/config" "no")
+    elisp_string_suffix_p_regex = @/\(if\s*\(string-suffix-p\s*"([^"]+)"\s*([^)]+)\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
+    # (if (eq system-type 'windows-nt) "yes" "no")
+    elisp_system_type_regex = @/\(if\s*\(eq system-type\s*'([^)]+)\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
+
+    uname_macos_regex = @/(darwin)/
+    uname_msys_regex = @/(mingw|msys)/
+    uname = ""
+    uname_system_type = _get_uname_system_type()
+    hostname = _get_hostname()
+
+    # Src block condition attributes
+    FILE_EXPRESSION = "file_expression"
+    CONDITION_TYPE = "condition_type"
+    # Expected values:
+    #   raw_value, system_type, file_exists_p, string_suffix_p
+    CONDITION_DATA1 = "condition_data1"
+    CONDITION_DATA2 = "condition_data2"
+    CONDITION_TRUE_CASE = "condition_true_case"
+    CONDITION_FALSE_CASE = "condition_false_case"
 }
 
-# Terminal color wrap functions
-
-function wrap_cli_color(colorcode, text) {
-    if (ENVIRON["TERM"] == "dumb")
-        return text
-    else
-        return sprintf("\033[%dm%s\033[0m", colorcode, text)
+BEGINFILE {
+    start_new_file()
 }
 
-function cli_green(text) { return wrap_cli_color(32, text) }
-function cli_warning(text) { return wrap_cli_color(33, text) }
-function cli_error(text) { return wrap_cli_color(31, text) }
-function cli_debug(text) { return wrap_cli_color(35, text) }
+# Check for a header-args :tangle property and save the filename
+# E.g. #+PROPERTY: header-args :tangle "~/.emacs.d/README.el"
+match($0, tangle_prop_regex, group) {
+    tangle_prop_file_name = group[1]
+    # init the file contents
 
-# Print a log message if TANGLEAWK_LOG is env var is set.
-function _DEBUG(text) {
-    if (LOG_DEBUG)
-        print cli_debug("[DEBUG] ") text
+    # current_block_filename = make_block_name(total_block_count, tangle_file_name())
+    tangled_files[tangle_file_name()] = ""
 }
 
-function print_tag_line(tag, text) {
-    if (ENVIRON["TERM"] == "dumb")
-        print "[" tag "]", text
-    else
-        print wrap_cli_color(36, "[" tag "]"), text
+# Check for an end block line
+#   Should come before in_block so the end_src line isn't printed
+match($0, end_src_regex) {
+    if (in_block && tangle_file_name())
+        # output one extra line break for this block
+        tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n"
+    reset_block_variables()
 }
 
-function find_index_ending_in(index_pattern, ary) {
-    # check for patterns matching the end of the line
-    p = index_pattern"$"
-    for (i in ary)
-        if (i ~ p)
-            return i
-    return 0
-}
-
-# function print_array_indexes(a) {
-#     for (i in a)
-#         print "["i"]: "
-# }
-
-# function print_array(a) {
-#     for (i in a)
-#         print "["i"]: '"a[i]"'"
-# }
-
-function _DEBUG_ARRAY(a) {
-    for (i in a)
-        _DEBUG("[" i "]: '" a[i] "'")
-}
-
-function basename(path,
-                  _path_array) {
-    split(path, _path_array, "/")
-    return _path_array[length(_path_array)]
-}
-
-function dirname(path,
-                 _path_array) {
-    split(path, _path_array, "/")
-    return join(_path_array, 1, length(_path_array)-1, "/")
-}
-
-function trim_whitespace(text,
-                         _trimmed_text) {
-    trimmed_text = text
-    sub(/^\s+/, "", trimmed_text)
-    sub(/\s+$/, "", trimmed_text)
-    return trimmed_text
-}
-
-function _get_uname_system_type(_system_type) {
-    while (("uname -a" |& getline line) > 0) {
-        uname = line
+# If we are inside a src block, capture the current line
+in_block {
+    current_line = $0
+    current_block_line_number += 1
+    # get starting indent length on the first line with text
+    if (!current_block_indent) {
+        # capture leading spaces substring
+        if (match(current_line, /^(\s+)\S/, spacegroup))
+            current_block_indent = spacegroup[1]
     }
-    close("uname -a")
-    _DEBUG("uname = " uname)
-    _system_type = "gnu/linux"
-    if (uname ~ uname_msys_regex)
-        _system_type = "windows-nt"
-    else if (uname ~ uname_macos_regex)
-        _system_type = "darwin"
-    _system_type = trim_whitespace(_system_type)
-    _DEBUG("uname_system_type = " _system_type)
-    return _system_type
+    # if there is a filename and it isn't no
+    if (tangle_file_name()) {
+        # remove leading indentation
+        sub(current_block_indent, "", current_line)
+        # check for an escaped asterix and remove the comma
+        if (match(current_line, org_escaped_asterix_regex, mg)) {
+            replacement = mg[1]
+            sub(/,[*]/, "*", replacement)
+            sub(org_escaped_asterix_regex, replacement, current_line)
+        }
+        # append the line and a linebreak
+        if (tangle_file_name() in tangled_files) {
+            tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n" current_line
+        }
+        # If this is the first line
+        else {
+            tangled_files[tangle_file_name()] = current_line
+        }
+        # print current_block_line_number,":",current_line
+    }
 }
 
-function _get_hostname(_hostname) {
-    while (("hostname" |& getline line) > 0) {
-        _hostname = line
-    }
-    close("hostname")
-    _hostname = trim_whitespace(_hostname)
-    _DEBUG("hostname = " _hostname)
-    return _hostname
+# Check for start block line
+#   Should come after in_block so the end_src line isn't printed
+match($0, begin_src_regex) {
+    handle_tangle_or_eval_line($0)
 }
+
+ENDFILE {
+    delete final_tangled_file_list
+
+    outfile = ".cache/" FILENAME
+    sub(/\.org$/, ".out", outfile)
+    # Move existing .out file to .out.last
+
+    if (!DRYRUN) {
+        print "test -f "outfile" && cp "outfile" "outfile".last && rm "outfile | "sh"
+        close("sh")
+    }
+
+    # Traverse array ordered by indices in ascending order compared as strings
+    PROCINFO["sorted_in"] = "@ind_str_asc"
+
+    # print_array_indexes(tangled_files)
+    for (file_name in tangled_files) {
+        _DEBUG(cli_warning(file_name))
+        # run script blocks
+        if (match(file_name, /(BLOCK[0-9]+) eval-([0-9]+)-(sh|shell) (.*)$/, mg)) {
+            shell_type = mg[3]
+            # _DEBUG_ARRAY(block_conditions[file_name])
+            if (get_destination_file_name(file_name) == "yes") {
+                run_script(shell_type, tangled_files[file_name])
+            }
+        }
+        # specific :tangle blocks
+        else if (match(file_name, /^(BLOCK[0-9]+) (.*)$/, mg)) {
+            _DEBUG_ARRAY(block_conditions[file_name])
+            block_prefix = mg[1]  # unused
+            expanded_file_name = mg[2]
+            _DEBUG("[TANGLE] " expanded_file_name)
+
+            write_tangled_file(outfile, file_name,
+                               get_destination_file_name(file_name))
+        }
+        # header-args blocks
+        else {
+            _DEBUG_ARRAY(block_conditions[file_name])
+            _DEBUG("[TANGLE] " file_name)
+            write_tangled_file(outfile, file_name,
+                               get_destination_file_name(file_name))
+        }
+    }
+
+    if (!DRYRUN) {
+        # close all final file names
+        for (file_name in final_tangled_file_list)
+            close(file_name)
+        # close .out file
+        close(outfile)
+    }
+}
+
 
 # Tangle.awk Specific Functions
 function start_new_file() {
@@ -353,117 +407,6 @@ function handle_tangle_or_eval_line(src_line) {
     }
 }
 
-BEGIN {
-    LOG_DEBUG = 0
-    DRYRUN = 0
-    if ("TANGLEAWK_LOG" in ENVIRON &&
-        ENVIRON["TANGLEAWK_LOG"] != "")
-        LOG_DEBUG = 1
-    if ("TANGLEAWK_DRYRUN" in ENVIRON &&
-        ENVIRON["TANGLEAWK_DRYRUN"] != "")
-        DRYRUN = 1
-
-    IGNORECASE = 1
-    tangle_prop_regex = @/^\s*#\+property.*header-args.*:tangle\s*(\S.*)$/
-
-    begin_src_regex = @/^\s*#\+begin_src/
-    end_src_regex = @/^\s*#\+end_src/
-    begin_src_tangle_or_eval_regex = @/^\s*#\+begin_src.*(:tangle|:eval)/
-
-    begin_src_tangle_to_end_regex  = @/^\s*#\+begin_src.*:tangle\s*(\S.*)$/
-    begin_src_eval_to_end_regex = @/^\s*#\+begin_src (sh|shell) .*:eval\s*(\S.*)$/
-
-    double_quoted_value_regex = @/^"([^"]+)"/
-    unquoted_value_regex = @/\s*(\S+)\s*.*/
-    yes_or_no_regex = @/^['"]?(yes|t|no|nil)['"]?/
-    no_or_nil_regex = @/^['"]?(no|nil)['"]?/
-    org_escaped_asterix_regex = @/^(\s*,[*])/
-
-    # (if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")
-    elisp_file_exists_p_regex = @/\(if\s*\(file-exists-p\s*"([^"]+)"\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
-    # (if (string-suffix-p "chip" hostname) "~/.i3/config" "no")
-    elisp_string_suffix_p_regex = @/\(if\s*\(string-suffix-p\s*"([^"]+)"\s*([^)]+)\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
-    # (if (eq system-type 'windows-nt) "yes" "no")
-    elisp_system_type_regex = @/\(if\s*\(eq system-type\s*'([^)]+)\)\s*"([^"]+)"\s*"([^"]+)"\s*\)/
-
-    uname_macos_regex = @/(darwin)/
-    uname_msys_regex = @/(mingw|msys)/
-    uname = ""
-    uname_system_type = _get_uname_system_type()
-    hostname = _get_hostname()
-
-    # Src block condition attributes
-    FILE_EXPRESSION = "file_expression"
-    CONDITION_TYPE = "condition_type"
-    # Expected values:
-    #   raw_value, system_type, file_exists_p, string_suffix_p
-    CONDITION_DATA1 = "condition_data1"
-    CONDITION_DATA2 = "condition_data2"
-    CONDITION_TRUE_CASE = "condition_true_case"
-    CONDITION_FALSE_CASE = "condition_false_case"
-}
-
-BEGINFILE {
-    start_new_file()
-}
-
-# Check for a header-args :tangle property and save the filename
-# E.g. #+PROPERTY: header-args :tangle "~/.emacs.d/README.el"
-match($0, tangle_prop_regex, group) {
-    tangle_prop_file_name = group[1]
-    # init the file contents
-
-    # current_block_filename = make_block_name(total_block_count, tangle_file_name())
-    tangled_files[tangle_file_name()] = ""
-}
-
-# Check for an end block line
-#   Should come before in_block so the end_src line isn't printed
-match($0, end_src_regex) {
-    if (in_block && tangle_file_name())
-        # output one extra line break for this block
-        tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n"
-    reset_block_variables()
-}
-
-# If we are inside a src block, capture the current line
-in_block {
-    current_line = $0
-    current_block_line_number += 1
-    # get starting indent length on the first line with text
-    if (!current_block_indent) {
-        # capture leading spaces substring
-        if (match(current_line, /^(\s+)\S/, spacegroup))
-            current_block_indent = spacegroup[1]
-    }
-    # if there is a filename and it isn't no
-    if (tangle_file_name()) {
-        # remove leading indentation
-        sub(current_block_indent, "", current_line)
-        # check for an escaped asterix and remove the comma
-        if (match(current_line, org_escaped_asterix_regex, mg)) {
-            replacement = mg[1]
-            sub(/,[*]/, "*", replacement)
-            sub(org_escaped_asterix_regex, replacement, current_line)
-        }
-        # append the line and a linebreak
-        if (tangle_file_name() in tangled_files) {
-            tangled_files[tangle_file_name()] = tangled_files[tangle_file_name()] "\n" current_line
-        }
-        # If this is the first line
-        else {
-            tangled_files[tangle_file_name()] = current_line
-        }
-        # print current_block_line_number,":",current_line
-    }
-}
-
-# Check for start block line
-#   Should come after in_block so the end_src line isn't printed
-match($0, begin_src_regex) {
-    handle_tangle_or_eval_line($0)
-}
-
 function write_tangled_file(_outfile, _index_name, _expanded_file_name) {
     if (_expanded_file_name == "")
         return
@@ -554,56 +497,111 @@ function get_destination_file_name(_file_name) {
     return destination_expression
 }
 
-ENDFILE {
-    delete final_tangled_file_list
+# Join an array into a string (ignoring empty strings)
+function join(array, start, end, sep,
+              _result, _i) {
+    if (sep == "")
+       sep = " "
+    else if (sep == SUBSEP) # magic value
+       sep = ""
+    result = array[start]
+    for (_i = start + 1; _i <= end; _i++)
+        if (array[_i] != "")
+            result = result sep array[_i]
+    return result
+}
 
-    outfile = ".cache/" FILENAME
-    sub(/\.org$/, ".out", outfile)
-    # Move existing .out file to .out.last
+function wrap_cli_color(colorcode, text) {
+    if (ENVIRON["TERM"] == "dumb")
+        return text
+    else
+        return sprintf("\033[%dm%s\033[0m", colorcode, text)
+}
 
-    if (!DRYRUN) {
-        print "test -f "outfile" && cp "outfile" "outfile".last && rm "outfile | "sh"
-        close("sh")
+function cli_green(text) { return wrap_cli_color(32, text) }
+function cli_warning(text) { return wrap_cli_color(33, text) }
+function cli_error(text) { return wrap_cli_color(31, text) }
+function cli_debug(text) { return wrap_cli_color(35, text) }
+
+# Print a log message if LOG_DEBUG is true.
+function _DEBUG(text) {
+    if (LOG_DEBUG)
+        print cli_debug("[DEBUG] ") text
+}
+
+function print_tag_line(tag, text) {
+    if (ENVIRON["TERM"] == "dumb")
+        print "[" tag "]", text
+    else
+        print wrap_cli_color(36, "[" tag "]"), text
+}
+
+function find_index_ending_in(index_pattern, ary) {
+    # check for patterns matching the end of the line
+    p = index_pattern"$"
+    for (i in ary)
+        if (i ~ p)
+            return i
+    return 0
+}
+
+function print_array_indexes(a) {
+    for (i in a)
+        print "["i"]"
+}
+
+function print_array(a) {
+    for (i in a)
+        print "["i"]: '"a[i]"'"
+}
+
+function _DEBUG_ARRAY(a) {
+    for (i in a)
+        _DEBUG("[" i "]: '" a[i] "'")
+}
+
+function basename(path,
+                  _path_array) {
+    split(path, _path_array, "/")
+    return _path_array[length(_path_array)]
+}
+
+function dirname(path,
+                 _path_array) {
+    split(path, _path_array, "/")
+    return join(_path_array, 1, length(_path_array)-1, "/")
+}
+
+function trim_whitespace(text,
+                         _trimmed_text) {
+    trimmed_text = text
+    sub(/^\s+/, "", trimmed_text)
+    sub(/\s+$/, "", trimmed_text)
+    return trimmed_text
+}
+
+function _get_uname_system_type(_system_type) {
+    while (("uname -a" |& getline line) > 0) {
+        uname = line
     }
+    close("uname -a")
+    _DEBUG("uname = " uname)
+    _system_type = "gnu/linux"
+    if (uname ~ uname_msys_regex)
+        _system_type = "windows-nt"
+    else if (uname ~ uname_macos_regex)
+        _system_type = "darwin"
+    _system_type = trim_whitespace(_system_type)
+    _DEBUG("uname_system_type = " _system_type)
+    return _system_type
+}
 
-    # Traverse array ordered by indices in ascending order compared as strings
-    PROCINFO["sorted_in"] = "@ind_str_asc"
-
-    # print_array_indexes(tangled_files)
-    for (file_name in tangled_files) {
-        _DEBUG(cli_warning(file_name))
-        # run script blocks
-        if (match(file_name, /(BLOCK[0-9]+) eval-([0-9]+)-(sh|shell) (.*)$/, mg)) {
-            shell_type = mg[3]
-            # _DEBUG_ARRAY(block_conditions[file_name])
-            if (get_destination_file_name(file_name) == "yes") {
-                run_script(shell_type, tangled_files[file_name])
-            }
-        }
-        # specific :tangle blocks
-        else if (match(file_name, /^(BLOCK[0-9]+) (.*)$/, mg)) {
-            _DEBUG_ARRAY(block_conditions[file_name])
-            block_prefix = mg[1]  # unused
-            expanded_file_name = mg[2]
-            _DEBUG("[TANGLE] " expanded_file_name)
-
-            write_tangled_file(outfile, file_name,
-                               get_destination_file_name(file_name))
-        }
-        # header-args blocks
-        else {
-            _DEBUG_ARRAY(block_conditions[file_name])
-            _DEBUG("[TANGLE] " file_name)
-            write_tangled_file(outfile, file_name,
-                               get_destination_file_name(file_name))
-        }
+function _get_hostname(_hostname) {
+    while (("hostname" |& getline line) > 0) {
+        _hostname = line
     }
-
-    if (!DRYRUN) {
-        # close all final file names
-        for (file_name in final_tangled_file_list)
-            close(file_name)
-        # close .out file
-        close(outfile)
-    }
+    close("hostname")
+    _hostname = trim_whitespace(_hostname)
+    _DEBUG("hostname = " _hostname)
+    return _hostname
 }

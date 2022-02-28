@@ -86,6 +86,13 @@ function getopt(argc, argv, options, longopts,
     }
 }
 
+function test() {
+    print "function test"
+}
+function lint() {
+    print "function lint"
+}
+
 BEGIN {
     Opterr = 1    # default is to diagnose
     Optind = 1    # skip ARGV[0]
@@ -111,9 +118,11 @@ BEGIN {
         #     printf("\tARGV[%d] = <%s>\n", i, ARGV[i])
 
         printf("non-option arguments:\n")
-        for (; Optind < ARGC; Optind++)
+        for (; Optind < ARGC; Optind++) {
             printf("\tARGV[%d] = <%s>\n", Optind, ARGV[Optind])
-
-
+            # Indirect call args as functions
+            the_function = ARGV[Optind]
+            _result = @the_function()
+        }
     }
 }
