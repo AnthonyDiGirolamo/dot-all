@@ -103,9 +103,9 @@ function usage() {
 function run(command,
              _return_value) {
     _return_value = 0
-    cli::print_debug("[RUN] " _command)
+    cli::print_debug("[RUN] " command)
     if (!make::DRYRUN) {
-        _return_value = system(_command)
+        _return_value = system(command)
         system("")  # flush output
     }
     return _return_value == 0
