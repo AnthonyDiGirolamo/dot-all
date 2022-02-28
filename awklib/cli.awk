@@ -14,12 +14,23 @@ function warning(text) { return color(33, text) }
 function error(text) { return color(31, text) }
 function debug(text) { return color(35, text) }
 
-function print_tag_line(tag, text) {
-    if (ENVIRON["TERM"] == "dumb")
-        print "[" tag "]", text
-    else
-        print color(36, "[" tag "]"), text
-}
+# Black:   30
+# Red:     31
+# Green:   32
+# Yellow:  33
+# Blue:    34
+# Magenta: 35
+# Cyan:    36
+# White:   37
+# Bright Black:   30;1
+# Bright Red:     31;1
+# Bright Green:   32;1
+# Bright Yellow:  33;1
+# Bright Blue:    34;1
+# Bright Magenta: 35;1
+# Bright Cyan:    36;1
+# Bright White:   37;1
+# Reset:   0
 
 function print_debug(text) {
     if (LOG_DEBUG)

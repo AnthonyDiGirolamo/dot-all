@@ -1,5 +1,6 @@
 #!/usr/bin/gawk -E
-@include "lib/make"
+@include "awklib/makefile"
+
 @namespace "make_targets"
 
 function help() {

@@ -1,6 +1,6 @@
 #!/usr/bin/gawk
-@include "lib/getopt"
-@include "lib/cli"
+@include "awklib/cli"
+@include "awklib/getopt"
 
 @namespace "make"
 
@@ -9,11 +9,10 @@ BEGIN {
     awk::Optind = 1
 
     cli::LOG_DEBUG = 0
-    awk::DRYRUN = 0
-    Help[""] = ""
+    make::DRYRUN = 0
 
     # Traverse array ordered by indices in ascending order compared as strings
-    PROCINFO["sorted_in"] = "@ind_str_asc"
+    # PROCINFO["sorted_in"] = "@ind_str_asc"
 
     _myshortopts = "vdh"
     _mylongopts = "verbose,dry-run,help"
@@ -26,7 +25,7 @@ BEGIN {
             break
         case "d":
         case "dry-run":
-            awk::DRYRUN = 1
+            make::DRYRUN = 1
             break
         case "?":
         case "h":
@@ -93,19 +92,16 @@ function _run_target(target_name) {
     }
 }
 
-function set_help(target_name, target_help) {
-    MakeHelp[target_name] = target_help
-}
-
 function usage() {
     print "usage: make.awk [-v] [-d] TARGET ..."
     print "options:"
     print "  -v, --verbose     show debug output"
-    print "  -d, --dry-run     don't write any files"
+    print "  -d, --dry-run     don't run any system commands"
     exit 1
 }
 
 function run(_command) {
     cli::print_debug("[RUN] " _command)
-    system(_command)
+    if (!make::DRYRUN)
+        system(_command)
 }
