@@ -56,41 +56,45 @@ BEGIN {
         targets_run += 1
     }
 
-    if (targets_run == 0)
-        usage()
+    if (targets_run == 0) {
+        if ("make_targets::help" in FUNCTAB)
+            make_targets::help()
+        # cli::print_debug_array(FUNCTAB)
+        # usage()
+    }
 
     exit 0
+}
+
+function print_help(name, help_text,
+                    max_length, target_length, format_string, i) {
+    max_length = 0
+    for (i in FUNCTAB) {
+        if (match(i, /^make_targets::(.*)$/, mg)) {
+            target_length = length(mg[1])
+            if (target_length > max_length)
+                max_length = target_length
+        }
+    }
+    format_string = sprintf("%%-%ds %%s\n", max_length + 4 + length(cli::cyan("")))
+    printf(format_string, cli::cyan(name), help_text)
 }
 
 function _run_target(target_name) {
     # Indirect call args as functions
     the_function = "make_targets::" target_name
-    print( cli::green("[TARGET] ")  target_name)
-    _result = @the_function()
-}
 
-function help(target_name, target_help) {
-    MakeHelp[target_name] = target_help
-}
-
-function print_target_help(i) {
-    # for(i in SYMTAB) {
-    #     # if (match(i, /^make_targets::help_(.*)$/, mg)) {
-    #     if (match(i, /^make::(.*)$/, mg)) {
-    #         print(i, mg[1])
-    #         if (awk::isarray(SYMTAB[i])) {
-    #             cli::print_debug_array(SYMTAB[i])
-    #         }
-    #         else {
-    #             print mg[1], "\t", SYMTAB[i]
-    #         }
-    #     }
-    # }
-
-    print "Target Help"
-    for (i in Help) {
-        print i, "\t", Help[i]
+    if (the_function in FUNCTAB) {
+        print( cli::green("[TARGET] ")  target_name)
+        _result = @the_function()
     }
+    else {
+        print cli::error("[ERROR]"), "Unknown target:", target_name
+    }
+}
+
+function set_help(target_name, target_help) {
+    MakeHelp[target_name] = target_help
 }
 
 function usage() {
@@ -98,9 +102,6 @@ function usage() {
     print "options:"
     print "  -v, --verbose     show debug output"
     print "  -d, --dry-run     don't write any files"
-
-    print_target_help()
-    # cli::print_debug_array(FUNCTAB)
     exit 1
 }
 

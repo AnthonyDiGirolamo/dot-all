@@ -9,6 +9,7 @@ function color(colorcode, text) {
 }
 
 function green(text) { return color(32, text) }
+function cyan(text) { return color(36, text) }
 function warning(text) { return color(33, text) }
 function error(text) { return color(31, text) }
 function debug(text) { return color(35, text) }
