@@ -1,22 +1,31 @@
 #!/usr/bin/gawk -f
 @include "tangle"
 @include "assert"
+@include "cli"
 
 BEGIN {
-    _assert_exit = 0
+    assert::set_keep_going()
 
-    assert::Equal(trim_whitespace("  something   "),
+    run_tests()
+
+    exit assert::get_exit_code()
+}
+
+function run_tests() {
+    assert::Equal(tangle::trim_whitespace("  something   "),
                   "something")
-    assert::Equal(trim_whitespace("  \nhello\nthere\n\n "),
+    assert::Equal(tangle::trim_whitespace("  \nhello\nthere\n\n "),
                   "hello\nthere")
 
-    assert::Equal(dirname("/c/Users/test/something"),
+    assert::Equal(tangle::dirname("/c/Users/test/something"),
                   "/c/Users/test")
-    assert::Equal(basename("/c/Users/test/something"),
+    assert::Equal(tangle::basename("/c/Users/test/something"),
                   "something")
+    print ""
 
-    printf "\n" > "/dev/stderr"
-    exit _assert_exit
+    cli::LOG_DEBUG = 1
+    # Print all path namespace variables
+    cli::print_debug_array(SYMTAB, "tangle::")
 }
 
 

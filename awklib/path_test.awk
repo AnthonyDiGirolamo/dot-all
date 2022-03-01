@@ -48,5 +48,17 @@ function run_tests() {
     cli::LOG_DEBUG = 1
     # Print all path namespace variables
     cli::print_debug_array(SYMTAB, "path::")
-}
+    path::glob("..", "\.org$")
 
+    # Traverse array ordered by indices in ascending order compared as strings
+    _original_sort = PROCINFO["sorted_in"]
+    PROCINFO["sorted_in"] = "@ind_str_asc"
+
+    for (f in path::globdata_flattened)
+        print path::globdata_flattened[f]
+
+    PROCINFO["sorted_in"] = _original_sort
+
+    cli::print_debug_array(SYMTAB, "path::")
+
+}

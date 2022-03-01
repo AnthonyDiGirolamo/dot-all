@@ -87,6 +87,73 @@ function md5sum_matches(target_path, expected_hash,
     return _matches
 }
 
+function glob(target_path,
+              pattern,
+              _file,
+              _pathlist, _flags, _result,
+              _original_sort) {
+
+    _pathlist[0] = target_path
+    _result = awk::fts(_pathlist,
+                       awk::FTS_LOGICAL,
+                       globdata)
+
+    _original_sort = PROCINFO["sorted_in"]
+    # Traverse array ordered by indices in ascending order compared as strings
+    PROCINFO["sorted_in"] = "@ind_str_asc"
+
+    delete globdata_flattened
+    globdata_pattern = ""
+    if (pattern) {
+        globdata_pattern = pattern
+    }
+
+    process_array(globdata[target_path], "", "path::save_glob_file", 0)
+
+    PROCINFO["sorted_in"] = _original_sort
+}
+
+function save_glob_file(varname, element) {
+    if (globdata_pattern == "") {
+        globdata_flattened[varname] = element
+    }
+    else if (varname ~ globdata_pattern) {
+        globdata_flattened[varname] = element
+    }
+}
+
+function process_array(arr, name, process, do_arrays,
+                       i, new_name) {
+    for (i in arr) {
+        new_name = (name i "/")
+
+        # Skip . which represents the current
+        if (i == ".")
+            continue
+
+        if (awk::isarray(arr[i])) {
+
+            if ("path" in arr[i])
+                @process(name i, arr[i]["path"])
+
+            # TODO: depth check here
+
+            # if (do_arrays)
+            #     @process(new_name, arr[i])
+
+            if (length(arr[i]) >= 2 && length(arr[i]) <= 3 && ("path" in arr[i]) && ("stat" in arr[i])) {
+            }
+            else {
+                process_array(arr[i], new_name, process, do_arrays)
+            }
+        }
+        else {
+            @process(new_name, arr[i])
+        }
+    }
+}
+
+
 # Private functions
 
 # Join an array into a string (ignoring empty strings)

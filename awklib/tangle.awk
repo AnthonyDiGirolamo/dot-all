@@ -58,6 +58,7 @@
 #
 # To lint this file, run:
 #   gawk --lint=no-ext -f tangle.awk *.org
+@namespace "tangle"
 
 # Set some globals
 BEGIN {

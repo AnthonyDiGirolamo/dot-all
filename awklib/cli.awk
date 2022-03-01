@@ -58,7 +58,7 @@ function print_debug_array(a, prefix,
                 # print_debug_array(a[i])
             }
             else {
-            print_debug("[" i "]: '" a[i] "'")
+            print_debug(i ": '" a[i] "'")
             }
         }
     }
