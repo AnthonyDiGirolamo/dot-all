@@ -12,8 +12,8 @@ BEGIN {
 
     cli::LOG_DEBUG = 0
 
-    _myshortopts = "vg:h"
-    _mylongopts = "verbose,file-pattern:help"
+    _myshortopts = "vg:ih"
+    _mylongopts = "verbose,file-pattern:ignore-case,help"
 
     file_pattern = ""
     search_pattern = ""
@@ -21,6 +21,7 @@ BEGIN {
 
     while ((_option = awk::getopt(ARGC, ARGV, _myshortopts, _mylongopts)) != -1) {
         switch (_option) {
+
         case "v":
         case "verbose":
             cli::LOG_DEBUG = 1
@@ -28,6 +29,10 @@ BEGIN {
         case "g":
         case "file-pattern":
             file_pattern = awk::Optarg
+            break
+        case "i":
+        case "ignore-case":
+            IGNORECASE = 1
             break
         case "?":
         case "h":
@@ -70,10 +75,15 @@ BEGIN {
     path::glob(search_path, file_pattern)
     with::sort_index_string_asc("ripawk::search_all_files")
 
-    exit 0
+    _exit_code = 1
+    if (global_match_count > 0)
+        _exit_code = 0
+    exit _exit_code
 }
 
 function search_all_files() {
+    global_match_count = 0
+
     # Print filenames
     for (f in path::globdata_flattened) {
         search(path::globdata_flattened[f], search_pattern)
@@ -86,6 +96,7 @@ function search(file_path, search_pattern,
     _firstmatch_found = 0
     while ((getline _line < file_path) > 0) {
         if (_line ~ search_pattern) {
+            global_match_count++
             # Print filename
             if (!_firstmatch_found) {
                 print "\n" cli::magenta(file_path)
@@ -114,7 +125,8 @@ function readfile(file_path,
 function usage() {
     print "usage: rip.awk [-v] [-g] PATTERN PATH"
     print "options:"
-    print "  -v, --verbose       show debug output"
-    print "  -g, --file-pattern  Optional: regex pattern for files to search"
+    print "  -v, --verbose       Show debug output."
+    print "  -g, --file-pattern  Regex pattern to pre-filter files to be searched."
+    print "  -i, --ignore-case   Case insensitive search."
     exit 1
 }
