@@ -2,6 +2,7 @@
 @include "awklib/cli"
 @include "awklib/getopt"
 @include "awklib/path"
+@include "awklib/with"
 
 @namespace "ripawk"
 
@@ -48,6 +49,14 @@ BEGIN {
         search_path = ARGV[awk::Optind + 1]
 
     # Debug print
+    # cli::print_debug("Non-option arguments:")
+    # for (; awk::Optind < ARGC; awk::Optind++) {
+    #     cli::print_debug(sprintf("\tARGV[%d] = <%s>",
+    #                              awk::Optind,
+    #                              ARGV[awk::Optind]))
+    # }
+
+    # Debug print
     cli::print_debug("  file_pattern = " file_pattern)
     cli::print_debug("search_pattern = " search_pattern)
     cli::print_debug("   search_path = " search_path)
@@ -57,29 +66,18 @@ BEGIN {
         usage()
     }
 
-    # cli::print_debug("Non-option arguments:")
-    # for (; awk::Optind < ARGC; awk::Optind++) {
-    #     cli::print_debug(sprintf("\tARGV[%d] = <%s>",
-    #                              awk::Optind,
-    #                              ARGV[awk::Optind]))
-    # }
-
     # Collect files matching the pattern
     path::glob(search_path, file_pattern)
+    with::sort_index_string_asc("ripawk::search_all_files")
 
-    # Traverse array ordered by indices in ascending order compared as strings
-    _original_sort = PROCINFO["sorted_in"]
-    PROCINFO["sorted_in"] = "@ind_str_asc"
+    exit 0
+}
 
+function search_all_files() {
     # Print filenames
     for (f in path::globdata_flattened) {
         search(path::globdata_flattened[f], search_pattern)
     }
-    # TODO: print matching lines in each file
-
-    PROCINFO["sorted_in"] = _original_sort
-
-    exit 0
 }
 
 function search(file_path, search_pattern,
