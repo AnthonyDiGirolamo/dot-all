@@ -15,7 +15,7 @@ BEGIN {
     _mylongopts = "verbose,file-pattern:help"
 
     file_pattern = ""
-    pattern = ""
+    search_pattern = ""
     search_path = "."
 
     while ((_option = awk::getopt(ARGC, ARGV, _myshortopts, _mylongopts)) != -1) {
@@ -41,18 +41,18 @@ BEGIN {
     for (i = 1; i < awk::Optind; i++)
         ARGV[i] = ""
 
-    # First arg is the pattern
-    pattern = ARGV[awk::Optind]
+    # First arg is the search_pattern
+    search_pattern = ARGV[awk::Optind]
     # Second arg if present is the search path
     if (awk::Optind + 1 in ARGV)
         search_path = ARGV[awk::Optind + 1]
 
     # Debug print
-    cli::print_debug("file_pattern = " file_pattern)
-    cli::print_debug("     pattern = " pattern)
-    cli::print_debug(" search_path = " search_path)
+    cli::print_debug("  file_pattern = " file_pattern)
+    cli::print_debug("search_pattern = " search_pattern)
+    cli::print_debug("   search_path = " search_path)
 
-    if (pattern == "") {
+    if (search_pattern == "") {
         print cli::error("Error: ") "Missing pattern"
         usage()
     }
@@ -73,7 +73,7 @@ BEGIN {
 
     # Print filenames
     for (f in path::globdata_flattened) {
-        print path::globdata_flattened[f]
+        search(path::globdata_flattened[f], search_pattern)
     }
     # TODO: print matching lines in each file
 
@@ -81,6 +81,37 @@ BEGIN {
 
     exit 0
 }
+
+function search(file_path, search_pattern,
+                _linenumber, _line, _firstmatch_found) {
+    _linenumber = 1
+    _firstmatch_found = 0
+    while ((getline _line < file_path) > 0) {
+        if (_line ~ search_pattern) {
+            # Print filename
+            if (!_firstmatch_found) {
+                print "\n" cli::magenta(file_path)
+                _firstmatch_found = 1
+            }
+            # Print line number and matching line
+            print cli::green(_linenumber) ":" _line
+        }
+        _linenumber++
+    }
+    close(file_path)
+}
+
+# readfile -- read an entire file into a variable
+function readfile(file_path,
+                  _text, _original_rs) {
+    _original_rs = RS
+    RS = "^$"
+    getline _text < file_path
+    close(file_path)
+    RS = _original_rs
+    return _text
+}
+
 
 function usage() {
     print "usage: rip.awk [-v] [-g] PATTERN PATH"
