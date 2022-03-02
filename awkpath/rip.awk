@@ -1,8 +1,8 @@
 #!/usr/bin/gawk -E
-@include "awklib/cli"
-@include "awklib/getopt"
-@include "awklib/path"
-@include "awklib/with"
+@include "cli"
+@include "getopt"
+@include "path"
+@include "with"
 
 @namespace "ripawk"
 

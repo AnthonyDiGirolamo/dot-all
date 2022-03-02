@@ -45,7 +45,10 @@
     add_directory_to_path $HOME/Android/Sdk/platform-tools
     add_directory_to_path $HOME/apps/fish/bin
     add_directory_to_path $HOME/apps/emacs/bin
+
     add_directory_to_path $HOME/dot-all/bin
+    add_directory_to_path $HOME/dot-all/awkpath
+    set -x AWKPATH $HOME/dot-all/awkpath
 
     add_directory_to_path /usr/local/go/bin
     if not set -q VIRTUAL_ENV

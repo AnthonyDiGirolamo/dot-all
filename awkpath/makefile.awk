@@ -1,7 +1,7 @@
 #!/usr/bin/gawk
-@include "awklib/cli"
-@include "awklib/getopt"
-@include "awklib/path"
+@include "cli"
+@include "getopt"
+@include "path"
 
 @namespace "make"
 

@@ -1,6 +1,6 @@
 #!/usr/bin/gawk -E
-@include "awklib/makefile"
-@include "awklib/path"
+@include "awkpath/makefile"
+@include "awkpath/path"
 
 @namespace "make_targets"
 
@@ -19,7 +19,7 @@ function build() {
 }
 
 function test() {
-    path::pushd("awklib")
+    path::pushd("awkpath")
     make::run("gawk -f cli_test.awk")
     make::run("gawk -f tangle_test.awk")
     make::run("gawk -f path_test.awk")
@@ -28,12 +28,12 @@ function test() {
 
 function lint() {
     make::run("env TANGLEAWK_DRYRUN=1 " \
-              "gawk --lint=no-ext -f ./awklib/tangle.awk *.org " \
+              "gawk --lint=no-ext -f ./awkpath/tangle.awk *.org " \
               "1>/dev/null")
 }
 
 function t() {
-    make::run("./awklib/tangle.awk *.org")
+    make::run("./awkpath/tangle.awk *.org")
 }
 
 function install_emacs() {
