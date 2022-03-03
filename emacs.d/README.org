@@ -237,7 +237,10 @@
         (when fsize
           (setq amd/font-size fsize))
         (when fname
-          (setq amd/font-name (concat fname "-%d")))
+          (setq amd/font-name
+                (if (string-suffix-p "-%d" fname)
+                    fname
+                  (concat fname "-%d"))))
 
         (set-frame-font (format amd/font-name amd/font-size))
         (add-to-list 'default-frame-alist `(font . ,(format amd/font-name amd/font-size)))
@@ -3223,39 +3226,40 @@
 
   #+begin_src emacs-lisp
     (use-package hydra
-      ;; Use posframe for hydra display
       ;; :init
       ;; (when (display-graphic-p)
-      ;;   (setq hydra-hint-display-type 'posframe))
+      ;;   ;; Use posframe for hydra display
+      ;;   (setq hydra-hint-display-type 'posframe
+      ;;         hydra-posframe-show-params
+      ;;         '(:internal-border-width
+      ;;           1
+      ;;           :internal-border-color
+      ;;           "cyan"
+      ;;           :poshandler
+      ;;           posframe-poshandler-frame-top-left-corner
+      ;;           ;; posframe-poshandler-window-center
+      ;;           ;; posframe-poshandler-frame-center
+      ;;           ;; posframe-poshandler-frame-top-center
+      ;;           ;; posframe-poshandler-frame-top-right-corner
+      ;;           ;; posframe-poshandler-frame-bottom-center
+      ;;           ;; posframe-poshandler-frame-bottom-left-corner
+      ;;           ;; posframe-poshandler-frame-bottom-right-corner
+      ;;           ;; posframe-poshandler-window-center
+      ;;           ;; posframe-poshandler-window-top-center
+      ;;           ;; posframe-poshandler-window-top-left-corner
+      ;;           ;; posframe-poshandler-window-top-right-corner
+      ;;           ;; posframe-poshandler-window-bottom-center
+      ;;           ;; posframe-poshandler-window-bottom-left-corner
+      ;;           ;; posframe-poshandler-window-bottom-right-corner
+      ;;           ;; posframe-poshandler-point-top-left-corner
+      ;;           ;; posframe-poshandler-point-bottom-left-corner
+      ;;           ))
+      ;;   )
       :config
-      (setq hydra-posframe-show-params
-            '(
-              :internal-border-width 1
-              :internal-border-color "cyan"
-              :poshandler
-              ;; posframe-poshandler-window-center
-              ;; posframe-poshandler-frame-center
-              ;; posframe-poshandler-frame-top-center
-              posframe-poshandler-frame-top-left-corner
-              ;; posframe-poshandler-frame-top-right-corner
-              ;; posframe-poshandler-frame-bottom-center
-              ;; posframe-poshandler-frame-bottom-left-corner
-              ;; posframe-poshandler-frame-bottom-right-corner
-              ;; posframe-poshandler-window-center
-              ;; posframe-poshandler-window-top-center
-              ;; posframe-poshandler-window-top-left-corner
-              ;; posframe-poshandler-window-top-right-corner
-              ;; posframe-poshandler-window-bottom-center
-              ;; posframe-poshandler-window-bottom-left-corner
-              ;; posframe-poshandler-window-bottom-right-corner
-              ;; posframe-poshandler-point-top-left-corner
-              ;; posframe-poshandler-point-bottom-left-corner
-              ))
-
       (defhydra hydra-font (:color red :columns 3)
-        ("h"  (lambda () (interactive) (amd/set-font (- amd/font-size 1.0)))
+        ("h"  (lambda () (interactive) (amd/set-font (- amd/font-size 1.0) amd/font-name))
          (format "smaller %.2f" amd/font-size))
-        ("l"  (lambda () (interactive) (amd/set-font (+ amd/font-size 1.0)))
+        ("l"  (lambda () (interactive) (amd/set-font (+ amd/font-size 1.0) amd/font-name))
          (format "larger" amd/font-size))
         ("RET" keyboard-escape-quit "quit" :exit t)
         ("a"  (lambda () (interactive) (amd/set-font amd/font-size "Iosevka SS08 Light"))
