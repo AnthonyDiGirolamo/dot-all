@@ -205,7 +205,7 @@
         (insert (x-export-frames nil 'svg))
         (save-buffer)))
 
-    (defun amd/set-font (&optional fsize)
+    (defun amd/set-font (&optional fsize fname)
       "Set preferred GUI font."
       (interactive)
       (when (display-graphic-p)
@@ -225,7 +225,10 @@
           (setq amd/font-size 18
                 ;; amd/font-name "Iosevka Term SS17 Light-%d:antialias=true:hinting=true:autohint=true:hintstyle=hintfull"
                 ;; amd/font-name "Iosevka Term SS08 Light-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintfull"
-                amd/font-name "PragmataPro-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintnone"
+                ;; amd/font-name "PragmataPro-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintnone"
+                amd/font-name "PragmataPro-%d"
+                ;; amd/font-name "Iosevka Term SS17 Light-%d"
+                ;; amd/font-name "Iosevka SS08 Light-%d"
                 ))
          (t
           (setq amd/font-size 20
@@ -233,6 +236,8 @@
 
         (when fsize
           (setq amd/font-size fsize))
+        (when fname
+          (setq amd/font-name (concat fname "-%d")))
 
         (set-frame-font (format amd/font-name amd/font-size))
         (add-to-list 'default-frame-alist `(font . ,(format amd/font-name amd/font-size)))
@@ -257,6 +262,9 @@
 
     ;; (amd/set-font 25)
     (amd/set-font)
+    ;; (amd/set-font nil "PragmataPro")
+    ;; (amd/set-font nil "Iosevka Term SS17 Light")
+    ;; (amd/set-font nil "Iosevka SS08 Light")
 
     (use-package prog-mode
       :config
@@ -3243,6 +3251,23 @@
               ;; posframe-poshandler-point-top-left-corner
               ;; posframe-poshandler-point-bottom-left-corner
               ))
+
+      (defhydra hydra-font (:color red :columns 3)
+        ("h"  (lambda () (interactive) (amd/set-font (- amd/font-size 1.0)))
+         (format "smaller %.2f" amd/font-size))
+        ("l"  (lambda () (interactive) (amd/set-font (+ amd/font-size 1.0)))
+         (format "larger" amd/font-size))
+        ("RET" keyboard-escape-quit "quit" :exit t)
+        ("a"  (lambda () (interactive) (amd/set-font amd/font-size "Iosevka SS08 Light"))
+         (format "[%s] Iosevka SS08"
+                 (if (string-equal amd/font-name "Iosevka SS08 Light-%d") "x" " ")))
+        ("r"  (lambda () (interactive) (amd/set-font amd/font-size "Iosevka Term SS17 Light"))
+         (format "[%s] Iosevka Term SS17"
+                 (if (string-equal amd/font-name "Iosevka Term SS17 Light-%d") "x" " ")))
+        ("s"  (lambda () (interactive) (amd/set-font amd/font-size "PragmataPro"))
+         (format "[%s] PragmataPro"
+                 (if (string-equal amd/font-name "PragmataPro-%d") "x" " ")))
+        )
     )
 
     (defun amd/hydra-column-hint (column-groups)
@@ -3410,6 +3435,7 @@
          ;; ("po" pt-regexp              "search pt other")
          ("/"  counsel-grep-or-swiper "search grep/swiper")
          (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra")
+         ("F" hydra-font/body  "Font")
          )
 
         (
