@@ -84,6 +84,7 @@
  - [[#screencast][screencast]]
 
 * top level settings
+
   #+begin_src emacs-lisp
     ;;; -*- lexical-binding: t; -*-
 
@@ -153,7 +154,7 @@
     (setq scroll-step 1)
     (setq scroll-conservatively 101)
 
-    (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)) ;; one line at a time
+    (setq mouse-wheel-scroll-amount '(5 ((shift) . 1)) ;; 5 lines at a time
           mouse-wheel-progressive-speed nil            ;; don't accelerate scrolling
           mouse-wheel-follow-mouse 't)                 ;; scroll window under mouse
 
@@ -222,9 +223,9 @@
                 amd/font-name "-xos4-Terminus-normal-normal-normal-*-%d-*-*-*-c-60-iso10646-1"))
          ((eq system-type 'gnu/linux)
           (setq amd/font-size 18
-                amd/font-name "Iosevka Term SS17 Light-%d:antialias=true:hinting=true:autohint=true:hintstyle=hintfull"
+                ;; amd/font-name "Iosevka Term SS17 Light-%d:antialias=true:hinting=true:autohint=true:hintstyle=hintfull"
                 ;; amd/font-name "Iosevka Term SS08 Light-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintfull"
-                ;; amd/font-name "PragmataPro-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintnone"
+                amd/font-name "PragmataPro-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintnone"
                 ))
          (t
           (setq amd/font-size 20
@@ -258,29 +259,31 @@
     (amd/set-font)
 
     (use-package prog-mode
-      :defer t
       :config
       (when (display-graphic-p)
-        (setq prettify-symbols-unprettify-at-point t)
         (setq
+         prettify-symbols-unprettify-at-point t
          prettify-symbols-alist
-         '(("->" . (?\s (Br . Bl) ?))
-           ("-->" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
-           ("==>" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
-           ("=>" . (?\s (Br . Bl) ?))
-           ("--" . (?\s (Br . Bl) ?))
-           ("!=" . (?\s (Br . Bl) ?))
-           ("==" . (?\s (Br . Bl) ?))
-           (">=" . (?\s (Br . Bl) ?))
-           ("<=" . (?\s (Br . Bl) ?))
-           ("~=" . (?\s (Br . Bl) ?))
-           ("&&" . (?\s (Br . Bl) ?))
-           ("#{" . (?\s (Br . Bl) ?))
-           ("lambda" . ?ƛ)
-           ("ERROR" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
-           ("DEBUG" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))))
+         '(("lambda" . ?ƛ)
+           ("self." . ?ⓢ)
+           ;; ("->" . (?\s (Br . Bl) ?))
+           ;; ("-->" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
+           ;; ("==>" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
+           ;; ("=>" . (?\s (Br . Bl) ?))
+           ;; ("--" . (?\s (Br . Bl) ?))
+           ;; ("!=" . (?\s (Br . Bl) ?))
+           ;; ("==" . (?\s (Br . Bl) ?))
+           ;; (">=" . (?\s (Br . Bl) ?))
+           ;; ("<=" . (?\s (Br . Bl) ?))
+           ;; ("~=" . (?\s (Br . Bl) ?))
+           ;; ("&&" . (?\s (Br . Bl) ?))
+           ;; ("#{" . (?\s (Br . Bl) ?))
+           ;; ("ERROR" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
+           ;; ("DEBUG" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
+           ))
         ;; (global-prettify-symbols-mode 1)
-        ))
+      )
+    )
   #+end_src
 
 * libraries
@@ -1552,19 +1555,19 @@
       :commands (eshell
                  amd/eshell-or-project-eshell
                  projectile-run-eshell)
+      :custom
+      (eshell-banner-message
+       '(format "%s %s\n"
+                (propertize (format " %s " (string-trim (buffer-name)))
+                            'face 'mode-line-highlight)
+                (propertize (current-time-string)
+                            'face 'font-lock-keyword-face)))
       :init
       (defun amd/move-modeline-to-header ()
         (interactive)
         (setq header-line-format mode-line-format)
         (hide-mode-line-mode))
       ;; (add-hook 'eshell-mode-hook #'amd/move-modeline-to-header)
-
-      (setq eshell-banner-message
-            '(format "%s %s\n"
-                     (propertize (format " %s " (string-trim (buffer-name)))
-                                 'face 'mode-line-highlight)
-                     (propertize (current-time-string)
-                                 'face 'font-lock-keyword-face)))
 
       (defun eshell-set-keys ()
         (interactive)
@@ -1586,7 +1589,8 @@
          :states '(normal)
          "E"  'eshell-previous-prompt
          "N"  'eshell-next-prompt
-         "G" 'amd/eshell-goto-prompt)
+         "G" 'amd/eshell-goto-prompt
+         "o" 'amd/eshell-goto-prompt)
       )
       (add-hook 'eshell-first-time-mode-hook 'eshell-set-keys)
 
@@ -1753,7 +1757,7 @@
 
         (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
         (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
-        )
+      )
 
       ;; (require 'xterm-color)
       ;; (progn (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
@@ -2117,7 +2121,6 @@
     )
 
   #+end_src
-
 
 * company auto-completion
 
