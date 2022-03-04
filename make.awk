@@ -40,9 +40,30 @@ function install_emacs() {
     tarfile = make::download("emacs",
         "http://ftpmirror.gnu.org/emacs/emacs-27.2.tar.xz",
         "4c3d9ff35b2ab2fe518dc7eb3951e128")
-    make::compile(tarfile,
+    make::compile(make::extract_tar(tarfile),
         "./configure --prefix=$HOME/apps/emacs --with-modules --with-cairo\n" \
         "make -j 4\n" \
+        "make install\n")
+}
+
+function install_emacs28() {
+    clonedir = make::git_clone("emacs28",
+        "https://git.savannah.gnu.org/git/emacs.git",
+        # Branch
+        "emacs-28")
+
+    if (!path::is_file(clonedir "/configure")) {
+        path::pushd(clonedir)
+        make::run("./autogen.sh")
+        path::popd()
+    }
+
+    make::compile(clonedir,
+        "./configure --prefix=$HOME/apps/emacs28 " \
+        "--with-modules --with-cairo " \
+        "--with-native-compilation " \
+	      "--with-x-toolkit=gtk3 --without-xaw3d\n" \
+        "make -j 2\n" \
         "make install\n")
 }
 
@@ -50,7 +71,7 @@ function install_lua54() {
     tarfile = make::download("lua54",
         "https://www.lua.org/ftp/lua-5.4.0.tar.gz",
         "dbf155764e5d433fc55ae80ea7060b60")
-    make::compile(tarfile,
+    make::compile(make::extract_tar(tarfile),
         "make linux -j 4\n" \
         "make INSTALL_TOP=$HOME/apps/lua54 install\n")
 }

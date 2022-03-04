@@ -132,10 +132,9 @@ function run(command,
 }
 
 
-function compile(source_archive, commands,
-                  # local vars
-                 _tmp_dir, _build_dir, _tar_command,
-                 _index, _this_command, _command_list, _result) {
+function extract_tar(source_archive,
+                     # local vars
+                     _tmp_dir, _build_dir, _tar_command) {
     # cd to the dir containing the source_archive
     _tmp_dir = path::dirname(source_archive)
     path::pushd(_tmp_dir)
@@ -152,8 +151,14 @@ function compile(source_archive, commands,
         make::run(_tar_command)
     }
 
+    return _build_dir
+}
+
+function compile(build_dir, commands,
+                  # local vars
+                 _index, _this_command, _command_list, _result) {
     # Cd to extracted source folder
-    path::pushd(_build_dir)
+    path::pushd(build_dir)
 
     # Split the commands string by \n
     split(commands, _command_list, "\n")
@@ -172,11 +177,37 @@ function compile(source_archive, commands,
     # cd to source_archive parent dir
     path::popd()
     # delete extracted source
-    make::run("rm -rf " _build_dir)
+    make::run("rm -rf " build_dir)
     # cd to original dir
     path::popd()
 }
 
+
+function git_clone(tool_name, url, branch, cachedir,
+                   # local vars
+                   _clone_dir) {
+    # Create download folder
+    if (!cachedir)
+        cachedir = ".cache"
+    # Mkdir and cd
+    path::mkdirp(cachedir)
+
+    # Clone folder
+    _clone_dir = path::resolve(cachedir "/" tool_name)
+
+    # Clone dir
+    if (!path::is_dir(_clone_dir)) {
+        path::pushd(cachedir)
+        print cli::green("[CLONE] ") url
+        make::run("git clone --depth=1 -b " branch " " url " " tool_name)
+        # Restore cwd
+        path::popd()
+    }
+    print cli::green("[DONE] ") url
+
+    # Restore cwd and return clone path
+    return _clone_dir
+}
 
 function download(tool_name, url, expected_md5hash, cachedir,
                   # local vars
