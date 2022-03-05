@@ -10,6 +10,7 @@ function help() {
     make::print_help("test",          "awk unit tests")
     make::print_help("lint",          "awk linting")
     make::print_help("install_emacs", "download, compile and install emacs")
+    make::print_help("install_fish",  "download, compile and install fish-shell")
     make::print_help("install_lua54", "download, compile and install lua 5.4")
 }
 
@@ -62,7 +63,7 @@ function install_emacs28() {
         "./configure --prefix=$HOME/apps/emacs28 " \
         "--with-modules --with-cairo " \
         "--with-native-compilation " \
-	      "--with-x-toolkit=gtk3 --without-xaw3d\n" \
+        "--with-x-toolkit=gtk3 --without-xaw3d\n" \
         "make -j 2\n" \
         "make install\n")
 }
@@ -76,3 +77,12 @@ function install_lua54() {
         "make INSTALL_TOP=$HOME/apps/lua54 install\n")
 }
 
+function install_fish() {
+    tarfile = make::download("fish",
+        "https://github.com/fish-shell/fish-shell/releases/download/3.3.1/fish-3.3.1.tar.xz",
+        "94be285255aadfcf0f910bdcc2f56073")
+    make::compile(make::extract_tar(tarfile),
+        "cmake -DCMAKE_INSTALL_PREFIX=~/apps/fish .\n" \
+        "make -j 4\n" \
+        "make install\n")
+}

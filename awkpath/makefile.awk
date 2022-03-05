@@ -236,6 +236,7 @@ function download(tool_name, url, expected_md5hash, cachedir,
         print cli::error("[ERROR] ") "MD5 mismatch"
         print cli::error("[ERROR] ") "Expected: " expected_md5hash "  " _downloaded_file
         print cli::error("[ERROR] ") "     Got: " _result
+        exit 1
     }
 
     # Restore cwd and return downloaded file
