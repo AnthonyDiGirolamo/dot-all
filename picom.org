@@ -7,7 +7,7 @@
     backend = "glx";
     glx-no-stencil = true;
     glx-no-rebind-pixmap = true;
-    vsync = "opengl-swc";
+    vsync = true;
 
     # Option `no-dock-shadow` is deprecated, and will be removed. Please use the wintype option `shadow` of `dock` instead.
     # Option `no-dnd-shadow` is deprecated, and will be removed. Please use the wintype option `shadow` of `dnd` instead.

@@ -20,7 +20,7 @@
 
 ** PC modifiers
 
-  #+BEGIN_SRC conf :tangle "~/.i3/config"
+  #+BEGIN_SRC conf :tangle "~/.config/i3/config"
     # i3 config file (v4)
     # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
@@ -481,7 +481,7 @@
     # order += "run_watch DHCP"
     # order += "run_watch VPN"
     order += "wireless wlan0"
-    order += "ethernet <<interface()>>"
+    # order += "ethernet <<interface()>>"
     # order += "ipv6"
     # order += "battery 0"
     order += "load"
@@ -492,11 +492,11 @@
             format_down = "wifi: down"
     }
 
-    ethernet <<interface()>> {
-            # if you use %speed, i3status requires root privileges
-            format_up = "<<interface()>>: %ip (%speed)"
-            format_down = "<<interface()>>: down"
-    }
+    # ethernet <<interface()>> {
+    #         # if you use %speed, i3status requires root privileges
+    #         format_up = "<<interface()>>: %ip (%speed)"
+    #         format_down = "<<interface()>>: down"
+    # }
 
     battery 0 {
             format = "%status %percentage %remaining"
