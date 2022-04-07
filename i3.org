@@ -41,7 +41,7 @@
 
 ** PocketCHIP modifiers
 
-  #+BEGIN_SRC conf :tangle (if (string-suffix-p "chip" hostname) "~/.i3/config" "no")
+  #+BEGIN_SRC conf :tangle (if (string-suffix-p "chip" hostname) "~/.config/i3/config" "no")
     # pocketchip modifiers
     set $mod Mod4
     font pango:Roboto Medium 7
@@ -49,7 +49,7 @@
 
 ** common config
 
-  #+BEGIN_SRC conf :tangle "~/.i3/config"
+  #+BEGIN_SRC conf :tangle "~/.config/i3/config"
     # Use Mouse+$mod to drag floating windows to their wanted position
     floating_modifier $mod
 
@@ -437,7 +437,7 @@
 
 ** PC start-up apps
 
-  #+BEGIN_SRC conf :tangle "~/.i3/config"
+  #+BEGIN_SRC conf :tangle "~/.config/i3/config"
     # PC start-up apps
     exec --no-startup-id xset r rate 200 30
     exec --no-startup-id feh --bg-fill $HOME/Pictures/backgrounds/cliff.jpg
