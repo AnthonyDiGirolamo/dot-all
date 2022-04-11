@@ -201,9 +201,14 @@
     (defun amd/take-svg-screenshot ()
       "Take a screenshot and save as an svg (requires cairo support)."
       (interactive)
-      (with-temp-buffer
-        (insert (x-export-frames nil 'svg))
-        (save-buffer)))
+      (let ((screenshot-filename (format-time-string
+                                  "%Y-%m-%d-%H%M%S-emacs.svg"
+                                  (current-time))))
+        (with-temp-buffer
+          (insert (x-export-frames nil 'svg))
+          (write-region (point-min) (point-max)
+                        (concat
+                         (expand-file-name "~/Pictures/") screenshot-filename)))))
 
     (defun amd/set-font (&optional fsize fname)
       "Set preferred GUI font."
@@ -2066,11 +2071,18 @@
     (use-package vterm
       :commands (vterm)
       :general
+      (:states '(emacs)
+       :keymaps '(vterm-mode-map)
+       (kbd "<f10>") 'amd/take-svg-screenshot)
       (:states '(normal)
        :keymaps '(vterm-mode-map)
+       "C-p" 'vterm--self-insert
+       (kbd "<f10>") 'amd/take-svg-screenshot
        "u" 'vterm-undo)
       (:states '(insert)
        :keymaps '(vterm-mode-map)
+       "C-p" 'vterm--self-insert
+       (kbd "<f10>") 'amd/take-svg-screenshot
        "C-a" 'vterm-send-C-a
        "C-e" 'vterm-send-C-e
        "C-d" 'vterm-send-C-d
