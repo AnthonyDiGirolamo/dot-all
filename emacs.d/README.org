@@ -3404,8 +3404,8 @@
         (("t" toggle-truncate-lines "truncate-lines" :toggle truncate-lines :color amaranth)
          ("a" auto-fill-mode "auto-fill-mode" :toggle auto-fill-function :color amaranth)
          ;; ("f" fci-mode "fill column indicator mode" :toggle t :color amaranth) ;; emacs26
-         ("f" display-fill-column-indicator-mode "fill column indicator mode" :toggle t :color amaranth) ;; emacs27
-         ("F" fringe-mode "fringe-mode" :toggle (not (eq fringe-mode 0)) :color amaranth))
+         ("fc" display-fill-column-indicator-mode "fill column indicator mode" :toggle t :color amaranth) ;; emacs27
+         ("fr" fringe-mode "fringe-mode" :toggle (not (eq fringe-mode 0)) :color amaranth))
         "Line Numbers"
         (("l" display-line-numbers-mode "display-line-numbers-mode" :toggle t :color amaranth)
          ("h" hl-line-mode "hl-line-mode" :toggle t :color amaranth)
@@ -3415,7 +3415,9 @@
         (("r" rainbow-delimiters-mode "rainbow-delimiters-mode" :toggle t :color amaranth)
          ("c" color-identifiers-mode "color-identifiers-mode" :toggle t :color amaranth)
          ("g" glasses-mode "glasses-mode" :toggle t :color amaranth)
-         ("w" whitespace-mode "whitespace-mode" :toggle t :color amaranth))))
+         ("w" whitespace-mode "whitespace-mode" :toggle t :color amaranth)
+         ("ff" hydra-font/body "Font" :color blue)
+         )))
 
      (amd/define-hydra-with-columns 'hydra-leader-menu 'blue
       `((
@@ -3460,7 +3462,6 @@
          ;; ("po" pt-regexp              "search pt other")
          ("/"  counsel-grep-or-swiper "search grep/swiper")
          (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra")
-         ("F" hydra-font/body  "Font")
          )
 
         (
