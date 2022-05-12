@@ -8,6 +8,7 @@
 (defconst emacs-start-time (current-time))
 
 (setq amd/settings-file (expand-file-name "~/.emacs.d/README.el")
+      amd/local-settings-file (expand-file-name "~/.emacs-local.el")
       amd/settings-org-file (expand-file-name "~/.emacs.d/README.org"))
 (setq hostname (string-trim (shell-command-to-string "hostname")))
 (setq amd/uname (shell-command-to-string "uname -a"))
@@ -110,6 +111,10 @@
 ;; do not steal focus while doing async compilations
 (setq warning-suppress-types '((comp)))
 
+(when (file-exists-p amd/local-settings-file)
+  (load amd/local-settings-file))
+
 ;; lastly, start a server
 (unless (and (fboundp 'server-running-p) (server-running-p))
   (server-start))
+

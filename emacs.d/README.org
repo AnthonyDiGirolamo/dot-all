@@ -1227,7 +1227,7 @@
        "C-s" (lambda() (interactive) (save-buffer) (evil-normal-state))
        "C-M-t" 'amd/eshell-or-project-eshell
        "C-y" 'counsel-yank-pop
-       "M-t" 'ivy-switch-buffer
+       "M-t" 'counsel-ibuffer
        "M-b" 'ibuffer
        "C-x C-l" 'evil-complete-previous-line
        ;; The C-w insert bindings require 'evil-want-C-w-delete nil
@@ -1239,7 +1239,7 @@
        ";" 'evil-ex)  ;; semicolon also enters : prompt
       (:states '(motion visual emacs)
        "C-w m" 'evil-window-set-height
-       "M-t" 'ivy-switch-buffer
+       "M-t" 'counsel-ibuffer
        "M-T" 'counsel-ibuffer
        "M-b" 'ibuffer
        "M-d" (lambda() (interactive) (dired-other-window (projectile-project-root)))
@@ -3786,6 +3786,7 @@
           "k" 'evil-ex-search-next
           "n" 'ivy-occur-next-line
           "e" 'ivy-occur-previous-line
+          "RET" 'ivy-occur-press-and-switch
           "N" 'next-error-no-select
           "E" 'previous-error-no-select)
         (:states '(motion)
