@@ -1,4 +1,4 @@
-#!/usr/bin/gawk -E
+#!/usr/bin/env -S AWKPATH=./awkpath gawk -E
 @include "awkpath/makefile"
 @include "awkpath/path"
 
@@ -21,9 +21,10 @@ function build() {
 
 function test() {
     path::pushd("awkpath")
-    make::run("gawk -f cli_test.awk")
-    make::run("gawk -f tangle_test.awk")
-    make::run("gawk -f path_test.awk")
+    setawkpath ="env AWKPATH=. "
+    make::run(setawkpath "gawk -f ./cli_test.awk")
+    make::run(setawkpath "gawk -f ./tangle_test.awk")
+    make::run(setawkpath "gawk -f ./path_test.awk")
     path::popd()
 }
 
