@@ -1,7 +1,3 @@
-* fonts.tar.xz
-
-  Should be extracted to ~/.fonts
-
 * Python Modules
 
   Installing modules from this directory

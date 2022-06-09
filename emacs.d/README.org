@@ -252,6 +252,7 @@
         ;; set-frame-font :size <int>pixel size <float>point size
         ;; (set-frame-font (font-spec :name "PragmataPro" :antialias t :size 17.0))
         ;; (set-frame-font (font-spec :name "Iosevka Term SS17 Light" :antialias t :size 16.0))
+        ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 18.0))
 
         ;; Determine a good powerline height
         (setq amd/font-dpi 96) ;; default dpi assumption
@@ -3292,6 +3293,9 @@
         ("s"  (lambda () (interactive) (amd/set-font amd/font-size "PragmataPro"))
          (format "[%s] PragmataPro"
                  (if (string-equal amd/font-name "PragmataPro-%d") "x" " ")))
+        ("c"  (lambda () (interactive) (amd/set-font amd/font-size "CozetteVector"))
+         (format "[%s] CozetteVector"
+                 (if (string-equal amd/font-name "CozetteVector-%d") "x" " ")))
         )
     )
 
