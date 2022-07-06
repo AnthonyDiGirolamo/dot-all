@@ -64,6 +64,7 @@
     # floating windows, use xprop to get class (the second part of WM_CLASS) or use title=
     for_window [class="Teensy"] floating enable
     for_window [class="pw_display"] floating enable
+    for_window [class="OneTwoscii"] floating enable
     for_window [class="Blueman-manager"] floating enable
     #, resize set 640 480
     for_window [title="Ediff"] floating enable

@@ -348,9 +348,9 @@
        (interactive)
        (amd/disable-loaded-themes)
        (load-theme 'leuven t)
-       ;;(when (featurep 'airline-themes)
-       ;;  ;; (load-theme 'airline-qwq t)
-       ;;  (load-theme 'airline-cobalt2 t))
+       (when (featurep 'airline-themes)
+        ;; (load-theme 'airline-qwq t)
+        (load-theme 'airline-base16_atelier_cave_light t))
        (custom-theme-set-faces
         'leuven
         ;; '(org-level-1 ((t (:height 1.3 :weight bold :slant normal :foreground "#875fff" :underline nil))) t)
@@ -1504,7 +1504,7 @@
        ;; colemak keys
        "h" 'left-char
        "l" 'right-char
-       "-" 'dired-hide-details-mode
+       "-" 'dired-up-directory
        "(" 'dired-hide-details-mode
        ")" 'dired-omit-mode
        "e" 'dired-previous-line
@@ -2811,6 +2811,7 @@
       :custom
       ;; (lsp-restart 'auto-restart)
       (lsp-restart 'interactive)
+      (lsp-headerline-breadcrumb-enable nil)
       :general
       (:keymaps '(lsp-mode-map)
        ;; was lsp-signature-next
