@@ -9,7 +9,8 @@ function help() {
     make::print_help("build",         "run test & lint")
     make::print_help("test",          "awk unit tests")
     make::print_help("lint",          "awk linting")
-    make::print_help("install_emacs", "download, compile and install emacs")
+    make::print_help("install_emacs", "download, compile and install emacs27")
+    make::print_help("install_emacs28", "download, compile and install emacs28")
     make::print_help("install_fish",  "download, compile and install fish-shell")
     make::print_help("install_lua54", "download, compile and install lua 5.4")
 }

@@ -13,6 +13,8 @@
    - [[#configfishfunctionstarxzfish][~/.config/fish/functions/tarxz.fish]]
    - [[#configfishfunctionsufish][~/.config/fish/functions/u.fish]]
    - [[#configfishfunctionsdlfish][~/.config/fish/functions/dl.fish]]
+ - [[#ssh][ssh]]
+   - [[#configfishfunctionsauthmefish][~/.config/fish/functions/authme.fish]]
  - [[#bash-releated][bash releated]]
    - [[#configfishfunctionssource-bash-aliasesfish][~/.config/fish/functions/source-bash-aliases.fish]]
  - [[#completions][completions]]
@@ -392,6 +394,16 @@
          echo $dir
        end
      end
+   #+END_SRC
+
+* ssh
+
+** ~/.config/fish/functions/authme.fish
+
+   #+BEGIN_SRC fish :tangle "~/.config/fish/functions/authme.fish"
+    function authme
+        ssh $argv 'cat >>.ssh/authorized_keys' <~/.ssh/id_rsa.pub
+    end
    #+END_SRC
 
 * bash releated
