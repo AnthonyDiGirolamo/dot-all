@@ -62,6 +62,7 @@
    - [[#org-hydra][Org Hydra]]
    - [[#emacs-lisp-hydra][Emacs-Lisp Hydra]]
  - [[#ivy-swiper-and-counsel][ivy, swiper, and counsel]]
+   - [[#orderless][orderless]]
    - [[#ivy][ivy]]
    - [[#swiper][swiper]]
    - [[#counsel][counsel]]
@@ -3647,6 +3648,16 @@
 
 * ivy, swiper, and counsel
 
+** orderless
+  #+begin_src emacs-lisp
+    (use-package orderless
+      :ensure t
+      :custom
+      (completion-styles '(orderless basic))
+      (completion-category-overrides '((file (styles basic partial-completion)))))
+  #+end_src
+
+
 ** ivy
 
   #+begin_src emacs-lisp
@@ -3658,6 +3669,10 @@
       (ivy-fixed-height-minibuffer t)
       (enable-recursive-minibuffers t)
       :config
+      ;; Enable orderless
+      (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
+      (add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight))
+
       (defvar ivy-switch-project-map (make-sparse-keymap))
 
       (defun ivy-switch-project ()
@@ -3702,6 +3717,8 @@
 
     (use-package ivy-rich
       :after ivy
+      ;; This seems to be slowing down ivy-switch-buffer
+      :disabled
       :custom
       (ivy-rich-display-transformers-list
        '(ivy-switch-buffer
