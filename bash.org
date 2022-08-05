@@ -110,19 +110,23 @@
     alias la='ls -a'
     alias l='ls -CF'
 
-    alias ga='git add'
-    alias gll='git l'
+    alias gll="git log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'"
+    alias gllo="git log --abbrev-commit --graph --decorate --date=relative --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'"
     alias gs='git status'
+    alias ga='git add'
+    alias gb='git branch'
     alias gc='git commit'
     alias gca='git commit -a'
-    #alias gd='git diff --no-color | vim -'
+    alias gwd='git diff'
+    alias gwdc='git diff --cached'
+    alias gp='git pull'
+    alias gpr='git pull --recurse-submodules'
+    alias gpp='git push'
+    alias gco='git checkout'
 
     function gd {
       git diff --no-color $@ | vim +'set bt=nowrite' -
     }
-    alias gdc='git diff --cached'
-    alias gp='git pull'
-    alias gpp='git push'
 
     function git_submodule_rm {
       git rm --cached $@
@@ -161,6 +165,9 @@
     }
     function tlll {
       tllll -L 3 $*
+    }
+    function tll4 {
+      tllll -L 4 $*
     }
 
     function dotbin {
