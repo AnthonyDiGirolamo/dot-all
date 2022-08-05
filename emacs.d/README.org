@@ -3649,14 +3649,13 @@
 * ivy, swiper, and counsel
 
 ** orderless
+
   #+begin_src emacs-lisp
     (use-package orderless
-      :ensure t
       :custom
       (completion-styles '(orderless basic))
       (completion-category-overrides '((file (styles basic partial-completion)))))
   #+end_src
-
 
 ** ivy
 
