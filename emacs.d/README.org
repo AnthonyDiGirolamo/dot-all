@@ -3982,6 +3982,11 @@
    - Clock table info [[info:org#The clock table][info:org#The clock table]]
    - Exporting Options: [[info:org#Export Settings][info:org#Export Settings]]
 
+*** HTML Tag to Org link find replace:
+    #+begin_src text
+      s/<a href="\([^"]+\)">\([^<]+\)<\/a>/[[\1][\2]]
+    #+end_src
+
 ** use-package org
 
   #+begin_src emacs-lisp
