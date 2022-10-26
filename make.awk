@@ -50,18 +50,22 @@ function install_emacs() {
 }
 
 function install_emacs28() {
-    clonedir = make::git_clone("emacs28",
-        "https://git.savannah.gnu.org/git/emacs.git",
-        # Branch
-        "emacs-28")
+    # From Git:
+    # clonedir = make::git_clone("emacs28",
+    #     "https://git.savannah.gnu.org/git/emacs.git",
+    #     # Branch
+    #     "emacs-28")
+    # if (!path::is_file(clonedir "/configure")) {
+    #     path::pushd(clonedir)
+    #     make::run("./autogen.sh")
+    #     path::popd()
+    # }
+    # make::compile(clonedir, ...)
 
-    if (!path::is_file(clonedir "/configure")) {
-        path::pushd(clonedir)
-        make::run("./autogen.sh")
-        path::popd()
-    }
-
-    make::compile(clonedir,
+    tarfile = make::download("emacs",
+        "http://ftpmirror.gnu.org/emacs/emacs-28.2.tar.xz",
+        "cb799cdfc3092272ff6d35223fc6bfef")
+    make::compile(make::extract_tar(tarfile),
         "./configure --prefix=$HOME/apps/emacs28 " \
         "--with-modules --with-cairo " \
         "--with-native-compilation " \
