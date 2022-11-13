@@ -5,12 +5,13 @@
 @namespace "make_targets"
 
 function help() {
-    make::print_help("t",             "tangle all org files")
+    make::print_help("t, tangle",     "tangle all org files")
     make::print_help("build",         "run test & lint")
     make::print_help("test",          "awk unit tests")
     make::print_help("lint",          "awk linting")
-    make::print_help("install_emacs", "download, compile and install emacs27")
+    make::print_help("install_emacs27", "download, compile and install emacs27")
     make::print_help("install_emacs28", "download, compile and install emacs28")
+    make::print_help("install_emacs_git", "download, compile and install emacs from git")
     make::print_help("install_fish",  "download, compile and install fish-shell")
     make::print_help("install_lua54", "download, compile and install lua 5.4")
 }
@@ -36,32 +37,45 @@ function lint() {
 }
 
 function t() {
+    tangle()
+}
+
+function tangle() {
     make::run("./awkpath/tangle.awk *.org")
 }
 
-function install_emacs() {
+function install_emacs27() {
     tarfile = make::download("emacs",
         "http://ftpmirror.gnu.org/emacs/emacs-27.2.tar.xz",
         "4c3d9ff35b2ab2fe518dc7eb3951e128")
     make::compile(make::extract_tar(tarfile),
-        "./configure --prefix=$HOME/apps/emacs --with-modules --with-cairo\n" \
-        "make -j 4\n" \
+        "./configure --prefix=$HOME/apps/emacs27 " \
+        "--with-modules --with-cairo\n" \
+        "make -j 2\n" \
+        "make install\n")
+}
+
+function install_emacs_git() {
+    # Install emacs from Git:
+    clonedir = make::git_clone("emacs",
+        "https://git.savannah.gnu.org/git/emacs.git",
+        # Branch
+        "master")
+    if (!path::is_file(clonedir "/configure")) {
+        path::pushd(clonedir)
+        make::run("./autogen.sh")
+        path::popd()
+    }
+    make::compile(clonedir,
+        "./configure --prefix=$HOME/apps/emacs_git " \
+        "--with-modules --with-cairo " \
+        "--with-native-compilation " \
+        "--with-x-toolkit=gtk3 --without-xaw3d\n" \
+        "make -j 2\n" \
         "make install\n")
 }
 
 function install_emacs28() {
-    # From Git:
-    # clonedir = make::git_clone("emacs28",
-    #     "https://git.savannah.gnu.org/git/emacs.git",
-    #     # Branch
-    #     "emacs-28")
-    # if (!path::is_file(clonedir "/configure")) {
-    #     path::pushd(clonedir)
-    #     make::run("./autogen.sh")
-    #     path::popd()
-    # }
-    # make::compile(clonedir, ...)
-
     tarfile = make::download("emacs",
         "http://ftpmirror.gnu.org/emacs/emacs-28.2.tar.xz",
         "cb799cdfc3092272ff6d35223fc6bfef")
