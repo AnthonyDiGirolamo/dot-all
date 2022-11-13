@@ -89,111 +89,199 @@
   #+begin_src emacs-lisp
     ;;; -*- lexical-binding: t; -*-
 
-    ;; Initial buffer to open
-    (setq initial-buffer-choice t ;; Open *scratch* buffer by default
-          ;; initial-major-mode 'fundamental-mode
-          inhibit-startup-message t
-          inhibit-startup-screen t)
+    ;;; README.el --- Summary
+    ;;; Commentary:
+    ;;; Code:
 
-    ;; Open org-default-notes-file by default
-    ;; (when (file-exists-p org-default-notes-file)
-    ;;   (find-file org-default-notes-file))
+    (use-package emacs
+      :init
+      ;; Initial buffer to open
+      (setq initial-buffer-choice nil ;; Always Open *scratch* buffer by default if true
+            ;; initial-major-mode 'fundamental-mode
+            inhibit-startup-message t
+            inhibit-startup-screen t)
 
-    ;; Start Maximized
-    ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
+      ;; Start Maximized
+      ;; (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-    ;; leader key
-    (setq amd/leader-key ",")
-    (setq amd/leader-key-insert "C-,")
-    (when amd/using-pocketchip
-      (setq amd/leader-key "SPC"))
+      ;; leader key
+      (setq amd/leader-key ",")
+      (setq amd/leader-key-insert "C-,")
+      (when amd/using-pocketchip
+        (setq amd/leader-key "SPC"))
 
-    ;; $PATH
+      (setq echo-keystrokes 0.2)
 
-    (when (memq window-system '(mac ns))
-      (exec-path-from-shell-initialize))
+      (setq ring-bell-function (lambda ()))
+      (setq recenter-redisplay nil) ;; don't redraw the whole display when recentering
 
-    ;; general settings
+      (setq-default fill-column 80)
+      ;; (add-hook 'text-mode-hook 'turn-on-auto-fill) ;; get auto line breaks at fill-column - auto-fill-mode
+      (set-display-table-slot standard-display-table 'wrap ?\ ) ;; Hide the \ at the end of each wrapped line. Don't reall need it with relative-line-numbers
+      ;; toggle-truncate-lines will toggle line wrapping
+      ;; auto-fill-mode will insert line breaks automatically
 
-    (require 'mouse)
-    (xterm-mouse-mode t)
+      ;; Save Tempfiles in a temp dir
+      (setq backup-directory-alist `((".*" . ,temporary-file-directory)))
+      (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
 
-    (setq echo-keystrokes 0.2)
+      ;; Stop making backup files
+      (setq make-backup-files nil)
 
-    (setq ring-bell-function (lambda ()))
-    (setq recenter-redisplay nil) ;; don't redraw the whole display when recentering
+      (defalias 'yes-or-no-p 'y-or-n-p) ;; no more typing out y.e.s.
 
-    (setq-default fill-column 80)
-    ;; (add-hook 'text-mode-hook 'turn-on-auto-fill) ;; get auto line breaks at fill-column - auto-fill-mode
-    (set-display-table-slot standard-display-table 'wrap ?\ ) ;; Hide the \ at the end of each wrapped line. Don't reall need it with relative-line-numbers
-    ;; toggle-truncate-lines will toggle line wrapping
-    ;; auto-fill-mode will insert line breaks automatically
+      ;; (set-default 'show-trailing-whitespace t)
+      (setq delete-trailing-lines nil)
 
-    (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-    (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-    (menu-bar-mode -1)
+      ;; Indentation
+      (setq-default c-basic-indent 2)
+      (setq-default tab-width 2)          ;; set tw=4
+      (setq-default indent-tabs-mode nil) ;; set expandtab
 
-    ;; Save Tempfiles in a temp dir
-    (setq backup-directory-alist `((".*" . ,temporary-file-directory)))
-    (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
+      ;; Scroll just one line when hitting bottom of window
+      (setq scroll-step 1)
+      (setq scroll-conservatively 101)
 
-    ;; Stop making backup files
-    (setq make-backup-files nil)
+      (setq mouse-wheel-scroll-amount '(5 ((shift) . 1)) ;; 5 lines at a time
+            mouse-wheel-progressive-speed nil            ;; don't accelerate scrolling
+            mouse-wheel-follow-mouse 't)                 ;; scroll window under mouse
 
-    (defalias 'yes-or-no-p 'y-or-n-p) ;; no more typing out y.e.s.
+      ;; (setq mouse-wheel-flip-direction nil) ;; Swap left/right scroll direction
 
-    ;; (set-default 'show-trailing-whitespace t)
-    (setq delete-trailing-lines nil)
-    (add-hook 'before-save-hook 'delete-trailing-whitespace) ;; Erase trailing whitespace before save
+      ;; Swap up/down scroll direction
+      (setq mouse-wheel-down-event 'mouse-5)
+      (setq mouse-wheel-up-event 'mouse-4)
 
-    ;; Indentation
-    (setq-default c-basic-indent 2)
-    (setq-default tab-width 2)          ;; set tw=4
-    (setq-default indent-tabs-mode nil) ;; set expandtab
+      ;; cursor movement lag reduction?
+      (setq auto-window-vscroll nil)
 
-    ;; Scroll just one line when hitting bottom of window
-    (setq scroll-step 1)
-    (setq scroll-conservatively 101)
+      ;; Mac OSX Emacs Settings
+      (setq ns-alternate-modifier 'meta
+            ns-command-modifier 'meta)
 
-    (setq mouse-wheel-scroll-amount '(5 ((shift) . 1)) ;; 5 lines at a time
-          mouse-wheel-progressive-speed nil            ;; don't accelerate scrolling
-          mouse-wheel-follow-mouse 't)                 ;; scroll window under mouse
+      ;; UTF8 Setup
+      (set-language-environment 'utf-8)
+      (setq locale-coding-system 'utf-8)
 
-    ;; (setq mouse-wheel-flip-direction nil) ;; Swap left/right scroll direction
+      ;; set the default encoding system
+      (prefer-coding-system 'utf-8)
+      (setq default-file-name-coding-system 'utf-8)
+      (set-default-coding-systems 'utf-8)
+      (set-terminal-coding-system 'utf-8)
+      (set-keyboard-coding-system 'utf-8)
 
-    ;; Swap up/down scroll direction
-    (setq mouse-wheel-down-event 'mouse-5)
-    (setq mouse-wheel-up-event 'mouse-4)
+      (setq buffer-file-coding-system 'utf-8)
 
-    ;; cursor movement lag reduction?
-    (setq auto-window-vscroll nil)
+      ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
+      (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
-    ;; Mac OSX Emacs Settings
-    (setq ns-alternate-modifier 'meta
-          ns-command-modifier 'meta)
+      ;; Enable narrowing and erasing buffers
+      (put 'narrow-to-region 'disabled nil)
+      (put 'erase-buffer 'disabled nil)
 
-    ;; UTF8 Setup
-    (set-language-environment 'utf-8)
-    (setq locale-coding-system 'utf-8)
+      (defun amd/tangle-init ()
+        (interactive)
+        (org-babel-tangle-file "~/.emacs.d/README.org" "~/.emacs.d/README.el" "emacs-lisp"))
 
-    ;; set the default encoding system
-    (prefer-coding-system 'utf-8)
-    (setq default-file-name-coding-system 'utf-8)
-    (set-default-coding-systems 'utf-8)
-    (set-terminal-coding-system 'utf-8)
-    (set-keyboard-coding-system 'utf-8)
-    ;; backwards compatibility as default-buffer-file-coding-system
-    ;; is deprecated in 23.2.
-    (if (boundp buffer-file-coding-system)
-        (setq buffer-file-coding-system 'utf-8)
-      (setq default-buffer-file-coding-system 'utf-8))
+      (defun amd/take-svg-screenshot ()
+        "Take a screenshot and save as an svg (requires cairo support)."
+        (interactive)
+        (let ((screenshot-filename (format-time-string
+                                    "%Y-%m-%d-%H%M%S-emacs.svg"
+                                    (current-time))))
+          (with-temp-buffer
+            (insert (x-export-frames nil 'svg))
+            (write-region (point-min) (point-max)
+                          (concat
+                           (expand-file-name "~/Pictures/") screenshot-filename)))))
 
-    ;; Treat clipboard input as UTF-8 string first; compound text next, etc.
-    (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+      ;; Default font size and name
+      (setq amd/font-size 20
+            amd/font-name "PragmataPro-%d")
 
-    ;; Enable narrowing and erasing buffers
-    (put 'narrow-to-region 'disabled nil)
-    (put 'erase-buffer 'disabled nil)
+      (defun amd/set-font (&optional fsize fname)
+        "Set preferred GUI font."
+        (interactive)
+        (when (display-graphic-p)
+          ;; Set the right font name and size by OS.
+          (cond
+           ((or (eq system-type 'cygwin)
+                (eq system-type 'windows-nt))
+            (setq amd/font-size 19
+                  amd/font-name "PragmataPro-%d"))
+           ((eq system-type 'darwin)
+            (setq amd/font-size 20
+                  amd/font-name "PragmataPro-%d"))
+           (amd/using-pocketchip
+            (setq amd/font-size 12
+                  amd/font-name "-xos4-Terminus-normal-normal-normal-*-%d-*-*-*-c-60-iso10646-1"))
+           ((eq system-type 'gnu/linux)
+            (setq amd/font-size 18
+                  ;; amd/font-name "Iosevka Term SS17 Light-%d:antialias=true:hinting=true:autohint=true:hintstyle=hintfull"
+                  ;; amd/font-name "Iosevka Term SS08 Light-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintfull"
+                  ;; amd/font-name "PragmataPro-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintnone"
+                  amd/font-name "PragmataPro-%d"
+                  ;; amd/font-name "Iosevka Term SS17 Light-%d"
+                  ;; amd/font-name "Iosevka SS08 Light-%d"
+                  ))
+           (t
+            (setq amd/font-size 20
+                  amd/font-name "PragmataPro-%d")))
+
+          (when fsize
+            (setq amd/font-size fsize))
+          (when fname
+            (setq amd/font-name
+                  (if (string-suffix-p "-%d" fname)
+                      fname
+                    (concat fname "-%d"))))
+
+          (set-frame-font (format amd/font-name amd/font-size))
+          (add-to-list 'default-frame-alist `(font . ,(format amd/font-name amd/font-size)))
+          ;; set-frame-font :size <int>pixel size <float>point size
+          ;; (set-frame-font (font-spec :name "PragmataPro" :antialias t :size 17.0))
+          ;; (set-frame-font (font-spec :name "Iosevka Term SS17 Light" :antialias t :size 16.0))
+          ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 18.0))
+
+          ;; Determine a good powerline height
+          (setq amd/font-dpi 96) ;; default dpi assumption
+          ;; query xrdb for existing xft dpi
+          (when (eq system-type 'gnu/linux)
+            (let ((xrdb-dpi
+                   (string-to-number
+                    (shell-command-to-string "xrdb -query | grep -i Xft.dpi | cut -f 2"))))
+              (if (> xrdb-dpi 0)
+                  (setq amd/font-dpi xrdb-dpi))))
+          ;; Formula: points = pixels * 72 / dpi
+          (setq powerline-height
+                (floor (* 2.0
+                          ;; pixel height from dpi and pt size
+                          (* (/ amd/font-dpi 72.0) amd/font-size))))))
+      :config
+      ;; $PATH
+      ;; Erase trailing whitespace before save
+      (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+      (when (memq window-system '(mac ns))
+        (exec-path-from-shell-initialize))
+
+      ;; general settings
+
+      (require 'mouse)
+      (xterm-mouse-mode t)
+
+      (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+      (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+      (menu-bar-mode -1)
+
+      (when (display-graphic-p)
+        ;; (amd/set-font 25)
+        (amd/set-font)
+        ;; (amd/set-font nil "PragmataPro")
+        ;; (amd/set-font nil "Iosevka Term SS17 Light")
+        ;; (amd/set-font nil "Iosevka SS08 Light")
+      )
+    )
   #+end_src
 
 * fonts
@@ -754,21 +842,18 @@
       ;;  'airline-base16_material_palenight
       ;;  '(tab-bar-tab-inactive ((t (:foreground "#32374D":background "#444267" :inherit))) t))
 
-      ;; modus light
-      (use-package modus-operandi-theme
+      (use-package modus-themes
         :disabled
         :config
-        (load-theme 'modus-operandi t)
-        (when (featurep 'airline-themes)
-          (load-theme 'airline-qwq t)))
-
-      ;; modus dark
-      (use-package modus-vivendi-theme
-        :disabled
-        :config
+        ;; modus light
+        ;; (load-theme 'modus-operandi t)
+        ;; (when (featurep 'airline-themes)
+        ;;   (load-theme 'airline-qwq t))
+        ;; modus dark
         (load-theme 'modus-vivendi t)
         (when (featurep 'airline-themes)
-          (load-theme 'airline-ouo t)))
+          (load-theme 'airline-ouo t))
+      )
     #+end_src
 
 ** appearance minor-modes
@@ -1135,7 +1220,10 @@
     (defun hexcolour-add-to-font-lock ()
       (interactive)
       (font-lock-add-keywords nil hexcolour-keywords))
-    (add-hook 'css-mode-hook 'hexcolour-add-to-font-lock)
+
+    (use-package css-mode
+      :config
+      (add-hook 'css-mode-hook 'hexcolour-add-to-font-lock))
   #+end_src
 
 * evil-mode
@@ -2182,7 +2270,7 @@
             '((company-files
                company-keywords
                company-capf
-               company-yasnippet
+               ;; company-yasnippet
                )
               (company-abbrev company-dabbrev)
               ))
@@ -2234,12 +2322,14 @@
 
   #+begin_src emacs-lisp
     (use-package yasnippet
+      :disabled
       :diminish yas-minor-mode
       :config
       (yas-global-mode) ;; seems to be needed for yankpad
     )
 
     (use-package yankpad
+      :disabled
       :commands (yankpad-edit yankpad-set-category yankpad-expand yankpad-insert)
       :after yasnippet
       :init
@@ -2428,6 +2518,8 @@
       :diminish
       :demand
       ;; :commands (undo-tree-visualize)
+      :custom
+      (undo-tree-auto-save-history nil)
       :init
       (setq undo-tree-visualizer-timestamps t
             undo-tree-visualizer-diff t)
@@ -2991,7 +3083,7 @@
                       elpy-module-flymake
                       ;; elpy-module-highlight-indentation
                       elpy-module-pyvenv
-                      elpy-module-yasnippet
+                      ;; elpy-module-yasnippet
                       elpy-module-django)))
 
     (use-package js2-mode
@@ -3405,7 +3497,7 @@
          ("s" align-to-space "align whitespace")
          ("i" align-interactively "align interactive"))))
 
-     (pretty-hydra-define hydra-set-toggles (:color blue :quit-key "q" :formatter amd/pretty-hydra-strip-header)
+     (pretty-hydra-define hydra-set-toggles (:color blue :quit-key "q" :formatter (lambda (docstring) (replace-regexp-in-string "\n\\([^\n]+\n\\)[-=─]+\n" "\\1" docstring)))
        ("Line Endings"
         (("t" toggle-truncate-lines "truncate-lines" :toggle truncate-lines :color amaranth)
          ("a" auto-fill-mode "auto-fill-mode" :toggle auto-fill-function :color amaranth)

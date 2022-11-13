@@ -44,36 +44,7 @@
 ;; (package-initialize)
 
 (if (>= emacs-major-version 27)
-    ;; emacs 27 or higher
-    (setq package-quickstart t)
-  ;; emacs 26 or lower
-  (progn
-    ;; Don't package-initialize
-    (setq package-enable-at-startup nil
-          package--init-file-ensured t)
-    (defvar cache-file "~/.emacs.d/cache/autoloads")
-    (defun initialize ()
-      "Concatenate all package autoloads into cache-file then load."
-      (unless (load cache-file t t)
-        (setq package-activated-list nil)
-        (package-initialize)
-        (with-temp-buffer
-          ;; (cl-pushnew doom-core-dir load-path :test #'string=)
-          (dolist (desc (delq nil (mapcar #'cdr package-alist)))
-            (let ((load-file-name (concat (package--autoloads-file-name (car desc)) ".el")))
-              ;; (message "initialize: %s" load-file-name)
-              (when (file-readable-p load-file-name)
-                (condition-case _
-                    ;; (while t (insert (read (current-buffer))))
-                    (insert-file-contents load-file-name)
-                  (end-of-file)))))
-          (prin1 `(setq load-path ',load-path
-                        auto-mode-alist ',auto-mode-alist
-                        Info-directory-list ',Info-directory-list)
-                 (current-buffer))
-          (write-file (concat cache-file ".el"))
-          (byte-compile-file (concat cache-file ".el")))))
-    (initialize)))
+    (setq package-quickstart t))
 
 (let ((elapsed (float-time (time-subtract (current-time) emacs-start-time))))
   (message "Loaded packages, elapsed time: %.3fs" elapsed))
@@ -81,12 +52,13 @@
 ;; Load use-package, used for loading packages
 (require 'use-package)
 
-;; conditionally tangle README.org
-(if (and amd/using-pocketchip (file-exists-p amd/settings-file))
+;; Only tangle README.org if README.el isn't available
+;; Manually tangle with (amd/tangle-init) when needed.
+(if (file-exists-p amd/settings-file)
     (load amd/settings-file)
   (progn
-    (org-babel-load-file amd/settings-org-file)
-    (message (concat "Done loading " amd/settings-org-file))))
+    (org-babel-load-file amd/settings-org-file)))
+
 
 ;; Message how long it took to load everything (minus packages)
 (let ((elapsed (float-time (time-subtract (current-time) emacs-start-time))))
