@@ -60,11 +60,12 @@
    - [[#major-mode-leader-hydra-function][Major Mode Leader Hydra Function]]
    - [[#org-hydra][Org Hydra]]
    - [[#emacs-lisp-hydra][Emacs-Lisp Hydra]]
- - [[#ivy-swiper-and-counsel][ivy, swiper, and counsel]]
+ - [[#completion-frameworks][completion frameworks]]
    - [[#orderless][orderless]]
    - [[#consult][consult]]
    - [[#embark][embark]]
-   - [[#vertico-and-marginalia][vertico and marginalia]]
+   - [[#vertico][vertico]]
+   - [[#marginalia][marginalia]]
    - [[#ivy][ivy]]
    - [[#ivy-xref][ivy-xref]]
    - [[#swiper][swiper]]
@@ -1357,7 +1358,7 @@
        ";" 'evil-ex)  ;; semicolon also enters : prompt
       (:states '(motion visual emacs)
        "C-w m" 'evil-window-set-height
-       "M-t" 'counsel-ibuffer
+       "M-t" 'switch-to-buffer
        "M-T" 'counsel-ibuffer
        "M-b" 'ibuffer
        "M-d" (lambda() (interactive) (dired-other-window (projectile-project-root)))
@@ -2100,30 +2101,6 @@
       ;;         (bps    "bit / s"     "Bit per second"))
       ;;       math-units-table nil)
 
-      ;; (defun counsel-calc-units ()
-      ;;   (interactive)
-      ;;   (require 'calc-units) ;; needed to access math-standard-units variable
-      ;;   (let ((this-command 'counsel-calc-units))
-      ;;     (ivy-read
-      ;;      "Unit: "
-      ;;      (mapcar
-      ;;       (lambda (unit-list)
-      ;;         (let* ((command (car unit-list))
-      ;;                (key (symbol-name command))
-      ;;                (doc (delq nil (mapcar (lambda (item) (when (stringp item) item)) (cdr unit-list))))
-      ;;                (doc-size (length doc))
-      ;;                (definition (cond ((eq doc-size 1) key) ((eq doc-size 2) (car doc)) ((eq doc-size 3) (car (reverse doc)))))
-      ;;                (description (cond ((eq doc-size 1) (format "%s (base unit)" (car (reverse doc)))) (t (car (cdr doc))))))
-      ;;           (cons (format "%-12s %-30s %s" (propertize key 'face 'font-lock-builtin-face) definition description) key)))
-      ;;       (append math-additional-units math-standard-units))
-      ;;      :action (lambda (arg) (calc-alg-entry (cdr arg))))))
-
-      ;; (ivy-set-actions
-      ;;  'counsel-calc-units
-      ;;  '(("c"
-      ;;     (lambda (arg) (calc-convert-units nil (cdr arg)))
-      ;;     "convert")))
-
       (defun calcFunc-dateDiffToHMS (date1 date2 worktime-per-day)
         "Calculate the difference of DATE1 and DATE2 in HMS form.
         Each day counts with WORKTIME-PER-DAY hours."
@@ -2191,16 +2168,16 @@
       :general
       (:states '(emacs)
        :keymaps '(vterm-mode-map)
-       (kbd "<f10>") 'amd/take-svg-screenshot)
+       (kbd "<f9>") 'amd/take-svg-screenshot)
       (:states '(normal)
        :keymaps '(vterm-mode-map)
        "C-p" 'vterm--self-insert
-       (kbd "<f10>") 'amd/take-svg-screenshot
+       (kbd "<f9>") 'amd/take-svg-screenshot
        "u" 'vterm-undo)
       (:states '(insert)
        :keymaps '(vterm-mode-map)
        "C-p" 'vterm--self-insert
-       (kbd "<f10>") 'amd/take-svg-screenshot
+       (kbd "<f9>") 'amd/take-svg-screenshot
        "C-a" 'vterm-send-C-a
        "C-e" 'vterm-send-C-e
        "C-d" 'vterm-send-C-d
@@ -3759,7 +3736,7 @@
         ))
    #+end_src
 
-* ivy, swiper, and counsel
+* completion frameworks
 
 ** orderless
 
@@ -3775,7 +3752,7 @@
    #+begin_src emacs-lisp
      ;; Example configuration for Consult
      (use-package consult
-       :ensure t
+       :disabled
        ;; Replace bindings. Lazily loaded due by `use-package'.
        :bind
        (;; C-c bindings (mode-specific-map)
@@ -3897,7 +3874,7 @@
 
    #+begin_src emacs-lisp
      (use-package embark
-       :ensure t
+       :disabled
        :bind
        (("C-." . embark-act)         ;; pick some comfortable binding
         ("C-;" . embark-dwim)        ;; good alternative: M-.
@@ -3921,11 +3898,11 @@
        (embark-collect-mode . consult-preview-at-point-mode))
    #+end_src
 
-** vertico and marginalia
+** vertico
 
    #+begin_src emacs-lisp
      (use-package vertico
-       :ensure t
+       :disabled
        :init
        (vertico-mode)
 
@@ -3941,9 +3918,13 @@
        ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
        ;; (setq vertico-cycle t)
        )
+   #+end_src
 
+** marginalia
+
+   #+begin_src emacs-lisp
      (use-package marginalia
-       :ensure t
+       :disabled
        :bind (:map minibuffer-local-map
                    ("M-A" . marginalia-cycle))
        ;; The :init configuration is always executed (Not lazy!)
@@ -3958,7 +3939,6 @@
 
    #+begin_src emacs-lisp
      (use-package ivy
-       :disabled
        :custom
        (ivy-display-style 'fancy)
        (ivy-use-virtual-buffers t)
@@ -4001,10 +3981,33 @@
        ;; (advice-add 'ivy--minibuffer-setup :after #'amd/adjust-windows-for-minibuffer)
        ;; (add-hook 'minibuffer-setup-hook #'amd/adjust-windows-for-minibuffer)
        ;; (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+
+       (defun counsel-calc-units ()
+         (interactive)
+         (require 'calc-units) ;; needed to access math-standard-units variable
+         (let ((this-command 'counsel-calc-units))
+           (ivy-read
+            "Unit: "
+            (mapcar
+             (lambda (unit-list)
+               (let* ((command (car unit-list))
+                      (key (symbol-name command))
+                      (doc (delq nil (mapcar (lambda (item) (when (stringp item) item)) (cdr unit-list))))
+                      (doc-size (length doc))
+                      (definition (cond ((eq doc-size 1) key) ((eq doc-size 2) (car doc)) ((eq doc-size 3) (car (reverse doc)))))
+                      (description (cond ((eq doc-size 1) (format "%s (base unit)" (car (reverse doc)))) (t (car (cdr doc))))))
+                 (cons (format "%-12s %-30s %s" (propertize key 'face 'font-lock-builtin-face) definition description) key)))
+             (append math-additional-units math-standard-units))
+            :action (lambda (arg) (calc-alg-entry (cdr arg))))))
+
+       (ivy-set-actions
+        'counsel-calc-units
+        '(("c"
+           (lambda (arg) (calc-convert-units nil (cdr arg)))
+           "convert")))
      )
 
      (use-package ivy-hydra
-       :disabled
        :config
        (define-key hydra-ivy/keymap (kbd "h") 'hydra-ivy/ivy-prev-action)
        (define-key hydra-ivy/keymap (kbd "l") 'hydra-ivy/ivy-next-action)
@@ -4018,7 +4021,6 @@
 
    #+begin_src emacs-lisp
      (use-package ivy-xref
-       :disabled
        :init (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))
    #+end_src
 
@@ -4026,7 +4028,6 @@
 
    #+begin_src emacs-lisp
      (use-package swiper
-       :disabled
        :diminish ivy-mode
        :general
        (:keymaps '(ivy-minibuffer-map)
@@ -4104,11 +4105,10 @@
      ) ;; used by counsel
 
      (use-package counsel
-       :disabled
        :after amx
        :demand
        :bind (("M-x" . counsel-M-x)
-              ([f10] . amd/take-svg-screenshot)
+              ([f9] . amd/take-svg-screenshot)
               ("C-h k" . counsel-descbinds)
               ("C-h C-k" . counsel-descbinds))
        :init
