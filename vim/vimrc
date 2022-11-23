@@ -248,3 +248,10 @@ endfunction
 " https://learnvimscriptthehardway.stevelosh.com/chapters/33.html
 " https://stackoverflow.com/questions/18343471/using-external-commands-in-vim-map-operator-function
 
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+
+autocmd User asyncomplete_setup call asyncomplete#register_source(
+    \ asyncomplete#sources#clang#get_source_options())
+

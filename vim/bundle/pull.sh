@@ -23,10 +23,15 @@ https://github.com/ycm-core/YouCompleteMe.git
 https://github.com/tpope/vim-flagship.git
 https://github.com/itchyny/lightline.vim
 https://github.com/jceb/vim-orgmode.git
-"
-urls="
 https://github.com/vim-airline/vim-airline-themes.git
 https://github.com/vim-airline/vim-airline.git
+https://github.com/mattn/vim-lsp-settings.git
+https://github.com/prabirshrestha/vim-lsp.git
+https://github.com/prabirshrestha/asyncomplete.vim.git
+https://github.com/keremc/asyncomplete-clang.vim
+https://github.com/prabirshrestha/async.vim
+"
+urls="
 "
 for URL in $urls
 do
