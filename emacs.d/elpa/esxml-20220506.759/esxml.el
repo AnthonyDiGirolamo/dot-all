@@ -3,8 +3,9 @@
 
 ;; Author: Evan Izaksonas-Smith <izak0002 at umn dot edu>
 ;; Maintainer: Evan Izaksonas-Smith
+;; URL: https://github.com/tali713/esxml
 ;; Created: 15th August 2012
-;; Version: 0.3.4
+;; Version: 0.3.7
 ;; Keywords: tools, lisp, comm
 ;; Description: A library for easily generating XML/XHTML in elisp
 ;;
@@ -44,7 +45,7 @@
 ;; resolve these issues.
 ;;
 ;;; Code:
-(require 'cl)
+(require 'cl-lib)
 (require 'xml)
 (require 'pcase)
 
@@ -77,21 +78,21 @@ An esxml attribute is a cons of the form (symbol . string)"
   "Converts from cons cell to attribute pair.  Not intended for
 general use."
   (pcase-let ((`(,car . ,cdr) attr))
-    (check-type cdr string)
+    (cl-check-type cdr string)
     (concat (symbol-name car)
             "="
-            (prin1-to-string cdr))))
+            (prin1-to-string (xml-escape-string cdr)))))
 
 (defun attrsp (attrs)
     "Returns t if attrs is a list of esxml attributes.
 
 See: `attrp'"
   (and (listp attrs)
-       (every (lambda (attr)
-                (and (consp attr)
-                     (symbolp (car attr))
-                     (stringp (cdr attr))))
-              attrs)))
+       (cl-every (lambda (attr)
+                   (and (consp attr)
+                        (symbolp (car attr))
+                        (stringp (cdr attr))))
+                 attrs)))
 
 (defun esxml-validate-form (esxml)
   "A fast esxml validator.  Will error on invalid subparts making
@@ -100,8 +101,8 @@ it suitable for hindsight testing."
         ((< (length esxml) 2)
          (error "%s is too short to be a valid esxml expression" esxml))
         (t (pcase-let ((`(,tag ,attrs . ,body) esxml))
-             (check-type tag symbol)
-             (check-type attrs attrs)
+             (cl-check-type tag symbol)
+             (cl-check-type attrs attrs)
              (mapcar 'esxml-validate-form body)))))
 
 ;; While the following could certainly have been written using format,
@@ -117,25 +118,55 @@ it suitable for hindsight testing."
 ;; represented as a string, non dynamic portions of the page may be
 ;; precached quite easily.
 (defun esxml--to-xml-recursive (esxml)
-  (if (stringp esxml) esxml
-    (pcase-let ((`(,tag ,attrs . ,body) esxml))
-      ;; code goes here to catch invalid data.
-      (concat "<" (symbol-name tag)
-              (when attrs
-                (concat " " (mapconcat 'esxml--convert-pair attrs " ")))
-              (if body
-                  (concat ">" (mapconcat 'esxml--to-xml-recursive body "")
-                          "</" (symbol-name tag) ">")
-                "/>")))))
+  (pcase esxml
+    ((pred stringp)
+     (xml-escape-string esxml))
+    (`(raw-string ,string)
+     (cl-check-type string stringp)
+     string)
+    (`(comment nil ,body)
+     (concat "<!-- " body " -->"))
+    (`(,tag ,attrs . ,body)
+     ;; code goes here to catch invalid data.
+     (concat "<" (symbol-name tag)
+             (when attrs
+               (concat " " (mapconcat 'esxml--convert-pair attrs " ")))
+             (if body
+                 (concat ">" (mapconcat 'esxml--to-xml-recursive body "")
+                         "</" (symbol-name tag) ">")
+               "/>")))))
 
 (defun esxml-to-xml (esxml)
-  "This translates an esxml expression, i.e. that which is
-returned by xml-parse-region.  The structure is defined as a
-string or a list where the first element is the tag the second is
+  "This translates an esxml expression, i.e. that which is returned
+by xml-parse-region. The structure is defined as any of the
+following forms:
+
+- A string.
+
+ STRING
+
+STRING: the string it is returned with entities escaped
+
+- A list where the first element is the raw-string symbol and the
+  second is a string.
+
+ (raw-string STRING)
+
+STRING: the string is returned unchanged. This allows for caching
+        of any constant parts, such as headers and footers.
+
+- A list where the first element is the comment symbol and the
+  second is a string.
+
+ (comment STRING)
+
+STRING: the string is embedded in a HTML comment.
+
+- A list where the first element is the tag, the second is
 an alist of attribute value pairs and the remainder of the list
 is 0 or more esxml elements.
 
- (TAG ATTRS &rest BODY) || STRING
+ (TAG ATTRS &rest BODY)
 
 TAG: is the tag and must be a symbol.
 
@@ -149,50 +180,57 @@ VALUE: is the value of the attribute and must be a string.
 BODY: is zero or more esxml expressions.  Having no body forms
       implies that the tag should be self closed.  If there is
       one or more body forms the tag will always be explicitly
-      closed, even if they are the empty string.
-
-STRING: if the esxml expression is a string it is returned
-        unchanged, this allows for caching of any constant parts,
-        such as headers and footers.
-"
+      closed, even if they are the empty string."
   (condition-case nil
       (esxml--to-xml-recursive esxml)
     (error (esxml-validate-form esxml))))
 
 (defun pp-esxml-to-xml (esxml)
   "This translates an esxml expresion as `esxml-to-xml' but
-indents it for ease of human readability, it is neccesarrily
+indents it for ease of human readability, it is necessarily
 slower and will produce longer output."
-  (cond ((stringp esxml) esxml)
-        ((and (listp esxml)
-              (> (length esxml) 1))
-         (pcase-let ((`(,tag ,attrs . ,body) esxml))
-           (check-type tag symbol)
-           (check-type attrs attrs)
-           (concat "<" (symbol-name tag)
-                   (when attrs
-                     (concat " " (mapconcat 'esxml--convert-pair attrs " ")))
-                   (if body
-                       (concat ">" (if (every 'stringp body)
-                                       (mapconcat 'identity body " ")
-                                     (concat "\n"
-                                             (replace-regexp-in-string
-                                              "^" "  "
-                                              (mapconcat 'pp-esxml-to-xml body "\n"))
-                                             "\n"))
-                               "</" (symbol-name tag) ">")
-                     "/>"))))
-        (t (error "%s is not a valid esxml expression" esxml))))
+  (pcase esxml
+    ((pred stringp)
+     (xml-escape-string esxml))
+    (`(raw-string ,string)
+     (cl-check-type string stringp)
+     string)
+    (`(comment nil ,body)
+     (concat "<!-- " body " -->"))
+    (`(,tag ,attrs . ,body)
+     (cl-check-type tag symbol)
+     (cl-check-type attrs attrs)
+     (concat "<" (symbol-name tag)
+             (when attrs
+               (concat " " (mapconcat 'esxml--convert-pair attrs " ")))
+             (if body
+                 (concat ">" (if (cl-every 'stringp body)
+                                 (mapconcat 'identity body " ")
+                               (concat "\n"
+                                       (replace-regexp-in-string
+                                        "^" "  "
+                                        (mapconcat 'pp-esxml-to-xml body "\n"))
+                                       "\n"))
+                         "</" (symbol-name tag) ">")
+               "/>")))
+    (_
+     (error "%s is not a valid esxml expression" esxml))))
 
 (defun sxml-to-esxml (sxml)
   "Translates sxml to esxml so the common standard can be used.
-See: http://okmij.org/ftp/Scheme/SXML.html."
+See: http://okmij.org/ftp/Scheme/SXML.html. Additionally,
+(*RAW-STRING* \"string\") is translated to (raw-string
+\"string\")."
   (pcase sxml
+    (`(*RAW-STRING* ,body)
+     `(raw-string ,body))
+    (`(*COMMENT* ,body)
+     `(comment nil ,body))
     (`(,tag (@ . ,attrs) . ,body)
      `(,tag ,(mapcar (lambda (attr)
-                       (cons (first attr)
-                             (or (second attr)
-                                 (prin1-to-string (first attr)))))
+                       (cons (car attr)
+                             (or (cadr attr)
+                                 (prin1-to-string (car attr)))))
                      attrs)
             ,@(mapcar 'sxml-to-esxml body)))
     (`(,tag . ,body)
@@ -250,9 +288,9 @@ recurse below a match."
 ;; taken from kv
 (defmacro esxml-destructuring-mapcar (args sexp seq)
   (declare (indent 2))
-  (let ((entry (make-symbol)))
+  (let ((entry (make-symbol "entry")))
     `(mapcar (lambda (,entry)
-               (destructuring-bind ,args ,entry ,sexp))
+               (cl-destructuring-bind ,args ,entry ,sexp))
              ,seq)))
 
 (provide 'esxml)

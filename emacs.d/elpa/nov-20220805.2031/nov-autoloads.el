@@ -1,4 +1,4 @@
-;;; nov-autoloads.el --- automatically extracted autoloads
+;;; nov-autoloads.el --- automatically extracted autoloads  -*- lexical-binding: t -*-
 ;;
 ;;; Code:
 
@@ -21,7 +21,7 @@ See also `nov-bookmark-make-record'.
 
 \(fn BMK)" nil nil)
 
-(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "nov" '("nov-")))
+(register-definition-prefixes "nov" '("nov-"))
 
 ;;;***
 
