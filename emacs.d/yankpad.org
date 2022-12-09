@@ -167,3 +167,49 @@
          docs=False,
      )
    #+end_src
+
+* lua-mode
+
+** class-from-scratch
+   #+begin_src lua
+     Canvas = {}
+     Canvas.__index = Canvas
+     setmetatable(Canvas, {
+       __call = function(_, ...)
+         return Canvas.new(...)
+       end
+     })
+
+     function Canvas.new(r, c)
+       local c = setmetatable(
+         {
+           canvas = {},
+           rows = r,
+           cols = c
+         },
+         Canvas
+       )
+       c:clear_canvas()
+       return c
+     end
+
+     function Canvas:clear_canvas()
+       self.canvas = {}
+       for y = 1, self.rows do
+         add(self.canvas, {})
+         for x = 1, self.cols do
+           add(self.canvas[y], {
+             0, 0, 0, -- fg rgb
+             0, 0, 0, -- bg rgb
+             EMPTY, -- character
+             16, -- fg 265 color number
+             16 -- bg 265 color number
+           })
+         end
+       end
+     end
+
+     function Canvas:__tostring()
+       return "Canvas [rows:" .. tostring(self.rows) .. ", cols:" .. tostring(self.cols) .. "]"
+     end
+   #+end_src
