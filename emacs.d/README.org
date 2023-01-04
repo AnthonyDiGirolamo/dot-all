@@ -1717,6 +1717,8 @@
          :states '(insert)
          ;; Use ivy for tab completion
          ;; "<tab>" (lambda () (interactive) (pcomplete-std-complete))
+         ;; "C-e"  'eshell-previous-prompt
+         ;; "C-n"  'eshell-next-prompt
          "<down>" 'eshell-next-matching-input-from-input
          "<up>" 'eshell-previous-matching-input-from-input)
         (general-define-key
@@ -1806,6 +1808,7 @@
 
       (setq eshell-buffer-maximum-lines 2048)
       (add-hook 'eshell-output-filter-functions 'eshell-truncate-buffer)
+      (add-hook 'eshell-output-filter-functions 'eshell-handle-ansi-color)
 
       (setq eshell-kill-on-exit t)
       (setq eshell-cd-on-directory t
@@ -1819,10 +1822,10 @@
 
       ;; Plan 9 style shell
       ;; Still requires running eshell-smart-initialize in ~/.emacs.d/eshell/login
-      (require 'em-smart)
-      (setq eshell-where-to-jump 'begin)
-      (setq eshell-review-quick-commands t)
-      (setq eshell-smart-space-goes-to-end t)
+      ;; (require 'em-smart)
+      ;; (setq eshell-where-to-jump 'begin)
+      ;; (setq eshell-review-quick-commands t)
+      ;; (setq eshell-smart-space-goes-to-end t)
 
       ;; Disable Company mode
       (add-hook 'eshell-mode-hook (lambda () (company-mode -1)))
