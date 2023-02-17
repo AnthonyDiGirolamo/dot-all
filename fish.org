@@ -108,13 +108,13 @@
     test -f $config_local; and source $config_local
 
     function fish_greeting
-      if status is-interactive
-        if which lua 1>/dev/null 2>/dev/null
-          if test -f $HOME/dot-all/bin/ship.lua
-            $HOME/dot-all/bin/ship.lua
-          end
-        end
-      end
+      # if status is-interactive
+      #   if which lua 1>/dev/null 2>/dev/null
+      #     if test -f $HOME/dot-all/bin/ship.lua
+      #       $HOME/dot-all/bin/ship.lua
+      #     end
+      #   end
+      # end
     end
 
     # Dracula Colorscheme
@@ -266,6 +266,7 @@
      # end
 
      set powerline_right_arrow ''
+     set powerline_right_arrow ''
      if set -q INSIDE_EMACS; or set -q XTERM_VERSION; or string match -q -r 'raspberrypi|chip' $hostname
        set powerline_right_arrow ''
      end
@@ -275,6 +276,7 @@
      set powerline_blue2 87afff
      set powerline_blue3 dfdfff
      set -x fish_custom_prompt_show_hostname 0
+     set -x fish_custom_prompt_show_user 0
 
      function fish_prompt
        if set -q INSIDE_EMACS
@@ -283,10 +285,13 @@
        end
 
        set_color -b $powerline_blue1 black
+       if test 1 = $fish_custom_prompt_show_user
+         printf ' %s' $USER
+       end
        if test 1 = $fish_custom_prompt_show_hostname
-         printf ' %s@%s ' $USER $hostname
+         printf '@%s ' $hostname
        else
-         printf ' %s ' $USER
+         printf '  '
        end
 
        set_color -b $powerline_blue2 $powerline_blue1

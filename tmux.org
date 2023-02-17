@@ -189,7 +189,7 @@
      # DATE
      #   bg slightly darker light purple = colour189
      #   fg darker purple text           = colour63
-     set-option -g status-right '#[bg=terminal,fg=colour189] #h #[bg=terminal,fg=colour63] %F %R '
+     set-option -g status-right '#[bg=terminal,fg=colour189]#[bg=terminal,fg=colour63] %F %R '
 
      set -g display-panes-active-colour colour105  # big numbers shown by display-panes command
      set -g display-panes-colour        colour63

@@ -61,16 +61,20 @@
     font:
       normal:
         # family: Iosevka SS17
-        # style: Light
         family: PragmataPro
+        # family: Terminus
         style: Regular
+        # style: Light
+        # style: Bold
       bold:
         # family: Iosevka SS17
         family: PragmataPro
+        # family: Terminus
         style: Bold
       italic:
         # family: Iosevka SS17
         family: PragmataPro
+        # family: Terminus
         style: Italic
       # Point size of the font
       size: 18.0

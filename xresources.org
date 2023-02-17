@@ -7,7 +7,8 @@
     ! Font options - ~/.fonts.conf seems to override this
     ! Resolution for Xft in dots per inch (e.g. 96)
     ! Xft.dpi:       240
-    Xft.dpi:       120
+    ! Xft.dpi:       120
+    Xft.dpi:       96
     ! Type of subpixel antialiasing (none, rgb, bgr, vrgb or vbgr)
     Xft.rgba:      rgba
     Xft.antialias: 1
@@ -23,20 +24,21 @@
     ! URxvt*font:     6x9
     ! URxvt*boldFont: 6x9
 
-    URxvt*font:     xft:Iosevka\ Term\ SS17\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
-    URxvt*boldFont: xft:Iosevka\ Term\ SS17\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
-    xterm*faceName: xft:Iosevka\ Term\ SS17\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=120
+    ! URxvt*font:     xft:Iosevka\ Term\ SS17\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
+    ! URxvt*boldFont: xft:Iosevka\ Term\ SS17\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=true:hintstyle=hintslight:dpi=120
+    ! xterm*faceName: xft:Iosevka\ Term\ SS17\ Light:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=120
     ! URxvt*font:     xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
     ! URxvt*boldFont: xft:PragmataPro:size=FONTSIZE:antialias=true:hinting=true:autohint=false:hintstyle=hintnone:dpi=101
 
-    ! xterm*faceName: xft:Terminus
-    xterm*faceSize: 16.0
+    xterm*faceName: xft:Terminus:bold
+    xterm*faceSize: 14.0
     xterm*faceSize1: 7.0
     xterm*faceSize2: 8.0
     xterm*faceSize3: 12.0
     xterm*faceSize4: 13.0
     xterm*faceSize5: 14.0
     xterm*faceSize6: 19.0
+    xterm*geometry: 80x33
 
     ! Extra options for xft font spec - ~/.fonts.conf seems to override this
     !:antialias=false:hintstyle=hintfull

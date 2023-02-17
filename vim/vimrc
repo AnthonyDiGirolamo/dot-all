@@ -135,6 +135,10 @@ nnoremap <leader>sw :set list!<cr>
 nnoremap <leader>t :Dispatch -compiler=pytest -dir=~/project rake test<CR>
 " nnoremap <leader>t :!bash -c 'cd ~/kadc-on-call/ && rake test'<CR>
 
+nnoremap <leader>tl :tabnext<cr>
+nnoremap <leader>tL :tabnew<cr>
+nnoremap <leader>th :tabprevious<cr>
+
 " Run make using Dispatch
 nnoremap <leader>rr :Make<cr>
 nnoremap <leader>rc :Make<space>
@@ -158,7 +162,7 @@ nnoremap <leader>p :cprevious<cr>
 nnoremap <leader>u :UndotreeToggle<cr>
 nnoremap <leader>g :Git<cr>
 nnoremap <leader>bb :CtrlPBuffer<cr>
-nnoremap <leader>bk :q<cr>
+nnoremap <leader>bk :q!<cr>
 nnoremap <leader>m :CtrlPBufTagAll<cr>
 nnoremap <leader>o :silent !ctags -R *.py kadc tests<cr>:CtrlPTag<cr>
 
