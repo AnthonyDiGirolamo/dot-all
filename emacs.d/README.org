@@ -4501,23 +4501,21 @@
         (kill-new (shell-command-to-string "xclip -selection clipboard -o -t text/html | pandoc -f html -t org"))
         (yank))
 
-      (defun amd/clipboard-org-to-html-pandoc-mac (begin end)
-        "Convert the org region to html and put it on the clipboard."
-        (interactive "r")
-        (require 'dash)
-        (let* ((old-buffer (current-buffer)))
-          (with-temp-buffer
-            (insert-buffer-substring old-buffer begin end)
-            (shell-command-on-region (point-min) (point-max)
-                                     "pandoc -f org -t html"; | ruby -e 'STDOUT.write(\"«data HTML\"+STDIN.read.unpack(\"H*\").first.upcase.chomp+\"»\" )'"
-                                     (current-buffer) t)
-
-            (let ((hex-encoded-string (->> (string-to-list (buffer-string))
-                                           (--map (format "%02X" it))
-                                           (-reduce 'concat))))
-              (message (shell-command-to-string (concat "osascript -e \"set the clipboard to «data HTML" hex-encoded-string "»\"")))))
-          (evil-normal-state)
-          ))
+      (defun amd/clipboard-org-to-html-mac ()
+        "Convert the org buffer to html and put it on the clipboard."
+        (interactive)
+        (let* ((html-output-buffer (org-html-export-as-html)))
+          (switch-to-buffer
+           html-output-buffer
+           (let ((hex-encoded-string
+                  (cl-loop for line in (string-to-list (buffer-string))
+                           concat (format "%02X" line))))
+             (message (shell-command-to-string (concat "osascript -e \"set the clipboard to «data HTML" hex-encoded-string "»\"")))
+             )
+           )
+          (delete-window)
+          )
+        )
 
       (defun org-agenda-cts ()
         (let ((args (get-text-property
