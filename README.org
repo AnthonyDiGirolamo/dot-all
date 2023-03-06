@@ -28,19 +28,9 @@
     update-xcape         git pull xcape source
   #+end_src
 
-** ~make symlinks~
-
-   This will symlink ~.vim~ and ~.emacs.d~.
-
-   #+begin_src text
-     [SYMLINKS]
-       '~/.vim'     -> '~/dot-all/vim'
-       '~/.emacs.d' -> '~/dot-all/emacs.d'
-   #+end_src
-
 ** ~make tangleawk~
 
-   This will run the ~tangle.awk~ script which attempts to mimic emacs
+   This will run the ~tangle.awk~ script which attempts to emulate emacs
    ~org-babel-tangle-file~ but without emacs installed.
 
    - It will copy each source block in a given ~*.org~ file into it's respective
@@ -109,7 +99,26 @@
        ~/.zshrc.local
    #+end_src
 
-
 ** ~make tangleorg~
 
    Alternative to ~tangleawk~ this uses emacs to tangle all ~*.org~ files.
+
+** ~./make.awk~
+
+   This is a ~gawk~ based task runner with some convenience functions for
+   running shell commands, downloading archives, and git cloning.
+
+   #+begin_src sh
+     $ ./make.awk
+     t, tangle             tangle all org files
+     build                 run test & lint
+     test                  awk unit tests
+     lint                  awk linting
+     install_emacs27       download, compile and install emacs27
+     install_emacs28       download, compile and install emacs28
+     install_emacs_git     download, compile and install emacs from git
+     install_fish          download, compile and install fish-shell
+     install_lua54         download, compile and install lua 5.4
+   #+end_src
+
+   It covers most of the use cases I needed in the root ~Makefile~.

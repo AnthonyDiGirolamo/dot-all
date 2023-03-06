@@ -49,23 +49,14 @@ test: ## tangle_test.awk
 lint: ## Lint: tangle.awk
 	@env TANGLEAWK_DRYRUN=1 gawk --lint=no-ext -f ./tangle.awk *.org 1>/dev/null
 
-all: clean t symlinks  ## clean and tangle all
+all: clean t  ## clean and tangle all
 t: tangle  ## tangle alias
 tangle: tangleawk  ## tangleawk alias
 tangleorg: mkdirs $(ORG_OUT_FILES) rm-removed-files  ## tangle all dotfiles with emacs+org-mode
 tangleawk: mkdirs ## tangle all dotfiles with gawk
-	@./tangle.awk *.org
+	@./awkpath/tangle.awk *.org
 
 tmux: mkdirs .cache/terminfo.out .cache/tmux.out
-
-.PHONY: symlinks
-.ONESHELL:
-symlinks:  ## symlink folders
-	@echo '[SYMLINKS]'
-	@echo -n '  '
-	@ln -snvf $(abspath ./vim) $(HOME)/.vim
-	@echo -n '  '
-	@ln -snvf $(abspath ./emacs.d) $(HOME)/.emacs.d
 
 .PHONY: install-gtk-themes
 .ONESHELL:
