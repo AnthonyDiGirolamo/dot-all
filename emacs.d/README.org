@@ -2376,6 +2376,7 @@
       (magit-diff-expansion-threshold 10.0)
       (magit-commit-show-diff nil)
       :init
+      (setq git-commit-fill-column 70)
       :general
       ;; (:keymaps '(magit-popup-mode-map)
       ;;  amd/leader-key 'amd/quit-magit-and-leader)
