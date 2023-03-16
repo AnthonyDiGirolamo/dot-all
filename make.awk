@@ -99,8 +99,8 @@ function install_lua54() {
 
 function install_fish() {
     tarfile = make::download("fish",
-        "https://github.com/fish-shell/fish-shell/releases/download/3.3.1/fish-3.3.1.tar.xz",
-        "94be285255aadfcf0f910bdcc2f56073")
+        "https://github.com/fish-shell/fish-shell/releases/download/3.6.0/fish-3.6.0.tar.xz",
+        "2a1ae1070c6486093cbea507da8b30e0")
     make::compile(make::extract_tar(tarfile),
         "cmake -DCMAKE_INSTALL_PREFIX=~/apps/fish .\n" \
         "make -j 4\n" \
