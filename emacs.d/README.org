@@ -1,92 +1,92 @@
 #+STARTUP: showall
 #+PROPERTY: header-args :tangle "~/.emacs.d/README.el"
 
-* Table of Contents                                                     :TOC:
- - [[#top-level-settings][top level settings]]
- - [[#fonts][fonts]]
- - [[#libraries][libraries]]
- - [[#appearance][appearance]]
-   - [[#themes][themes]]
-   - [[#leuven-light][leuven light]]
-   - [[#moe-dark][moe dark]]
-   - [[#doom-themes][doom-themes]]
-   - [[#solaire-mode][solaire-mode]]
-   - [[#modeline][modeline]]
-   - [[#load-theme][load theme]]
-   - [[#appearance-minor-modes][appearance minor-modes]]
- - [[#amdfunctions][amd/functions]]
- - [[#evil-mode][evil-mode]]
- - [[#packages-built-in][packages (built-in)]]
-   - [[#auto-revert-mode][Auto Revert mode]]
-   - [[#recent-files-mode][Recent Files mode]]
-   - [[#re-builder][re-builder]]
-   - [[#saveplace---save-last-position-in-a-file][saveplace - save last position in a file]]
-   - [[#savehist---save-minibuffer-history][savehist - save minibuffer history]]
-   - [[#desktop---save-buffers-windows-and-eyebrowse-tabs-between-sessions][desktop - save buffers, windows, and eyebrowse (tabs) between sessions]]
-   - [[#dired][dired]]
-   - [[#eshell][eshell]]
-   - [[#shell][shell]]
-   - [[#ansi-color][ansi-color]]
-   - [[#compilation][compilation]]
-   - [[#calc][calc]]
-   - [[#winner---window-layout-undoredo][winner - window layout undo/redo]]
-   - [[#eww][eww]]
- - [[#vterm][vterm]]
- - [[#novel][nov.el]]
- - [[#company-auto-completion][company auto-completion]]
- - [[#key-discovery][key discovery]]
- - [[#snippets][snippets]]
- - [[#wgrep][wgrep]]
- - [[#magit---version-control][magit - version-control]]
-   - [[#transient][transient]]
-   - [[#ediff][ediff]]
- - [[#spell-checking][spell checking]]
- - [[#navigation][navigation]]
-   - [[#avy][avy]]
-   - [[#undo-tree][undo-tree]]
-   - [[#tab-bar-mode][tab-bar-mode]]
-   - [[#eyebrowse---tabs][eyebrowse - tabs]]
-   - [[#ace-window][ace-window]]
-   - [[#ace-link][ace-link]]
-   - [[#projectile][projectile]]
-   - [[#shackle][shackle]]
-   - [[#ibuffer][ibuffer]]
-   - [[#tmux-window-navigation][tmux-window-navigation]]
-   - [[#which-func][which-func]]
- - [[#language-major-modes][language major-modes]]
- - [[#hydra][hydra]]
- - [[#hydra-leader-menus][hydra leader menus]]
-   - [[#main-leader-hydra][Main Leader Hydra]]
-   - [[#major-mode-leader-hydra-function][Major Mode Leader Hydra Function]]
-   - [[#org-hydra][Org Hydra]]
-   - [[#emacs-lisp-hydra][Emacs-Lisp Hydra]]
- - [[#completion-frameworks][completion frameworks]]
-   - [[#orderless][orderless]]
-   - [[#consult][consult]]
-   - [[#embark][embark]]
-   - [[#vertico][vertico]]
-   - [[#marginalia][marginalia]]
-   - [[#ivy][ivy]]
-   - [[#ivy-xref][ivy-xref]]
-   - [[#swiper][swiper]]
-   - [[#counsel][counsel]]
-   - [[#ivy-posframe][ivy-posframe]]
- - [[#helpful][helpful]]
- - [[#fun][fun]]
- - [[#org][org]]
-   - [[#help-docs][Help docs]]
-   - [[#use-package-org][use-package org]]
-   - [[#org-exports][org exports]]
-   - [[#org-capture][org-capture]]
-   - [[#kanbanel][kanban.el]]
-   - [[#toc-org][toc-org]]
-   - [[#org-protocol][org-protocol]]
- - [[#elisp-links][elisp links]]
- - [[#edit-with-emacs-and-cvim][edit-with-emacs and cvim]]
- - [[#view-large-files][view large files]]
- - [[#emacs-and-git-on-windows][emacs and git on windows]]
- - [[#tramp][tramp]]
- - [[#screencast][screencast]]
+* Table of Contents                                            :TOC:noexport:
+- [[#top-level-settings][top level settings]]
+- [[#fonts][fonts]]
+- [[#libraries][libraries]]
+- [[#appearance][appearance]]
+  - [[#themes][themes]]
+  - [[#leuven-light][leuven light]]
+  - [[#moe-dark][moe dark]]
+  - [[#doom-themes][doom-themes]]
+  - [[#solaire-mode][solaire-mode]]
+  - [[#modeline][modeline]]
+  - [[#load-theme][load theme]]
+  - [[#appearance-minor-modes][appearance minor-modes]]
+- [[#amdfunctions][amd/functions]]
+- [[#evil-mode][evil-mode]]
+- [[#packages-built-in][packages (built-in)]]
+  - [[#auto-revert-mode][Auto Revert mode]]
+  - [[#recent-files-mode][Recent Files mode]]
+  - [[#re-builder][re-builder]]
+  - [[#saveplace---save-last-position-in-a-file][saveplace - save last position in a file]]
+  - [[#savehist---save-minibuffer-history][savehist - save minibuffer history]]
+  - [[#desktop---save-buffers-windows-and-eyebrowse-tabs-between-sessions][desktop - save buffers, windows, and eyebrowse (tabs) between sessions]]
+  - [[#dired][dired]]
+  - [[#eshell][eshell]]
+  - [[#shell][shell]]
+  - [[#ansi-color][ansi-color]]
+  - [[#compilation][compilation]]
+  - [[#calc][calc]]
+  - [[#winner---window-layout-undoredo][winner - window layout undo/redo]]
+  - [[#eww][eww]]
+- [[#vterm][vterm]]
+- [[#novel][nov.el]]
+- [[#company-auto-completion][company auto-completion]]
+- [[#key-discovery][key discovery]]
+- [[#snippets][snippets]]
+- [[#wgrep][wgrep]]
+- [[#magit---version-control][magit - version-control]]
+  - [[#transient][transient]]
+  - [[#ediff][ediff]]
+- [[#spell-checking][spell checking]]
+- [[#navigation][navigation]]
+  - [[#avy][avy]]
+  - [[#undo-tree][undo-tree]]
+  - [[#tab-bar-mode][tab-bar-mode]]
+  - [[#eyebrowse---tabs][eyebrowse - tabs]]
+  - [[#ace-window][ace-window]]
+  - [[#ace-link][ace-link]]
+  - [[#projectile][projectile]]
+  - [[#shackle][shackle]]
+  - [[#ibuffer][ibuffer]]
+  - [[#tmux-window-navigation][tmux-window-navigation]]
+  - [[#which-func][which-func]]
+- [[#language-major-modes][language major-modes]]
+- [[#hydra][hydra]]
+- [[#hydra-leader-menus][hydra leader menus]]
+  - [[#main-leader-hydra][Main Leader Hydra]]
+  - [[#major-mode-leader-hydra-function][Major Mode Leader Hydra Function]]
+  - [[#org-hydra][Org Hydra]]
+  - [[#emacs-lisp-hydra][Emacs-Lisp Hydra]]
+- [[#completion-frameworks][completion frameworks]]
+  - [[#orderless][orderless]]
+  - [[#consult][consult]]
+  - [[#embark][embark]]
+  - [[#vertico][vertico]]
+  - [[#marginalia][marginalia]]
+  - [[#ivy][ivy]]
+  - [[#ivy-xref][ivy-xref]]
+  - [[#swiper][swiper]]
+  - [[#counsel][counsel]]
+  - [[#ivy-posframe][ivy-posframe]]
+- [[#helpful][helpful]]
+- [[#fun][fun]]
+- [[#org][org]]
+  - [[#help-docs][Help docs]]
+  - [[#use-package-org][use-package org]]
+  - [[#org-exports][org exports]]
+  - [[#org-capture][org-capture]]
+  - [[#kanbanel][kanban.el]]
+  - [[#toc-org][toc-org]]
+  - [[#org-protocol][org-protocol]]
+- [[#elisp-links][elisp links]]
+- [[#edit-with-emacs-and-cvim][edit-with-emacs and cvim]]
+- [[#view-large-files][view large files]]
+- [[#emacs-and-git-on-windows][emacs and git on windows]]
+- [[#tramp][tramp]]
+- [[#screencast][screencast]]
 
 * top level settings
 
@@ -848,10 +848,10 @@
 
     #+begin_src emacs-lisp
       ;; (amd/leuven-light-theme)
-      (amd/doom-one-theme)
-      (load-theme 'airline-doom-one t)
+      ;; (amd/doom-one-theme)
       ;; (amd/moe-dark-theme)
-      ;; (amd/doom-snazzy-theme)
+      (amd/doom-snazzy-theme)
+      (load-theme 'airline-doom-one t)
 
       ;; (load-theme 'doom-palenight)
       ;; (custom-theme-set-faces
@@ -2529,6 +2529,8 @@
       ;; :commands (undo-tree-visualize)
       :custom
       (undo-tree-auto-save-history nil)
+      (undo-tree-history-directory-alist
+       '(("." . "~/.emacs.d/undo-tree-history")))
       :init
       (setq undo-tree-visualizer-timestamps t
             undo-tree-visualizer-diff t)
@@ -4256,7 +4258,7 @@
 
 
       ;; Square Bullets
-      (setq org-bullets-bullet-list (quote ("■" "■" "■" "■" "■" "■" "■" "■")))
+      ;; (setq org-bullets-bullet-list (quote ("■" "■" "■" "■" "■" "■" "■" "■")))
       ;; Roman Numeral Bullets
       ;; (setq org-bullets-bullet-list (quote ("Ⅰ" "Ⅱ" "Ⅲ" "Ⅳ" "Ⅴ" "Ⅵ" "Ⅶ" "Ⅷ" "Ⅸ" "Ⅹ" "Ⅺ" "Ⅻ")))
       ;; Nubered Circle Dingbat Bullets
@@ -4351,7 +4353,8 @@
       ;; #+STARTUP: odd
       ;; #+STARTUP: indent
       ;; #+STARTUP: hidestars
-      (add-hook 'org-mode-hook 'org-bullets-mode)
+      ;; (add-hook 'org-mode-hook 'org-bullets-mode)
+
       (add-hook 'org-mode-hook 'flyspell-mode)
       ;; (add-hook 'org-mode-hook 'pandoc-mode)
 

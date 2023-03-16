@@ -1,10 +1,11 @@
 ;;; leuven-dark-theme.el --- Awesome Emacs color theme on dark background
 
-;; Copyright (C) 2003-2020 Free Software Foundation, Inc.
+;; Copyright (C) 2003-2022 Free Software Foundation, Inc.
 
 ;; Author: Fabrice Niessen <(concat "fniessen" at-sign "pirilampo.org")>
-;; URL: https://github.com/fniessen/emacs-leuven-dark-theme
-;; Version: 20200102.2050
+;; Contributor: Thibault Polge <(concat "thibault" at-sign "thb.lt")>
+;; URL: https://github.com/fniessen/emacs-leuven-theme
+;; Version: 1.0
 ;; Keywords: color theme
 
 ;; This file is part of GNU Emacs.
@@ -20,7 +21,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
+;; along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -45,24 +46,43 @@
 The theme has to be reloaded after changing anything in this group."
   :group 'faces)
 
-(defcustom leuven-dark-scale-outline-headlines t
-  "Scale `outline' (and `org') level-1 headlines.
-This can be nil for unscaled, t for using the theme default, or a scaling number."
+(defcustom leuven-dark-scale-org-document-title t
+  "Scale Org document title.
+This can be nil for unscaled, t for using the theme default, or a scaling
+number."
   :type '(choice
           (const :tag "Unscaled" nil)
           (const :tag "Default provided by theme" t)
-          (number :tag "Set scaling"))
-  :group 'leuven-dark)
+          (number :tag "Set scaling")))
+
+(defcustom leuven-dark-scale-outline-headlines t
+  "Scale `outline' (and `org') level-1 headlines.
+This can be nil for unscaled, t for using the theme default, or a scaling
+number."
+  :type '(choice
+          (const :tag "Unscaled" nil)
+          (const :tag "Default provided by theme" t)
+          (number :tag "Set scaling")))
 
 (defcustom leuven-dark-scale-org-agenda-structure t
   "Scale Org agenda structure lines, like dates.
-This can be nil for unscaled, t for using the theme default, or a scaling number."
+This can be nil for unscaled, t for using the theme default, or a scaling
+number."
   :type '(choice
           (const :tag "Unscaled" nil)
           (const :tag "Default provided by theme" t)
-          (number :tag "Set scaling"))
-  :group 'leuven-dark)
+          (number :tag "Set scaling")))
 
+(defcustom leuven-dark-scale-volatile-highlight t
+  "Increase size in the `next-error' face.
+This can be nil for unscaled, t for using the theme default, or a scaling
+number."
+  :type '(choice
+          (const :tag "Unscaled" nil)
+          (const :tag "Default provided by theme" t)
+          (number :tag "Set scaling")))
+
+;;;###autoload
 (defun leuven-dark-scale-font (control default-height)
   "Function for splicing optional font heights into face descriptions.
 CONTROL can be a number, nil, or t.  When t, use DEFAULT-HEIGHT."
@@ -84,8 +104,8 @@ more...")
       ;; Leuven generic colors.
       (cancel '(:slant italic :strike-through t :foreground "#5b5660"))
       (clock-line '(:box (:line-width 1 :color "#cfa161") :foreground "#ffffff" :background "#1636ff"))
-      (code-block '(:foreground "#ffff7f" :background "#252046" :extend t))
-      (code-inline '(:foreground "#ff9bff" :background "#262031" :extend t))
+      (code-block '(:foreground "#ffff7f" :background "#252046"))
+      (code-inline '(:foreground "#ff9bff" :background "#262031"))
       (column '(:height 1.0 :weight normal :slant normal :underline nil :strike-through nil :foreground "#1e52b8" :background "#252c48"))
       (completion-inline '(:weight normal :foreground "#443f49" :inherit hl-line)) ; Like Google.
       (completion-other-candidates '(:weight bold :foreground "#ffffff" :background "#372a2a"))
@@ -103,12 +123,12 @@ more...")
       (function-param '(:foreground "#de8d83"))
       (grep-file-name '(:weight bold :foreground "#d8b76b")) ; Used for grep hits.
       (grep-line-number '(:weight bold :foreground "#5fca5b"))
-      (highlight-blue '(:background "#3c312a" :extend t))
-      (highlight-blue2 '(:background "#3e2d2f" :extend t))
-      (highlight-gray '(:background "#3e3944" :extend t))
-      (highlight-green '(:background "#2f0e3a" :extend t))
-      (highlight-red '(:background "#063741" :extend t))
-      (highlight-yellow '(:background "#2d2058" :extend t))
+      (highlight-blue '(:background "#3c312a"))
+      (highlight-blue2 '(:background "#3e2d2f"))
+      (highlight-gray '(:background "#3e3944"))
+      (highlight-green '(:background "#2f0e3a"))
+      (highlight-red '(:background "#063741"))
+      (highlight-yellow '(:background "#2d2058"))
       (link '(:weight normal :underline t :foreground "#ff925a"))
       (link-no-underline '(:weight normal :foreground "#ff925a"))
       (mail-header-name '(:family "Sans Serif" :weight normal :foreground "#615c67"))
@@ -121,17 +141,17 @@ more...")
       (mail-unread-high '(:weight bold :foreground "#eea682"))
       (marked-line '(:foreground "#5affff" :background "#06555f"))
       (match '(:weight bold :background "#0601ff")) ; occur patterns + match in helm for files + match in Org files.
-      (ol1 `(,@(leuven-dark-scale-font leuven-dark-scale-outline-headlines 1.3) :weight bold :overline "#5d5862" :foreground "#c7c3cb" :background "#322d37" :extend t))
-      (ol2 '(:height 1.0 :weight bold :overline "#efcab2" :foreground "#efcab2" :background "#3d2a2d" :extend t))
-      (ol3 '(:height 1.0 :weight bold :foreground "#ffaae3" :background "#332038" :extend t))
-      (ol4 '(:height 1.0 :weight bold :slant normal :foreground "#1a9cff" :extend t))
-      (ol5 '(:height 1.0 :weight bold :slant normal :foreground "#21da7a" :extend t))
-      (ol6 '(:height 1.0 :weight bold :slant italic :foreground "#ff883d" :extend t))
-      (ol7 '(:height 1.0 :weight bold :slant italic :foreground "#d451d9" :extend t))
-      (ol8 '(:height 1.0 :weight bold :slant italic :foreground "#077ffa" :extend t))
-      (paren-matched '(:background "#441746")) ; Or take that green for region?
+      (ol1 `(,@(leuven-dark-scale-font leuven-dark-scale-outline-headlines 1.3) :weight bold :overline "#5d5862" :foreground "#c7c3cb" :background "#322d37"))
+      (ol2 '(:height 1.0 :weight bold :overline "#efcab2" :foreground "#efcab2" :background "#3d2a2d"))
+      (ol3 '(:height 1.0 :weight bold :foreground "#ffaae3" :background "#332038"))
+      (ol4 '(:height 1.0 :weight bold :slant normal :foreground "#1a9cff"))
+      (ol5 '(:height 1.0 :weight bold :slant normal :foreground "#21da7a"))
+      (ol6 '(:height 1.0 :weight bold :slant italic :foreground "#ff883d"))
+      (ol7 '(:height 1.0 :weight bold :slant italic :foreground "#d451d9"))
+      (ol8 '(:height 1.0 :weight bold :slant italic :foreground "#077ffa"))
+      (paren-matched '(:background "#7B4B98")) ; XXX Edited by hqnd.
       (paren-unmatched '(:weight bold :underline "#06ffff" :foreground "#ffffff" :background "#065a64"))
-      (region '(:background "#752c0b" :extend t))
+      (region '(:background "#752c0b"))
       (shadow '(:foreground "#848088"))
       (string '(:foreground "#ff7fff")) ; or #34c8d8
       (subject '(:family "Sans Serif" :weight bold :foreground "#ffffff"))
@@ -139,7 +159,7 @@ more...")
       (tab '(:foreground "#3a353f" :background "#25202a"))
       (trailing '(:foreground "#3a353f" :background "#252076"))
       (volatile-highlight '(:underline nil :foreground "#25202a" :background "#66c96f"))
-      (volatile-highlight-supersize '(:height 1.1 :underline nil :foreground "#25202a" :background "#66c96f")) ; flash-region
+      (volatile-highlight-supersize `(,@(leuven-dark-scale-font leuven-dark-scale-volatile-highlight 1.1) :underline nil :foreground "#25202a" :background "#66c96f")) ; flash-region
       (vc-branch '(:box (:line-width 1 :color "#ff33d2") :foreground "#ffffff" :background "#5a015f"))
       (xml-attribute '(:foreground "#119cd0"))
       (xml-tag '(:foreground "#56e46f"))
@@ -314,15 +334,15 @@ more...")
    `(smerge-refined-change ((,class (:background "#5a550b"))))
 
    ;; Ediff.
-   `(ediff-current-diff-A ((,class (:background "#253f49" :extend t))))
-   `(ediff-current-diff-B ((,class (:background "#442049" :extend t))))
-   `(ediff-current-diff-C ((,class (:background "#ff010b" :extend t))))
-   `(ediff-even-diff-A ((,class (:background "#312c36" :extend t))))
-   `(ediff-even-diff-B ((,class (:background "#312c36" :extend t))))
-   `(ediff-fine-diff-A ((,class (:background "#06555f" :extend t))))
-   `(ediff-fine-diff-B ((,class (:background "#ae01b2" :extend t))))
-   `(ediff-odd-diff-A ((,class (:background "#312c36" :extend t))))
-   `(ediff-odd-diff-B ((,class (:background "#312c36" :extend t))))
+   `(ediff-current-diff-A ((,class (:background "#253f49"))))
+   `(ediff-current-diff-B ((,class (:background "#442049"))))
+   `(ediff-current-diff-C ((,class (:background "#ff010b"))))
+   `(ediff-even-diff-A ((,class (:background "#312c36"))))
+   `(ediff-even-diff-B ((,class (:background "#312c36"))))
+   `(ediff-fine-diff-A ((,class (:background "#06555f"))))
+   `(ediff-fine-diff-B ((,class (:background "#ae01b2"))))
+   `(ediff-odd-diff-A ((,class (:background "#312c36"))))
+   `(ediff-odd-diff-B ((,class (:background "#312c36"))))
 
    ;; Flyspell.
    (if (version< emacs-version "24.4")
@@ -414,6 +434,7 @@ more...")
    `(popup-scroll-bar-background-face ((,class (:background "#372a2a"))))
    `(popup-scroll-bar-foreground-face ((,class (:background "#332525")))) ; Scrollbar (visible).
 
+   ;; Company.
    `(company-tooltip-common-selection ((,class (:weight normal :foreground "#2a3159" :inherit company-tooltip-selection)))) ; Prefix + common part in tooltip (for selection).
    `(company-tooltip-selection ((,class ,completion-selected-candidate))) ; Suffix in tooltip (for selection).
    `(company-tooltip-annotation-selection ((,class (:weight normal :foreground "#2a3159")))) ; Annotation (for selection).
@@ -421,9 +442,8 @@ more...")
    `(company-tooltip-common ((,class (:weight normal :foreground "#54ff59" :inherit company-tooltip)))) ; Prefix + common part in tooltip.
    `(company-tooltip ((,class ,completion-other-candidates))) ; Suffix in tooltip.
    `(company-tooltip-annotation ((,class (:weight normal :foreground "#deea0b")))) ; Annotation.
-
+   `(company-preview ((,class ,completion-inline)))
    `(company-preview-common ((,class ,completion-inline)))
-
    `(company-scrollbar-bg ((,class (:background "#372a2a"))))
    `(company-scrollbar-fg ((,class (:background "#332525")))) ; Scrollbar (visible).
 
@@ -499,6 +519,7 @@ more...")
    `(dired-mark ((,class ,marked-line)))
    `(dired-marked ((,class ,marked-line)))
    `(dired-symlink ((,class ,symlink)))
+   `(diredfl-compressed-file-suffix ((,class (:foreground "#ffffff" :background "#2526c0"))))
    `(diredp-compressed-file-suffix ((,class (:foreground "#06ffff"))))
    `(diredp-date-time ((,class (:foreground "#64df19"))))
    `(diredp-dir-heading ((,class ,directory)))
@@ -512,6 +533,7 @@ more...")
    `(diredp-ignored-file-name ((,class ,shadow)))
    `(diredp-read-priv ((,class (:background "#f7660b"))))
    `(diredp-write-priv ((,class (:foreground "#25202a" :background "#06bfc7"))))
+   `(doom-modeline-panel ((,class (:foreground "#ffffff" :background "#2526c0"))))
    `(eldoc-highlight-function-argument ((,class (:weight bold :foreground "#06ffff" :background "#25392a"))))
    `(elfeed-search-filter-face ((,class (:foreground "#46414b"))))
    ;; `(eww-form-checkbox ((,class ())))
@@ -595,11 +617,11 @@ more...")
    `(helm-source-header ((,class (:weight bold :box (:line-width 1 :color "#3d3842") :background "#433e48" :foreground "#ffffff"))))
    `(helm-swoop-target-line-block-face ((,class (:background "#3833ff" :foreground "#e0dde3"))))
    `(helm-swoop-target-line-face ((,class (:background "#38330b"))))
-   `(helm-swoop-target-word-face ((,class (:weight bold :foreground nil :background "#0742d2"))))
+   `(helm-swoop-target-word-face ((,class (:weight bold :foreground unspecified :background "#0742d2"))))
    `(helm-visible-mark ((,class ,marked-line)))
    `(helm-w3m-bookmarks-face ((,class (:underline t :foreground "#ff010b"))))
-   `(highlight-changes ((,class (:foreground nil)))) ;; blue "#d4f754"
-   `(highlight-changes-delete ((,class (:strike-through nil :foreground nil)))) ;; red "#4ff7d7"
+   `(highlight-changes ((,class (:foreground unspecified)))) ;; blue "#d4f754"
+   `(highlight-changes-delete ((,class (:strike-through nil :foreground unspecified)))) ;; red "#4ff7d7"
    `(highlight-symbol-face ((,class (:background "#252080"))))
    `(hl-line ((,class ,highlight-yellow))) ; Highlight current line.
    `(hl-tags-face ((,class ,highlight-current-tag))) ; ~ Pair highlighting (matching tags).
@@ -617,7 +639,7 @@ more...")
    `(info-file ((,class (:family "Sans Serif" :height 1.8 :weight bold :box (:line-width 1 :color "#ffff3d") :foreground "#9f6a1c" :background "#563c2a"))))
    `(info-header-node ((,class (:underline t :foreground "#065aff")))) ; nodes in header
    `(info-header-xref ((,class (:underline t :foreground "#e46f0b")))) ; cross references in header
-   `(info-index-match ((,class (:weight bold :foreground nil :background "#0742d2")))) ; when using `i'
+   `(info-index-match ((,class (:weight bold :foreground unspecified :background "#0742d2")))) ; when using `i'
    `(info-menu-header ((,class ,ol2))) ; menu titles (headers) -- major topics
    `(info-menu-star ((,class (:foreground "#ffffff")))) ; every 3rd menu item
    `(info-node ((,class (:underline t :foreground "#ffff0b")))) ; node names
@@ -655,6 +677,9 @@ more...")
    `(linum ((,class (:foreground "#6a656f" :background "#35303a"))))
    `(log-view-file ((,class (:foreground "#ffff3d" :background "#382c33"))))
    `(log-view-message ((,class (:foreground "#ffffff" :background "#171593"))))
+   `(lsp-modeline-code-actions-preferred-face ((,class (:foreground "#ffffff" :background "#2526c0"))))
+   `(lsp-ui-doc-background ((,class (:background "#2d2058"))))
+   `(lsp-ui-sideline-code-action ((,class (:foreground "#ffffff" :background "#2526c0"))))
    `(lui-button-face ((,class ,link)))
    `(lui-highlight-face ((,class (:box '(:line-width 1 :color "#38ffff") :foreground "#38ffff" :background "#06017f")))) ; my nickname
    `(lui-time-stamp-face ((,class (:foreground "#64df19"))))
@@ -675,6 +700,7 @@ more...")
    `(magit-item-mark ((,class ,marked-line)))
    `(magit-log-head-label ((,class (:box (:line-width 1 :color "#ffff0b" :style nil)))))
    `(magit-log-tag-label ((,class (:box (:line-width 1 :color "#ff33ff" :style nil)))))
+   `(magit-section-highlight ((,class (:background  "#2d2058"))))
    `(magit-section-title ((,class (:family "Sans Serif" :height 1.8 :weight bold :foreground "#9f6a1c" :inherit nil))))
    `(makefile-space-face ((,class (:background "#069655"))))
    `(makefile-targets ((,class (:weight bold :foreground "#ffff0b"))))
@@ -746,9 +772,9 @@ more...")
    `(org-archived ((,class (:foreground "#514c56"))))
    `(org-beamer-tag ((,class (:box (:line-width 1 :color "#0a43ed") :foreground "#d6d3d9" :background "#252655"))))
    `(org-block ((,class ,code-block)))
-   `(org-block-background ((,class (:background "#252046" :extend t)))) ;; :inherit fixed-pitch))))
-   `(org-block-begin-line ((,class (:underline "#5d595f" :foreground "#aeaab2" :background "#221e34" :extend t))))
-   `(org-block-end-line ((,class (:overline "#5d595f" :foreground "#aeaab2" :background "#221e34" :extend t))))
+   `(org-block-background ((,class (:background "#252046")))) ;; :inherit fixed-pitch))))
+   `(org-block-begin-line ((,class (:underline "#5d595f" :foreground "#aeaab2" :background "#221e34"))))
+   `(org-block-end-line ((,class (:overline "#5d595f" :foreground "#aeaab2" :background "#221e34"))))
    `(org-checkbox ((,class (:weight bold :box (:line-width 1 :style pressed-button) :foreground "#efcab2" :background "#615c66"))))
    `(org-clock-overlay ((,class (:foreground "#25202a" :background "#b98f7c"))))
    `(org-code ((,class ,code-inline)))
@@ -759,14 +785,23 @@ more...")
    `(org-dim ((,class (:foreground "#5a555f"))))
    `(org-document-info ((,class (:foreground "#bbb7bf"))))
    `(org-document-info-keyword ((,class (:foreground "#ff7138" :background "#38332a"))))
-   `(org-document-title ((,class (:height 1.8 :weight bold :foreground "#ffffff"))))
+   `(org-document-title ((,class (,@(leuven-dark-scale-font leuven-dark-scale-org-document-title 1.8)  :weight bold :foreground "#ffffff"))))
    `(org-done ((,class (:weight bold :box (:line-width 1 :color "#49444e") :foreground "#49444e" :background "#322d37"))))
-   `(org-drawer ((,class (:foreground "#7c310f"))))
+   `(org-drawer ((,class (:weight bold :foreground "#ff44ff" :background "#38203d"))))
    `(org-ellipsis ((,class (:underline nil :foreground "#6b666f")))) ; #0611a5
    `(org-example ((,class (:foreground "#ffff0b" :background "#38203d"))))
    `(org-footnote ((,class (:underline t :foreground "#ff7138"))))
    `(org-formula ((,class (:foreground "#0680e1"))))
-   `(org-headline-done ((,class (:height 1.0 :weight normal :strike-through t :foreground "#57525c"))))
+   ;; org-habit colours are thanks to zenburn
+   `(org-habit-ready-face ((t :background "#7F9F7F"))) ; ,zenburn-green
+   `(org-habit-alert-face ((t :background "#E0CF9F" :foreground "#3F3F3F"))) ; ,zenburn-yellow-1 fg ,zenburn-bg
+   `(org-habit-clear-face ((t :background "#5C888B")))                       ; ,zenburn-blue-3
+   `(org-habit-overdue-face ((t :background "#9C6363")))                     ; ,zenburn-red-3
+   `(org-habit-clear-future-face ((t :background "#4C7073")))                ; ,zenburn-blue-4
+   `(org-habit-ready-future-face ((t :background "#5F7F5F")))                ; ,zenburn-green-2
+   `(org-habit-alert-future-face ((t :background "#D0BF8F" :foreground "#3F3F3F"))) ; ,zenburn-yellow-2 fg ,zenburn-bg
+   `(org-habit-overdue-future-face ((t :background "#8C5353"))) ; ,zenburn-red-4
+   `(org-headline-done ((,class (:height 1.0 :weight normal :foreground "#57525c"))))
    `(org-hide ((,class (:foreground "#403b45"))))
    `(org-inlinetask ((,class (:box (:line-width 1 :color "#37323c") :foreground "#8c8890" :background "#252050"))))
    `(org-latex-and-related ((,class (:foreground "#cf996f" :background "#25202a"))))
@@ -1041,27 +1076,13 @@ more...")
     ["#ffffff" "#37ffff" "#e074e3" "#3732ff" "#ffff0b" "#37ff3c" "#ff400b" "#848088"])
  )
 
-;;;######autoload
+;;;###autoload
 (when (and (boundp 'custom-theme-load-path)
            load-file-name)
   ;; Add theme folder to `custom-theme-load-path' when installing over MELPA.
   (add-to-list 'custom-theme-load-path
                (file-name-as-directory (file-name-directory load-file-name))))
 
-;;;######autoload
-(when (string-match "/etc/themes/$"
-                    (file-name-directory (or load-file-name (buffer-file-name))))
-  (message "To stay up-to-date, you should better install and use leuven-dark-theme from MELPA.")
-  (sit-for 2))
-
 (provide-theme 'leuven-dark)
-
-;; This is for the sake of Emacs.
-;; Local Variables:
-;; no-byte-compile: t
-;; time-stamp-end: "$"
-;; time-stamp-format: "%:y%02m%02d.%02H%02M"
-;; time-stamp-start: "Version: "
-;; End:
 
 ;;; leuven-dark-theme.el ends here

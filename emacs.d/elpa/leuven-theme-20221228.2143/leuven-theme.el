@@ -1,10 +1,10 @@
 ;;; leuven-theme.el --- Awesome Emacs color theme on white background
 
-;; Copyright (C) 2003-2020 Free Software Foundation, Inc.
+;; Copyright (C) 2003-2022 Free Software Foundation, Inc.
 
 ;; Author: Fabrice Niessen <(concat "fniessen" at-sign "pirilampo.org")>
 ;; URL: https://github.com/fniessen/emacs-leuven-theme
-;; Version: 20200505.2010
+;; Version: 1.0
 ;; Keywords: color theme
 
 ;; This file is part of GNU Emacs.
@@ -45,6 +45,15 @@
 The theme has to be reloaded after changing anything in this group."
   :group 'faces)
 
+(defcustom leuven-scale-org-document-title t
+  "Scale Org document title.
+This can be nil for unscaled, t for using the theme default, or a scaling
+number."
+  :type '(choice
+          (const :tag "Unscaled" nil)
+          (const :tag "Default provided by theme" t)
+          (number :tag "Set scaling")))
+
 (defcustom leuven-scale-outline-headlines t
   "Scale `outline' (and `org') level-1 headlines.
 This can be nil for unscaled, t for using the theme default, or a scaling
@@ -52,8 +61,7 @@ number."
   :type '(choice
           (const :tag "Unscaled" nil)
           (const :tag "Default provided by theme" t)
-          (number :tag "Set scaling"))
-  :group 'leuven)
+          (number :tag "Set scaling")))
 
 (defcustom leuven-scale-org-agenda-structure t
   "Scale Org agenda structure lines, like dates.
@@ -64,6 +72,16 @@ number."
           (const :tag "Default provided by theme" t)
           (number :tag "Set scaling")))
 
+(defcustom leuven-scale-volatile-highlight t
+  "Increase size in the `next-error' face.
+This can be nil for unscaled, t for using the theme default, or a scaling
+number."
+  :type '(choice
+          (const :tag "Unscaled" nil)
+          (const :tag "Default provided by theme" t)
+          (number :tag "Set scaling")))
+
+;;;###autoload
 (defun leuven-scale-font (control default-height)
   "Function for splicing optional font heights into face descriptions.
 CONTROL can be a number, nil, or t.  When t, use DEFAULT-HEIGHT."
@@ -85,12 +103,12 @@ more...")
       ;; Leuven generic colors.
       (cancel '(:slant italic :strike-through t :foreground "#A9A9A9"))
       (clock-line '(:box (:line-width 1 :color "#335EA8") :foreground "black" :background "#EEC900"))
-      (code-block '(:foreground "#000088" :background "#FFFFE0" :extend t))
-      (code-inline '(:foreground "#006400" :background "#FDFFF7" :extend t))
+      (code-block '(:foreground "#000088" :background "#FFFFE0"))
+      (code-inline '(:foreground "#006400" :background "#FDFFF7"))
       (column '(:height 1.0 :weight normal :slant normal :underline nil :strike-through nil :foreground "#E6AD4F" :background "#FFF2DE"))
       (completion-inline '(:weight normal :foreground "#C0C0C0" :inherit hl-line)) ; Like Google.
-      (completion-other-candidates '(:weight bold :foreground "black" :background "#EBF4FE"))
-      (completion-selected-candidate '(:weight bold :foreground "white" :background "#0052A4"))
+      (completion-other-candidates '(:foreground "black" :background "#F7F7F7"))
+      (completion-selected-candidate '(:weight bold :foreground "black" :background "#C1E0FD"))
       (diff-added '(:background "#DDFFDD"))
       (diff-changed '(:foreground "#0000FF" :background "#DDDDFF"))
       (diff-header '(:weight bold :foreground "#800000" :background "#FFFFAF"))
@@ -104,12 +122,11 @@ more...")
       (function-param '(:foreground "#247284"))
       (grep-file-name '(:weight bold :foreground "#2A489E")) ; Used for grep hits.
       (grep-line-number '(:weight bold :foreground "#A535AE"))
-      (highlight-blue '(:background "#E6ECFF" :extend t))
-      (highlight-blue2 '(:background "#E4F1F9" :extend t))
-      (highlight-gray '(:background "#E4E4E3" :extend t))
-      (highlight-green '(:background "#D5F1CF" :extend t))
-      (highlight-red '(:background "#FFC8C8" :extend t))
-      (highlight-yellow '(:background "#F6FECD" :extend t))
+      (highlight-blue '(:background "#B6D6FD"))
+      (highlight-gray '(:background "#E4E4E3"))
+      (highlight-green '(:background "#D5F1CF"))
+      (highlight-red '(:background "#FFC8C8"))
+      (highlight-yellow '(:background "#F6FECD"))
       (link '(:weight normal :underline t :foreground "#006DAF"))
       (link-no-underline '(:weight normal :foreground "#006DAF"))
       (mail-header-name '(:family "Sans Serif" :weight normal :foreground "#A3A3A2"))
@@ -122,17 +139,17 @@ more...")
       (mail-unread-high '(:weight bold :foreground "#135985"))
       (marked-line '(:foreground "#AA0000" :background "#FFAAAA"))
       (match '(:weight bold :background "#FFFF00")) ; occur patterns + match in helm for files + match in Org files.
-      (ol1 `(,@(leuven-scale-font leuven-scale-outline-headlines 1.3) :weight bold :overline "#A7A7A7" :foreground "#3C3C3C" :background "#F0F0F0" :extend t))
-      (ol2 '(:height 1.0 :weight bold :overline "#123555" :foreground "#123555" :background "#E5F4FB" :extend t))
-      (ol3 '(:height 1.0 :weight bold :foreground "#005522" :background "#EFFFEF" :extend t))
-      (ol4 '(:height 1.0 :weight bold :slant normal :foreground "#EA6300" :extend t))
-      (ol5 '(:height 1.0 :weight bold :slant normal :foreground "#E3258D" :extend t))
-      (ol6 '(:height 1.0 :weight bold :slant italic :foreground "#0077CC" :extend t))
-      (ol7 '(:height 1.0 :weight bold :slant italic :foreground "#2EAE2C" :extend t))
-      (ol8 '(:height 1.0 :weight bold :slant italic :foreground "#FD8008" :extend t))
+      (ol1 `(,@(leuven-scale-font leuven-scale-outline-headlines 1.3) :weight bold :overline "#A7A7A7" :foreground "#3C3C3C" :background "#F0F0F0"))
+      (ol2 '(:height 1.0 :weight bold :overline "#123555" :foreground "#123555" :background "#E5F4FB"))
+      (ol3 '(:height 1.0 :weight bold :foreground "#005522" :background "#EFFFEF"))
+      (ol4 '(:height 1.0 :weight bold :slant normal :foreground "#EA6300"))
+      (ol5 '(:height 1.0 :weight bold :slant normal :foreground "#E3258D"))
+      (ol6 '(:height 1.0 :weight bold :slant italic :foreground "#0077CC"))
+      (ol7 '(:height 1.0 :weight bold :slant italic :foreground "#2EAE2C"))
+      (ol8 '(:height 1.0 :weight bold :slant italic :foreground "#FD8008"))
       (paren-matched '(:background "#C0E8C3")) ; Or take that green for region?
       (paren-unmatched '(:weight bold :underline "red" :foreground "black" :background "#FFA5A5"))
-      (region '(:background "#8ED3FF" :extend t))
+      (region '(:background "#8ED3FF"))
       (shadow '(:foreground "#7F7F7F"))
       (string '(:foreground "#008000")) ; or #D0372D
       (subject '(:family "Sans Serif" :weight bold :foreground "black"))
@@ -140,7 +157,7 @@ more...")
       (tab '(:foreground "#E8E8E8" :background "white"))
       (trailing '(:foreground "#E8E8E8" :background "#FFFFAB"))
       (volatile-highlight '(:underline nil :foreground "white" :background "#9E3699"))
-      (volatile-highlight-supersize '(:height 1.1 :underline nil :foreground "white" :background "#9E3699")) ; flash-region
+      (volatile-highlight-supersize `(,@(leuven-scale-font leuven-scale-volatile-highlight 1.1) :underline nil :foreground "white" :background "#9E3699")) ; flash-region
       (vc-branch '(:box (:line-width 1 :color "#00CC33") :foreground "black" :background "#AAFFAA"))
       (xml-attribute '(:foreground "#F36335"))
       (xml-tag '(:foreground "#AE1B9A"))
@@ -196,7 +213,6 @@ more...")
    `(font-lock-comment-face ((,class (:slant italic :foreground "#8D8D84")))) ; #696969
    `(font-lock-constant-face ((,class (:foreground "#D0372D"))))
    `(font-lock-doc-face ((,class (:foreground "#036A07"))))
-   ;; `(font-lock-doc-string-face ((,class (:foreground "#008000")))) ; XEmacs only, but is used for HTML exports from org2html (and not interactively)
    `(font-lock-function-name-face ((,class (:weight normal :foreground "#006699"))))
    `(font-lock-keyword-face ((,class (:bold nil :foreground "#0000FF")))) ; #3654DC
    `(font-lock-preprocessor-face ((,class (:foreground "#808080"))))
@@ -315,15 +331,15 @@ more...")
    `(smerge-refined-change ((,class (:background "#AAAAFF"))))
 
    ;; Ediff.
-   `(ediff-current-diff-A ((,class (:background "#FFDDDD" :extend t))))
-   `(ediff-current-diff-B ((,class (:background "#DDFFDD" :extend t))))
-   `(ediff-current-diff-C ((,class (:background "cyan" :extend t))))
-   `(ediff-even-diff-A ((,class (:background "light grey" :extend t))))
-   `(ediff-even-diff-B ((,class (:background "light grey" :extend t))))
-   `(ediff-fine-diff-A ((,class (:background "#FFAAAA" :extend t))))
-   `(ediff-fine-diff-B ((,class (:background "#55FF55" :extend t))))
-   `(ediff-odd-diff-A ((,class (:background "light grey" :extend t))))
-   `(ediff-odd-diff-B ((,class (:background "light grey" :extend t))))
+   `(ediff-current-diff-A ((,class (:background "#FFDDDD"))))
+   `(ediff-current-diff-B ((,class (:background "#DDFFDD"))))
+   `(ediff-current-diff-C ((,class (:background "cyan"))))
+   `(ediff-even-diff-A ((,class (:background "light grey"))))
+   `(ediff-even-diff-B ((,class (:background "light grey"))))
+   `(ediff-fine-diff-A ((,class (:background "#FFAAAA"))))
+   `(ediff-fine-diff-B ((,class (:background "#55FF55"))))
+   `(ediff-odd-diff-A ((,class (:background "light grey"))))
+   `(ediff-odd-diff-B ((,class (:background "light grey"))))
 
    ;; Flyspell.
    (if (version< emacs-version "24.4")
@@ -403,9 +419,6 @@ more...")
    `(circe-originator-face ((,class (:foreground "blue"))))
    `(circe-prompt-face ((,class (:foreground "red"))))
    `(circe-server-face ((,class (:foreground "#99CAE5"))))
-   `(comint-highlight-input ((,class (:weight bold :foreground "#0000FF" :inherit nil))))
-   ;; `(comint-highlight-prompt ((,class (:weight bold :foreground "black" :background "gold"))))
-   `(comint-highlight-prompt ((,class (:weight bold :foreground "#0000FF" :inherit nil))))
 
    ;; `(ac-selection-face ((,class ,completion-selected-candidate)))
    `(ac-selection-face ((,class (:weight bold :foreground "white" :background "orange")))) ; TEMP For diff'ing AC from Comp.
@@ -415,18 +428,47 @@ more...")
    `(popup-scroll-bar-background-face ((,class (:background "#EBF4FE"))))
    `(popup-scroll-bar-foreground-face ((,class (:background "#D1DAE4")))) ; Scrollbar (visible).
 
-   `(company-tooltip-common-selection ((,class (:weight normal :foreground "#F9ECCC" :inherit company-tooltip-selection)))) ; Prefix + common part in tooltip (for selection).
+   ;; Company.
+   `(company-tooltip-common-selection ((,class (:weight bold :foreground "#0474B6" :inherit company-tooltip-selection)))) ; Prefix + common part in tooltip (for selection).
    `(company-tooltip-selection ((,class ,completion-selected-candidate))) ; Suffix in tooltip (for selection).
-   `(company-tooltip-annotation-selection ((,class (:weight normal :foreground "#F9ECCC")))) ; Annotation (for selection).
-
-   `(company-tooltip-common ((,class (:weight normal :foreground "#B000B0" :inherit company-tooltip)))) ; Prefix + common part in tooltip.
+   `(company-tooltip-annotation-selection ((,class (:weight bold :foreground "#818181")))) ; Annotation (for selection).
+   `(company-tooltip-common ((,class (:weight normal :foreground "#0474B6" :inherit company-tooltip)))) ; Prefix + common part in tooltip.
    `(company-tooltip ((,class ,completion-other-candidates))) ; Suffix in tooltip.
-   `(company-tooltip-annotation ((,class (:weight normal :foreground "#2415FF")))) ; Annotation.
-
+   `(company-tooltip-annotation ((,class (:weight normal :foreground "#818181")))) ; Annotation.
+   `(company-preview ((,class ,completion-inline)))
    `(company-preview-common ((,class ,completion-inline)))
-
    `(company-scrollbar-bg ((,class (:background "#EBF4FE"))))
    `(company-scrollbar-fg ((,class (:background "#D1DAE4")))) ; Scrollbar (visible).
+
+   ;; Centaur Tabs
+   ;; With the addition of tab-mode, centaur tabs looks there first for how the tabline should look
+   (if (version<= "27.0" emacs-version)
+       `(tab-line ((t (:background ,"#5D6B99" :foreground ,"#5D6B99")))))
+   `(centaur-tabs-default ((t (:background ,"#335EA8" :foreground ,"#FFFFFF" :box nil))))
+   `(centaur-tabs-background-color ((t (:background ,"#5D6B99" :foreground ,"#5D6B99" :box nil))))
+   `(centaur-tabs-active-bar-face ((t (:background ,"#335EA8" :foreground ,"#FFFFFF"  :box nil))))
+   `(centaur-tabs-selected ((t (:foreground ,"#333333" :background ,"#F5CC84" :box nil))))
+   `(centaur-tabs-unselected ((t (:foreground ,"#FFFFFF" :background ,"#3B4F81" :box nil))))
+   `(centaur-tabs-selected-modified ((t (:foreground ,"#333333" :background ,"#F5CC84" :weight ,'bold :box nil))))
+   `(centaur-tabs-unselected-modified ((t (:foreground ,"#FFFFFF" :background ,"#3B4F81" :weight ,'bold :box nil))))
+   `(centaur-tabs-modified-marker-selected ((t (:foreground ,"#333333" :background ,"#F5CC84" :weight ,'bold :box nil))))
+   `(centaur-tabs-modified-marker-unselected ((t (:foreground ,"#FFFFFF" :background ,"#3B4F81" :weight ,'bold :box nil))))
+
+   ;; doom-modeline
+   `(doom-modeline-bar ((t (:background ,"#5D6B99"))))
+   `(doom-modeline-info ((t (:inherit ,'mode-line-emphasis))))
+   `(doom-modeline-urgent ((t (:inherit ,'mode-line-emphasis))))
+   `(doom-modeline-warning ((t (:inherit ,'mode-line-emphasis))))
+   `(doom-modeline-debug ((t (:inherit ,'mode-line-emphasis))))
+   `(doom-modeline-buffer-minor-mode ((t (:inherit ,'mode-line-emphasis :weight ,'bold))))
+   `(doom-modeline-project-dir ((t (:inherit ,'mode-line-emphasis :weight ,'bold))))
+   `(doom-modeline-project-parent-dir ((t (:inherit ,'mode-line-emphasis :weight ,'bold))))
+   `(doom-modeline-persp-name ((t (:inherit ,'mode-line-emphasis :weight ,'bold))))
+   `(doom-modeline-buffer-file ((t (:inherit ,'mode-line-emphasis :weight ,'bold))))
+   `(doom-modeline-buffer-modified ((t (:inherit ,'mode-line-emphasis :weight ,'bold))))
+   `(doom-modeline-lsp-success ((t (:inherit ,'mode-line-emphasis :weight ,'bold))))
+   `(doom-modeline-buffer-path ((t (:inherit ,'mode-line-emphasis :weight ,'bold))))
+   `(doom-modeline-buffer-project-root ((t (:inherit ,'mode-line-emphasis))))
 
    `(compare-windows ((,class (:background "#FFFF00"))))
    ;; `(completions-common-part ((,class (:foreground "red" :weight bold))))
@@ -500,6 +542,7 @@ more...")
    `(dired-mark ((,class ,marked-line)))
    `(dired-marked ((,class ,marked-line)))
    `(dired-symlink ((,class ,symlink)))
+   `(diredfl-compressed-file-suffix ((,class (:foreground "#000000" :background "#FFF68F"))))
    `(diredp-compressed-file-suffix ((,class (:foreground "red"))))
    `(diredp-date-time ((,class (:foreground "purple"))))
    `(diredp-dir-heading ((,class ,directory)))
@@ -596,11 +639,11 @@ more...")
    `(helm-source-header ((,class (:weight bold :box (:line-width 1 :color "#C7C7C7") :background "#DEDEDE" :foreground "black"))))
    `(helm-swoop-target-line-block-face ((,class (:background "#CCCC00" :foreground "#222222"))))
    `(helm-swoop-target-line-face ((,class (:background "#CCCCFF"))))
-   `(helm-swoop-target-word-face ((,class (:weight bold :foreground nil :background "#FDBD33"))))
+   `(helm-swoop-target-word-face ((,class (:weight bold :foreground unspecified :background "#FDBD33"))))
    `(helm-visible-mark ((,class ,marked-line)))
    `(helm-w3m-bookmarks-face ((,class (:underline t :foreground "cyan1"))))
-   `(highlight-changes ((,class (:foreground nil)))) ;; blue "#2E08B5"
-   `(highlight-changes-delete ((,class (:strike-through nil :foreground nil)))) ;; red "#B5082E"
+   `(highlight-changes ((,class (:foreground unspecified)))) ;; blue "#2E08B5"
+   `(highlight-changes-delete ((,class (:strike-through nil :foreground unspecified)))) ;; red "#B5082E"
    `(highlight-symbol-face ((,class (:background "#FFFFA0"))))
    `(hl-line ((,class ,highlight-yellow))) ; Highlight current line.
    `(hl-tags-face ((,class ,highlight-current-tag))) ; ~ Pair highlighting (matching tags).
@@ -618,7 +661,7 @@ more...")
    `(info-file ((,class (:family "Sans Serif" :height 1.8 :weight bold :box (:line-width 1 :color "#0000CC") :foreground "cornflower blue" :background "LightSteelBlue1"))))
    `(info-header-node ((,class (:underline t :foreground "orange")))) ; nodes in header
    `(info-header-xref ((,class (:underline t :foreground "dodger blue")))) ; cross references in header
-   `(info-index-match ((,class (:weight bold :foreground nil :background "#FDBD33")))) ; when using `i'
+   `(info-index-match ((,class (:weight bold :foreground unspecified :background "#FDBD33")))) ; when using `i'
    `(info-menu-header ((,class ,ol2))) ; menu titles (headers) -- major topics
    `(info-menu-star ((,class (:foreground "black")))) ; every 3rd menu item
    `(info-node ((,class (:underline t :foreground "blue")))) ; node names
@@ -656,7 +699,9 @@ more...")
    `(linum ((,class (:foreground "#9A9A9A" :background "#EDEDED"))))
    `(log-view-file ((,class (:foreground "#0000CC" :background "#EAF2F5"))))
    `(log-view-message ((,class (:foreground "black" :background "#EDEA74"))))
+   `(lsp-modeline-code-actions-preferred-face ((,class (:foreground "#000000" :background "#FFF68F"))))
    `(lsp-ui-doc-background ((,class (:background "#F6FECD"))))
+   `(lsp-ui-sideline-code-action ((,class (:foreground "#000000" :background "#FFF68F"))))
    `(lui-button-face ((,class ,link)))
    `(lui-highlight-face ((,class (:box '(:line-width 1 :color "#CC0000") :foreground "#CC0000" :background "#FFFF88")))) ; my nickname
    `(lui-time-stamp-face ((,class (:foreground "purple"))))
@@ -749,9 +794,9 @@ more...")
    `(org-archived ((,class (:foreground "gray70"))))
    `(org-beamer-tag ((,class (:box (:line-width 1 :color "#FABC18") :foreground "#2C2C2C" :background "#FFF8D0"))))
    `(org-block ((,class ,code-block)))
-   `(org-block-background ((,class (:background "#FFFFE0" :extend t)))) ;; :inherit fixed-pitch))))
-   `(org-block-begin-line ((,class (:underline "#A7A6AA" :foreground "#555555" :background "#E2E1D5" :extend t))))
-   `(org-block-end-line ((,class (:overline "#A7A6AA" :foreground "#555555" :background "#E2E1D5" :extend t))))
+   `(org-block-background ((,class (:background "#FFFFE0")))) ;; :inherit fixed-pitch))))
+   `(org-block-begin-line ((,class (:underline "#A7A6AA" :foreground "#555555" :background "#E2E1D5"))))
+   `(org-block-end-line ((,class (:overline "#A7A6AA" :foreground "#555555" :background "#E2E1D5"))))
    `(org-checkbox ((,class (:weight bold :box (:line-width 1 :style pressed-button) :foreground "#123555" :background "#A3A3A3"))))
    `(org-clock-overlay ((,class (:foreground "white" :background "SkyBlue4"))))
    `(org-code ((,class ,code-inline)))
@@ -762,13 +807,22 @@ more...")
    `(org-dim ((,class (:foreground "#AAAAAA"))))
    `(org-document-info ((,class (:foreground "#484848"))))
    `(org-document-info-keyword ((,class (:foreground "#008ED1" :background "#EAEAFF"))))
-   `(org-document-title ((,class (:height 1.8 :weight bold :foreground "black"))))
+   `(org-document-title ((,class (,@(leuven-scale-font leuven-scale-org-document-title 1.8)  :weight bold :foreground "black"))))
    `(org-done ((,class (:weight bold :box (:line-width 1 :color "#BBBBBB") :foreground "#BBBBBB" :background "#F0F0F0"))))
-   `(org-drawer ((,class (:weight bold :foreground "#00BB00" :background "#EAFFEA" :extend nil))))
+   `(org-drawer ((,class (:weight bold :foreground "#00BB00" :background "#EAFFEA"))))
    `(org-ellipsis ((,class (:underline nil :foreground "#999999")))) ; #FFEE62
    `(org-example ((,class (:foreground "blue" :background "#EAFFEA"))))
    `(org-footnote ((,class (:underline t :foreground "#008ED1"))))
    `(org-formula ((,class (:foreground "chocolate1"))))
+   ;; org-habit colours are thanks to zenburn
+   `(org-habit-ready-face ((t :background "#7F9F7F"))) ; ,zenburn-green
+   `(org-habit-alert-face ((t :background "#E0CF9F" :foreground "#3F3F3F"))) ; ,zenburn-yellow-1 fg ,zenburn-bg
+   `(org-habit-clear-face ((t :background "#5C888B")))                       ; ,zenburn-blue-3
+   `(org-habit-overdue-face ((t :background "#9C6363")))                     ; ,zenburn-red-3
+   `(org-habit-clear-future-face ((t :background "#4C7073")))                ; ,zenburn-blue-4
+   `(org-habit-ready-future-face ((t :background "#5F7F5F")))                ; ,zenburn-green-2
+   `(org-habit-alert-future-face ((t :background "#D0BF8F" :foreground "#3F3F3F"))) ; ,zenburn-yellow-2 fg ,zenburn-bg
+   `(org-habit-overdue-future-face ((t :background "#8C5353"))) ; ,zenburn-red-4
    `(org-headline-done ((,class (:height 1.0 :weight normal :foreground "#ADADAD"))))
    `(org-hide ((,class (:foreground "#E2E2E2"))))
    `(org-inlinetask ((,class (:box (:line-width 1 :color "#EBEBEB") :foreground "#777777" :background "#FFFFD6"))))
@@ -798,7 +852,7 @@ more...")
    `(org-table ((,class (:foreground "dark green" :background "#EAFFEA")))) ;; :inherit fixed-pitch))))
    `(org-tag ((,class (:weight normal :slant italic :foreground "#9A9FA4" :background "white"))))
    `(org-target ((,class (:foreground "#FF6DAF"))))
-   `(org-time-grid ((,class (:foreground "#CFCFCF"))))
+   `(org-time-grid ((,class (:foreground "#B8B8B8"))))
    `(org-todo ((,class (:weight bold :box (:line-width 1 :color "#D8ABA7") :foreground "#D8ABA7" :background "#FFE6E4"))))
    `(org-upcoming-deadline ((,class (:foreground "#FF5555"))))
    `(org-verbatim ((,class (:foreground "#0066CC" :background "#F7FDFF"))))
@@ -1052,13 +1106,5 @@ more...")
                (file-name-as-directory (file-name-directory load-file-name))))
 
 (provide-theme 'leuven)
-
-;; This is for the sake of Emacs.
-;; Local Variables:
-;; no-byte-compile: t
-;; time-stamp-end: "$"
-;; time-stamp-format: "%:y%02m%02d.%02H%02M"
-;; time-stamp-start: "Version: "
-;; End:
 
 ;;; leuven-theme.el ends here
