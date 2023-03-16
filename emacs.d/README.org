@@ -4362,7 +4362,7 @@
     ;; #+STARTUP: odd
     ;; #+STARTUP: indent
     ;; #+STARTUP: hidestars
-    ;; (add-hook 'org-mode-hook 'org-bullets-mode)
+    ;; (add-hook 'org-mode-hook 'org-superstar-mode)
 
     (add-hook 'org-mode-hook 'flyspell-mode)
     ;; (add-hook 'org-mode-hook 'pandoc-mode)
