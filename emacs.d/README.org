@@ -891,8 +891,8 @@
 
 ** appearance minor-modes
 
-   Setup a list of major-modes to load appearance minor-modes. ~eval-and-compile~
-   is used so the list is accessible inside use-package definitions.
+Setup a list of major-modes to load appearance minor-modes. ~eval-and-compile~
+is used so the list is accessible inside use-package definitions.
 
 #+begin_src emacs-lisp
   (eval-and-compile
@@ -927,7 +927,7 @@
 
 *** hl-line
 
-    Highlight the current line using the built-in ~hl-line-mode~.
+Highlight the current line using the built-in ~hl-line-mode~.
 
 #+begin_src emacs-lisp
   (use-package hl-line
@@ -947,6 +947,7 @@
 #+end_src
 
 *** highlight-indent-guides
+
 #+begin_src emacs-lisp
   (use-package highlight-indent-guides
     :custom
@@ -970,7 +971,7 @@
 
 *** color-identifiers
 
-    This mode gives variables names unique colors.
+This mode gives variables names unique colors.
 
 #+begin_src emacs-lisp
   (use-package color-identifiers-mode ;; the package is actually called "color-identifiers-mode" with -mode at the end
@@ -1541,8 +1542,8 @@
 
 ** re-builder
 
-   - [[info:emacs#Regexps][info:emacs#Regexps]]
-   - [[info:emacs#Regexp%20Backslash][info:emacs#Regexp Backslash]]
+- [[info:emacs#Regexps][info:emacs#Regexps]]
+- [[info:emacs#Regexp%20Backslash][info:emacs#Regexp Backslash]]
 
 #+begin_src emacs-lisp
   (use-package re-builder
@@ -1964,6 +1965,7 @@
 #+end_src
 
 ** shell
+
 #+begin_src emacs-lisp
   (use-package shell
     :general
@@ -4029,7 +4031,6 @@
     (define-key hydra-ivy/keymap (kbd "e") 'hydra-ivy/ivy-previous-line)
   )
 #+end_src
-
 
 ** ivy-xref
 
