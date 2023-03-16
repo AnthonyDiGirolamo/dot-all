@@ -4134,9 +4134,9 @@
              (counsel-ag-base-command (concat ag-command " -G '" fileregex "' %s")))
         (counsel-ag)))
 
-    (defun amd/counsel-rg-with-initial-directory (initial-directory)
-      (interactive "DInitial Directory: ")
-      (counsel-rg nil initial-directory))
+    (defun amd/counsel-rg-with-initial-directory (initial-directory extra-args)
+      (interactive "DInitial Directory: \nsExtra Args: ")
+      (counsel-rg nil initial-directory extra-args))
   )
 #+end_src
 
