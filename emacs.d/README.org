@@ -1090,7 +1090,7 @@ This mode gives variables names unique colors.
                   "~/.rbenv/shims/ruby ./bin/rspec ")
                  ((string-match ".py$" (buffer-file-name (current-buffer)))
                   "py.test -v --doctest-modules ")
-                 ((string-match ".moon$" (buffer-file-name (current-buffer)))                                                               "moon ")
+                 ((string-match ".moon$" (buffer-file-name (current-buffer))) "moon ")
                  (t
                   "unknown_test_framework")))
           (rspec-buffer     (get-buffer-window "*rspec*")))

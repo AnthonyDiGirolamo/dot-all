@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Image to ANSI text Generator."""
 
 from pathlib import Path

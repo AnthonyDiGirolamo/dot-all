@@ -162,6 +162,7 @@ nnoremap <leader>p :cprevious<cr>
 nnoremap <leader>u :UndotreeToggle<cr>
 nnoremap <leader>g :Git<cr>
 nnoremap <leader>bb :CtrlPBuffer<cr>
+nnoremap <leader>fc :CtrlPQuickfix<cr>
 nnoremap <leader>bk :q!<cr>
 nnoremap <leader>m :CtrlPBufTagAll<cr>
 nnoremap <leader>o :silent !ctags -R *.py kadc tests<cr>:CtrlPTag<cr>
@@ -179,16 +180,19 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
+nnoremap <c-p> :FZF<CR>
 
+let g:ctrlp_map = ''
+let g:ctrlp_cmd = 'CtrlP'
 
 " Ctrlp: Use git ls-files
 let g:ctrlp_user_command = {
       \ 'types': {
-        \ 1: ['.git', 'cd %s && git ls-files'],
-        \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-        \ },
-        \ 'fallback': 'find %s -type f'
-        \ }
+      \ 1: ['.git', 'cd %s && git ls-files'],
+      \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+      \ },
+      \ 'fallback': 'find %s -type f'
+      \ }
 
 " Ignore some file types in ctrlp
 let g:ctrlp_custom_ignore = {
