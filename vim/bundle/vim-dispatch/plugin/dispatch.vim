@@ -89,6 +89,7 @@ if !exists('g:dispatch_handlers')
         \ 'tmux',
         \ 'job',
         \ 'screen',
+        \ 'terminal',
         \ 'windows',
         \ 'iterm',
         \ 'x11',
@@ -98,6 +99,7 @@ endif
 
 augroup dispatch
   autocmd!
+  autocmd QuickfixCmdPre,QuickfixCmdPost * "
   autocmd FileType qf
         \ if &buftype ==# 'quickfix' && empty(getloclist(winnr())) && get(w:, 'quickfix_title') =~# '^:noautocmd cgetfile\>\|^:\d*Dispatch\>' |
         \   call dispatch#quickfix_init() |
