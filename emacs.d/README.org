@@ -36,7 +36,7 @@
 - [[#novel][nov.el]]
 - [[#company-auto-completion][company auto-completion]]
 - [[#key-discovery][key discovery]]
-- [[#snippets][snippets]]
+- [[#snippets-yasnippet-yankpad][snippets (yasnippet yankpad)]]
 - [[#wgrep][wgrep]]
 - [[#magit---version-control][magit - version-control]]
   - [[#transient][transient]]
@@ -852,9 +852,9 @@
 
 #+begin_src emacs-lisp
   ;; (amd/leuven-light-theme)
-  ;; (amd/doom-one-theme)
+  (amd/doom-one-theme)
   ;; (amd/moe-dark-theme)
-  (amd/doom-snazzy-theme)
+  ;; (amd/doom-snazzy-theme)
   (load-theme 'airline-doom-one t)
 
   ;; (load-theme 'doom-palenight)
@@ -1450,6 +1450,10 @@ This mode gives variables names unique colors.
     (add-to-list 'evil-normal-state-modes 'Info-mode)
     (add-to-list 'evil-normal-state-modes 'eww-mode)
     (add-to-list 'evil-normal-state-modes 'Custom-mode)
+
+    ;; Recenter after using history back or forward in Info mode (C-o or TAB).
+    (defadvice Info-history-back (after advice-for-Info-history-back activate) (recenter))
+    (defadvice Info-history-forward (after advice-for-Info-history-forward activate) (recenter))
 
     (defun paste-other-window (beg end other-buffer-window-name)
       (let ((current-file-window (selected-window))
@@ -2335,22 +2339,20 @@ This mode gives variables names unique colors.
     (which-key-mode 1))
 #+end_src
 
-* snippets
+* snippets (yasnippet yankpad)
 
 #+begin_src emacs-lisp
   (use-package yasnippet
-    :disabled
     :diminish yas-minor-mode
     :config
     (yas-global-mode) ;; seems to be needed for yankpad
   )
 
   (use-package yankpad
-    :disabled
     :commands (yankpad-edit yankpad-set-category yankpad-expand yankpad-insert)
     :after yasnippet
-    :init
-    (setq yankpad-file "~/.emacs.d/yankpad.org")
+    :custom
+    (yankpad-file "~/.emacs.d/yankpad.org")
     :general
     (:states '(insert)
       "C-t" 'yankpad-expand))
