@@ -207,7 +207,7 @@ let g:ctrlp_extensions = [ 'tag', 'buffertag', 'quickfix' ]
 " vim-flagship recommended modeline settings
 set laststatus=2
 set showtabline=2
-set guioptions=-e
+set guioptions-=e
 set guifont=Iosevka\ SS08
 " This seems to happen automatically:
 " autocmd User Flags call Hoist("buffer", "fugitive#statusline")
