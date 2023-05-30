@@ -64,12 +64,18 @@
 BEGIN {
     LOG_DEBUG = 0
     DRYRUN = 0
+    DELETE_OUTPUT = 0
     if ("TANGLEAWK_LOG" in ENVIRON &&
         ENVIRON["TANGLEAWK_LOG"] != "")
         LOG_DEBUG = 1
     if ("TANGLEAWK_DRYRUN" in ENVIRON &&
         ENVIRON["TANGLEAWK_DRYRUN"] != "")
         DRYRUN = 1
+    if ("TANGLEAWK_DELETE" in ENVIRON &&
+        ENVIRON["TANGLEAWK_DELETE"] != "") {
+        DRYRUN = 1
+        DELETE_OUTPUT = 1
+    }
 
     IGNORECASE = 1
     tangle_prop_regex = @/^\s*#\+property.*header-args.*:tangle\s*(\S.*)$/
@@ -430,13 +436,20 @@ function write_tangled_file(_outfile, _index_name, _expanded_file_name) {
     else {
         # first time we have tangled to this file
         final_tangled_file_list[_expanded_file_name] = 1
+
+        if (DELETE_OUTPUT) {
+            print "  " cli_error("rm ") _expanded_file_name
+            system("rm -f " _expanded_file_name)
+            return
+        }
+
         # print file being tangled
         print "  " _expanded_file_name
 
         if (DRYRUN)
             return
         # always mkdir -p
-        system("mkdir -v -p "dirname(_expanded_file_name))
+        system("mkdir -v -p " dirname(_expanded_file_name))
         # output contents string to the file all at once
         print tangled_files[_index_name] > _expanded_file_name
         # add tangled file path to outfile
@@ -446,7 +459,7 @@ function write_tangled_file(_outfile, _index_name, _expanded_file_name) {
 }
 
 function run_script(_shell_type, _script_text) {
-    if (DRYRUN)
+    if (DRYRUN )
         return
     if (_shell_type == "sh") {
         print cli_debug("[EVAL]"), "sh"
