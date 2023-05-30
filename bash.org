@@ -49,16 +49,16 @@
   export LC_CTYPE=en_US.UTF-8
   export LC_ALL=en_US.UTF-8
 
-  export PATH=$HOME/Preferences/bin/els:$PATH
-  export PATH=$HOME/Preferences/bin:$PATH
   export PATH=$HOME/apps/ack/bin:$PATH
   export PATH=$HOME/apps/bash/bin:$PATH
   export PATH=$HOME/apps/ctags/bin:$PATH
   export PATH=$HOME/apps/fish/bin:$PATH
+  export PATH=$HOME/apps/gawk/bin:$PATH
   export PATH=$HOME/apps/git/bin:$PATH
   export PATH=$HOME/apps/tmux/bin:$PATH
   export PATH=$HOME/apps/tree/bin:$PATH
   export PATH=$HOME/apps/zsh/bin:$PATH
+
   export PATH=$HOME/apps:$PATH
   export PATH=$HOME/dot-all/bin:$PATH
   export PATH=$HOME/dot-all/awkpath:$PATH
@@ -255,25 +255,27 @@
   # MacOS Specific Settings
   uname -a | grep -qs Darwin
   if [ $? -eq 0 ]; then
+    alias ls='ls -G'
+
     # brew install coreutils
     # eval "`gdircolors -b`"
-    unalias gls
-    alias ls='gls --color=auto'
-    alias gvim=mvim
-    alias vim='TERM=xterm-256color /Applications/MacVim.app/Contents/MacOS/Vim'
-    export EDITOR='TERM=xterm-256color /Applications/MacVim.app/Contents/MacOS/Vim'
-    # xmodmap -e "keycode 119 = Insert"
-    alias f12insert='xmodmap -e "keycode 119 = Insert"'
-    alias mission_controll_animation_disable='defaults write com.apple.dock expose-animation-duration -float 0; killall Dock'
-    alias mission_controll_animation_enable='defaults delete com.apple.dock expose-animation-duration; killall Dock'
-    function clipboard_as_html {
-      osascript -e 'the clipboard as "HTML"' | ruby -ne 'puts([$_[10..-3]].pack("H*"))'
-    }
+    # unalias gls
+    # alias ls='gls --color=auto'
+    # alias gvim=mvim
+    # alias vim='TERM=xterm-256color /Applications/MacVim.app/Contents/MacOS/Vim'
+    # export EDITOR='TERM=xterm-256color /Applications/MacVim.app/Contents/MacOS/Vim'
+    # # xmodmap -e "keycode 119 = Insert"
+    # alias f12insert='xmodmap -e "keycode 119 = Insert"'
+    # alias mission_controll_animation_disable='defaults write com.apple.dock expose-animation-duration -float 0; killall Dock'
+    # alias mission_controll_animation_enable='defaults delete com.apple.dock expose-animation-duration; killall Dock'
+    # function clipboard_as_html {
+    #   osascript -e 'the clipboard as "HTML"' | ruby -ne 'puts([$_[10..-3]].pack("H*"))'
+    # }
 
-    if [ -d "$HOME/homebrew/bin" ]; then
-      export PATH=$HOME/homebrew/bin:$PATH
-      export MANPATH=$HOME/homebrew/share/man:$MANPATH
-    fi
+    # if [ -d "$HOME/homebrew/bin" ]; then
+    #   export PATH=$HOME/homebrew/bin:$PATH
+    #   export MANPATH=$HOME/homebrew/share/man:$MANPATH
+    # fi
 
   else
     # Linux
@@ -362,7 +364,6 @@
   # pip
   # for python pip install --user
   export PATH="$HOME/.local/bin:$PATH"
-  export PATH="$HOME/Library/Python/2.7/bin:$PATH"
 
   # luarocks
   export PATH="$HOME/.luarocks/bin:$PATH"
@@ -371,7 +372,7 @@
   # rust/cargo
   export PATH="$HOME/.cargo/bin:$PATH"
 
-  export PATH="$HOME/apps/pebble-sdk-4.5-linux64/bin:$PATH"
+  # export PATH="$HOME/apps/pebble-sdk-4.5-linux64/bin:$PATH"
 
   if [[ -n ${ZSH_VERSION-} ]]; then
     setopt clobber

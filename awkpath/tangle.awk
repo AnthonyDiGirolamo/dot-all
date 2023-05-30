@@ -1,4 +1,4 @@
-#!/usr/bin/gawk -f
+#!/usr/bin/env -S gawk -f
 # Copyright 2021 Anthony DiGirolamo
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
