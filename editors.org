@@ -1,29 +1,30 @@
 #+TITLE: vim
+#+STARTUP: showall indent
 #+PROPERTY: header-args :mkdirp yes
 
 * Symlink vim and emacs
 
-   #+begin_src sh :exports code :results silent output :eval (if (eq system-type 'windows-nt) "no" "yes")
-     echo '  [SYMLINKS]'
-     ln -snvf $(realpath ./vim) $HOME/.vim
-     ln -snvf $(realpath ./emacs.d) $HOME/.emacs.d
-   #+end_src
+#+begin_src sh :exports code :results silent output :eval (if (eq system-type 'windows-nt) "no" "yes")
+  echo '  [SYMLINKS]'
+  ln -snvf $(realpath ./vim) $HOME/.vim
+  ln -snvf $(realpath ./emacs.d) $HOME/.emacs.d
+#+end_src
 
-   #+begin_src shell :exports code :results silent output :eval (if (eq system-type 'windows-nt) "yes" "no")
-     echo '  [SYMLINKS]'
-     cd %USERPROFILE%
-     mklink /D .vim dot-all\vim
-     mklink /D .emacs.d dot-all\emacs.d
-   #+end_src
+#+begin_src shell :exports code :results silent output :eval (if (eq system-type 'windows-nt) "yes" "no")
+  echo '  [SYMLINKS]'
+  cd %USERPROFILE%
+  mklink /D .vim dot-all\vim
+  mklink /D .emacs.d dot-all\emacs.d
+#+end_src
 
-   #+begin_src fundamental :tangle (if (eq system-type 'windows-nt) "C:/Users/anthony/runemacs.bat" "no")
-     SET GIT=PortableGit
-     SET GIT_HOME=%CD%\%GIT%
-     SET GIT_SSH=%CD%\%GIT%\cmd\plink.exe
-     SET PLINK_PROTOCOL=ssh
-     SET GIT_ASKPASS=git-gui--askpass
-     SET SSH_ASKPASS=git-gui--askpass
-     SET PATH=%GIT_HOME%\bin;%GIT_HOME%\mingw64\bin;%GIT_HOME%\cmd;%GIT_HOME%\usr\bin;%GIT_HOME%\mingw64\libexec\git-core;%PATH%
-     SET HOME=.\
-     emacs\bin\runemacs.exe %*
-   #+end_src
+#+begin_src fundamental :tangle (if (eq system-type 'windows-nt) "C:/Users/anthony/runemacs.bat" "no")
+  SET GIT=PortableGit
+  SET GIT_HOME=%CD%\%GIT%
+  SET GIT_SSH=%CD%\%GIT%\cmd\plink.exe
+  SET PLINK_PROTOCOL=ssh
+  SET GIT_ASKPASS=git-gui--askpass
+  SET SSH_ASKPASS=git-gui--askpass
+  SET PATH=%GIT_HOME%\bin;%GIT_HOME%\mingw64\bin;%GIT_HOME%\cmd;%GIT_HOME%\usr\bin;%GIT_HOME%\mingw64\libexec\git-core;%PATH%
+  SET HOME=.\
+  emacs\bin\runemacs.exe %*
+#+end_src

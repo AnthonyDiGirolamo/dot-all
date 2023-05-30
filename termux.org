@@ -1,15 +1,16 @@
 #+TITLE: termux
+#+STARTUP: showall indent
 #+PROPERTY: header-args :mkdirp yes
 
 * =~/.termux/termux.properties=
 
-  Contains extra keyboard key definitions.
-  Hold down on the keyboard button in drawer to toggle, or VolumeUp+Q.
+Contains extra keyboard key definitions.
+Hold down on the keyboard button in drawer to toggle, or VolumeUp+Q.
 
-  #+begin_src sh :tangle ~/.termux/termux.properties
-    extra-keys = [ \
-      ['ESC','|','/','HOME','UP','END','PGUP','"','DEL'], \
-      ['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','-','BKSP'] \
-    ]
-  #+end_src
+#+begin_src sh :tangle ~/.termux/termux.properties
+  extra-keys = [ \
+    ['ESC','|','/','HOME','UP','END','PGUP','"','DEL'], \
+    ['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','-','BKSP'] \
+  ]
+#+end_src
 

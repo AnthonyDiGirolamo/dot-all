@@ -1,35 +1,37 @@
 #+TITLE: gitconfig
+#+STARTUP: showall indent
 #+PROPERTY: header-args :mkdirp yes
 
 * Table of Contents                                                     :TOC:
- - [[#gitconfig-local][=~/.gitconfig-local=]]
- - [[#gitconfig][=~/.gitconfig=]]
+- [[#gitconfig-local][=~/.gitconfig-local=]]
+- [[#gitconfig][=~/.gitconfig=]]
 
 * =~/.gitconfig-local=
 
-  Secondary gitconfig file so a local =~/.gitconfig= isn't clobbered.
+Secondary gitconfig file so a local =~/.gitconfig= isn't clobbered.
 
-  #+begin_src text :tangle "~/.gitconfig-local"
-    [color]
-      diff = auto
-      status = auto
-      branch = auto
-    [push]
-      default = current
-    [alias]
-      l = log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
-      hist = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-      ls-updated-in-head = diff-tree --no-commit-id --name-only -r HEAD
-      ls-updated-in = diff-tree --no-commit-id --name-only -r
-    [core]
-      editor = vim
-  #+end_src
+#+begin_src text :tangle "~/.gitconfig-local"
+  [color]
+    diff = auto
+    status = auto
+    branch = auto
+  [push]
+    default = current
+  [alias]
+    l = log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+    hist = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    ls-updated-in-head = diff-tree --no-commit-id --name-only -r HEAD
+    ls-updated-in = diff-tree --no-commit-id --name-only -r
+  [core]
+    editor = vim
+#+end_src
 
 * =~/.gitconfig=
 
-  Only create this if it doesn't already exist.
+Only create this if it doesn't already exist.
 
-  #+begin_src text :tangle (if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")
-    [include]
-      path = ~/.gitconfig-local
-  #+end_src
+#+begin_src text :tangle (if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")
+  [include]
+    path = ~/.gitconfig-local
+#+end_src
+

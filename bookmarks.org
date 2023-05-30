@@ -1,4 +1,5 @@
 #+TITLE: Bookmarks
+#+STARTUP: content indent
 
 * Bookmarks
 ** 2020
@@ -6,27 +7,27 @@
 **** 2020-05-07 Thursday
 
 ***** [2020-05-07 Thu 11:32] [[https://github.com/progfolio/doct][progfolio/doct: DOCT: Declarative Org Capture Templates for Emacs]] :emacs:
-      Example:
-      #+begin_src emacs-lisp
-        (setq org-capture-templates
-              (doct '(("Parent" :keys "p"
-                       :file "~/example.org"
-                       :prepend t
-                       :template ("* %{todo-state} "
-                                  ":PROPERTIES:"
-                                  ":Created: %U"
-                                  ":END:"
-                                  "%?")
-                       :children (("First Child"  :keys "1"
-                                   :headline   "One"
-                                   :todo-state "TODO"
-                                   :hook (lambda () (message "\"First Child\" selected.")))
-                                  ("Second Child" :keys "2"
-                                   :headline   "Two"
-                                   :todo-state "NEXT")
-                                  ("Third Child"  :keys "3"
-                                   :headline   "Three"
-                                   :todo-state "MAYBE"))))))
-      #+end_src
+Example:
+#+begin_src emacs-lisp
+  (setq org-capture-templates
+        (doct '(("Parent" :keys "p"
+                 :file "~/example.org"
+                 :prepend t
+                 :template ("* %{todo-state} "
+                            ":PROPERTIES:"
+                            ":Created: %U"
+                            ":END:"
+                            "%?")
+                 :children (("First Child"  :keys "1"
+                             :headline   "One"
+                             :todo-state "TODO"
+                             :hook (lambda () (message "\"First Child\" selected.")))
+                            ("Second Child" :keys "2"
+                             :headline   "Two"
+                             :todo-state "NEXT")
+                            ("Third Child"  :keys "3"
+                             :headline   "Three"
+                             :todo-state "MAYBE"))))))
+#+end_src
 
 

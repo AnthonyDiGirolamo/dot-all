@@ -1,68 +1,68 @@
 #+TITLE: picom
-#+STARTUP: content
+#+STARTUP: content indent
 
 * ~/.config/picom.conf
 
-  #+BEGIN_SRC yaml :tangle "~/.config/picom.conf"
-    backend = "glx";
-    glx-no-stencil = true;
-    glx-no-rebind-pixmap = true;
-    vsync = true;
+#+BEGIN_SRC yaml :tangle "~/.config/picom.conf"
+  backend = "glx";
+  glx-no-stencil = true;
+  glx-no-rebind-pixmap = true;
+  vsync = true;
 
-    # Option `no-dock-shadow` is deprecated, and will be removed. Please use the wintype option `shadow` of `dock` instead.
-    # Option `no-dnd-shadow` is deprecated, and will be removed. Please use the wintype option `shadow` of `dnd` instead.
-    # vsync option will take a boolean from now on. "opengl-swc" is interpreted as "true" for compatibility, but this will stop working soon
-    # "clear-shadow" is removed as an option, and is always enabled now. Consider removing it from your config file
-
-
-    # These are important. The first one enables the opengl backend. The last one is the vsync method. Depending on the driver you might need to use a different method.
-    # The other options are smaller performance tweaks that work well in most cases.
-    # You can find the rest of the options here: https://github.com/chjj/compton/wiki/perf-guide, and here: https://github.com/chjj/compton/wiki/vsync-guide
+  # Option `no-dock-shadow` is deprecated, and will be removed. Please use the wintype option `shadow` of `dock` instead.
+  # Option `no-dnd-shadow` is deprecated, and will be removed. Please use the wintype option `shadow` of `dnd` instead.
+  # vsync option will take a boolean from now on. "opengl-swc" is interpreted as "true" for compatibility, but this will stop working soon
+  # "clear-shadow" is removed as an option, and is always enabled now. Consider removing it from your config file
 
 
-    # Shadow
-    shadow = true;                  # Enabled client-side shadows on windows.
-    shadow-radius = 7;              # The blur radius for shadows. (default 12)
-    shadow-offset-x = -7;           # The left offset for shadows. (default -15)
-    shadow-offset-y = -7;           # The top offset for shadows. (default -15)
-    shadow-exclude = [
-     "! name~=''",
-     "n:e:Notification",
-     "n:e:Plank",
-     "n:e:Docky",
-     "g:e:Synapse",
-     "g:e:Kupfer",
-     "g:e:Conky",
-     "n:w:*Firefox*",
-     "n:w:*Chrome*",
-     "n:w:*Chromium*",
-     "class_g ?= 'Notify-osd'",
-     "class_g ?= 'Cairo-dock'",
-     "class_g ?= 'Xfce4-notifyd'",
-     "class_g ?= 'Xfce4-power-manager'"
-    ];
+  # These are important. The first one enables the opengl backend. The last one is the vsync method. Depending on the driver you might need to use a different method.
+  # The other options are smaller performance tweaks that work well in most cases.
+  # You can find the rest of the options here: https://github.com/chjj/compton/wiki/perf-guide, and here: https://github.com/chjj/compton/wiki/vsync-guide
 
-    # The shadow exclude options are helpful if you have shadows enabled. Due to the way compton draws its shadows, certain applications will have visual glitches
-    # (most applications are fine, only apps that do weird things with xshapes or argb are affected).
-    # This list includes all the affected apps I found in my testing. The "! name~=''" part excludes shadows on any "Unknown" windows, this prevents a visual glitch with the XFWM alt tab switcher.
 
-    # Fading
-    fading = false; # Fade windows during opacity changes.
-    fade-delta = 4; # The time between steps in a fade in milliseconds. (default 10).
-    fade-in-step = 0.03; # Opacity change between steps while fading in. (default 0.028).
-    fade-out-step = 0.03; # Opacity change between steps while fading out. (default 0.03).
-    #no-fading-openclose = true; # Fade windows in/out when opening/closing
+  # Shadow
+  shadow = true;                  # Enabled client-side shadows on windows.
+  shadow-radius = 7;              # The blur radius for shadows. (default 12)
+  shadow-offset-x = -7;           # The left offset for shadows. (default -15)
+  shadow-offset-y = -7;           # The top offset for shadows. (default -15)
+  shadow-exclude = [
+   "! name~=''",
+   "n:e:Notification",
+   "n:e:Plank",
+   "n:e:Docky",
+   "g:e:Synapse",
+   "g:e:Kupfer",
+   "g:e:Conky",
+   "n:w:*Firefox*",
+   "n:w:*Chrome*",
+   "n:w:*Chromium*",
+   "class_g ?= 'Notify-osd'",
+   "class_g ?= 'Cairo-dock'",
+   "class_g ?= 'Xfce4-notifyd'",
+   "class_g ?= 'Xfce4-power-manager'"
+  ];
 
-    inactive-opacity = 0.90;
+  # The shadow exclude options are helpful if you have shadows enabled. Due to the way compton draws its shadows, certain applications will have visual glitches
+  # (most applications are fine, only apps that do weird things with xshapes or argb are affected).
+  # This list includes all the affected apps I found in my testing. The "! name~=''" part excludes shadows on any "Unknown" windows, this prevents a visual glitch with the XFWM alt tab switcher.
 
-    detect-client-opacity = true; # This prevents opacity being ignored for some apps. For example without this enabled my xfce4-notifyd is 100% opacity no matter what.
+  # Fading
+  fading = false; # Fade windows during opacity changes.
+  fade-delta = 4; # The time between steps in a fade in milliseconds. (default 10).
+  fade-in-step = 0.03; # Opacity change between steps while fading in. (default 0.028).
+  fade-out-step = 0.03; # Opacity change between steps while fading out. (default 0.03).
+  #no-fading-openclose = true; # Fade windows in/out when opening/closing
 
-    # Window type settings
-    wintypes:
-    {
-      tooltip = { fade = true; shadow = false; focus = true };
-    };
+  inactive-opacity = 0.90;
 
-  #+END_SRC
+  detect-client-opacity = true; # This prevents opacity being ignored for some apps. For example without this enabled my xfce4-notifyd is 100% opacity no matter what.
+
+  # Window type settings
+  wintypes:
+  {
+    tooltip = { fade = true; shadow = false; focus = true };
+  };
+
+#+END_SRC
 
 

@@ -1,124 +1,128 @@
-* dot-all
-  This repo contains all the dotfiles. Files are contained in ~*.org~ files and
-  can be put in place by running ~make tangle~. Running ~make~ with no target
-  displays the help:
+#+TITLE: dot-all
+#+STARTUP: content indent
 
-  #+begin_src sh
-    $ make
-    all                  clean and tangle all
-    clean                delete .cache
-    help                 show help
-    install-emacs        download, compile and install emacs
-    install-fish         download, compile and install fish
-    install-gtk-themes   download and install gtk themes/icons
-    install-lua54        download, compile and install lua 5.4
-    install-lua          download, compile and install lua
-    install-luarocks     download, compile and install luarocks
-    install-pip          install python3 pip
-    rm-all-tangled-files rm all tangled files
-    rm-removed-files     rm files removed since last make tangle
-    symlinks             symlink folders
-    tangleawk            tangle all dotfiles with tangle.awk
-    tangleorg            tangle all dotfiles with emacs+org-mode
-    tangle               tangleawk alias
-    t                    tangle alias
-    update-base16shell   git pull base16-shell source
-    update-clac          git pull clac source
-    update-lux           git pull lux source
-    update-xcape         git pull xcape source
-  #+end_src
+* dot-all
+
+This repo contains all the dotfiles. Files are contained in ~*.org~ files and
+can be put in place by running ~make tangle~. Running ~make~ with no target
+displays the help:
+
+#+begin_src sh
+  $ make
+  all                  clean and tangle all
+  clean                delete .cache
+  help                 show help
+  install-emacs        download, compile and install emacs
+  install-fish         download, compile and install fish
+  install-gtk-themes   download and install gtk themes/icons
+  install-lua54        download, compile and install lua 5.4
+  install-lua          download, compile and install lua
+  install-luarocks     download, compile and install luarocks
+  install-pip          install python3 pip
+  rm-all-tangled-files rm all tangled files
+  rm-removed-files     rm files removed since last make tangle
+  symlinks             symlink folders
+  tangleawk            tangle all dotfiles with tangle.awk
+  tangleorg            tangle all dotfiles with emacs+org-mode
+  tangle               tangleawk alias
+  t                    tangle alias
+  update-base16shell   git pull base16-shell source
+  update-clac          git pull clac source
+  update-lux           git pull lux source
+  update-xcape         git pull xcape source
+#+end_src
 
 ** ~make tangleawk~
 
-   This will run the ~tangle.awk~ script which attempts to emulate emacs
-   ~org-babel-tangle-file~ but without emacs installed.
+This will run the ~tangle.awk~ script which attempts to emulate emacs
+~org-babel-tangle-file~ but without emacs installed.
 
-   - It will copy each source block in a given ~*.org~ file into it's respective
-     ~:tangle~ destination and create any parent directories.
-   - Some conditional checks are supported for :tangle and :eval:
-     - ~(if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")~
-     - ~(if (eq system-type 'windows-nt) "yes" "no")~
-       - Valid types: ~'windows-nt~, ~'gnu/linux~, ~'darwin~
-     - ~(if (string-suffix-p "chip" hostname) "~/.i3/config" "no")~
-       - Only supported variable is: ~hostname~
-   - Any blocks with ~#+begin_src sh :eval yes~ will be executed as well. The
-     above elisp checks are supported as well.
+- It will copy each source block in a given ~*.org~ file into it's respective
+  ~:tangle~ destination and create any parent directories.
+- Some conditional checks are supported for :tangle and :eval:
+  - ~(if (file-exists-p "~/.gitconfig") "no" "~/.gitconfig")~
+  - ~(if (eq system-type 'windows-nt) "yes" "no")~
+    - Valid types: ~'windows-nt~, ~'gnu/linux~, ~'darwin~
+  - ~(if (string-suffix-p "chip" hostname) "~/.i3/config" "no")~
+    - Only supported variable is: ~hostname~
+- Any blocks with ~#+begin_src sh :eval yes~ will be executed as well. The
+  above elisp checks are supported as well.
 
-   #+begin_src text
-     $ make tangleawk
-     [TANGLE] alacritty.org
-       ~/.config/alacritty/alacritty.yml
-     [TANGLE] bash.org
-       ~/.bashrc
-       ~/.bash_profile
-       ~/.aliases
-     [TANGLE] bookmarks.org
-     [TANGLE] compton.org
-       ~/.compton.conf
-     [TANGLE] dunst.org
-       ~/.config/dunst/dunstrc
-     [TANGLE] fish.org
-       ~/.config/fish/config.fish
-       ~/.config/fish/conf.d/aliases.fish
-       ~/.config/fish/conf.d/fish_user_key_bindings.fish
-       ~/.config/fish/functions/fish_prompt.fish
-       ~/.config/fish/functions/fish_mode_prompt.fish
-       ~/.config/fish/functions/tarxz.fish
-       ~/.config/fish/functions/u.fish
-       ~/.config/fish/functions/dl.fish
-       ~/.config/fish/functions/source-bash-aliases.fish
-       ~/.config/fish/completions/dhcpcd-restart.fish
-     [TANGLE] gdb.org
-       ~/.gdbinit
-     [TANGLE] gitconfig.org
-       ~/.gitconfig-local
-     [TANGLE] i3.org
-       ~/.i3/config
-     [TANGLE] lxde.org
-     [TANGLE] ranger.org
-       ~/.config/ranger/rc.conf
-     [TANGLE] README.org
-     [TANGLE] ruby.org
-       ~/.irbrc
-       ~/.rdebugrc
-       ~/.pryrc
-       ~/.rubocop.yml
-     [TANGLE] terminfo.org
-       .artifacts/terminfo-24bit.src
-       [RUNSCRIPT] sh
-       [PROCESS tic]
-     [TANGLE] termux.org
-       ~/.termux/termux.properties
-     [TANGLE] tmux.org
-       ~/.tmux.conf
-     [TANGLE] xmodmap.org
-     [TANGLE] xresources.org
-       ~/.Xresources
-     [TANGLE] zsh.org
-       ~/.zshrc
-       ~/.zshrc.local
-   #+end_src
+#+begin_src text
+  $ make tangleawk
+  [TANGLE] alacritty.org
+    ~/.config/alacritty/alacritty.yml
+  [TANGLE] bash.org
+    ~/.bashrc
+    ~/.bash_profile
+    ~/.aliases
+  [TANGLE] bookmarks.org
+  [TANGLE] compton.org
+    ~/.compton.conf
+  [TANGLE] dunst.org
+    ~/.config/dunst/dunstrc
+  [TANGLE] fish.org
+    ~/.config/fish/config.fish
+    ~/.config/fish/conf.d/aliases.fish
+    ~/.config/fish/conf.d/fish_user_key_bindings.fish
+    ~/.config/fish/functions/fish_prompt.fish
+    ~/.config/fish/functions/fish_mode_prompt.fish
+    ~/.config/fish/functions/tarxz.fish
+    ~/.config/fish/functions/u.fish
+    ~/.config/fish/functions/dl.fish
+    ~/.config/fish/functions/source-bash-aliases.fish
+    ~/.config/fish/completions/dhcpcd-restart.fish
+  [TANGLE] gdb.org
+    ~/.gdbinit
+  [TANGLE] gitconfig.org
+    ~/.gitconfig-local
+  [TANGLE] i3.org
+    ~/.i3/config
+  [TANGLE] lxde.org
+  [TANGLE] ranger.org
+    ~/.config/ranger/rc.conf
+  [TANGLE] README.org
+  [TANGLE] ruby.org
+    ~/.irbrc
+    ~/.rdebugrc
+    ~/.pryrc
+    ~/.rubocop.yml
+  [TANGLE] terminfo.org
+    .artifacts/terminfo-24bit.src
+    [RUNSCRIPT] sh
+    [PROCESS tic]
+  [TANGLE] termux.org
+    ~/.termux/termux.properties
+  [TANGLE] tmux.org
+    ~/.tmux.conf
+  [TANGLE] xmodmap.org
+  [TANGLE] xresources.org
+    ~/.Xresources
+  [TANGLE] zsh.org
+    ~/.zshrc
+    ~/.zshrc.local
+#+end_src
 
 ** ~make tangleorg~
 
-   Alternative to ~tangleawk~ this uses emacs to tangle all ~*.org~ files.
+Alternative to ~tangleawk~ this uses emacs to tangle all ~*.org~ files.
 
 ** ~./make.awk~
 
-   This is a ~gawk~ based task runner with some convenience functions for
-   running shell commands, downloading archives, and git cloning.
+This is a ~gawk~ based task runner with some convenience functions for running
+shell commands, downloading archives, and git cloning.
 
-   #+begin_src sh
-     $ ./make.awk
-     t, tangle             tangle all org files
-     build                 run test & lint
-     test                  awk unit tests
-     lint                  awk linting
-     install_emacs27       download, compile and install emacs27
-     install_emacs28       download, compile and install emacs28
-     install_emacs_git     download, compile and install emacs from git
-     install_fish          download, compile and install fish-shell
-     install_lua54         download, compile and install lua 5.4
-   #+end_src
+#+begin_src sh
+  $ ./make.awk
+  t, tangle             tangle all org files
+  build                 run test & lint
+  test                  awk unit tests
+  lint                  awk linting
+  install_emacs27       download, compile and install emacs27
+  install_emacs28       download, compile and install emacs28
+  install_emacs_git     download, compile and install emacs from git
+  install_fish          download, compile and install fish-shell
+  install_lua54         download, compile and install lua 5.4
+#+end_src
 
-   It covers most of the use cases I needed in the root ~Makefile~.
+It covers most of the use cases I needed in the root ~Makefile~.
