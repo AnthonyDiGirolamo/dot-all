@@ -46,7 +46,7 @@ function cwd(_current_dir) {
 
 function resolve(target_path,
                  _resolved_path, _command) {
-    _command = "realpath " target_path
+    _command = "readlink -f " target_path
     _command | getline _resolved_path
     close(_command)
     return _resolved_path
@@ -70,21 +70,36 @@ function is_dir(target_path,
     return _fdata["type"] == "directory"
  }
 
-function md5sum(target_path,
-                _result_hash, _command) {
-    _command = "md5sum " target_path
-    _command | getline _result_hash
-    close(_command)
-    return _result_hash
-}
 
-function md5sum_matches(target_path, expected_hash,
-                        _result, _matches) {
-    _matches = 0
-    _result = md5sum(target_path)
-    if (_result == expected_hash "  " target_path)
-        _matches = 1
-    return _matches
+function which(bin_name,
+               _command, _result) {
+    _result = ""
+    _command = "which " bin_name
+    _command | getline _result
+    close(_command)
+    return _result
+ }
+
+function md5sum(target_path,
+                _md5_bin, _result_output,
+                _result_index, _result_array, _command) {
+    _md5_bin = ""
+    _result_index = 0
+    if (which("md5sum")) {
+        _md5_bin = "md5sum"
+        _result_index = 1
+    }
+    else if (which("md5")) {
+        _md5_bin = "md5"
+        _result_index = 4
+    }
+
+    _command = _md5_bin " " target_path
+    _command | getline _result_output
+    close(_command)
+    split(_result_output, _result_array, " ")
+
+    return _result_array[_result_index]
 }
 
 function glob(target_path,

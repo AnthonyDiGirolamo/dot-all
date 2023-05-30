@@ -232,7 +232,7 @@ function download(tool_name, url, expected_md5hash, cachedir,
     _result = path::md5sum(_downloaded_file)
 
     # Checksum matches?
-    if (_result != expected_md5hash "  " _downloaded_file) {
+    if (_result != expected_md5hash) {
         print cli::error("[ERROR] ") "MD5 mismatch"
         print cli::error("[ERROR] ") "Expected: " expected_md5hash "  " _downloaded_file
         print cli::error("[ERROR] ") "     Got: " _result

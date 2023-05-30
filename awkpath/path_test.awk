@@ -61,4 +61,6 @@ function run_tests() {
 
     cli::print_debug_array(SYMTAB, "path::")
 
+    assert::Equal(path::basename(path::which("gawk")), "gawk")
+    assert::Equal(path::which("SomeNonExistentGawkPathTangleAwkTest"), "")
 }

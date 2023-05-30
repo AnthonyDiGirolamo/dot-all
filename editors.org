@@ -6,8 +6,8 @@
 
 #+begin_src sh :exports code :results silent output :eval (if (eq system-type 'windows-nt) "no" "yes")
   echo '  [SYMLINKS]'
-  ln -snvf $(realpath ./vim) $HOME/.vim
-  ln -snvf $(realpath ./emacs.d) $HOME/.emacs.d
+  ln -snvf $(readlink -f ./vim) $HOME/.vim
+  ln -snvf $(readlink -f ./emacs.d) $HOME/.emacs.d
 #+end_src
 
 #+begin_src shell :exports code :results silent output :eval (if (eq system-type 'windows-nt) "yes" "no")
