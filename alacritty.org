@@ -60,20 +60,20 @@ https://github.com/jwilm/alacritty
   # * file:///usr/share/doc/fontconfig/fontconfig-user.html
   font:
     normal:
-      # family: Iosevka SS17
-      family: PragmataPro
+      family: Iosevka SS08
+      # family: PragmataPro
       # family: Terminus
-      style: Regular
-      # style: Light
+      # style: Regular
+      style: Light
       # style: Bold
     bold:
-      # family: Iosevka SS17
-      family: PragmataPro
+      family: Iosevka SS08
+      # family: PragmataPro
       # family: Terminus
       style: Bold
     italic:
-      # family: Iosevka SS17
-      family: PragmataPro
+      family: Iosevka SS08
+      # family: PragmataPro
       # family: Terminus
       style: Italic
     # Point size of the font

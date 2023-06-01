@@ -4,7 +4,6 @@
 
 * Table of Contents                                            :TOC:noexport:
 - [[#top-level-settings][top level settings]]
-- [[#fonts][fonts]]
 - [[#libraries][libraries]]
 - [[#appearance][appearance]]
   - [[#themes][themes]]
@@ -205,38 +204,14 @@
                          (expand-file-name "~/Pictures/") screenshot-filename)))))
 
     ;; Default font size and name
-    (setq amd/font-size 20
+    (setq amd/font-size 18
           amd/font-name "PragmataPro-%d")
 
     (defun amd/set-font (&optional fsize fname)
       "Set preferred GUI font."
       (interactive)
       (when (display-graphic-p)
-        ;; Set the right font name and size by OS.
-        (cond
-         ((or (eq system-type 'cygwin)
-              (eq system-type 'windows-nt))
-          (setq amd/font-size 19
-                amd/font-name "PragmataPro-%d"))
-         ((eq system-type 'darwin)
-          (setq amd/font-size 20
-                amd/font-name "PragmataPro-%d"))
-         (amd/using-pocketchip
-          (setq amd/font-size 12
-                amd/font-name "-xos4-Terminus-normal-normal-normal-*-%d-*-*-*-c-60-iso10646-1"))
-         ((eq system-type 'gnu/linux)
-          (setq amd/font-size 18
-                ;; amd/font-name "Iosevka Term SS17 Light-%d:antialias=true:hinting=true:autohint=true:hintstyle=hintfull"
-                ;; amd/font-name "Iosevka Term SS08 Light-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintfull"
-                ;; amd/font-name "PragmataPro-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintnone"
-                amd/font-name "PragmataPro-%d"
-                ;; amd/font-name "Iosevka Term SS17 Light-%d"
-                ;; amd/font-name "Iosevka SS08 Light-%d"
-                ))
-         (t
-          (setq amd/font-size 20
-                amd/font-name "PragmataPro-%d")))
-
+        ;; Update amd/font-* variables
         (when fsize
           (setq amd/font-size fsize))
         (when fname
@@ -247,10 +222,6 @@
 
         (set-frame-font (format amd/font-name amd/font-size))
         (add-to-list 'default-frame-alist `(font . ,(format amd/font-name amd/font-size)))
-        ;; set-frame-font :size <int>pixel size <float>point size
-        ;; (set-frame-font (font-spec :name "PragmataPro" :antialias t :size 17.0))
-        ;; (set-frame-font (font-spec :name "Iosevka Term SS17 Light" :antialias t :size 16.0))
-        ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 18.0))
 
         ;; Determine a good powerline height
         (setq amd/font-dpi 96) ;; default dpi assumption
@@ -308,121 +279,23 @@
     (menu-bar-mode -1)
 
     (when (display-graphic-p)
-      ;; (amd/set-font 25)
-      (amd/set-font)
-      ;; (amd/set-font nil "PragmataPro")
-      ;; (amd/set-font nil "Iosevka Term SS17 Light")
-      ;; (amd/set-font nil "Iosevka SS08 Light")
-      )
-    )
-#+end_src
-
-* fonts
-
-#+begin_src emacs-lisp
-  (defun amd/take-svg-screenshot ()
-    "Take a screenshot and save as an svg (requires cairo support)."
-    (interactive)
-    (let ((screenshot-filename (format-time-string
-                                "%Y-%m-%d-%H%M%S-emacs.svg"
-                                (current-time))))
-      (with-temp-buffer
-        (insert (x-export-frames nil 'svg))
-        (write-region (point-min) (point-max)
-                      (concat
-                       (expand-file-name "~/Pictures/") screenshot-filename)))))
-
-  (defun amd/set-font (&optional fsize fname)
-    "Set preferred GUI font."
-    (interactive)
-    (when (display-graphic-p)
-      ;; Set the right font name and size by OS.
       (cond
-       ((or (eq system-type 'cygwin)
-            (eq system-type 'windows-nt))
-        (setq amd/font-size 19
-              amd/font-name "PragmataPro-%d"))
-       ((eq system-type 'darwin)
-        (setq amd/font-size 20
-              amd/font-name "PragmataPro-%d"))
-       (amd/using-pocketchip
-        (setq amd/font-size 12
-              amd/font-name "-xos4-Terminus-normal-normal-normal-*-%d-*-*-*-c-60-iso10646-1"))
-       ((eq system-type 'gnu/linux)
-        (setq amd/font-size 18
-              ;; amd/font-name "Iosevka Term SS17 Light-%d:antialias=true:hinting=true:autohint=true:hintstyle=hintfull"
-              ;; amd/font-name "Iosevka Term SS08 Light-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintfull"
-              ;; amd/font-name "PragmataPro-%d:antialias=true:hinting=true:autohint=false:hintstyle=hintnone"
-              amd/font-name "PragmataPro-%d"
-              ;; amd/font-name "Iosevka Term SS17 Light-%d"
-              ;; amd/font-name "Iosevka SS08 Light-%d"
-              ))
+       ((member "PragmataPro" (font-family-list))
+        (amd/set-font nil "PragmataPro"))
+       ((member "Iosevka SS08" (font-family-list))
+        (amd/set-font nil "Iosevka SS08 Light"))
+       ((member "Iosevka SS17" (font-family-list))
+        (amd/set-font nil "Iosevka SS17 Light"))
        (t
-        (setq amd/font-size 20
-              amd/font-name "PragmataPro-%d")))
+        (amd/set-font)))
 
-      (when fsize
-        (setq amd/font-size fsize))
-      (when fname
-        (setq amd/font-name
-              (if (string-suffix-p "-%d" fname)
-                  fname
-                (concat fname "-%d"))))
-
-      (set-frame-font (format amd/font-name amd/font-size))
-      (add-to-list 'default-frame-alist `(font . ,(format amd/font-name amd/font-size)))
+      ;; Examples of setting a font with antialias on or off:
       ;; set-frame-font :size <int>pixel size <float>point size
       ;; (set-frame-font (font-spec :name "PragmataPro" :antialias t :size 17.0))
       ;; (set-frame-font (font-spec :name "Iosevka Term SS17 Light" :antialias t :size 16.0))
       ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 18.0))
-
-      ;; Determine a good powerline height
-      (setq amd/font-dpi 96) ;; default dpi assumption
-      ;; query xrdb for existing xft dpi
-      (when (eq system-type 'gnu/linux)
-        (let ((xrdb-dpi
-               (string-to-number
-                (shell-command-to-string "xrdb -query | grep -i Xft.dpi | cut -f 2"))))
-          (if (> xrdb-dpi 0)
-              (setq amd/font-dpi xrdb-dpi))))
-      ;; Formula: points = pixels * 72 / dpi
-      (setq powerline-height
-            (floor (* 2.0
-                      ;; pixel height from dpi and pt size
-                      (* (/ amd/font-dpi 72.0) amd/font-size))))))
-
-  ;; (amd/set-font 25)
-  (amd/set-font)
-  ;; (amd/set-font nil "PragmataPro")
-  ;; (amd/set-font nil "Iosevka Term SS17 Light")
-  ;; (amd/set-font nil "Iosevka SS08 Light")
-
-  (use-package prog-mode
-    :config
-    (when (display-graphic-p)
-      (setq
-       prettify-symbols-unprettify-at-point t
-       prettify-symbols-alist
-       '(("lambda" . ?ƛ)
-         ("self." . ?ⓢ)
-         ;; ("->" . (?\s (Br . Bl) ?))
-         ;; ("-->" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
-         ;; ("==>" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
-         ;; ("=>" . (?\s (Br . Bl) ?))
-         ;; ("--" . (?\s (Br . Bl) ?))
-         ;; ("!=" . (?\s (Br . Bl) ?))
-         ;; ("==" . (?\s (Br . Bl) ?))
-         ;; (">=" . (?\s (Br . Bl) ?))
-         ;; ("<=" . (?\s (Br . Bl) ?))
-         ;; ("~=" . (?\s (Br . Bl) ?))
-         ;; ("&&" . (?\s (Br . Bl) ?))
-         ;; ("#{" . (?\s (Br . Bl) ?))
-         ;; ("ERROR" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
-         ;; ("DEBUG" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
-         ))
-      ;; (global-prettify-symbols-mode 1)
+      )
     )
-  )
 #+end_src
 
 * libraries
@@ -2909,6 +2782,35 @@ This mode gives variables names unique colors.
 #+end_src
 
 * language major-modes
+
+#+begin_src emacs-lisp
+  (use-package prog-mode
+    :config
+    (when (display-graphic-p)
+      (setq
+       prettify-symbols-unprettify-at-point t
+       prettify-symbols-alist
+       '(("lambda" . ?ƛ)
+         ("self." . ?ⓢ)
+         ;; ("->" . (?\s (Br . Bl) ?))
+         ;; ("-->" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
+         ;; ("==>" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
+         ;; ("=>" . (?\s (Br . Bl) ?))
+         ;; ("--" . (?\s (Br . Bl) ?))
+         ;; ("!=" . (?\s (Br . Bl) ?))
+         ;; ("==" . (?\s (Br . Bl) ?))
+         ;; (">=" . (?\s (Br . Bl) ?))
+         ;; ("<=" . (?\s (Br . Bl) ?))
+         ;; ("~=" . (?\s (Br . Bl) ?))
+         ;; ("&&" . (?\s (Br . Bl) ?))
+         ;; ("#{" . (?\s (Br . Bl) ?))
+         ;; ("ERROR" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
+         ;; ("DEBUG" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
+         ))
+      ;; (global-prettify-symbols-mode 1)
+    )
+  )
+#+end_src
 
 #+begin_src emacs-lisp
   ;; (use-package eglot

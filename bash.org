@@ -256,7 +256,10 @@
   uname -a | grep -qs Darwin
   if [ $? -eq 0 ]; then
     alias ls='ls -G'
+    export LSCOLORS=exfxcxdxcxegedabagacad
 
+    # Outdated Settings:
+    #
     # brew install coreutils
     # eval "`gdircolors -b`"
     # unalias gls
@@ -271,7 +274,6 @@
     # function clipboard_as_html {
     #   osascript -e 'the clipboard as "HTML"' | ruby -ne 'puts([$_[10..-3]].pack("H*"))'
     # }
-
     # if [ -d "$HOME/homebrew/bin" ]; then
     #   export PATH=$HOME/homebrew/bin:$PATH
     #   export MANPATH=$HOME/homebrew/share/man:$MANPATH
