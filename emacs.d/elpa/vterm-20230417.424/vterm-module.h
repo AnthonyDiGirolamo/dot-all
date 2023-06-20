@@ -8,17 +8,17 @@
 
 // https://gcc.gnu.org/wiki/Visibility
 #if defined _WIN32 || defined __CYGWIN__
-  #ifdef __GNUC__
-    #define VTERM_EXPORT __attribute__ ((dllexport))
-  #else
-    #define VTERM_EXPORT __declspec(dllexport)
-  #endif
+#ifdef __GNUC__
+#define VTERM_EXPORT __attribute__((dllexport))
 #else
-  #if __GNUC__ >= 4
-    #define VTERM_EXPORT __attribute__ ((visibility ("default")))
-  #else
-    #define VTERM_EXPORT
-  #endif
+#define VTERM_EXPORT __declspec(dllexport)
+#endif
+#else
+#if __GNUC__ >= 4
+#define VTERM_EXPORT __attribute__((visibility("default")))
+#else
+#define VTERM_EXPORT
+#endif
 #endif
 
 VTERM_EXPORT int plugin_is_GPL_compatible;
@@ -53,7 +53,7 @@ typedef struct ElispCodeListNode {
 
 /*  c , p , q , s , 0 , 1 , 2 , 3 , 4 , 5 , 6 , and 7  */
 /* clipboard, primary, secondary, select, or cut buffers 0 through 7 */
-#define SELECTION_TARGET_MAX 12
+#define SELECTION_BUF_LEN 4096
 
 typedef struct Cursor {
   int row, col;
@@ -79,6 +79,7 @@ typedef struct Term {
   // window height has increased) and must be deleted from the terminal buffer
   int sb_pending;
   int sb_pending_by_height_decr;
+  bool sb_clear_pending;
   long linenum;
   long linenum_added;
 
@@ -100,8 +101,9 @@ typedef struct Term {
 
   /*  c , p , q , s , 0 , 1 , 2 , 3 , 4 , 5 , 6 , and 7  */
   /* clipboard, primary, secondary, select, or cut buffers 0 through 7 */
-  char selection_target[SELECTION_TARGET_MAX];
+  int selection_mask; /* see VTermSelectionMask in vterm.h */
   char *selection_data;
+  char selection_buf[SELECTION_BUF_LEN];
 
   /* the size of dirs almost = window height, value = directory of that line */
   LineInfo **lines;

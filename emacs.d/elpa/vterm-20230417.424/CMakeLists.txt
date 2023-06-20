@@ -42,6 +42,15 @@ if (USE_SYSTEM_LIBVTERM)
 #    add_compile_definitions(VTermStringFragmentNotExists)
     add_definitions(-DVTermStringFragmentNotExists)
     endif()
+    execute_process(COMMAND  grep -c "VTermSelectionMask" "${LIBVTERM_INCLUDE_DIR}/vterm.h" OUTPUT_VARIABLE VTermSelectionMaskExists)
+    if (${VTermSelectionMaskExists} EQUAL "0")
+#    add_compile_definitions(VTermStringFragmentNotExists)
+    add_definitions(-DVTermSelectionMaskNotExists)
+    endif()
+    execute_process(COMMAND  grep -c "sb_clear" "${LIBVTERM_INCLUDE_DIR}/vterm.h" OUTPUT_VARIABLE VTermSBClearExists)
+    if (${VTermSBClearExists} EQUAL "0")
+      add_definitions(-DVTermSBClearNotExists)
+    endif()
   else()
     message(STATUS "System libvterm not found: libvterm will be downloaded and compiled as part of the build process")
   endif()
@@ -63,10 +72,10 @@ else()
   endif()
 
   ExternalProject_add(libvterm
-    GIT_REPOSITORY https://github.com/neovim/libvterm.git
-    GIT_TAG 54c03b21f763fa775a4c0643a9d8326342873179
+    GIT_REPOSITORY https://github.com/Sbozzolo/libvterm-mirror.git
+    GIT_TAG 64f1775952dbe001e989f2ab679563b54f2fca55
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND ${LIBVTERM_BUILD_COMMAND} "CFLAGS='-fPIC'"
+    BUILD_COMMAND ${LIBVTERM_BUILD_COMMAND} "CFLAGS='-fPIC'" "LDFLAGS='-static'"
     BUILD_IN_SOURCE ON
     INSTALL_COMMAND "")
 

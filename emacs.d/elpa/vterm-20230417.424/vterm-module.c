@@ -154,6 +154,32 @@ static int term_sb_pop(int cols, VTermScreenCell *cells, void *data) {
   return 1;
 }
 
+static int term_sb_clear(void *data) {
+  Term *term = (Term *)data;
+
+  if (term->sb_clear_pending) {
+    // Another scrollback clear is already pending, so skip this one.
+    return 0;
+  }
+
+  for (int i = 0; i < term->sb_current; i++) {
+    if (term->sb_buffer[i]->info != NULL) {
+      free_lineinfo(term->sb_buffer[i]->info);
+      term->sb_buffer[i]->info = NULL;
+    }
+    free(term->sb_buffer[i]);
+  }
+  free(term->sb_buffer);
+  term->sb_buffer = malloc(sizeof(ScrollbackLine *) * term->sb_size);
+  term->sb_clear_pending = true;
+  term->sb_current = 0;
+  term->sb_pending = 0;
+  term->sb_pending_by_height_decr = 0;
+  invalidate_terminal(term, -1, -1);
+
+  return 0;
+}
+
 static int row_to_linenr(Term *term, int row) {
   return row != INT_MAX ? row + (int)term->sb_current + 1 : INT_MAX;
 }
@@ -436,6 +462,14 @@ static int term_resize(int rows, int cols, void *user_data) {
 static void refresh_scrollback(Term *term, emacs_env *env) {
   int max_line_count = (int)term->sb_current + term->height;
   int del_cnt = 0;
+  if (term->sb_clear_pending) {
+    del_cnt = term->linenum - term->height;
+    if (del_cnt > 0) {
+      delete_lines(env, 1, del_cnt, true);
+      term->linenum -= del_cnt;
+    }
+    term->sb_clear_pending = false;
+  }
   if (term->sb_pending > 0) {
     // This means that either the window height has decreased or the screen
     // became full and libvterm had to push all rows up. Convert the first
@@ -608,13 +642,13 @@ static void term_redraw(Term *term, emacs_env *env) {
   term->elisp_code_p_insert = &term->elisp_code_first;
 
   if (term->selection_data) {
-    emacs_value selection_target = env->make_string(
-        env, &term->selection_target[0], strlen(&term->selection_target[0]));
+    emacs_value selection_mask = env->make_integer(env, term->selection_mask);
     emacs_value selection_data = env->make_string(env, term->selection_data,
                                                   strlen(term->selection_data));
-    vterm_selection(env, selection_target, selection_data);
+    vterm_set_selection(env, selection_mask, selection_data);
     free(term->selection_data);
     term->selection_data = NULL;
+    term->selection_mask = 0;
   }
 
   term->is_invalidated = false;
@@ -628,6 +662,9 @@ static VTermScreenCallbacks vterm_screen_callbacks = {
     .resize = term_resize,
     .sb_pushline = term_sb_push,
     .sb_popline = term_sb_pop,
+#if !defined(VTermSBClearNotExists)
+    .sb_clear = term_sb_clear,
+#endif
 };
 
 static bool compare_cells(VTermScreenCell *a, VTermScreenCell *b) {
@@ -846,24 +883,11 @@ static void term_flush_output(Term *term, emacs_env *env) {
 }
 
 static void term_clear_scrollback(Term *term, emacs_env *env) {
+  term_sb_clear(term);
   vterm_screen_flush_damage(term->vts);
   term_redraw(term, env);
-  if (term->sb_pending > 0) { // Pending rows must be processed first.
-    return;
-  }
-  for (int i = 0; i < term->sb_current; i++) {
-    if (term->sb_buffer[i]->info != NULL) {
-      free_lineinfo(term->sb_buffer[i]->info);
-      term->sb_buffer[i]->info = NULL;
-    }
-    free(term->sb_buffer[i]);
-  }
-  free(term->sb_buffer);
-  term->sb_buffer = malloc(sizeof(ScrollbackLine *) * term->sb_size);
-  delete_lines(env, 1, term->sb_current, true);
-  term->linenum -= term->sb_current;
-  term->sb_current = 0;
 }
+
 static void term_process_key(Term *term, emacs_env *env, unsigned char *key,
                              size_t len, VTermModifier modifier) {
   if (is_key(key, len, "<clear_scrollback>")) {
@@ -1076,37 +1100,7 @@ static int handle_osc_cmd_51(Term *term, char subCmd, char *buffer) {
   }
   return 0;
 }
-static int handle_osc_cmd_52(Term *term, char *buffer) {
-  /* OSC 52 ; Pc ; Pd BEL */
-  /* Manipulate Selection Data  */
-  /* https://invisible-island.net/xterm/ctlseqs/ctlseqs.html */
-  /* test by printf "\033]52;c;$(printf "%s" "blabla" | base64)\a" */
 
-  for (int i = 0; i < SELECTION_TARGET_MAX; i++) { /* reset Pc */
-    term->selection_target[i] = 0;
-  }
-  int selection_target_idx = 0;
-  size_t cmdlen = strlen(buffer);
-
-  for (int i = 0; i < cmdlen; i++) {
-    /* OSC 52 ; Pc ; Pd BEL */
-    if (buffer[i] == ';') { /* find the second ";" */
-      term->selection_data = malloc(cmdlen - i);
-      strcpy(term->selection_data, &buffer[i + 1]);
-      break;
-    }
-    if (selection_target_idx < SELECTION_TARGET_MAX) {
-      /* c , p , q , s , 0 , 1 , 2 , 3 , 4 , 5 , 6 , and 7 */
-      /* for clipboard, primary, secondary, select, or cut buffers 0 through 7
-       * respectively */
-      term->selection_target[selection_target_idx] = buffer[i];
-      selection_target_idx++;
-    } else { /* len of Pc should not >12 just ignore this cmd,am I wrong? */
-      return 0;
-    }
-  }
-  return 1;
-}
 static int handle_osc_cmd(Term *term, int cmd, char *buffer) {
   if (cmd == 51) {
     char subCmd = '0';
@@ -1116,11 +1110,11 @@ static int handle_osc_cmd(Term *term, int cmd, char *buffer) {
     subCmd = buffer[0];
     /* ++ skip the subcmd char */
     return handle_osc_cmd_51(term, subCmd, ++buffer);
-  } else if (cmd == 52) {
-    return handle_osc_cmd_52(term, buffer);
   }
   return 0;
 }
+/* maybe we should drop support of libvterm < v0.2 */
+/* VTermStringFragmentNotExists was introduced when libvterm is not released */
 #ifdef VTermStringFragmentNotExists
 static int osc_callback(const char *command, size_t cmdlen, void *user) {
   Term *term = (Term *)user;
@@ -1134,10 +1128,6 @@ static int osc_callback(const char *command, size_t cmdlen, void *user) {
   } else if (cmdlen > 4 && buffer[0] == '5' && buffer[1] == '1' &&
              buffer[2] == ';' && buffer[3] == 'E') {
     return handle_osc_cmd_51(term, 'E', &buffer[4]);
-  } else if (cmdlen > 4 && buffer[0] == '5' && buffer[1] == '2' &&
-             buffer[2] == ';') {
-    /* OSC 52 ; Pc ; Pd BEL */
-    return handle_osc_cmd_52(term, &buffer[3]);
   }
   return 0;
 }
@@ -1159,13 +1149,6 @@ static int osc_callback(int cmd, VTermStringFragment frag, void *user) {
   /* "51;A" has also the role of identifying the end of the prompt */
   /* "51;E" executes elisp code */
   /* The elisp code is executed in term_redraw */
-
-  /* "52;[cpqs01234567];data" Manipulate Selection Data */
-  /* I think libvterm has bug ,sometimes when the data is long enough ,the final
-   * fragment is missed */
-  /* printf "\033]52;c;$(printf "%s" $(ruby -e 'print "x"*999999')|base64)\a"
-   */
-
   Term *term = (Term *)user;
 
   if (frag.initial) {
@@ -1194,6 +1177,37 @@ static VTermStateFallbacks parser_callbacks = {
     .osc = &osc_callback,
     .dcs = NULL,
 };
+#ifndef VTermSelectionMaskNotExists
+static int set_selection(VTermSelectionMask mask, VTermStringFragment frag,
+                         void *user) {
+  Term *term = (Term *)user;
+
+  if (frag.initial) {
+    term->selection_mask = mask;
+    if (term->selection_data) {
+      free(term->selection_data);
+    }
+    term->selection_data = NULL;
+  }
+
+  if (frag.len) {
+    term->selection_data =
+        concat(term->selection_data, frag.str, frag.len, true);
+  }
+  return 1;
+}
+/* OSC 52 ; Pc ; Pd BEL */
+/* Manipulate Selection Data */
+/* https://invisible-island.net/xterm/ctlseqs/ctlseqs.html */
+/* test by printf "\033]52;c;$(printf "%s" "blabla" | base64)\a" */
+/* c , p , q , s , 0 , 1 , 2 , 3 , 4 , 5 , 6 , and 7 */
+/* for clipboard, primary, secondary, select, or cut buffers 0 through 7 */
+/* respectively */
+static VTermSelectionCallbacks selection_callbacks = {
+    .set = &set_selection,
+    .query = NULL,
+};
+#endif /* VTermSelectionMaskNotExists */
 
 #endif
 
@@ -1217,6 +1231,11 @@ emacs_value Fvterm_new(emacs_env *env, ptrdiff_t nargs, emacs_value args[],
 
   VTermState *state = vterm_obtain_state(term->vt);
   vterm_state_set_unrecognised_fallbacks(state, &parser_callbacks, term);
+
+#ifndef VTermSelectionMaskNotExists
+  vterm_state_set_selection_callbacks(state, &selection_callbacks, term,
+                                      term->selection_buf, SELECTION_BUF_LEN);
+#endif
   vterm_state_set_bold_highbright(state, set_bold_hightbright);
 
   vterm_screen_reset(term->vts, 1);
@@ -1226,10 +1245,12 @@ emacs_value Fvterm_new(emacs_env *env, ptrdiff_t nargs, emacs_value args[],
   term->sb_size = MIN(SB_MAX, sb_size);
   term->sb_current = 0;
   term->sb_pending = 0;
+  term->sb_clear_pending = false;
   term->sb_pending_by_height_decr = 0;
   term->sb_buffer = malloc(sizeof(ScrollbackLine *) * term->sb_size);
   term->invalid_start = 0;
   term->invalid_end = rows;
+  term->is_invalidated = false;
   term->width = cols;
   term->height = rows;
   term->height_resize = 0;
@@ -1262,6 +1283,7 @@ emacs_value Fvterm_new(emacs_env *env, ptrdiff_t nargs, emacs_value args[],
   term->elisp_code_first = NULL;
   term->elisp_code_p_insert = &term->elisp_code_first;
   term->selection_data = NULL;
+  term->selection_mask = 0;
 
   term->cmd_buffer = NULL;
 
@@ -1472,8 +1494,8 @@ int emacs_module_init(struct emacs_runtime *ert) {
   Fvterm_get_color =
       env->make_global_ref(env, env->intern(env, "vterm--get-color"));
   Fvterm_eval = env->make_global_ref(env, env->intern(env, "vterm--eval"));
-  Fvterm_selection =
-      env->make_global_ref(env, env->intern(env, "vterm--selection"));
+  Fvterm_set_selection =
+      env->make_global_ref(env, env->intern(env, "vterm--set-selection"));
 
   // Exported functions
   emacs_value fun;
