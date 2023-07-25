@@ -90,11 +90,11 @@ function install_emacs28() {
 
 function install_lua54() {
     tarfile = make::download("lua54",
-        "https://www.lua.org/ftp/lua-5.4.0.tar.gz",
-        "dbf155764e5d433fc55ae80ea7060b60")
+        "https://www.lua.org/ftp/lua-5.4.4.tar.gz",
+        "bd8ce7069ff99a400efd14cf339a727b")
     make::compile(make::extract_tar(tarfile),
         "make linux -j 4\n" \
-        "make INSTALL_TOP=$HOME/apps/lua54 install\n")
+        "make CC=clang INSTALL_TOP=$HOME/apps/lua54 install\n")
 }
 
 function install_fish() {

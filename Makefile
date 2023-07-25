@@ -31,8 +31,8 @@ lua54_md5 := dbf155764e5d433fc55ae80ea7060b60
 lua_url := https://www.lua.org/ftp/lua-5.3.5.tar.gz
 lua_md5 := 4f4b4f323fd3514a68e0ab3da8ce3455
 
-luarocks_url := https://luarocks.org/releases/luarocks-3.3.1.tar.gz
-luarocks_md5 := 1dc12df0b4dc312625a0d36b194b76ef
+luarocks_url := https://luarocks.org/releases/luarocks-3.9.1.tar.gz
+luarocks_md5 := d123cf5de8b3673ebc961e3855a52d40
 
 ORG_FILES := $(wildcard *.org)
 ORG_OUT_FILES := $(foreach f, $(ORG_FILES),$(CACHEDIR)/$(basename $(f)).out)
