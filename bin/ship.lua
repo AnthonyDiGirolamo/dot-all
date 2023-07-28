@@ -58,6 +58,65 @@ function Object:__call(...)
 end
 -- end classic.lua
 
+--
+-- classic.lua
+--
+-- Copyright (c) 2014, rxi
+--
+-- This module is free software; you can redistribute it and/or modify it under
+-- the terms of the MIT license. See LICENSE for details.
+--
+local Object = {}
+Object.__index = Object
+
+function Object:new()
+end
+
+function Object:extend()
+  local cls = {}
+  for k, v in pairs(self) do
+    if k:find("__") == 1 then
+      cls[k] = v
+    end
+  end
+  cls.__index = cls
+  cls.super = self
+  setmetatable(cls, self)
+  return cls
+end
+
+function Object:implement(...)
+  for _, cls in pairs({...}) do
+    for k, v in pairs(cls) do
+      if self[k] == nil and type(v) == "function" then
+        self[k] = v
+      end
+    end
+  end
+end
+
+function Object:is(T)
+  local mt = getmetatable(self)
+  while mt do
+    if mt == T then
+      return true
+    end
+    mt = getmetatable(mt)
+  end
+  return false
+end
+
+function Object:__tostring()
+  return "Object"
+end
+
+function Object:__call(...)
+  local obj = setmetatable({}, self)
+  obj:new(...)
+  return obj
+end
+-- end classic.lua
+
 -- debug printing
 local DEBUG
 
@@ -1437,12 +1496,13 @@ function cmd_draw_shipyard(seed, type_index)
   -- local spec_attribute_width = max(10, round(max(pilot.sprite_columns, pilot.sprite_rows)/2))
   -- left text
   local spec_attribute_width = 2
-  local fstr = ("%0" .. spec_attribute_width .. "s %s")
-  print(string.format(fstr, "[Serial#]:", string.format("%d,%d", pilot.seed_value, pilot.ship_type_index)) .. "  " ..
-            string.format(fstr, "[Class]:", pilot.name))
-  print(string.format(fstr, "[HP]:", pilot.hp) .. "  " ..
-            string.format(fstr, "[DeltaV]:", string.format("%.02fg", pilot.deltav)) .. "  " ..
-            string.format(fstr, "[TurnRate]:", string.format("%.01f deg/sec ", pilot.turn_rate)))
+  local fstr = ("%" .. spec_attribute_width .. "s %s")
+  print(string.format(fstr, "[Serial#]:",
+                      string.format("%d,%d", pilot.seed_value, pilot.ship_type_index)) .."  ".. string.format(fstr, "[Class]:", pilot.name))
+  print(string.format(fstr, "[HP]:", pilot.hp) .."  "..
+          string.format(fstr, "[DeltaV]:", string.format("%.02fg", pilot.deltav)) .."  "..
+          string.format(fstr, "[TurnRate]:", string.format("%.01f deg/sec ", pilot.turn_rate)))
+
 
   -- os.execute("sleep " .. tonumber(.5))
   -- end
@@ -1520,7 +1580,7 @@ if ship_value_index or planet_value_index then
 
 else
   -- if no options
-  cmd_draw_planet_map()
+  -- cmd_draw_planet_map()
   cmd_draw_shipyard()
 
   -- cmd_draw_shipyard(32132,5)
@@ -1544,6 +1604,7 @@ else
   -- cmd_draw_shipyard(131525,2)
   -- cmd_draw_shipyard(16950,2)
   -- cmd_draw_shipyard(25433,2)
+  -- cmd_draw_shipyard(199584,2)
 
 end
 
