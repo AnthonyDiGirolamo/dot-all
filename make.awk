@@ -9,8 +9,8 @@ function help() {
     make::print_help("build",         "run test & lint")
     make::print_help("test",          "awk unit tests")
     make::print_help("lint",          "awk linting")
-    make::print_help("install_emacs27", "download, compile and install emacs27")
     make::print_help("install_emacs28", "download, compile and install emacs28")
+    make::print_help("install_emacs29", "download, compile and install emacs29")
     make::print_help("install_emacs_git", "download, compile and install emacs from git")
     make::print_help("install_fish",  "download, compile and install fish-shell")
     make::print_help("install_lua54", "download, compile and install lua 5.4")
@@ -81,6 +81,19 @@ function install_emacs28() {
         "cb799cdfc3092272ff6d35223fc6bfef")
     make::compile(make::extract_tar(tarfile),
         "./configure --prefix=$HOME/apps/emacs28 " \
+        "--with-modules --with-cairo " \
+        "--with-native-compilation " \
+        "--with-x-toolkit=gtk3 --without-xaw3d\n" \
+        "make -j 2\n" \
+        "make install\n")
+}
+
+function install_emacs29() {
+    tarfile = make::download("emacs",
+        "https://ftpmirror.gnu.org/emacs/emacs-29.1.tar.xz",
+        "e0631d868a13b503a5feef042435b67c")
+    make::compile(make::extract_tar(tarfile),
+        "./configure --prefix=$HOME/apps/emacs29 " \
         "--with-modules --with-cairo " \
         "--with-native-compilation " \
         "--with-x-toolkit=gtk3 --without-xaw3d\n" \
