@@ -59,8 +59,7 @@ function install_emacs_git() {
     # Install emacs from Git:
     clonedir = make::git_clone("emacs",
         "https://git.savannah.gnu.org/git/emacs.git",
-        # Branch
-        "master")
+        "master")  # Branch
     if (!path::is_file(clonedir "/configure")) {
         path::pushd(clonedir)
         make::run("./autogen.sh")
@@ -71,7 +70,7 @@ function install_emacs_git() {
         "--with-modules --with-cairo " \
         "--with-native-compilation " \
         "--with-x-toolkit=gtk3 --without-xaw3d\n" \
-        "make -j 2\n" \
+        "make -j 4\n" \
         "make install\n")
 }
 
@@ -84,7 +83,7 @@ function install_emacs28() {
         "--with-modules --with-cairo " \
         "--with-native-compilation " \
         "--with-x-toolkit=gtk3 --without-xaw3d\n" \
-        "make -j 2\n" \
+        "make -j 4\n" \
         "make install\n")
 }
 
@@ -97,7 +96,7 @@ function install_emacs29() {
         "--with-modules --with-cairo " \
         "--with-native-compilation " \
         "--with-x-toolkit=gtk3 --without-xaw3d\n" \
-        "make -j 2\n" \
+        "make -j 4\n" \
         "make install\n")
 }
 

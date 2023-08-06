@@ -1,6 +1,6 @@
 #!/bin/sh
 rm -f ~/.emacs.d/cache/autoload*
-rm -f ~/.emacs.d/package-quickstart.el
+rm -f ~/.emacs.d/package-quickstart.el*
 find ~/.emacs.d/elpa/ -iname "*.elc" -delete
 find ~/.emacs.d/elpa/ -maxdepth 1 -type d -empty -delete
 emacs -Q --batch --eval '(byte-recompile-directory "~/.emacs.d/elpa/" 0 t)'
