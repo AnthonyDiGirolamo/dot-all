@@ -1,0 +1,2 @@
+;; Generated package description from dts-mode.el  -*- no-byte-compile: t -*-
+(define-package "dts-mode" "1.0" "Major mode for Device Tree source files" '((emacs "24")) :commit "8413d2dc9b3347831aa9e8c8b2524af3ef005441" :url "https://elpa.gnu.org/packages/dts-mode.html" :authors '(("Ben Gamari" . "ben@smart-cactus.org")) :maintainer '("Ben Gamari" . "ben@smart-cactus.org") :keywords '("languages"))

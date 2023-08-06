@@ -1,0 +1,13 @@
+# dts-mode — A Device Tree major mode for emacs
+
+This is a quick attempt at getting basic highlighting for [Device
+Tree][devicetree] syntax in emacs. While it's fairly functional, it's not
+pretty; pull requests welcome.
+
+[devicetree]: http://www.devicetree.org/
+
+## Installation
+
+Available from [GNU ELPA](https://elpa.gnu.org/packages/dts-mode.html).
+Alternatively ensure `dts-mode.el` is available in `load-path`
+and `(require'dts-mode)`.
