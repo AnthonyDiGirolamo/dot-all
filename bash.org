@@ -353,15 +353,14 @@
     git config user.email "anthony.digirolamo@gmail.com"
   }
 
-  # node
-  export PATH="$HOME/apps/node-v8.5.0-linux-x64/bin:$PATH"
-  NPM_PACKAGES="$HOME/.npm-packages"
-  mkdir -p $NPM_PACKAGES/bin
-  export PATH="$NPM_PACKAGES/bin:$PATH"
-  # export MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
-  # NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
-  # echo "prefix = $NPM_PACKAGES" > ~/.npmrc
-  export NPM_CONFIG_PREFIX=$NPM_PACKAGES
+  # NPM global settings
+  # NPM_PACKAGES="$HOME/.npm-packages"
+  # mkdir -p $NPM_PACKAGES/bin
+  # export PATH="$NPM_PACKAGES/bin:$PATH"
+  # # export MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
+  # # NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
+  # # echo "prefix = $NPM_PACKAGES" > ~/.npmrc
+  # export NPM_CONFIG_PREFIX=$NPM_PACKAGES
 
   # pip
   # for python pip install --user

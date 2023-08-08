@@ -3841,6 +3841,22 @@ curl -L http://git.grml.org/f/grml-etc-core/etc/zsh/zshrc > ~/.zshrc
 #+begin_src sh :tangle ~/.zshrc.local
   . ~/.aliases
 
+  # grml prompt settings
+  zstyle ':prompt:grml:*:items:user' pre '%F{yellow}'
+  # TODO: Figure out how to hide these items
+  #   user at host
+  zstyle ':prompt:grml:*:left:setup' items rc change-root path vcs percent
+  zstyle ':prompt:grml:*:right:setup' items sad-smiley
+
+  prompt grml
+
+  AF="%F{blue}%s%F{yellow}:%F{green}%b%F{yellow}|%F{red}%a%f "
+  F="%F{blue}%s%F{yellow}:%F{green}%b%%f "
+  BF="%b%F{red}:%F{yellow}%r"
+  zstyle ':vcs_info:*'              actionformats "$AF" "zsh: %r"
+  zstyle ':vcs_info:*'              formats       "$F"  "zsh: %r"
+  zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat  "$BF"
+
   # Directories
   zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
   zstyle ':completion:*:*:cd:*' tag-order local-directories directory-stack path-directories
@@ -3856,7 +3872,7 @@ curl -L http://git.grml.org/f/grml-etc-core/etc/zsh/zshrc > ~/.zshrc
   zstyle ':completion:*:history-words' menu yes
 
   # Enable verbose completions
-  zstyle ':completion:*'			extra-verbose true
+  zstyle ':completion:*' extra-verbose true
   # Description heading format
   zstyle ':completion:*:descriptions' format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'
   # If there are more than 5 options allow selecting from a menu
