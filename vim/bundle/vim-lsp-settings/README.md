@@ -100,6 +100,7 @@ You can change the directory to install servers by set `g:lsp_settings_servers_d
 | Elixir            | elixir-ls                           |    Yes    |      Yes      |
 | Elm               | elm-language-server                 |    Yes    |      Yes      |
 | Erlang            | erlang-ls                           |    Yes    |      Yes      |
+| F#                | fsautocomplete                      |    Yes    |      Yes      |
 | F#                | fsharp-language-server              |    Yes    |      Yes      |
 | Fortran           | fortls                              |    Yes    |      Yes      |
 | Go                | gopls                               |    Yes    |      Yes      |
@@ -114,6 +115,7 @@ You can change the directory to install servers by set `g:lsp_settings_servers_d
 | HTML              | tailwindcss-intellisense            |    Yes    |      Yes      |
 | JSON              | json-languageserver                 |    Yes    |      Yes      |
 | JSON              | rome                                |    Yes    |      Yes      |
+| Jsonnet           | jsonnet-language-server             |    Yes    |      Yes      |
 | Java              | eclipse-jdt-ls                      |    Yes    |      Yes      |
 | Java              | java-language-server                |    No     |      Yes      |
 | JavaScript        | typescript-language-server          |    Yes    |      Yes      |
@@ -129,6 +131,7 @@ You can change the directory to install servers by set `g:lsp_settings_servers_d
 | Markdown (remark) | remark-language-server              |    Yes    |      Yes      |
 | Markdown          | Marksman                            |    Yes    |      Yes      |
 | Nim               | nimls                               |    No     |      No       |
+| Nix               | nixd                                |    Yes    |      Yes      |
 | Nix               | rnix-lsp                            |    Yes    |      Yes      |
 | PHP               | intelephense                        |    Yes    |      Yes      |
 | PHP               | psalm-language-server               |    Yes    |      Yes      |
@@ -143,6 +146,7 @@ You can change the directory to install servers by set `g:lsp_settings_servers_d
 | Python            | pyright-langserver                  |    Yes    |      Yes      |
 | Python            | pylsp-all (pylsp with dependencies) |    Yes    |      Yes      |
 | Python            | pylsp (pylsp without dependencies)  |    Yes    |      Yes      |
+| Python            | ruff-lsp                            |    Yes    |      Yes      |
 | Prisma            | prisma-language-server              |    Yes    |      Yes      |
 | R                 | languageserver                      |    Yes    |      No       |
 | Racket            | racket-lsp                          |    Yes    |      No       |
@@ -173,6 +177,7 @@ You can change the directory to install servers by set `g:lsp_settings_servers_d
 | TypeScript        | eslint-language-server              |    Yes    |      Yes      |
 | Vim               | vim-language-server                 |    Yes    |      Yes      |
 | Vala              | vala-language-server                |    No     |      No       |
+| Veryl             | veryl-ls                            |    Yes    |      Yes      |
 | Vue               | volar-server                        |    Yes    |      Yes      |
 | Vue               | vls                                 |    Yes    |      Yes      |
 | V                 | vlang-vls                           |    Yes    |      Yes      |
@@ -228,7 +233,7 @@ If you don't want to use `import_map.json`, you may put `.vim-lsp-settings/setti
 }
 ```
 
-Recommend to add `let g:markdown_fenced_languages = ['ts=typescript']` to your 
+Recommend to add `let g:markdown_fenced_languages = ['ts=typescript']` to your
 vimrc for hover(preview) Deno's library.
 
 Note that `deno` language server is specified.

@@ -7,11 +7,6 @@ https://github.com/gerardbm/vim-atomic.git
 https://github.com/itchyny/lightline.vim
 https://github.com/jceb/vim-orgmode.git
 https://github.com/junegunn/fzf.vim
-https://github.com/keremc/asyncomplete-clang.vim
-https://github.com/mattn/vim-lsp-settings.git
-https://github.com/prabirshrestha/async.vim
-https://github.com/prabirshrestha/asyncomplete.vim.git
-https://github.com/prabirshrestha/vim-lsp.git
 https://github.com/rakr/vim-one.git
 https://github.com/tpope/vim-commentary.git
 https://github.com/tpope/vim-dispatch.git
@@ -32,6 +27,11 @@ https://github.com/vim-syntastic/syntastic.git
 https://github.com/ycm-core/YouCompleteMe.git
 "
 urls="
+https://github.com/keremc/asyncomplete-clang.vim
+https://github.com/mattn/vim-lsp-settings.git
+https://github.com/prabirshrestha/async.vim
+https://github.com/prabirshrestha/asyncomplete.vim.git
+https://github.com/prabirshrestha/vim-lsp.git
 "
 for URL in $urls
 do
@@ -40,6 +40,6 @@ do
        echo "-> ${GDIR}"
        rm -rf $GDIR
        git clone --depth=1 --branch=master --recurse-submodules $URL
-       rm -rf $GDIR/.git
+       rm -rf $GDIR/.git $GDIR/.github
        git add -A $GDIR
 done
