@@ -1,3 +1,5 @@
 /.cache/
 /.artifacts/
 /bin/xcape
+/awkprof.out
+/.gawk_history

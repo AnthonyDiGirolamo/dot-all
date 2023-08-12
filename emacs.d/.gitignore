@@ -44,3 +44,4 @@ __pycache__
 /elpa/vterm*/*.so
 /eln-cache
 /server/
+/tree-sitter/

@@ -1230,6 +1230,7 @@ This mode gives variables names unique colors.
      ;; The C-w insert bindings require 'evil-want-C-w-delete nil
      "C-w c" 'evil-window-delete
      "C-w o" 'delete-other-windows
+     "C-b" 'yankpad-insert ;; Was evil-scroll-page-up
      amd/leader-key-insert 'hydra-leader-menu/body)
     (:states '(motion visual)
      "RET" 'evil-ex ;; Enter opens : prompt
@@ -2813,6 +2814,14 @@ This mode gives variables names unique colors.
 #+end_src
 
 #+begin_src emacs-lisp
+  (use-package treesit-auto
+    :demand t
+    :config
+    (setq treesit-auto-install 'prompt)
+    (global-treesit-auto-mode))
+#+end_src
+
+#+begin_src emacs-lisp
   ;; (use-package eglot
   ;;   :init
   ;;   (add-hook 'c++-mode-hook 'eglot-ensure))
@@ -4230,7 +4239,8 @@ This mode gives variables names unique colors.
       "f" 'ace-link-org)
     (:states '(insert)
      :keymaps '(org-mode-map)
-      "C-b" 'amd/org-insert-code-block
+      ;; Use yankpad instead
+      ;; "C-b" 'amd/org-insert-code-block
       "M-H" 'org-metaleft
       "M-L" 'org-metaright
       "M-N" 'org-metadown
