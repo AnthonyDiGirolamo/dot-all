@@ -44,17 +44,6 @@ function tangle() {
     make::run("./awkpath/tangle.awk *.org")
 }
 
-function install_emacs27() {
-    tarfile = make::download("emacs",
-        "http://ftpmirror.gnu.org/emacs/emacs-27.2.tar.xz",
-        "4c3d9ff35b2ab2fe518dc7eb3951e128")
-    make::compile(make::extract_tar(tarfile),
-        "./configure --prefix=$HOME/apps/emacs27 " \
-        "--with-modules --with-cairo\n" \
-        "make -j 2\n" \
-        "make install\n")
-}
-
 function install_emacs_git() {
     # Install emacs from Git:
     clonedir = make::git_clone("emacs",
@@ -87,15 +76,37 @@ function install_emacs28() {
         "make install\n")
 }
 
+function install_treesitter() {
+    clonedir = make::git_clone("tree-sitter",
+        "https://github.com/tree-sitter/tree-sitter",
+        "v0.20.8")  # Branch
+    make::compile(clonedir,
+        "make -j 4\n" \
+        "make PREFIX=$HOME/apps/tree-sitter install\n")
+}
+
 function install_emacs29() {
+    # Tree-sitter environment flags for configure:
+    # "env " \
+    # "TREE_SITTER_CFLAGS=\"-I${HOME}/apps/tree-sitter/include\" " \
+    # "TREE_SITTER_LIBS=\"-L${HOME}/apps/tree-sitter/lib -ltree-sitter\" " \
+
+    # Tree-sitter environment flags for make && make install:
+    # "env " \
+    # "LD_LIBRARY_PATH=\"${HOME}/apps/tree-sitter/lib\" " \
+
+    # Assume tree-sitter is installed with apt/pacman:
     tarfile = make::download("emacs",
         "https://ftpmirror.gnu.org/emacs/emacs-29.1.tar.xz",
         "e0631d868a13b503a5feef042435b67c")
     make::compile(make::extract_tar(tarfile),
         "./configure --prefix=$HOME/apps/emacs29 " \
-        "--with-modules --with-cairo " \
+        "--with-modules " \
+        "--with-cairo " \
         "--with-native-compilation " \
-        "--with-x-toolkit=gtk3 --without-xaw3d\n" \
+        "--with-tree-sitter " \
+        "--with-x-toolkit=gtk3 " \
+        "--without-xaw3d\n" \
         "make -j 4\n" \
         "make install\n")
 }

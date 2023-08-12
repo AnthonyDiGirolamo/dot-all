@@ -247,6 +247,9 @@
     # Also Use Ctrl-p and Ctrl-n for reverse history search
     bind -M insert \cp 'history --merge; up-or-search'
     bind -M insert \cn down-or-search
+
+    # Interactive history search Ctrl-r insert mode (normally / in normal mode).
+    bind -M insert \cr history-pager
   end
 #+end_src
 
