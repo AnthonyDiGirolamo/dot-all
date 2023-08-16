@@ -10,6 +10,7 @@
   - [[#leuven-light][leuven light]]
   - [[#moe-dark][moe dark]]
   - [[#doom-themes][doom-themes]]
+  - [[#modus-themes][modus-themes]]
   - [[#solaire-mode][solaire-mode]]
   - [[#modeline][modeline]]
   - [[#load-theme][load theme]]
@@ -321,6 +322,7 @@
 #+begin_src emacs-lisp
   ;; (defadvice load-theme (before theme-dont-propagate activate)
   (defun amd/disable-loaded-themes ()
+    (interactive)
     (cl-loop for theme-name in custom-enabled-themes
              do (funcall #'disable-theme theme-name))
   )
@@ -649,11 +651,50 @@
        '(term-color-red     ((t (:background "#303030" :foreground "#f2777a"))) t)
        '(term-color-white   ((t (:background "#303030" :foreground "#f2f0ec"))) t)
        '(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))) t)
+
+       '(line-number ((t (:weight normal :slant normal :inherit default))) t)
+       '(line-number-current-line ((t (:inherit (hl-line default) :slant normal :weight normal))) t)
        )
       (solaire-mode-swap-faces-maybe)
       )
   )
 #+end_src
+
+** modus-themes
+
+#+begin_src emacs-lisp
+  (use-package modus-themes
+    :config
+    (defun amd/modus-light-theme ()
+      "load modus-operandi and override some colors"
+      (interactive)
+      (amd/disable-loaded-themes)
+      (load-theme 'modus-operandi t)
+      (when (featurep 'airline-themes)
+        (load-theme 'airline-qwq t))
+    )
+
+    (defun amd/modus-dark-theme ()
+      "load modus-vivendi and override some colors"
+      (interactive)
+      (amd/disable-loaded-themes)
+      (load-theme 'modus-vivendi t)
+      (custom-theme-set-faces
+       'modus-vivendi
+       '(font-lock-comment-face
+         ((t (:weight normal :slant normal :inverse-video nil :foreground "#707070" :background "#000000" :inherit default))) t)
+       '(line-number
+         ((t (:weight normal :slant normal :inherit default))) t)
+       '(line-number-current-line
+         ((t (:weight normal :slant normal :inherit (hl-line default)))) t)
+       )
+      (when (featurep 'airline-themes)
+        (load-theme 'airline-ouo t))
+      )
+    )
+#+end_src
+
+
 
 ** solaire-mode
 
@@ -725,10 +766,14 @@
 
 #+begin_src emacs-lisp
   ;; (amd/leuven-light-theme)
-  (amd/doom-one-theme)
   ;; (amd/moe-dark-theme)
+
   ;; (amd/doom-snazzy-theme)
+  (amd/doom-one-theme)
   (load-theme 'airline-doom-one t)
+
+  ;; (amd/modus-light-theme)
+  ;; (amd/modus-dark-theme)
 
   ;; (load-theme 'doom-palenight)
   ;; (custom-theme-set-faces
@@ -748,18 +793,6 @@
   ;;  'airline-base16_material_palenight
   ;;  '(tab-bar-tab-inactive ((t (:foreground "#32374D":background "#444267" :inherit))) t))
 
-  (use-package modus-themes
-    :disabled
-    :config
-    ;; modus light
-    ;; (load-theme 'modus-operandi t)
-    ;; (when (featurep 'airline-themes)
-    ;;   (load-theme 'airline-qwq t))
-    ;; modus dark
-    (load-theme 'modus-vivendi t)
-    (when (featurep 'airline-themes)
-      (load-theme 'airline-ouo t))
-  )
 #+end_src
 
 ** appearance minor-modes
