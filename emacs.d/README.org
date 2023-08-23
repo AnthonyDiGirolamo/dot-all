@@ -1264,6 +1264,7 @@ This mode gives variables names unique colors.
      "C-w c" 'evil-window-delete
      "C-w o" 'delete-other-windows
      "C-b" 'yankpad-insert ;; Was evil-scroll-page-up
+     "C-t" 'yankpad-insert
      amd/leader-key-insert 'hydra-leader-menu/body)
     (:states '(motion visual)
      "RET" 'evil-ex ;; Enter opens : prompt
