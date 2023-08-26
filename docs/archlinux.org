@@ -48,29 +48,150 @@
 
 * packages
 
-  Current explicitly installed packages
+  Explicitly installed packages
 
   #+begin_src sh
     pacman -Qe
   #+end_src
 
-* aur packages
+  #+RESULTS:
+  | alacritty                   |
+  | alsa-utils                  |
+  | ark                         |
+  | arm-none-eabi-binutils      |
+  | arm-none-eabi-gcc           |
+  | arm-none-eabi-gdb           |
+  | arm-none-eabi-newlib        |
+  | avr-gcc                     |
+  | avr-libc                    |
+  | base-devel                  |
+  | btop                        |
+  | chromium                    |
+  | dfu-programmer              |
+  | dfu-util                    |
+  | dhcpcd                      |
+  | discover                    |
+  | dnsmasq                     |
+  | efibootmgr                  |
+  | emacs                       |
+  | emscripten                  |
+  | fish                        |
+  | gamescope                   |
+  | git                         |
+  | grub                        |
+  | inetutils                   |
+  | iptables-nft                |
+  | keepassxc                   |
+  | kicad                       |
+  | kicad-library               |
+  | kicad-library-3d            |
+  | konsole                     |
+  | lib32-systemd               |
+  | libgccjit                   |
+  | libvirt                     |
+  | lightdm                     |
+  | lightdm-gtk-greeter         |
+  | linux                       |
+  | linux-firmware              |
+  | lua                         |
+  | luarocks                    |
+  | mangohud                    |
+  | noto-fonts-emoji            |
+  | nvidia                      |
+  | nvidia-settings             |
+  | openssh                     |
+  | p7zip                       |
+  | qemu-full                   |
+  | rsync                       |
+  | ruby                        |
+  | sudo                        |
+  | tmux                        |
+  | ttc-iosevka-ss08            |
+  | ttc-iosevka-ss17            |
+  | unrar                       |
+  | vim                         |
+  | virt-manager                |
+  | xclip                       |
+  | xorg-xinput                 |
+  | xsel                        |
+  | zsh                         |
 
-  Some AUR packages I use
+  Explicitly installed by parent group
+
+  #+begin_src sh
+    pacman -Qeg
+  #+end_src
+
+  #+RESULTS:
+  | kde-applications | ark                         |
+  | kde-applications | dolphin                     |
+  | kde-applications | konsole                     |
+  | kde-applications | kwalletmanager              |
+  | kde-utilities    | ark                         |
+  | kde-utilities    | konsole                     |
+  | kde-utilities    | kwalletmanager              |
+  | plasma           | bluedevil                   |
+  | plasma           | breeze-gtk                  |
+  | plasma           | breeze-plymouth             |
+  | plasma           | discover                    |
+  | plasma           | drkonqi                     |
+  | plasma           | flatpak-kcm                 |
+  | plasma           | kde-gtk-config              |
+  | plasma           | kdeplasma-addons            |
+  | plasma           | kgamma5                     |
+  | plasma           | khotkeys                    |
+  | plasma           | kinfocenter                 |
+  | plasma           | kscreen                     |
+  | plasma           | ksshaskpass                 |
+  | plasma           | kwallet-pam                 |
+  | plasma           | kwayland-integration        |
+  | plasma           | kwrited                     |
+  | plasma           | oxygen                      |
+  | plasma           | plasma-browser-integration  |
+  | plasma           | plasma-desktop              |
+  | plasma           | plasma-disks                |
+  | plasma           | plasma-firewall             |
+  | plasma           | plasma-nm                   |
+  | plasma           | plasma-pa                   |
+  | plasma           | plasma-sdk                  |
+  | plasma           | plasma-systemmonitor        |
+  | plasma           | plasma-thunderbolt          |
+  | plasma           | plasma-vault                |
+  | plasma           | plasma-welcome              |
+  | plasma           | plasma-workspace-wallpapers |
+  | plasma           | plymouth-kcm                |
+  | plasma           | sddm-kcm                    |
+  | plasma           | xdg-desktop-portal-kde      |
+  | kde-system       | dolphin                     |
+  | xfce4            | exo                         |
+  | xfce4            | garcon                      |
+  | xfce4            | thunar                      |
+  | xfce4            | thunar-volman               |
+  | xfce4            | tumbler                     |
+  | xfce4            | xfce4-appfinder             |
+  | xfce4            | xfce4-panel                 |
+  | xfce4            | xfce4-power-manager         |
+  | xfce4            | xfce4-session               |
+  | xfce4            | xfce4-settings              |
+  | xfce4            | xfce4-terminal              |
+  | xfce4            | xfconf                      |
+  | xfce4            | xfdesktop                   |
+  | xfce4            | xfwm4                       |
+  | xfce4            | xfwm4-themes                |
+  | xorg             | xorg-xinput                 |
+  | xorg-apps        | xorg-xinput                 |
+
+* aur packages
 
   #+begin_src sh
     git clone https://aur.archlinux.org/lux.git
     git clone https://aur.archlinux.org/google-chrome.git
-    git clone https://aur.archlinux.org/chrome-remote-desktop.git
-    # git clone https://aur.archlinux.org/fritzing.git
+    # git clone https://aur.archlinux.org/chrome-remote-desktop.git
     # git clone https://aur.archlinux.org/layan-gtk-theme-git.git
     # git clone https://aur.archlinux.org/paper-icon-theme-git.git
-    # git clone https://aur.archlinux.org/f3.git
-    # git clone https://aur.archlinux.org/ncurses5-compat-libs.git
-    # git clone https://aur.archlinux.org/aurman.git
   #+end_src
 
-** google-chrome example
+** google-chrome
 
   #+BEGIN_SRC sh
     mkdir -p ~/aurpkgs
@@ -78,7 +199,7 @@
     rm -rf google-chrome.git
     git clone https://aur.archlinux.org/google-chrome.git google-chrome.git
     cd google-chrome.git
-    makepkg -i
+    makepkg -is
   #+END_SRC
 
 * lm_sensors
