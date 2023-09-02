@@ -2912,6 +2912,7 @@ This mode gives variables names unique colors.
 
   (use-package company-lsp
     :commands company-lsp)
+
   (use-package lsp-ivy
     :commands lsp-ivy-workspace-symbol)
 
@@ -3203,6 +3204,12 @@ This mode gives variables names unique colors.
     ;;   (add-to-list 'flycheck-checkers 'arduino))
     ;; (provide 'flycheck-arduino)
   )
+
+  (use-package flycheck-eglot
+    :disabled
+    :after (flycheck eglot)
+    :config
+    (global-flycheck-eglot-mode 1))
 
   (use-package flymake-ruby
     :defer t
@@ -3540,8 +3547,9 @@ This mode gives variables names unique colors.
       ("pi" projectile-invalidate-cache      "project clear")
       ("ps" ivy-switch-project               "project switch")
       ("pe" amd/eshell-or-project-eshell     "project eshell")
+      ("rf" counsel-recentf                  "counsel-recentf")
       ("rt" run-current-test                 "run test")
-      ("rf" (run-current-test nil t)         "run file")
+      ("rF" (run-current-test nil t)         "run file")
       ("rp" run-pico8                        "run pico8")
       ("rl" run-love2d                       "run love2d")
       ("rc" compile                          "run compile")
