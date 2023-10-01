@@ -1940,6 +1940,9 @@ This mode gives variables names unique colors.
     ;;         (t
     ;;          (message "Compilation exited abnormally: %s" string))))
 
+    :init
+    ;; TODO: Figure out how to truncate line by default in compilation mode
+    ;; (add-hook 'compilation-start-hook (lambda () (toggle-truncate-lines 1)))
     :config
     (defun amd/split-compilation ()
       "Open/close the *compilation* buffer."
@@ -2849,7 +2852,8 @@ This mode gives variables names unique colors.
 
 #+begin_src emacs-lisp
   (use-package treesit-auto
-    :demand t
+    ;; :demand t
+    :disabled
     :config
     (setq treesit-auto-install 'prompt)
     (global-treesit-auto-mode))

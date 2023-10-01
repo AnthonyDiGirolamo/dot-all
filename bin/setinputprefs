@@ -41,7 +41,7 @@ xinput list --name-only | while read -l DEVICE_NAME
     xinput_set_prop "$DEVICE_NAME" 'libinput Disable While Typing Enabled' 0
     xinput_set_prop "$DEVICE_NAME" 'libinput Natural Scrolling Enabled' 1
     xinput_set_prop "$DEVICE_NAME" 'libinput Accel Speed' 0.520000
-    # xinput list-props $DEVICE_NAME
+    xinput list-props $DEVICE_NAME
 
   # Thinkpad X1 carbon gen6 with debian
   else if string match -q 'Synaptics TM3289-021' $DEVICE_NAME
