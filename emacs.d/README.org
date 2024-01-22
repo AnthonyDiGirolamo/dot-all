@@ -3531,6 +3531,7 @@ This mode gives variables names unique colors.
       ;; ("pp" projectile-pt          "search pt project")
       ;; ("po" pt-regexp              "search pt other")
       ("/"  counsel-grep-or-swiper "search grep/swiper")
+      ("bu"  browse-url "browse-url")
       (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra")
       )
 

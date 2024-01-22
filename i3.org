@@ -77,7 +77,7 @@
 
   # screen lock
   # bindsym $mod+k exec i3lock -c 000000
-  bindsym $mod+k exec xscreensaver-command -lock
+  # bindsym $mod+k exec xscreensaver-command -lock
   # bindsym $mod+k exec xset s activate
 
   bindsym XF86MonBrightnessDown exec lux -s 5%

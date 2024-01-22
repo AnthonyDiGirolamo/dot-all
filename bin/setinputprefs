@@ -4,6 +4,10 @@
 xset r rate 200 30
 # xset r off
 
+# Gnome WM options
+dconf write '/org/gnome/desktop/wm/preferences/resize-with-right-button' true
+# dconf write '/org/gnome/desktop/wm/preferences/mouse-button-modifier' "'<Super>'"
+
 function xinput_set_prop --argument-names DEVICE_NAME PROPERTY
   # echo "SET"
   # # echo $DEVICE_NAME
