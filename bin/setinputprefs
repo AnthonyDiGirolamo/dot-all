@@ -1,6 +1,7 @@
 #!/usr/bin/env fish
 
 set COLOR_CYAN "\033[36m"
+set COLOR_GREEN "\033[32m"
 set COLOR_RESET "\033[0m"
 
 function print_device --argument-names DEVICE_NAME
@@ -21,12 +22,16 @@ function xinput_set_prop --argument-names DEVICE_NAME PROPERTY
   # set -e before
   # xinput list-props $DEVICE_NAME | while read -l line; set -a before $line; end
   xinput set-prop $DEVICE_NAME $PROPERTY $argv[3..]
+  printf "  $COLOR_GREEN->$COLOR_RESET $PROPERTY = $argv[3.. ]\n"
 end
 
 # keyboard
 print_device "Keyboard xset"
-echo "  -> Set repeat rate"
-xset r rate 200 30
+set KEY_DELAY 200
+set KEY_RATE 30
+printf "  $COLOR_GREEN->$COLOR_RESET Repeat rate = $KEY_RATE\n"
+printf "  $COLOR_GREEN->$COLOR_RESET Delay = $KEY_DELAY\n"
+xset r rate $KEY_DELAY $KEY_RATE
 # xset r off
 
 xinput list --name-only | while read -l DEVICE_NAME
@@ -75,7 +80,6 @@ xinput list --name-only | while read -l DEVICE_NAME
   # Trackball
   else if string match -q 'Kensington SlimBlade Pro(2.4GHz Receiver) Kensington SlimBlade Pro Trackball(2.4GHz Receiver)' $DEVICE_NAME
     print_device $DEVICE_NAME
-    echo "  -> Set left handed mode"
     # Left handed mode
     xinput_set_prop "$DEVICE_NAME" 'libinput Left Handed Enabled' 1
   end
