@@ -1,4 +1,4 @@
 #!/bin/bash
 
-setxkbmap -model pc105 -layout us
+setxkbmap -model pc105 -layout us -option caps:ctrl_modifier
 killall xcape

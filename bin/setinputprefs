@@ -1,8 +1,13 @@
 #!/usr/bin/env fish
 
-# keyboard
-xset r rate 200 30
-# xset r off
+set COLOR_CYAN "\033[36m"
+set COLOR_RESET "\033[0m"
+
+function print_device --argument-names DEVICE_NAME
+  printf $COLOR_CYAN
+  echo $DEVICE_NAME
+  printf $COLOR_RESET
+end
 
 # Gnome WM options
 dconf write '/org/gnome/desktop/wm/preferences/resize-with-right-button' true
@@ -18,10 +23,16 @@ function xinput_set_prop --argument-names DEVICE_NAME PROPERTY
   xinput set-prop $DEVICE_NAME $PROPERTY $argv[3..]
 end
 
+# keyboard
+print_device "Keyboard xset"
+echo "  -> Set repeat rate"
+xset r rate 200 30
+# xset r off
+
 xinput list --name-only | while read -l DEVICE_NAME
   # Apple magic trackpad v1
   if string match -q 'anthony’s trackpad' $DEVICE_NAME
-    echo "Device:" $DEVICE_NAME
+    print_device $DEVICE_NAME
     # Scroll vertical and horizontal
     xinput_set_prop "$DEVICE_NAME" 'Synaptics Two-Finger Scrolling' 1, 1
     # Reverse the scroll directions
@@ -33,7 +44,7 @@ xinput list --name-only | while read -l DEVICE_NAME
     # xinput list-props $DEVICE_NAME
 
   else if string match -q 'TPPS/2 Elan TrackPoint' $DEVICE_NAME
-    echo "Device:" $DEVICE_NAME
+    print_device $DEVICE_NAME
     xinput_set_prop "$DEVICE_NAME" 'libinput Accel Speed' .8
     hostname | grep -iqs grover && xinput_set_prop "$DEVICE_NAME" 'libinput Accel Speed' .1
     xinput_set_prop "$DEVICE_NAME" 'libinput Accel Profile Enabled' 1, 0
@@ -41,7 +52,7 @@ xinput list --name-only | while read -l DEVICE_NAME
 
   # Thinkpad X1 carbon gen7 with Arch
   else if string match -q 'SYNA8004:00 06CB:CD8B Touchpad' $DEVICE_NAME
-    echo "Device:" $DEVICE_NAME
+    print_device $DEVICE_NAME
     xinput_set_prop "$DEVICE_NAME" 'libinput Disable While Typing Enabled' 0
     xinput_set_prop "$DEVICE_NAME" 'libinput Natural Scrolling Enabled' 1
     xinput_set_prop "$DEVICE_NAME" 'libinput Accel Speed' 0.520000
@@ -49,7 +60,7 @@ xinput list --name-only | while read -l DEVICE_NAME
 
   # Thinkpad X1 carbon gen6 with debian
   else if string match -q 'Synaptics TM3289-021' $DEVICE_NAME
-    echo "Device:" $DEVICE_NAME
+    print_device $DEVICE_NAME
     # Scroll vertical and horizontal
     xinput_set_prop "$DEVICE_NAME" 'Synaptics Two-Finger Scrolling' 1, 1
     # Reverse the scroll directions
@@ -60,6 +71,13 @@ xinput list --name-only | while read -l DEVICE_NAME
     xinput_set_prop "$DEVICE_NAME" 'Synaptics Palm Dimensions' 4, 50
     xinput_set_prop "$DEVICE_NAME" 'Synaptics Move Speed' 1.000000, 2.750000, 0.034880, 0.000000
     # xinput list-props $DEVICE_NAME
+
+  # Trackball
+  else if string match -q 'Kensington SlimBlade Pro(2.4GHz Receiver) Kensington SlimBlade Pro Trackball(2.4GHz Receiver)' $DEVICE_NAME
+    print_device $DEVICE_NAME
+    echo "  -> Set left handed mode"
+    # Left handed mode
+    xinput_set_prop "$DEVICE_NAME" 'libinput Left Handed Enabled' 1
   end
 end
 
