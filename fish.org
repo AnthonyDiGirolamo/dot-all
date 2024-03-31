@@ -269,7 +269,7 @@ The =fish_prompt= function is responsible for setting the prompt.
   # end
 
   set powerline_right_arrow ''
-  set powerline_right_arrow ''
+  # set powerline_right_arrow ''
   if set -q INSIDE_EMACS; or set -q XTERM_VERSION; or string match -q -r 'raspberrypi|chip' $hostname
     set powerline_right_arrow ''
   end

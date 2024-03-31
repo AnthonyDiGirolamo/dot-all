@@ -37,13 +37,13 @@
      save_config
      EOF
 
+     systemctl enable wpa_supplicant@$INTERFACE
      systemctl start  wpa_supplicant@$INTERFACE
      systemctl status wpa_supplicant@$INTERFACE
-     systemctl enable wpa_supplicant@$INTERFACE
 
+     systemctl enable dhcpcd@$INTERFACE
      systemctl start  dhcpcd@$INTERFACE
      systemctl status dhcpcd@$INTERFACE
-     systemctl enable dhcpcd@$INTERFACE
    #+END_SRC
 
 * packages
