@@ -96,18 +96,19 @@ function install_emacs29() {
     # "LD_LIBRARY_PATH=\"${HOME}/apps/tree-sitter/lib\" " \
 
     # Assume tree-sitter is installed with apt/pacman:
+    # "--with-tree-sitter "
+
     tarfile = make::download("emacs",
-        "https://ftpmirror.gnu.org/emacs/emacs-29.1.tar.xz",
-        "e0631d868a13b503a5feef042435b67c")
+        "https://ftpmirror.gnu.org/emacs/emacs-29.3.tar.xz",
+        "1e402f3f632b68a56cb9fab4dff8e313")
     make::compile(make::extract_tar(tarfile),
         "./configure --prefix=$HOME/apps/emacs29 " \
         "--with-modules " \
         "--with-cairo " \
         "--with-native-compilation " \
-        "--with-tree-sitter " \
         "--with-x-toolkit=gtk3 " \
         "--without-xaw3d\n" \
-        "make -j 4\n" \
+        "make -j 8\n" \
         "make install\n")
 }
 
