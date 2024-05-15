@@ -205,7 +205,7 @@
                          (expand-file-name "~/Pictures/") screenshot-filename)))))
 
     ;; Default font size and name
-    (setq amd/font-size 18
+    (setq amd/font-size 22
           amd/font-name "PragmataPro-%d")
 
     (defun amd/set-font (&optional fsize fname)

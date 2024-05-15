@@ -63,7 +63,8 @@
   size = 18.0
 
   [font.bold]
-  family = "Iosevka SS08"
+  # family = "Iosevka SS08"
+  family = "Iosevka SS17"
   style = "Bold"
 
   [font.glyph_offset]
@@ -71,11 +72,13 @@
   y = 0
 
   [font.italic]
-  family = "Iosevka SS08"
+  # family = "Iosevka SS08"
+  family = "Iosevka SS17"
   style = "Italic"
 
   [font.normal]
-  family = "Iosevka SS08"
+  # family = "Iosevka SS08"
+  family = "Iosevka SS17"
   style = "Light"
 
   [font.offset]
@@ -412,19 +415,22 @@
   # * file:///usr/share/doc/fontconfig/fontconfig-user.html
   font:
     normal:
-      family: Iosevka SS08
+      # family: Iosevka SS08
+      family: Iosevka SS17
       # family: PragmataPro
       # family: Terminus
       # style: Regular
       style: Light
       # style: Bold
     bold:
-      family: Iosevka SS08
+      # family: Iosevka SS08
+      family: Iosevka SS17
       # family: PragmataPro
       # family: Terminus
       style: Bold
     italic:
-      family: Iosevka SS08
+      # family: Iosevka SS08
+      family: Iosevka SS17
       # family: PragmataPro
       # family: Terminus
       style: Italic
