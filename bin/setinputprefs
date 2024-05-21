@@ -78,7 +78,7 @@ xinput list --name-only | while read -l DEVICE_NAME
     # xinput list-props $DEVICE_NAME
 
   # Trackball
-  else if string match -q 'Kensington SlimBlade Pro(2.4GHz Receiver) Kensington SlimBlade Pro Trackball(2.4GHz Receiver)' $DEVICE_NAME
+  else if string match -q 'Kensington SlimBlade Pro(2.4GHz Receiver) Kensington SlimBlade Pro Trackball(2.4GHz Receiver)' $DEVICE_NAME; or string match -q 'Kensington SlimBlade Pro Trackball(Wired) Kensington SlimBlade Pro Trackball(Wired)' $DEVICE_NAME
     print_device $DEVICE_NAME
     # Left handed mode
     xinput_set_prop "$DEVICE_NAME" 'libinput Left Handed Enabled' 1

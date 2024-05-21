@@ -120,7 +120,8 @@
     (setq ring-bell-function (lambda ()))
     (setq recenter-redisplay nil) ;; don't redraw the whole display when recentering
 
-    (setq-default fill-column 80)
+    ;; NOTE: Setting the default here seems to override settings like git-commit-fill-column 70
+    ;; (setq-default fill-column 80)
 
     ;; Get auto line breaks at fill-column - auto-fill-mode
     ;; (add-hook 'text-mode-hook 'turn-on-auto-fill)
@@ -3086,9 +3087,10 @@ This mode gives variables names unique colors.
     ;; (global-set-key (kbd "C-c C-c") 'xmp)
   )
 
+  ;; Set Evil indentation amount to python indent amount. Necessary if a value other than the default of 4.
   (add-hook 'python-mode-hook
             (function (lambda ()
-                        (setq evil-shift-width python-indent))))
+                        (setq evil-shift-width python-indent-offset))))
   (add-hook 'ruby-mode-hook
             (function (lambda ()
                         (setq evil-shift-width ruby-indent-level))))
