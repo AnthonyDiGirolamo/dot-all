@@ -299,7 +299,8 @@
   alias ec="env TERM=xterm-24bits emacsclient --alternate-editor='' -nw"
   alias ecg="env TERM=xterm-24bits emacsclient --alternate-editor='' --no-wait --create-frame"
 
-  export MANPAGER="sh -c \"sed -e 's/.//g' | vim -c 'set ft=man ts=8 nomod nolist nonu nornu noma' -\""
+  # export MANPAGER="sh -c \"sed -e 's/.//g' | vim -c 'set ft=man ts=8 nomod nolist nonu nornu noma' -\""
+  export MANPAGER="vim -M +MANPAGER '+set nonumber' -"
 
   if [ -z ${DISPLAY+x} ];
   then

@@ -101,7 +101,8 @@
     # set -x TERM xterm-24bits
     set -x TERM xterm-256color
   end
-  set -x MANPAGER "sh -c \"sed -e 's/.//g' | vim -c 'set ft=man ts=8 nomod nolist nonu nornu noma' -\""
+  # set -x MANPAGER "sh -c \"sed -e 's/.//g' | vim -c 'set ft=man ts=8 nomod nolist nonu nornu noma' -\""
+  set -x MANPAGER "vim -M +MANPAGER '+set nonumber' -"
 
   # if ~/.config/fish/config-local.fish exists, load it
   set config_local $HOME/.config/fish/config-local.fish
