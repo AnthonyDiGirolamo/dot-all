@@ -1,253 +1,270 @@
-#+STARTUP: content
+#+TITLE: Arch Linux Notes
+#+STARTUP: content indent
+#+PROPERTY: header-args :mkdirp yes
 
 * wpa
 
 ** setup script
 
-   #+BEGIN_SRC fundamental :noweb-ref ssid
-     example-ssid
-   #+END_SRC
+#+begin_src fundamental :noweb-ref ssid
+  example-ssid
+#+end_src
 
-   #+BEGIN_SRC fundamental :noweb-ref password
-     example-password
-   #+END_SRC
+#+begin_src fundamental :noweb-ref password
+  example-password
+#+end_src
 
-   #+BEGIN_SRC fundamental :noweb-ref interface
-     example-interface
-   #+END_SRC
+#+begin_src fundamental :noweb-ref interface
+  example-interface
+#+end_src
 
-   #+BEGIN_SRC sh :tangle ~/setupwpasupplicant.sh :noweb yes :shebang #!/bin/bash
-     INTERFACE=<<interface>>
-     cat <<EOF > /etc/wpa_supplicant/wpa_supplicant.conf
-     ctrl_interface=/run/wpa_supplicant
-     update_config=1
-     EOF
+#+begin_src sh :tangle ~/setupwpasupplicant.sh :noweb yes :shebang #!/bin/bash
+  INTERFACE=<<interface>>
+  cat <<EOF > /etc/wpa_supplicant/wpa_supplicant.conf
+  ctrl_interface=/run/wpa_supplicant
+  update_config=1
+  EOF
 
-     ip link set $INTERFACE up
-     wpa_supplicant -B -i $INTERFACE -c /etc/wpa_supplicant/wpa_supplicant.conf
+  ip link set $INTERFACE up
+  wpa_supplicant -B -i $INTERFACE -c /etc/wpa_supplicant/wpa_supplicant.conf
 
-     # if there is no network 0, add it
-     ! wpa_cli list_networks | grep -E "^0\s+" && wpa_cli add_network
+  # if there is no network 0, add it
+  ! wpa_cli list_networks | grep -E "^0\s+" && wpa_cli add_network
 
-     wpa_cli <<EOF
-     scan
-     set_network 0 ssid "<<ssid>>"
-     set_network 0 psk "<<password>>"
-     enable_network 0
-     save_config
-     EOF
+  wpa_cli <<EOF
+  scan
+  set_network 0 ssid "<<ssid>>"
+  set_network 0 psk "<<password>>"
+  enable_network 0
+  save_config
+  EOF
 
-     systemctl enable wpa_supplicant@$INTERFACE
-     systemctl start  wpa_supplicant@$INTERFACE
-     systemctl status wpa_supplicant@$INTERFACE
+  systemctl enable wpa_supplicant@$INTERFACE
+  systemctl start  wpa_supplicant@$INTERFACE
+  systemctl status wpa_supplicant@$INTERFACE
 
-     systemctl enable dhcpcd@$INTERFACE
-     systemctl start  dhcpcd@$INTERFACE
-     systemctl status dhcpcd@$INTERFACE
-   #+END_SRC
+  systemctl enable dhcpcd@$INTERFACE
+  systemctl start  dhcpcd@$INTERFACE
+  systemctl status dhcpcd@$INTERFACE
+#+end_src
+
+* dhcpcd
+
+** Don't wait for an IP durring boot
+
+#+begin_src sh
+  sudo systemctl edit dhcpcd@.service --drop-in=no-wait
+#+end_src
+
+#+begin_src conf :tangle /etc/systemd/system/dhcpcd@.service.d/no-wait.conf
+  [Service]
+  ExecStart=
+  ExecStart=/usr/bin/dhcpcd -q -b %I
+#+end_src
+
 
 * packages
 
-  Explicitly installed packages
+Explicitly installed packages
 
-  #+begin_src sh
-    pacman -Qe
-  #+end_src
+#+begin_src sh
+  pacman -Qe
+#+end_src
 
-  #+RESULTS:
-  | alacritty                   |
-  | alsa-utils                  |
-  | ark                         |
-  | arm-none-eabi-binutils      |
-  | arm-none-eabi-gcc           |
-  | arm-none-eabi-gdb           |
-  | arm-none-eabi-newlib        |
-  | avr-gcc                     |
-  | avr-libc                    |
-  | base-devel                  |
-  | btop                        |
-  | chromium                    |
-  | dfu-programmer              |
-  | dfu-util                    |
-  | dhcpcd                      |
-  | discover                    |
-  | dnsmasq                     |
-  | efibootmgr                  |
-  | emacs                       |
-  | emscripten                  |
-  | fish                        |
-  | gamescope                   |
-  | git                         |
-  | grub                        |
-  | inetutils                   |
-  | iptables-nft                |
-  | keepassxc                   |
-  | kicad                       |
-  | kicad-library               |
-  | kicad-library-3d            |
-  | konsole                     |
-  | lib32-systemd               |
-  | libgccjit                   |
-  | libvirt                     |
-  | lightdm                     |
-  | lightdm-gtk-greeter         |
-  | linux                       |
-  | linux-firmware              |
-  | lua                         |
-  | luarocks                    |
-  | mangohud                    |
-  | noto-fonts-emoji            |
-  | nvidia                      |
-  | nvidia-settings             |
-  | openssh                     |
-  | p7zip                       |
-  | qemu-full                   |
-  | rsync                       |
-  | ruby                        |
-  | sudo                        |
-  | tmux                        |
-  | ttc-iosevka-ss08            |
-  | ttc-iosevka-ss17            |
-  | unrar                       |
-  | vim                         |
-  | virt-manager                |
-  | xclip                       |
-  | xorg-xinput                 |
-  | xsel                        |
-  | zsh                         |
+#+RESULTS:
+| alacritty                   |
+| alsa-utils                  |
+| ark                         |
+| arm-none-eabi-binutils      |
+| arm-none-eabi-gcc           |
+| arm-none-eabi-gdb           |
+| arm-none-eabi-newlib        |
+| avr-gcc                     |
+| avr-libc                    |
+| base-devel                  |
+| btop                        |
+| chromium                    |
+| dfu-programmer              |
+| dfu-util                    |
+| dhcpcd                      |
+| discover                    |
+| dnsmasq                     |
+| efibootmgr                  |
+| emacs                       |
+| emscripten                  |
+| fish                        |
+| gamescope                   |
+| git                         |
+| grub                        |
+| inetutils                   |
+| iptables-nft                |
+| keepassxc                   |
+| kicad                       |
+| kicad-library               |
+| kicad-library-3d            |
+| konsole                     |
+| lib32-systemd               |
+| libgccjit                   |
+| libvirt                     |
+| lightdm                     |
+| lightdm-gtk-greeter         |
+| linux                       |
+| linux-firmware              |
+| lua                         |
+| luarocks                    |
+| mangohud                    |
+| noto-fonts-emoji            |
+| nvidia                      |
+| nvidia-settings             |
+| openssh                     |
+| p7zip                       |
+| qemu-full                   |
+| rsync                       |
+| ruby                        |
+| sudo                        |
+| tmux                        |
+| ttc-iosevka-ss08            |
+| ttc-iosevka-ss17            |
+| unrar                       |
+| vim                         |
+| virt-manager                |
+| xclip                       |
+| xorg-xinput                 |
+| xsel                        |
+| zsh                         |
 
-  Explicitly installed by parent group
+Explicitly installed by parent group
 
-  #+begin_src sh
-    pacman -Qeg
-  #+end_src
+#+begin_src sh
+  pacman -Qeg
+#+end_src
 
-  #+RESULTS:
-  | kde-applications | ark                         |
-  | kde-applications | dolphin                     |
-  | kde-applications | konsole                     |
-  | kde-applications | kwalletmanager              |
-  | kde-utilities    | ark                         |
-  | kde-utilities    | konsole                     |
-  | kde-utilities    | kwalletmanager              |
-  | plasma           | bluedevil                   |
-  | plasma           | breeze-gtk                  |
-  | plasma           | breeze-plymouth             |
-  | plasma           | discover                    |
-  | plasma           | drkonqi                     |
-  | plasma           | flatpak-kcm                 |
-  | plasma           | kde-gtk-config              |
-  | plasma           | kdeplasma-addons            |
-  | plasma           | kgamma5                     |
-  | plasma           | khotkeys                    |
-  | plasma           | kinfocenter                 |
-  | plasma           | kscreen                     |
-  | plasma           | ksshaskpass                 |
-  | plasma           | kwallet-pam                 |
-  | plasma           | kwayland-integration        |
-  | plasma           | kwrited                     |
-  | plasma           | oxygen                      |
-  | plasma           | plasma-browser-integration  |
-  | plasma           | plasma-desktop              |
-  | plasma           | plasma-disks                |
-  | plasma           | plasma-firewall             |
-  | plasma           | plasma-nm                   |
-  | plasma           | plasma-pa                   |
-  | plasma           | plasma-sdk                  |
-  | plasma           | plasma-systemmonitor        |
-  | plasma           | plasma-thunderbolt          |
-  | plasma           | plasma-vault                |
-  | plasma           | plasma-welcome              |
-  | plasma           | plasma-workspace-wallpapers |
-  | plasma           | plymouth-kcm                |
-  | plasma           | sddm-kcm                    |
-  | plasma           | xdg-desktop-portal-kde      |
-  | kde-system       | dolphin                     |
-  | xfce4            | exo                         |
-  | xfce4            | garcon                      |
-  | xfce4            | thunar                      |
-  | xfce4            | thunar-volman               |
-  | xfce4            | tumbler                     |
-  | xfce4            | xfce4-appfinder             |
-  | xfce4            | xfce4-panel                 |
-  | xfce4            | xfce4-power-manager         |
-  | xfce4            | xfce4-session               |
-  | xfce4            | xfce4-settings              |
-  | xfce4            | xfce4-terminal              |
-  | xfce4            | xfconf                      |
-  | xfce4            | xfdesktop                   |
-  | xfce4            | xfwm4                       |
-  | xfce4            | xfwm4-themes                |
-  | xorg             | xorg-xinput                 |
-  | xorg-apps        | xorg-xinput                 |
+#+RESULTS:
+| kde-applications | ark                         |
+| kde-applications | dolphin                     |
+| kde-applications | konsole                     |
+| kde-applications | kwalletmanager              |
+| kde-utilities    | ark                         |
+| kde-utilities    | konsole                     |
+| kde-utilities    | kwalletmanager              |
+| plasma           | bluedevil                   |
+| plasma           | breeze-gtk                  |
+| plasma           | breeze-plymouth             |
+| plasma           | discover                    |
+| plasma           | drkonqi                     |
+| plasma           | flatpak-kcm                 |
+| plasma           | kde-gtk-config              |
+| plasma           | kdeplasma-addons            |
+| plasma           | kgamma5                     |
+| plasma           | khotkeys                    |
+| plasma           | kinfocenter                 |
+| plasma           | kscreen                     |
+| plasma           | ksshaskpass                 |
+| plasma           | kwallet-pam                 |
+| plasma           | kwayland-integration        |
+| plasma           | kwrited                     |
+| plasma           | oxygen                      |
+| plasma           | plasma-browser-integration  |
+| plasma           | plasma-desktop              |
+| plasma           | plasma-disks                |
+| plasma           | plasma-firewall             |
+| plasma           | plasma-nm                   |
+| plasma           | plasma-pa                   |
+| plasma           | plasma-sdk                  |
+| plasma           | plasma-systemmonitor        |
+| plasma           | plasma-thunderbolt          |
+| plasma           | plasma-vault                |
+| plasma           | plasma-welcome              |
+| plasma           | plasma-workspace-wallpapers |
+| plasma           | plymouth-kcm                |
+| plasma           | sddm-kcm                    |
+| plasma           | xdg-desktop-portal-kde      |
+| kde-system       | dolphin                     |
+| xfce4            | exo                         |
+| xfce4            | garcon                      |
+| xfce4            | thunar                      |
+| xfce4            | thunar-volman               |
+| xfce4            | tumbler                     |
+| xfce4            | xfce4-appfinder             |
+| xfce4            | xfce4-panel                 |
+| xfce4            | xfce4-power-manager         |
+| xfce4            | xfce4-session               |
+| xfce4            | xfce4-settings              |
+| xfce4            | xfce4-terminal              |
+| xfce4            | xfconf                      |
+| xfce4            | xfdesktop                   |
+| xfce4            | xfwm4                       |
+| xfce4            | xfwm4-themes                |
+| xorg             | xorg-xinput                 |
+| xorg-apps        | xorg-xinput                 |
 
 * aur packages
 
-  #+begin_src sh
-    git clone https://aur.archlinux.org/lux.git
-    git clone https://aur.archlinux.org/google-chrome.git
-    # git clone https://aur.archlinux.org/chrome-remote-desktop.git
-    # git clone https://aur.archlinux.org/layan-gtk-theme-git.git
-    # git clone https://aur.archlinux.org/paper-icon-theme-git.git
-  #+end_src
+#+begin_src sh
+  git clone https://aur.archlinux.org/lux.git
+  git clone https://aur.archlinux.org/google-chrome.git
+  # git clone https://aur.archlinux.org/chrome-remote-desktop.git
+  # git clone https://aur.archlinux.org/layan-gtk-theme-git.git
+  # git clone https://aur.archlinux.org/paper-icon-theme-git.git
+#+end_src
 
 ** google-chrome
 
-  #+BEGIN_SRC sh
-    mkdir -p ~/aurpkgs
-    cd ~/aurpkgs
-    rm -rf google-chrome.git
-    git clone https://aur.archlinux.org/google-chrome.git google-chrome.git
-    cd google-chrome.git
-    makepkg -is
-  #+END_SRC
+#+begin_src sh
+  mkdir -p ~/aurpkgs
+  cd ~/aurpkgs
+  rm -rf google-chrome.git
+  git clone https://aur.archlinux.org/google-chrome.git google-chrome.git
+  cd google-chrome.git
+  makepkg -is
+#+end_src
 
 * lm_sensors
 
-  #+BEGIN_SRC sh
-    # install
-    sudo pacman -S lm_sensors
-    # display configured sensors
-    sensors
-  #+END_SRC
+#+begin_src sh
+  # install
+  sudo pacman -S lm_sensors
+  # display configured sensors
+  sensors
+#+end_src
 
 * luks cryptsetup
 
 ** setup new partition
 
-   #+begin_src sh
-     # format luks
-     cryptsetup luksFormat /dev/nvme0n1p7
-     cryptsetup open /dev/$PARTITION auxdata
-     cryptsetup status /dev/mapper/auxdata
+#+begin_src sh
+  # format luks
+  cryptsetup luksFormat /dev/nvme0n1p7
+  cryptsetup open /dev/$PARTITION auxdata
+  cryptsetup status /dev/mapper/auxdata
 
-     # format btrfs
-     mkfs.btrfs -L auxdata /dev/mapper/auxdata
-     mount /dev/mapper/auxdata /mnt/auxdata
-     btrfs filesystem usage /mnt/auxdata
-   #+end_src
+  # format btrfs
+  mkfs.btrfs -L auxdata /dev/mapper/auxdata
+  mount /dev/mapper/auxdata /mnt/auxdata
+  btrfs filesystem usage /mnt/auxdata
+#+end_src
 
 ** get info
 
-   #+begin_src sh
-     # list disks
-     lsblk -f
+#+begin_src sh
+  # list disks
+  lsblk -f
 
-     # get encryption info
-     cryptsetup status /dev/mapper/root
-     cryptsetup luksDump /dev/$PARTITION
+  # get encryption info
+  cryptsetup status /dev/mapper/root
+  cryptsetup luksDump /dev/$PARTITION
 
-     # or
-     dmsetup table
-   #+end_src
+  # or
+  dmsetup table
+#+end_src
 
 ** mount script
 
-   #+begin_src sh
-     #!/bin/bash
-     sudo cryptsetup open /dev/$PARTITION auxdata
-     sudo cryptsetup status /dev/mapper/root
-     sudo mount /dev/mapper/auxdata /mnt/auxdata
-     sudo btrfs filesystem usage /mnt/auxdata/
-     lsblk -f
-   #+end_src
+#+begin_src sh
+  #!/bin/bash
+  sudo cryptsetup open /dev/$PARTITION auxdata
+  sudo cryptsetup status /dev/mapper/root
+  sudo mount /dev/mapper/auxdata /mnt/auxdata
+  sudo btrfs filesystem usage /mnt/auxdata/
+  lsblk -f
+#+end_src
