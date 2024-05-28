@@ -9,6 +9,7 @@
   - [[#themes][themes]]
   - [[#leuven-light][leuven light]]
   - [[#moe-dark][moe dark]]
+  - [[#cattpuccin][cattpuccin]]
   - [[#doom-themes][doom-themes]]
   - [[#modus-themes][modus-themes]]
   - [[#solaire-mode][solaire-mode]]
@@ -572,6 +573,27 @@
   )
 #+end_src
 
+** cattpuccin
+
+#+begin_src emacs-lisp
+  (use-package catppuccin-theme
+    :custom
+    ;; Dark
+    (catppuccin-flavor 'mocha) ;; High contrast
+    ;; (catppuccin-flavor 'macchiato) ;; Low contrast
+    ;; Light
+    ;; (catppuccin-flavor 'frappe) ;; High contrast
+    ;; (catppuccin-flavor 'latte) ;; Low contrast
+
+    (defun amd/catppuccin-theme ()
+      "load catppuccin"
+      (interactive)
+      (amd/disable-loaded-themes)
+      (load-theme 'catppuccin t)
+    )
+  )
+#+end_src
+
 ** doom-themes
 
 #+begin_src emacs-lisp
@@ -694,8 +716,6 @@
       )
     )
 #+end_src
-
-
 
 ** solaire-mode
 
