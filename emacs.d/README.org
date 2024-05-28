@@ -585,11 +585,13 @@
     ;; (catppuccin-flavor 'frappe) ;; High contrast
     ;; (catppuccin-flavor 'latte) ;; Low contrast
 
+    :config
     (defun amd/catppuccin-theme ()
       "load catppuccin"
       (interactive)
       (amd/disable-loaded-themes)
       (load-theme 'catppuccin t)
+      (load-theme 'airline-doom-one t)
     )
   )
 #+end_src

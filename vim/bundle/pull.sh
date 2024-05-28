@@ -21,17 +21,17 @@ https://github.com/tpope/vim-tbone.git
 https://github.com/tpope/vim-unimpaired.git
 https://github.com/tpope/vim-vinegar.git
 https://github.com/tpope/vim-vividchalk.git
-https://github.com/vim-airline/vim-airline-themes.git
 https://github.com/vim-airline/vim-airline.git
 https://github.com/vim-syntastic/syntastic.git
 https://github.com/ycm-core/YouCompleteMe.git
-"
-urls="
 https://github.com/keremc/asyncomplete-clang.vim
 https://github.com/mattn/vim-lsp-settings.git
 https://github.com/prabirshrestha/async.vim
 https://github.com/prabirshrestha/asyncomplete.vim.git
 https://github.com/prabirshrestha/vim-lsp.git
+"
+urls="
+https://github.com/vim-airline/vim-airline-themes.git
 "
 for URL in $urls
 do
