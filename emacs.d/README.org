@@ -207,7 +207,10 @@
                          (expand-file-name "~/Pictures/") screenshot-filename)))))
 
     ;; Default font size and name
-    (setq amd/font-size 22
+    (setq amd/font-size (cond
+                         ((eq system-type 'gnu/linux) 18)
+                         ((eq system-type 'darwin) 22)
+                         (t 18))
           amd/font-name "PragmataPro-%d")
 
     (defun amd/set-font (&optional fsize fname)
@@ -579,11 +582,11 @@
   (use-package catppuccin-theme
     :custom
     ;; Dark
-    (catppuccin-flavor 'mocha) ;; High contrast
+    (catppuccin-flavor 'mocha)        ;; High contrast
     ;; (catppuccin-flavor 'macchiato) ;; Low contrast
     ;; Light
-    ;; (catppuccin-flavor 'frappe) ;; High contrast
-    ;; (catppuccin-flavor 'latte) ;; Low contrast
+    ;; (catppuccin-flavor 'frappe)    ;; High contrast
+    ;; (catppuccin-flavor 'latte)     ;; Low contrast
 
     :config
     (defun amd/catppuccin-theme ()
@@ -591,7 +594,7 @@
       (interactive)
       (amd/disable-loaded-themes)
       (load-theme 'catppuccin t)
-      (load-theme 'airline-doom-one t)
+      (load-theme 'airline-catppuccin_frappe t)
     )
   )
 #+end_src
@@ -792,8 +795,10 @@
   ;; (amd/moe-dark-theme)
 
   ;; (amd/doom-snazzy-theme)
-  (amd/doom-one-theme)
-  (load-theme 'airline-doom-one t)
+  ;; (amd/doom-one-theme)
+  ;; (load-theme 'airline-doom-one t)
+
+  (amd/catppuccin-theme)
 
   ;; (amd/modus-light-theme)
   ;; (amd/modus-dark-theme)
