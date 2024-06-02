@@ -20,6 +20,7 @@
   - [[#appearance-minor-modes][appearance minor-modes]]
 - [[#amdfunctions][amd/functions]]
 - [[#evil-mode][evil-mode]]
+- [[#evil-mode-extensions][evil-mode extensions]]
 - [[#packages-built-in][packages (built-in)]]
   - [[#auto-revert-mode][Auto Revert mode]]
   - [[#recent-files-mode][Recent Files mode]]
@@ -280,7 +281,7 @@
     (when (memq window-system '(mac ns))
       (exec-path-from-shell-initialize))
 
-    ;; general settings
+    ;; General Settings
 
     (require 'mouse)
     (xterm-mouse-mode t)
@@ -288,6 +289,12 @@
     (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
     (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
     (menu-bar-mode -1)
+
+    ;; Examples of setting a font with antialias on or off:
+    ;; set-frame-font :size <int>pixel size <float>point size
+    ;; (set-frame-font (font-spec :name "PragmataPro" :antialias t :size 17.0))
+    ;; (set-frame-font (font-spec :name "Iosevka Term SS17 Light" :antialias t :size 16.0))
+    ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 18.0))
 
     (when (display-graphic-p)
       (cond
@@ -298,25 +305,16 @@
        ((member "Iosevka SS17" (font-family-list))
         (amd/set-font nil "Iosevka SS17 Light"))
        (t
-        (amd/set-font)))
-
-      ;; Examples of setting a font with antialias on or off:
-      ;; set-frame-font :size <int>pixel size <float>point size
-      ;; (set-frame-font (font-spec :name "PragmataPro" :antialias t :size 17.0))
-      ;; (set-frame-font (font-spec :name "Iosevka Term SS17 Light" :antialias t :size 16.0))
-      ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 18.0))
-      )
-    )
+        (amd/set-font)))))
 #+end_src
 
 * libraries
 
 #+begin_src emacs-lisp
   (use-package general
-    :demand
     ;; :config
     ;; (general-auto-unbind-keys t)
-  )
+    :demand)
 
   (use-package s)
 
@@ -388,8 +386,7 @@
   (defun amd/disable-loaded-themes ()
     (interactive)
     (cl-loop for theme-name in custom-enabled-themes
-             do (funcall #'disable-theme theme-name))
-  )
+             do (funcall #'disable-theme theme-name)))
 #+end_src
 
 ** leuven light
@@ -401,8 +398,7 @@
   (use-package leuven-theme
     :custom
     (leuven-scale-org-agenda-structure nil)
-    (leuven-scale-outline-headlines nil)
-  )
+    (leuven-scale-outline-headlines nil))
 
   (defun amd/leuven-light-theme ()
     "Light background theme"
@@ -430,10 +426,6 @@
      '(rainbow-delimiters-depth-7-face ((t (:foreground "#ff6666" :weight bold))) t)
      '(rainbow-delimiters-depth-8-face ((t (:foreground "#ff66aa" :weight bold))) t)
 
-     '(avy-lead-face ((t (:foreground "#ffaf00"))) t)
-     '(avy-lead-face-0 ((t (:foreground "#5fd7ff"))) t)
-     '(avy-background-face ((t (:background "#eeeeee" :foreground "#a2a2a2"))) t)
-
      ;; lavender experiment
      ;; ;; '(default ((t (:foreground "#333333" :background "#F5F5F5"))) t)
      ;; '(default ((t (:foreground "#E0CEED" :background "#29222E"))) t)
@@ -460,7 +452,10 @@
      ;; '(web-mode-keyword-face ((t (:foreground "#ff4500"))) t)
      ;; '(web-mode-css-selector-face ((t (:foreground "#ff4500"))) t)
      ;; '(which-key-group-description-face ((t (:foreground "#ff4500"))) t)
-  ))
+
+     '(avy-lead-face ((t (:foreground "#ffaf00"))) t)
+     '(avy-lead-face-0 ((t (:foreground "#5fd7ff"))) t)
+     '(avy-background-face ((t (:background "#eeeeee" :foreground "#a2a2a2"))) t)))
 #+end_src
 
 ** moe dark
@@ -629,10 +624,7 @@
        '(term-color-magenta ((t (:background "#303030" :foreground "#cc99cc"))) t)
        '(term-color-red     ((t (:background "#303030" :foreground "#f2777a"))) t)
        '(term-color-white   ((t (:background "#303030" :foreground "#f2f0ec"))) t)
-       '(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))) t)
-      )
-    )
-  )
+       '(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))) t))))
 #+end_src
 
 ** cattpuccin
@@ -660,10 +652,7 @@
        '(avy-lead-face-0 ((t (:foreground "#5fd7ff"))) t)
        '(avy-lead-face-1 ((t (:foreground "#66ffaa"))) t)
        '(avy-lead-face-2 ((t (:foreground "#ff6666"))) t))
-      (load-theme 'airline-catppuccin_frappe t))
-  )
-
-
+      (load-theme 'airline-catppuccin_frappe t)))
 #+end_src
 
 ** doom-themes
@@ -683,9 +672,7 @@
        'doom-snazzy
        '(markdown-code-face ((t (:extend t :background "#242631"))) t t)
        '(magit-diff-removed ((t (:foreground "#cc4945" :background "#433b3d"))) t t)
-       '(magit-diff-removed-highlight ((t (:foreground "#ff5c57" :background "#433b3d"))) t t)
-       )
-    )
+       '(magit-diff-removed-highlight ((t (:foreground "#ff5c57" :background "#433b3d"))) t t)))
 
     (defun amd/doom-one-theme ()
       "load doom-one-theme and override some colors"
@@ -748,11 +735,8 @@
        '(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))) t)
 
        '(line-number ((t (:weight normal :slant normal :inherit default))) t)
-       '(line-number-current-line ((t (:inherit (hl-line default) :slant normal :weight normal))) t)
-       )
-      (solaire-mode-swap-faces-maybe)
-      )
-  )
+       '(line-number-current-line ((t (:inherit (hl-line default) :slant normal :weight normal))) t))
+      (solaire-mode-swap-faces-maybe)))
 #+end_src
 
 ** modus-themes
@@ -766,8 +750,7 @@
       (amd/disable-loaded-themes)
       (load-theme 'modus-operandi t)
       (when (featurep 'airline-themes)
-        (load-theme 'airline-qwq t))
-    )
+        (load-theme 'airline-qwq t)))
 
     (defun amd/modus-dark-theme ()
       "load modus-vivendi and override some colors"
@@ -781,12 +764,9 @@
        '(line-number
          ((t (:weight normal :slant normal :inherit default))) t)
        '(line-number-current-line
-         ((t (:weight normal :slant normal :inherit (hl-line default)))) t)
-       )
+         ((t (:weight normal :slant normal :inherit (hl-line default)))) t))
       (when (featurep 'airline-themes)
-        (load-theme 'airline-ouo t))
-      )
-    )
+        (load-theme 'airline-ouo t))))
 #+end_src
 
 ** solaire-mode
@@ -799,9 +779,8 @@
     (minibufer-setup . solaire-mode-in-minibuffer)
     :init
     :config
-    (solaire-global-mode +1)
     ;; (solaire-mode-swap-faces-maybe)
-  )
+    (solaire-global-mode +1))
 #+end_src
 
 ** modeline
@@ -827,7 +806,6 @@
     (setq airline-display-directory 'airline-directory-shortened)
     ;; (setq airline-display-directory nil)
     (setq airline-eshell-colors t)
-    (setq airline-shortened-directory-length 16)
     ;; (setq airline-utf-glyph-separator-left      #x20)
     ;; (setq airline-utf-glyph-separator-right     #x20)
     ;; (setq airline-utf-glyph-subseparator-left   #x20)
@@ -835,11 +813,9 @@
     ;; (setq airline-utf-glyph-branch              #xe0a0)
     ;; (setq airline-utf-glyph-readonly            #xe0a2)
     ;; (setq airline-utf-glyph-linenumber          #xe0a1)
-  )
+    (setq airline-shortened-directory-length 16))
 
-  (use-package powerline
-    ;; :disabled
-  )
+  (use-package powerline)
 
   (use-package doom-modeline
     :disabled
@@ -887,7 +863,6 @@
   ;; (custom-theme-set-faces
   ;;  'airline-base16_material_palenight
   ;;  '(tab-bar-tab-inactive ((t (:foreground "#32374D":background "#444267" :inherit))) t))
-
 #+end_src
 
 ** appearance minor-modes
@@ -940,11 +915,10 @@ Highlight the current line using the built-in ~hl-line-mode~.
 
 #+begin_src emacs-lisp
   (use-package fill-column-indicator
-    :commands (fci-mode)
-    :init
+    ;; :init
     ;; (unless (or amd/using-pocketchip amd/using-android)
     ;;   (amd/add-appearance-mode 'fci-mode))
-  )
+    :commands (fci-mode))
 #+end_src
 
 *** highlight-indent-guides
@@ -963,10 +937,7 @@ Highlight the current line using the built-in ~hl-line-mode~.
 #+begin_src emacs-lisp
   (use-package display-line-numbers
     :custom
-    (display-line-numbers-type t ;; absolute
-                               ;; 'relative
-                               ;; 'visual
-                               )
+    (display-line-numbers-type t) ;; t=absolute 'relative 'visual
     (display-line-numbers-current-absolute t))
 #+end_src
 
@@ -981,13 +952,12 @@ This mode gives variables names unique colors.
     :init
     (amd/add-appearance-mode 'color-identifiers-mode)
     :config
-    (setq color-identifiers:num-colors 16)
     ;; (add-to-list
     ;;  'color-identifiers:modes-alist
     ;;  `(lua-mode . ("[^.][[:space:]]*"
     ;;                "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
     ;;                (nil font-lock-variable-name-face))))
-  )
+    (setq color-identifiers:num-colors 16))
 #+end_src
 
 *** rainbow-delimiters
@@ -1021,8 +991,7 @@ This mode gives variables names unique colors.
     (interactive)
     (setq-local left-margin-width nil
                 right-margin-width nil)
-    (set-window-buffer (selected-window) (current-buffer))
-  )
+    (set-window-buffer (selected-window) (current-buffer)))
 
   (defun amd/center-buffer (width)
     (interactive "nBuffer width: ")
@@ -1066,12 +1035,10 @@ This mode gives variables names unique colors.
      (interactive)
      (let ((current-file-path (file-name-base (buffer-file-name (current-buffer))))
            (pico8-command     (cond ((eq system-type 'cygwin)
-                                     "/home/anthony/pico-8_win32/pico8.exe -windowed 1 -home 'C:\cygwin64\home\anthony\heliopause-pico-8' -run "
                                      ;; "/home/anthony/pico-8_win32/pico8.exe -windowed 1 -home C:/cygwin64/home/anthony/heliopause-pico-8 "
-                                     )
+                                     "/home/anthony/pico-8_win32/pico8.exe -windowed 1 -home 'C:\cygwin64\home\anthony\heliopause-pico-8' -run ")
                                     ((eq system-type 'windows-nt)
-                                     "c:/Users/anthony/pico-8_win32/pico8.exe -windowed 1 -home C:\\Users\\anthony\\heliopause-pico-8 -run "
-                                     )
+                                     "c:/Users/anthony/pico-8_win32/pico8.exe -windowed 1 -home C:\\Users\\anthony\\heliopause-pico-8 -run ")
                                     (amd/using-pocketchip
                                      "/usr/lib/pico-8/pico8 -run ")
                                     (t
@@ -1124,9 +1091,7 @@ This mode gives variables names unique colors.
     (let ((face (or (get-char-property (point) 'read-face-name)
                     (get-char-property (point) 'face))))
       (if face
-          (let (
-                (face-string (format "%s" face))
-                )
+          (let ((face-string (format "%s" face)))
             (kill-new face-string )
             (message "Copied Face: %s" face))
         (message "No face at %d" pos))))
@@ -1179,9 +1144,7 @@ This mode gives variables names unique colors.
           (beginning-of-line 2)) ;; move to the beginning of the next line
       (insert text)
       (forward-char -1)
-      (evil-visual-line (- (point) (string-width text)) (point))
-    )
-  )
+      (evil-visual-line (- (point) (string-width text)) (point))))
 
   (defun evil-eval-print-last-sexp ()
     "Eval print when in evil-normal-state."
@@ -1479,9 +1442,12 @@ This mode gives variables names unique colors.
       (paste-other-window beg end "*SQL*"))
 
     (evil-define-key 'motion (current-global-map)
-      (kbd "g p s") 'paste-to-sql)
-  )
+      (kbd "g p s") 'paste-to-sql))
+#+end_src
 
+* evil-mode extensions
+
+#+begin_src emacs-lisp
   ;; (use-package evil-visualstar
   ;;   :config
   ;;   (global-evil-visualstar-mode 1))
@@ -1566,9 +1532,9 @@ This mode gives variables names unique colors.
   (use-package saveplace
     :config
     (save-place-mode)
+    ;; Recenter when opening a file.
     ;; TODO: make this work when in an org-src buffer
-    (defadvice find-file (after advice-for-find-file activate) (recenter)) ;; recenter when opening a file?
-  )
+    (defadvice find-file (after advice-for-find-file activate) (recenter)))
 #+end_src
 
 ** savehist - save minibuffer history
@@ -1587,10 +1553,9 @@ This mode gives variables names unique colors.
 #+begin_src emacs-lisp
   (use-package desktop
     :custom
-    (desktop-auto-save-timeout 30)
+    (desktop-auto-save-timeout 30))
     ;; :config
     ;; (desktop-save-mode 1)
-  )
 #+end_src
 
 ** dired
@@ -1646,11 +1611,10 @@ This mode gives variables names unique colors.
     (defun amd/dired-open-thing ()
       "If file at point is a directory open a dired buffer in the same window. Else open in a new window."
       (interactive)
-      (dired-find-file)
       ;; (if (file-directory-p (dired-get-filename nil t))
       ;;     (dired-find-alternate-file)
-      ;;     (dired-find-file-other-window))
-    )
+      ;;   (dired-find-file-other-window))
+      (dired-find-file))
 
     (defun ora-ediff-files ()
       (interactive)
@@ -1741,8 +1705,7 @@ This mode gives variables names unique colors.
        "E"  'eshell-previous-prompt
        "N"  'eshell-next-prompt
        "G" 'amd/eshell-goto-prompt
-       "o" 'amd/eshell-goto-prompt)
-    )
+       "o" 'amd/eshell-goto-prompt))
     (add-hook 'eshell-first-time-mode-hook 'eshell-set-keys)
 
     ;; ;; Use ivy for tab completion
@@ -1908,8 +1871,8 @@ This mode gives variables names unique colors.
       ;; ))
 
       (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
-      (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
-    )
+      (setq eshell-output-filter-functions
+            (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
 
     ;; (require 'xterm-color)
     ;; (progn (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter)
@@ -1968,9 +1931,7 @@ This mode gives variables names unique colors.
           (beginning-of-line)
           (let ((pos (point)))
             (delete-region (point-min) (point)))))
-      (end-of-buffer))
-
-  )
+      (end-of-buffer)))
 #+end_src
 
 ** shell
@@ -1999,8 +1960,7 @@ This mode gives variables names unique colors.
     (setq comint-buffer-maximum-size 2048)
     (add-hook 'comint-output-filter-functions 'comint-truncate-buffer)
     (when (executable-find "fish")
-      (setq explicit-shell-file-name (executable-find "fish")))
-  )
+      (setq explicit-shell-file-name (executable-find "fish"))))
 #+end_src
 
 ** ansi-color
@@ -2065,8 +2025,7 @@ This mode gives variables names unique colors.
       (let ((inhibit-read-only t))
         (ansi-color-apply-on-region
          compilation-filter-start (point))))
-    (add-hook 'compilation-filter-hook #'endless/colorize-compilation)
-  )
+    (add-hook 'compilation-filter-hook #'endless/colorize-compilation))
 #+end_src
 
 ** calc
@@ -2180,8 +2139,7 @@ This mode gives variables names unique colors.
      :keymaps '(eww-bookmark-mode-map)
       "RET" 'eww-bookmark-browse)
     :config
-    (add-to-list 'evil-motion-state-modes 'eww-bookmark-mode)
-  )
+    (add-to-list 'evil-motion-state-modes 'eww-bookmark-mode))
 #+end_src
 
 * vterm
@@ -2205,8 +2163,7 @@ This mode gives variables names unique colors.
      "C-a" 'vterm-send-C-a
      "C-e" 'vterm-send-C-e
      "C-d" 'vterm-send-C-d
-     "C-y" 'vterm-yank)
-  )
+     "C-y" 'vterm-yank))
 #+end_src
 
 * nov.el
@@ -2258,10 +2215,7 @@ This mode gives variables names unique colors.
     (defun ace-link--nov-action (pt)
       (when (number-or-marker-p pt)
         (goto-char (1+ pt))
-        (nov-browse-url)))
-
-  )
-
+        (nov-browse-url))))
 #+end_src
 
 * company auto-completion
@@ -2298,11 +2252,8 @@ This mode gives variables names unique colors.
     (setq company-backends
           '((company-files
              company-keywords
-             company-capf
-             ;; company-yasnippet
-             )
-            (company-abbrev company-dabbrev)
-            ))
+             company-capf)
+            (company-abbrev company-dabbrev)))
 
     :general
     (:states '(insert)
@@ -2319,8 +2270,7 @@ This mode gives variables names unique colors.
     (defun abort-company-on-insert-state-exit ()
       (company-abort))
 
-    (add-hook 'evil-insert-state-exit-hook 'abort-company-on-insert-state-exit)
-  )
+    (add-hook 'evil-insert-state-exit-hook 'abort-company-on-insert-state-exit))
 
   ;; (use-package company-shell
   ;;   :after company
@@ -2353,8 +2303,8 @@ This mode gives variables names unique colors.
   (use-package yasnippet
     :diminish yas-minor-mode
     :config
-    (yas-global-mode) ;; seems to be needed for yankpad
-  )
+    ;; seems to be needed for yankpad
+    (yas-global-mode))
 
   (use-package yankpad
     :commands (yankpad-edit yankpad-set-category yankpad-expand yankpad-insert)
@@ -2421,8 +2371,7 @@ This mode gives variables names unique colors.
     (defun amd/magit-instant-commit ()
       (interactive)
       (magit-commit (list "-a" "-m" "instant-update"))
-      (magit-push-current-to-upstream))
-  )
+      (magit-push-current-to-upstream)))
 #+end_src
 
 ** transient
@@ -2561,8 +2510,7 @@ This mode gives variables names unique colors.
       "h" 'undo-tree-visualize-switch-branch-left
       "l" 'undo-tree-visualize-switch-branch-right)
     :config
-    (global-undo-tree-mode)
-  )
+    (global-undo-tree-mode))
 #+end_src
 
 ** tab-bar-mode
@@ -2600,8 +2548,7 @@ This mode gives variables names unique colors.
 
       ("."  tab-bar-switch-to-tab  "switch" :color blue)
       ("r"  tab-rename             "rename")
-      ("RET" keyboard-escape-quit  "quit" :exit t))
-  )
+      ("RET" keyboard-escape-quit  "quit" :exit t)))
 #+end_src
 
 ** eyebrowse - tabs
@@ -2672,10 +2619,9 @@ This mode gives variables names unique colors.
             (?v aw-split-window-horz "Ace - Split Horz Window")
             (?o delete-other-windows "Ace - Maximize Window")
             (?p aw-flip-window)
-            (?= balance-windows)
             ;; (?u winner-undo)
             ;; (?r winner-redo)
-            ))
+            (?= balance-windows)))
     :config
     ;; (setq aw-keys '(?t ?n ?s ?e ?d ?h ?r ?i ?a ?o ?b ?k ?g ?j ?v ?m ?p ?l))
     ;; show the window letter in the modeline
@@ -2736,8 +2682,7 @@ This mode gives variables names unique colors.
     (:states '(normal) :keymaps '(custom-mode-map)
       "f" 'ace-link-custom)
     :init
-    :config
-  )
+    :config)
 #+end_src
 
 ** projectile
@@ -2827,13 +2772,10 @@ This mode gives variables names unique colors.
     :init
     (add-hook 'ibuffer-mode-hook (lambda () (hl-line-mode 1)))
     (setq ibuffer-formats
-          '(
-            (mark
+          '((mark
              " " (name 32 32 :left)
              " "
-             filename-and-process
-             ;; project-relative-file
-            )
+             filename-and-process)
             (mark
              ;; modified
              ;; read-only
@@ -2843,34 +2785,30 @@ This mode gives variables names unique colors.
              " "
              filename-and-process
              ;; project-relative-file
-             "  --  " name
-            )
-           ))
+             "  --  " name)))
     :general
     (:states '(emacs)
      :keymaps 'ibuffer-mode-map
      "e" 'ibuffer-backward-line
      "/" 'swiper
      "C-/" 'swiper
-     "C-d" 'evil-scroll-down
-     "C-u" 'evil-scroll-up
      ;; "RET" 'ibuffer-visit-buffer-other-window ;; default is "o"
      ;; "a" 'ibuffer-visit-buffer                ;; default is "RET"
-    )
-    :config
-    ;; create a "default" placeholder to build the filter groups
-    ;; (setf ibuffer-saved-filter-groups (quote (("default"))))
+     "C-d" 'evil-scroll-down
+     "C-u" 'evil-scroll-up)
+    :config)
 
-    ;; ;; replace the PROJECTS directory with whatever you like
-    ;; (cl-dolist (dir (directory-files "~/projects/"))
-    ;;   (when (not (member dir '("." "..")))
-    ;;     (setf (car ibuffer-saved-filter-groups)
-    ;;           (append (car ibuffer-saved-filter-groups)
-    ;;                   `((,dir
-    ;;                      (filename . ,(expand-file-name
-    ;;                                    dir "~/projects/"))))))))
+  ;; create a "default" placeholder to build the filter groups
+  ;; (setf ibuffer-saved-filter-groups (quote (("default"))))
 
-  )
+  ;; ;; replace the PROJECTS directory with whatever you like
+  ;; (cl-dolist (dir (directory-files "~/projects/"))
+  ;;   (when (not (member dir '("." "..")))
+  ;;     (setf (car ibuffer-saved-filter-groups)
+  ;;           (append (car ibuffer-saved-filter-groups)
+  ;;                   `((,dir
+  ;;                      (filename . ,(expand-file-name
+  ;;                                    dir "~/projects/"))))))))
 
   (use-package ibuffer-vc
     :init
@@ -2879,17 +2817,15 @@ This mode gives variables names unique colors.
       (lambda ()
         (ibuffer-vc-set-filter-groups-by-vc-root)
         (unless (eq ibuffer-sorting-mode 'filename/process)
-          (ibuffer-do-sort-by-filename/process))))
-  )
+          (ibuffer-do-sort-by-filename/process)))))
 
   ;; (use-package ibuffer-projectile
   ;;   :init
   ;;   (add-hook 'ibuffer-hook
-  ;;       (lambda ()
-  ;;         (ibuffer-projectile-set-filter-groups)
-  ;;         (unless (eq ibuffer-sorting-mode 'alphabetic)
-  ;;           (ibuffer-do-sort-by-alphabetic))))
-  ;; )
+  ;;             (lambda ()
+  ;;               (ibuffer-projectile-set-filter-groups)
+  ;;               (unless (eq ibuffer-sorting-mode 'alphabetic)
+  ;;                 (ibuffer-do-sort-by-alphabetic)))))
 #+end_src
 
 ** tmux-window-navigation
@@ -2922,6 +2858,7 @@ This mode gives variables names unique colors.
   (use-package prog-mode
     :config
     (when (display-graphic-p)
+      ;; (global-prettify-symbols-mode 1)
       (setq
        prettify-symbols-unprettify-at-point t
        prettify-symbols-alist
@@ -2941,10 +2878,7 @@ This mode gives variables names unique colors.
          ;; ("#{" . (?\s (Br . Bl) ?))
          ;; ("ERROR" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
          ;; ("DEBUG" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
-         ))
-      ;; (global-prettify-symbols-mode 1)
-    )
-  )
+         ))))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -3072,8 +3006,7 @@ This mode gives variables names unique colors.
     :init
     (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
     (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-    (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-  )
+    (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
 
   (use-package rst-mode
     :defer t
@@ -3103,9 +3036,7 @@ This mode gives variables names unique colors.
      "E" 'rst-backward-section
      "N" 'rst-forward-section
      "M-<down>" 'amd/move-rst-section-down
-     "M-<up>" 'amd/move-rst-section-up
-    )
-  )
+     "M-<up>" 'amd/move-rst-section-up))
 
   ;; Web Settings
   (use-package web-mode
@@ -3125,8 +3056,7 @@ This mode gives variables names unique colors.
     (setq web-mode-engines-alist '(("liquid" . "\\.html\\'")))
     (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
-  )
+    (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode)))
 
   (use-package python
     :commands python-mode
@@ -3152,15 +3082,13 @@ This mode gives variables names unique colors.
   (use-package js2-mode
     :defer t
     :init
-    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
     ;; (add-hook 'js-mode-hook 'js2-minor-mode)
-  )
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
 
   ;; (use-package ac-js2
   ;;   :defer t
   ;;   :init
-  ;;   (add-hook 'js2-mode-hook 'ac-js2-mode)
-  ;; )
+  ;;   (add-hook 'js2-mode-hook 'ac-js2-mode))
 
   ;; Ruby Settings
   (use-package robe
@@ -3175,13 +3103,11 @@ This mode gives variables names unique colors.
     ;; super word should handle the above
     ;; (add-hook 'ruby-mode-hook 'superword-mode)
 
-    (eval-after-load 'inf-ruby
-      `(add-to-list 'inf-ruby-implementations '("bundle console")))
-
     ;; (add-to-list 'load-path "~/.emacs.d/xmpfilter")
     ;; (require 'rcodetools)
     ;; (global-set-key (kbd "C-c C-c") 'xmp)
-  )
+    (eval-after-load 'inf-ruby
+      `(add-to-list 'inf-ruby-implementations '("bundle console"))))
 
   ;; Set Evil indentation amount to python indent amount. Necessary if a value other than the default of 4.
   (add-hook 'python-mode-hook
@@ -3286,26 +3212,7 @@ This mode gives variables names unique colors.
               #b0000111111110000
               #b0000000000000000
               #b0000000000000000))
-    (global-flycheck-mode)
-
-    ;; (flycheck-define-checker arduino
-    ;;   "Arduino checker using an arduino makefile."
-    ;;   ;; source, source-inplace, source-original
-    ;;   :command ("make" "build")
-    ;;   :error-patterns
-    ;;   (;; I don't make sure about this warning... How to emit a warning?
-    ;;    (warning line-start (file-name) ":" line ":" column ": warning: " (message) line-end)
-    ;;    (error   line-start (file-name) ":" line ":" column ": " (0+ "fatal ") "error: " (message) line-end))
-    ;;   :modes (c++-mode)
-    ;;   )
-    ;; ;;;###autoload
-    ;; (defun flycheck-arduino-setup ()
-    ;;   "Setup Flycheck Arduino.
-    ;;   Add `arduino' to `flycheck-checkers'."
-    ;;   (interactive)
-    ;;   (add-to-list 'flycheck-checkers 'arduino))
-    ;; (provide 'flycheck-arduino)
-  )
+    (global-flycheck-mode))
 
   (use-package flycheck-eglot
     :disabled
@@ -3316,14 +3223,12 @@ This mode gives variables names unique colors.
   (use-package flymake-ruby
     :defer t
     :init
-    (add-hook 'ruby-mode-hook 'flymake-ruby-load)
-  )
+    (add-hook 'ruby-mode-hook 'flymake-ruby-load))
 
   (use-package flymake-haml
     :defer t
     :init
-    (add-hook 'haml-mode-hook 'flymake-haml-load)
-  )
+    (add-hook 'haml-mode-hook 'flymake-haml-load))
 
   (use-package sql
     :defer t
@@ -3380,8 +3285,7 @@ This mode gives variables names unique colors.
     (setq graphviz-dot-auto-indent-on-semi nil
           graphviz-dot-auto-indent-on-newline nil
           graphviz-dot-dot-program "dot"
-          graphviz-dot-preview-extension "svg")
-  )
+          graphviz-dot-preview-extension "svg"))
 
   (use-package jinja2-mode
     :config
@@ -3459,9 +3363,8 @@ This mode gives variables names unique colors.
                (if (string-equal amd/font-name "PragmataPro-%d") "x" " ")))
       ("c"  (lambda () (interactive) (amd/set-font amd/font-size "CozetteVector"))
        (format "[%s] CozetteVector"
-               (if (string-equal amd/font-name "CozetteVector-%d") "x" " ")))
-      )
-  )
+               (if (string-equal amd/font-name "CozetteVector-%d") "x" " "))))
+    (message "use-package: hydra :config"))
 
   (defun amd/hydra-column-hint (column-groups)
     "Generate a hydra hint string from a list of COLUMN-GROUPS."
@@ -3478,8 +3381,7 @@ This mode gives variables names unique colors.
                                                 ;; surround the key string with underscores
                                                 (if (equal nil h)
                                                     (list "^^" " ")
-                                                  (list (s-concat "_" (-first-item h) "_") (-last-item h)))
-                                                )
+                                                  (list (s-concat "_" (-first-item h) "_") (-last-item h))))
                                               column-group))
                                       column-groups))))
            ;; get the max key string width for each column
@@ -3535,8 +3437,7 @@ This mode gives variables names unique colors.
                                      (--filter (not (null it))
                                                (-map (lambda (column-head)
                                                        (-remove-last 'stringp column-head))
-                                                     column-group))
-                                     )
+                                                     column-group)))
                                    (-clone columns))))))
 
   ;; ;; For quoting with , and ,@ see:
@@ -3588,8 +3489,7 @@ This mode gives variables names unique colors.
       )))
 
   (amd/define-hydra-with-columns 'hydra-leader-menu 'blue
-   `((
-      ("d" counsel-find-file      "find-file")
+   `((("d" counsel-find-file      "find-file")
       ("g" magit-status           "git")
       ("s" hydra-set-toggles/body "set-toggles")
       ("u" undo-tree-visualize    "undo-tree")
@@ -3601,12 +3501,9 @@ This mode gives variables names unique colors.
             ;; user-emacs-directory
             "~/dot-all/"
             )  "open .emacs")
-      ("V" (find-file amd/settings-org-file) "open README.org")
+      ("V" (find-file amd/settings-org-file) "open README.org"))
 
-      )
-
-     (
-      ("fc" flycheck-list-errors    "flycheck")
+     (("fc" flycheck-list-errors    "flycheck")
       ("fn" flycheck-next-error     "flycheck next error")
       ("fp" flycheck-previous-error "flycheck prev error")
       ("bb" switch-to-buffer        "buffer switch")
@@ -3615,11 +3512,9 @@ This mode gives variables names unique colors.
       ("br" revert-buffer           "buffer revert")
       ("yb" amd/copy-buffer         "yank buffer")
       ("yxy" amd/x-yank             "xsel yank")
-      ("yxp" amd/x-paste            "xsel paste")
-      )
+      ("yxp" amd/x-paste            "xsel paste"))
 
-     (
-      ("a" hydra-align-menu/body "align")
+     (("a" hydra-align-menu/body "align")
       ("G"  counsel-git-grep       "search git grep")
       ;; ("rgg"  counsel-rg       "ripgrep")
       ("rg"  amd/counsel-rg-with-initial-directory  "ripgrep w/ dir")
@@ -3630,11 +3525,9 @@ This mode gives variables names unique colors.
       ;; ("po" pt-regexp              "search pt other")
       ("/"  counsel-grep-or-swiper "search grep/swiper")
       ("bu"  browse-url "browse-url")
-      (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra")
-      )
+      (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra"))
 
-     (
-      ("la" counsel-linux-app                "linux apps")
+     (("la" counsel-linux-app                "linux apps")
       ("lt" load-theme                       "load theme")
       ("lc" list-colors-display              "list colors")
       ("lf" list-faces-display               "list faces")
@@ -3643,11 +3536,9 @@ This mode gives variables names unique colors.
       ("hK" which-key-show-top-level         "help whichkey")
       ("hm" (describe-variable 'major-mode)  "help mode")
       ("hr" yari                             "help ruby")
-      ("bu" browse-url-generic               "browse url")
-      )
+      ("bu" browse-url-generic               "browse url"))
 
-     (
-      ("pi" projectile-invalidate-cache      "project clear")
+     (("pi" projectile-invalidate-cache      "project clear")
       ("ps" ivy-switch-project               "project switch")
       ("pe" amd/eshell-or-project-eshell     "project eshell")
       ("rf" counsel-recentf                  "counsel-recentf")
@@ -3656,11 +3547,9 @@ This mode gives variables names unique colors.
       ("rp" run-pico8                        "run pico8")
       ("rl" run-love2d                       "run love2d")
       ("rc" compile                          "run compile")
-      ("rr" recompile                        "run recompile")
-      )
+      ("rr" recompile                        "run recompile"))
 
-     (
-      ("zi" (text-scale-increase 0.5)  "zoom-in" :color pink)
+     (("zi" (text-scale-increase 0.5)  "zoom-in" :color pink)
       ("zo" (text-scale-decrease 0.5)  "zoom-out" :color pink)
       ("DS" desktop-save               "desktop-save")
       ("DC" desktop-clear              "desktop-clear")
@@ -3672,10 +3561,7 @@ This mode gives variables names unique colors.
              "xmllint --format -" (current-buffer) t)
                                        "xml format")
       ("xx"  counsel-M-x               "M-x")
-      ("q"  keyboard-quit :exit t      "close")
-      )
-     )
-   )
+      ("q"  keyboard-quit :exit t      "close"))))
 
   ;; ("y"  counsel-yank-pop            "yank hist--ory") use ctrl-y in evil insert mode
   ;; ("im" counsel-imenu "imenu")
@@ -3737,8 +3623,7 @@ This mode gives variables names unique colors.
       ("cd" org-clock-display "clock display")
       ("o" (lambda() (interactive) (find-file org-default-notes-file)) "open todos"))
 
-     (
-      ("fc" org-table-toggle-coordinate-overlays "formula coords")
+     (("fc" org-table-toggle-coordinate-overlays "formula coords")
       ("fd" org-table-toggle-formula-debugger "formula debug")
       ("fe" (lambda() (interactive)
               (let ((current-prefix-arg '(16))) ;; emulate C-u C-u
@@ -3756,8 +3641,7 @@ This mode gives variables names unique colors.
               (org-babel-tangle)
               (widen)
               ) "tangle at point")
-      ("ta" org-babel-tangle "tangle all")
-      )
+      ("ta" org-babel-tangle "tangle all"))
 
      (("P" org-set-property "property")
       ("S" org-schedule "schedule")
@@ -3766,8 +3650,7 @@ This mode gives variables names unique colors.
       ("p" org-priority "priority")
       ("ih" org-babel-insert-header-arg "insert header"))
 
-     (
-      ("a" org-agenda "agenda")
+     (("a" org-agenda "agenda")
       ("y" org-archive-subtree "archive subtree")
       ("R" org-mode-restart "restart")
       ("l" counsel-org-tag "change tag (label)")
@@ -3779,19 +3662,16 @@ This mode gives variables names unique colors.
       ("n" org-narrow-to-subtree "subtree")
       ("gl" org-match-sparse-tree "tag tree"))
 
-     (("d" pandoc-main-hydra/body "pandoc")
-      ("hy" amd/clipboard-org-buffer-to-html-xclip "org→html→yank")
-      ("hp" amd/clipboard-html-to-org-pandoc-linux "html→org→paste")
-      ("x" org-export-dispatch "export")
-      ("q"  keyboard-quit :exit t "close")
-      )
-
      ;; (("h" org-shiftmetaleft  "←" :color pink)
      ;;  ("l" org-shiftmetaright "→" :color pink)
      ;;  ("n" org-shiftmetadown  "↓" :color pink)
      ;;  ("e" org-shiftmetaup    "↑" :color pink))
 
-     ))
+     (("d" pandoc-main-hydra/body "pandoc")
+      ("hy" amd/clipboard-org-buffer-to-html-xclip "org→html→yank")
+      ("hp" amd/clipboard-html-to-org-pandoc-linux "html→org→paste")
+      ("x" org-export-dispatch "export")
+      ("q"  keyboard-quit :exit t "close"))))
 #+end_src
 
 ** Emacs-Lisp Hydra
@@ -3800,14 +3680,10 @@ This mode gives variables names unique colors.
   (amd/define-hydra-with-columns
    'hydra-elisp-menu
    'blue
-   '((("e" amd/toggle-org-edit-code-block "[org] toggle code edit")
-      )
-     (("d" eval-defun            "eval defun")
-      )
-     (("D" amd/edebug-eval-defun "eDebug defun")
-      )
-     (("q"  keyboard-quit :exit t "close"))
-     ))
+   '((("e" amd/toggle-org-edit-code-block "[org] toggle code edit"))
+     (("d" eval-defun            "eval defun"))
+     (("D" amd/edebug-eval-defun "eDebug defun"))
+     (("q"  keyboard-quit :exit t "close"))))
 #+end_src
 
 * completion frameworks
@@ -3921,10 +3797,6 @@ This mode gives variables names unique colors.
      ;; :preview-key (kbd "M-.")
      :preview-key '(:debounce 0.4 any))
 
-    ;; Optionally configure the narrowing key.
-    ;; Both < and C-+ work reasonably well.
-    (setq consult-narrow-key "<") ;; (kbd "C-+")
-
     ;; Optionally make narrowing help available in the minibuffer.
     ;; You may want to use `embark-prefix-help-command' or which-key instead.
     ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
@@ -3941,7 +3813,10 @@ This mode gives variables names unique colors.
     ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
   ;;;; 4. locate-dominating-file
     ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-    )
+
+    ;; Optionally configure the narrowing key.
+    ;; Both < and C-+ work reasonably well. ;; (kbd "C-+")
+    (setq consult-narrow-key "<"))
 #+end_src
 
 ** embark
@@ -3978,8 +3853,6 @@ This mode gives variables names unique colors.
   (use-package vertico
     :disabled
     :init
-    (vertico-mode)
-
     ;; Different scroll margin
     ;; (setq vertico-scroll-margin 0)
 
@@ -3991,7 +3864,10 @@ This mode gives variables names unique colors.
 
     ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
     ;; (setq vertico-cycle t)
-    )
+
+    ;; Must be in the :init section of use-package such that the mode gets
+    ;; enabled right away. Note that this forces loading the package.
+    (vertico-mode))
 #+end_src
 
 ** marginalia
@@ -4005,8 +3881,7 @@ This mode gives variables names unique colors.
     :init
     ;; Must be in the :init section of use-package such that the mode gets
     ;; enabled right away. Note that this forces loading the package.
-    (marginalia-mode)
-    )
+    (marginalia-mode))
 #+end_src
 
 ** ivy
@@ -4078,16 +3953,14 @@ This mode gives variables names unique colors.
      'counsel-calc-units
      '(("c"
         (lambda (arg) (calc-convert-units nil (cdr arg)))
-        "convert")))
-  )
+        "convert"))))
 
   (use-package ivy-hydra
     :config
     (define-key hydra-ivy/keymap (kbd "h") 'hydra-ivy/ivy-prev-action)
     (define-key hydra-ivy/keymap (kbd "l") 'hydra-ivy/ivy-next-action)
     (define-key hydra-ivy/keymap (kbd "n") 'hydra-ivy/ivy-next-line)
-    (define-key hydra-ivy/keymap (kbd "e") 'hydra-ivy/ivy-previous-line)
-  )
+    (define-key hydra-ivy/keymap (kbd "e") 'hydra-ivy/ivy-previous-line))
 #+end_src
 
 ** ivy-xref
@@ -4158,24 +4031,22 @@ This mode gives variables names unique colors.
           (push regex evil-ex-search-history))
         (evil-push-search-history regex (eq direction 'forward))
         ;; set the highlight
-        (evil-ex-search-activate-highlight evil-ex-search-pattern))
-    )
+        (evil-ex-search-activate-highlight evil-ex-search-pattern)))
 
+    ;; TODO: update swiper history after evil-ex-search
     (advice-add 'swiper                 :after #'amd/update-evil-search)
     (advice-add 'counsel-git-grep       :after #'amd/update-evil-search)
     (advice-add 'counsel-grep           :after #'amd/update-evil-search)
-    (advice-add 'counsel-grep-or-swiper :after #'amd/update-evil-search)
-    ;; TODO: update swiper history after evil-ex-search
-  )
+    (advice-add 'counsel-grep-or-swiper :after #'amd/update-evil-search))
 #+end_src
 
 ** counsel
 
 #+begin_src emacs-lisp
   (use-package amx
+    ;; used by counsel
     :config
-    (amx-mode)
-  ) ;; used by counsel
+    (amx-mode))
 
   (use-package counsel
     :after amx
@@ -4195,8 +4066,7 @@ This mode gives variables names unique colors.
 
     (defun amd/counsel-rg-with-initial-directory (initial-directory extra-args)
       (interactive "DInitial Directory: \nsExtra Args: ")
-      (counsel-rg nil initial-directory extra-args))
-  )
+      (counsel-rg nil initial-directory extra-args)))
 #+end_src
 
 ** ivy-posframe
@@ -4228,8 +4098,7 @@ This mode gives variables names unique colors.
        ;; (width      . 80)
        ;; (left-fringe . 17)
        ;; (right-fringe . 17)
-       )
-     )
+       ))
     :config
     (ivy-posframe-mode 1))
 #+end_src
@@ -4555,11 +4424,9 @@ This mode gives variables names unique colors.
         (shell-command-on-region
          1 (point-max)
          "xclip -selection clipboard -i -t text/html &> /dev/null")
-        (delete-window)
-        )
-        (recenter)
-        (evil-normal-state)
-      )
+        (delete-window))
+      (recenter)
+      (evil-normal-state))
 
 
     (defun amd/clipboard-html-to-org-pandoc-mac ()
@@ -4583,12 +4450,10 @@ This mode gives variables names unique colors.
          (let ((hex-encoded-string
                 (cl-loop for line in (string-to-list (buffer-string))
                          concat (format "%02X" line))))
-           (message (shell-command-to-string (concat "osascript -e \"set the clipboard to «data HTML" hex-encoded-string "»\"")))
-           )
-         )
-        (delete-window)
-        )
-      )
+           (message
+            (shell-command-to-string
+             (concat "osascript -e \"set the clipboard to «data HTML" hex-encoded-string "»\"")))))
+        (delete-window)))
 
     (defun org-agenda-cts ()
       (let ((args (get-text-property
@@ -4645,15 +4510,12 @@ This mode gives variables names unique colors.
 
     (defun amd/org-insert-code-block ()
       (interactive)
-      ;; For org version >= 9.2
-      (org-insert-structure-template "src")
       ;; For org version < 9.2
       ;; (org-complete-expand-structure-template
       ;;  (point)
       ;;  (--first (equal (car it) "s") org-structure-template-alist))
-    )
-
-  )
+      ;; For org version >= 9.2
+      (org-insert-structure-template "src")))
 #+end_src
 
 *** Easy Templates
@@ -4668,8 +4530,7 @@ Supported Types: [[info:org#Easy%20templates][info:org#Easy templates]] ([[http:
   (use-package ox-html
     :after org
     :custom
-    (org-html-html5-fancy t)
-  )
+    (org-html-html5-fancy t))
 
   (use-package ox
     :after org
@@ -4697,8 +4558,7 @@ Supported Types: [[info:org#Easy%20templates][info:org#Easy templates]] ([[http:
     (add-to-list 'org-export-filter-src-block-functions 'amd/org-export-html-wrap-src-blocks-in-tables))
 
   (use-package ox-gfm
-    :after ox
-  )
+    :after ox)
 #+end_src
 
 ** org-capture
@@ -4762,8 +4622,7 @@ Supported Types: [[info:org#Easy%20templates][info:org#Easy templates]] ([[http:
 
 #+begin_src emacs-lisp
   (use-package org-protocol
-    :after org
-  )
+    :after org)
 #+end_src
 
 *** Chrome bookmarks
@@ -4911,8 +4770,7 @@ cvim sends a json payload to the edit server instead of the raw text.
       (let ((parsed-json (json-read)))
         (erase-buffer)
         (insert (alist-get 'data parsed-json))))
-    (add-hook 'edit-server-edit-mode-hook #'amd/parse-json)
-  )
+    (add-hook 'edit-server-edit-mode-hook #'amd/parse-json))
 #+end_src
 
 * view large files
@@ -4985,8 +4843,7 @@ With the above this isn't necessary.
                 (tramp-file-name-host vec)
                 (tramp-file-name-localname vec)))
            (concat "/sudo:root@localhost:" (buffer-file-name))))
-        (goto-char position)))
-  )
+        (goto-char position))))
 #+end_src
 
 * screencast
