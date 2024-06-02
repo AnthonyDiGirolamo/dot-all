@@ -6,6 +6,7 @@
 - [[#top-level-settings][top level settings]]
 - [[#libraries][libraries]]
 - [[#appearance][appearance]]
+  - [[#dashboard][dashboard]]
   - [[#themes][themes]]
   - [[#leuven-light][leuven light]]
   - [[#moe-dark][moe dark]]
@@ -101,9 +102,12 @@
 
   (use-package emacs
     :init
-    ;; Initial buffer to open
-    (setq initial-buffer-choice nil ;; Always Open *scratch* buffer by default if true
-          ;; initial-major-mode 'fundamental-mode
+    ;; Startup buffer
+    (setq initial-buffer-choice nil
+          ;; nil      = emacs startup screen
+          ;; t        = Open *scratch* buffer
+          ;; function = call and display returned buffer
+          ;; string   = open file or directory
           inhibit-startup-message t
           inhibit-startup-screen t)
 
@@ -321,6 +325,75 @@
 #+end_src
 
 * appearance
+
+** dashboard
+
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :diminish dashboard-mode
+    :demand
+    :custom-face
+    (dashboard-heading ((t (:inherit (font-lock-string-face bold)))))
+    (dashboard-items-face ((t (:weight normal))))
+    (dashboard-no-items-face ((t (:weight normal))))
+    :custom
+    (dashboard-projects-backend 'projectile)
+    (dashboard-startup-banner 'ascii)
+    (dashboard-banner-ascii " ⊂_
+     ＼＼  Λ＿Λ
+       ＼(  ˇωˇ)
+        /   
+       /   ⋀ ＼
+      /   /  ＼ ＼
+      │  ╱     _⮌
+     /  / per
+    (  ( my
+    |  |、＼last
+    | ⎠  ＼ ＼ email
+    | |    ) /
+   _)    L⎠
+  ")
+    :init
+    (setq dashboard-items
+          '((projects . 5)
+            (recents . 5)
+            (bookmarks . 5)
+            (agenda . 5)))
+    :general
+    (:states '(emacs) :keymaps 'dashboard-mode-map
+             "n" 'dashboard-next-line
+             "e" 'dashboard-previous-line
+             "N" 'dashboard-next-section
+             "E" 'dashboard-previous-section)
+    ;; :pretty-hydra
+    ;; ((:title (pretty-hydra-title "Dashboard" 'mdicon "nf-md-view_dashboard")
+    ;;          :color pink :quit-key ("q" "C-g"))
+    ;;  ("Navigator"
+    ;;   (("U" update-config-and-packages "update" :exit t)
+    ;;    ("H" browse-homepage "homepage" :exit t)
+    ;;    ("R" restore-session "recover session" :exit t)
+    ;;    ("S" find-custom-file "settings" :exit t))
+    ;;   "Section"
+    ;;   (("}" dashboard-next-section "next")
+    ;;    ("{" dashboard-previous-section "previous")
+    ;;    ("r" dashboard-goto-recent-files "recent files")
+    ;;    ("m" dashboard-goto-bookmarks "bookmarks")
+    ;;    ("p" dashboard-goto-projects "projects"))
+    ;;   "Item"
+    ;;   (("RET" widget-button-press "open" :exit t)
+    ;;    ("<tab>" widget-forward "next")
+    ;;    ("C-i" widget-forward "next")
+    ;;    ("<backtab>" widget-backward "previous")
+    ;;    ("C-n" next-line "next line")
+    ;;    ("C-p" previous-line "previous  line"))
+    ;;   "Misc"
+    ;;   (("<f2>" open-dashboard "open" :exit t)
+    ;;    ("g" dashboard-refresh-buffer "refresh" :exit t)
+    ;;    ("Q" quit-dashboard "quit" :exit t))))
+    :config
+    (add-hook 'dashboard-mode-hook 'page-break-lines-mode)
+    (dashboard-setup-startup-hook))
+#+end_src
 
 ** themes
 
@@ -594,9 +667,17 @@
       (interactive)
       (amd/disable-loaded-themes)
       (load-theme 'catppuccin t)
-      (load-theme 'airline-catppuccin_frappe t)
-    )
+      (custom-theme-set-faces
+       'catppuccin
+       '(ace-jump-face-foreground ((t (:background "color-18" :foreground "#ff8700" :weight bold))) t)
+       '(avy-lead-face ((t (:foreground "#ffaf00"))) t)
+       '(avy-lead-face-0 ((t (:foreground "#5fd7ff"))) t)
+       '(avy-lead-face-1 ((t (:foreground "#66ffaa"))) t)
+       '(avy-lead-face-2 ((t (:foreground "#ff6666"))) t))
+      (load-theme 'airline-catppuccin_frappe t))
   )
+
+
 #+end_src
 
 ** doom-themes
@@ -1370,9 +1451,11 @@ This mode gives variables names unique colors.
     ;; (advice-add 'evil-jump-forward  :after #'recenter)
     ;; (advice-add 'evil-jump-backward :after #'recenter)
 
+    (add-to-list 'evil-emacs-state-modes 'dashboard-mode)
     (add-to-list 'evil-emacs-state-modes 'dired-mode)
-    (add-to-list 'evil-emacs-state-modes 'makey-key-mode)
     (add-to-list 'evil-emacs-state-modes 'magit-popup-mode)
+    (add-to-list 'evil-emacs-state-modes 'makey-key-mode)
+
     (add-to-list 'evil-normal-state-modes 'git-commit-mode)
 
     (add-to-list 'evil-motion-state-modes 'package-menu-mode)
@@ -2268,11 +2351,11 @@ This mode gives variables names unique colors.
     :demand
     :diminish
     :init
-    ;; (setq which-key-idle-delay 0.5)
-    ;; (setq which-key-echo-keystrokes 0)
     ;; (setq echo-keystrokes 0)
     (setq which-key-popup-type 'side-window
           which-key-side-window-location 'bottom
+          which-key-idle-delay 0.5
+          which-key-echo-keystrokes 0.2
           which-key-show-prefix 'echo)
     :config
     (which-key-mode 1))
