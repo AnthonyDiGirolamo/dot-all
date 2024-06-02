@@ -5,15 +5,16 @@
 @namespace "make_targets"
 
 function help() {
-    make::print_help("t, tangle",     "tangle all org files")
-    make::print_help("build",         "run test & lint")
-    make::print_help("test",          "awk unit tests")
-    make::print_help("lint",          "awk linting")
-    make::print_help("install_emacs28", "download, compile and install emacs28")
-    make::print_help("install_emacs29", "download, compile and install emacs29")
+    make::print_help("t,                  tangle",   "tangle all org files")
+    make::print_help("build",             "run test & lint")
+    make::print_help("test",              "awk unit tests")
+    make::print_help("lint",              "awk linting")
+    make::print_help("install_emacs28",   "download, compile and install emacs28")
+    make::print_help("install_emacs29",   "download, compile and install emacs29")
     make::print_help("install_emacs_git", "download, compile and install emacs from git")
-    make::print_help("install_fish",  "download, compile and install fish-shell")
-    make::print_help("install_lua54", "download, compile and install lua 5.4")
+    make::print_help("install_fish",      "download, compile and install fish")
+    make::print_help("install_fish_git",  "download, compile and install fish from git")
+    make::print_help("install_lua54",     "download, compile and install lua 5.4")
 }
 
 function build() {
@@ -126,6 +127,17 @@ function install_fish() {
         "https://github.com/fish-shell/fish-shell/releases/download/3.7.0/fish-3.7.0.tar.xz",
         "22c3fab479b185faf620a3b3f43443c3")
     make::compile(make::extract_tar(tarfile),
+        "cmake -S . -B build " \
+        "-DCMAKE_INSTALL_PREFIX=~/apps/fish\n" \
+        "cmake --build build\n" \
+        "cmake --install build\n")
+}
+
+function install_fish_git() {
+    clonedir = make::git_clone("fish-shell",
+        "https://github.com/fish-shell/fish-shell",
+        "master")  # Branch
+    make::compile(clonedir,
         "cmake -S . -B build " \
         "-DCMAKE_INSTALL_PREFIX=~/apps/fish\n" \
         "cmake --build build\n" \
