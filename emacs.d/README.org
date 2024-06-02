@@ -6,6 +6,7 @@
 - [[#top-level-settings][top level settings]]
 - [[#libraries][libraries]]
 - [[#appearance][appearance]]
+  - [[#page-break-lines][page-break-lines]]
   - [[#dashboard][dashboard]]
   - [[#themes][themes]]
   - [[#leuven-light][leuven light]]
@@ -326,6 +327,13 @@
 
 * appearance
 
+** page-break-lines
+
+#+begin_src emacs-lisp
+  (use-package page-break-lines
+    :diminish)
+#+end_src
+
 ** dashboard
 
 #+begin_src emacs-lisp
@@ -337,7 +345,6 @@
     (dashboard-items-face ((t (:weight normal))))
     (dashboard-no-items-face ((t (:weight normal))))
     :custom
-    (dashboard-projects-backend 'projectile)
     (dashboard-startup-banner 'ascii)
     (dashboard-banner-ascii " ⊂_
      ＼＼  Λ＿Λ
@@ -353,6 +360,10 @@
     | |    ) /
    _)    L⎠
   ")
+    (dashboard-page-separator "\n\f\n")
+    (dashboard-projects-backend 'projectile)
+    (dashboard-center-content t)
+    (dashboard-vertically-center-content t)
     :init
     (setq dashboard-items
           '((projects . 5)
@@ -365,31 +376,6 @@
              "e" 'dashboard-previous-line
              "N" 'dashboard-next-section
              "E" 'dashboard-previous-section)
-    ;; :pretty-hydra
-    ;; ((:title (pretty-hydra-title "Dashboard" 'mdicon "nf-md-view_dashboard")
-    ;;          :color pink :quit-key ("q" "C-g"))
-    ;;  ("Navigator"
-    ;;   (("U" update-config-and-packages "update" :exit t)
-    ;;    ("H" browse-homepage "homepage" :exit t)
-    ;;    ("R" restore-session "recover session" :exit t)
-    ;;    ("S" find-custom-file "settings" :exit t))
-    ;;   "Section"
-    ;;   (("}" dashboard-next-section "next")
-    ;;    ("{" dashboard-previous-section "previous")
-    ;;    ("r" dashboard-goto-recent-files "recent files")
-    ;;    ("m" dashboard-goto-bookmarks "bookmarks")
-    ;;    ("p" dashboard-goto-projects "projects"))
-    ;;   "Item"
-    ;;   (("RET" widget-button-press "open" :exit t)
-    ;;    ("<tab>" widget-forward "next")
-    ;;    ("C-i" widget-forward "next")
-    ;;    ("<backtab>" widget-backward "previous")
-    ;;    ("C-n" next-line "next line")
-    ;;    ("C-p" previous-line "previous  line"))
-    ;;   "Misc"
-    ;;   (("<f2>" open-dashboard "open" :exit t)
-    ;;    ("g" dashboard-refresh-buffer "refresh" :exit t)
-    ;;    ("Q" quit-dashboard "quit" :exit t))))
     :config
     (add-hook 'dashboard-mode-hook 'page-break-lines-mode)
     (dashboard-setup-startup-hook))
