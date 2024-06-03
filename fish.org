@@ -220,6 +220,13 @@
 * ~/.config/fish/conf.d/fish_user_key_bindings.fish
 
 #+begin_src fish :tangle "~/.config/fish/conf.d/fish_user_key_bindings.fish"
+  function ctrl_a_with_accept
+    if commandline --paging-mode
+      commandline -f execute
+    end
+    commandline -f beginning-of-line
+  end
+
   # This function is auto-run by fish, use it to override keybindings
   function fish_user_key_bindings
     # Default Bindings
@@ -251,6 +258,8 @@
 
     # Interactive history search Ctrl-r insert mode (normally / in normal mode).
     bind -M insert \cr history-pager
+    # ctrl-a moves to the beginning of the line. Will conditionally accept the current selection first if in pager-mode.
+    bind -M insert \ca ctrl_a_with_accept
   end
 #+end_src
 
