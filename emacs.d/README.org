@@ -39,7 +39,7 @@
 - [[#vterm][vterm]]
 - [[#novel][nov.el]]
 - [[#company-auto-completion][company auto-completion]]
-- [[#key-discovery][key discovery]]
+- [[#which-key][which-key]]
 - [[#snippets-yasnippet-yankpad][snippets (yasnippet yankpad)]]
 - [[#wgrep][wgrep]]
 - [[#magit---version-control][magit - version-control]]
@@ -122,6 +122,7 @@
     (when amd/using-pocketchip
       (setq amd/leader-key "SPC"))
 
+    ;; Echo unfinished keystrokes after 0.2 seconds.
     (setq echo-keystrokes 0.2)
 
     (setq ring-bell-function (lambda ()))
@@ -366,10 +367,11 @@
     (setq dashboard-items
           '((projects . 5)
             (recents . 5)
-            (bookmarks . 5)
-            (agenda . 5)))
+            ;; (agenda . 5)
+            (bookmarks . 5)))
     :general
     (:states '(emacs) :keymaps 'dashboard-mode-map
+             "C-p" 'counsel-git
              "n" 'dashboard-next-line
              "e" 'dashboard-previous-line
              "N" 'dashboard-next-section
@@ -2280,19 +2282,20 @@ This mode gives variables names unique colors.
   ;;   (add-to-list 'company-backends 'company-shell))
 #+end_src
 
-* key discovery
+* which-key
 
 #+begin_src emacs-lisp
   (use-package which-key
     :demand
     :diminish
-    :init
-    ;; (setq echo-keystrokes 0)
-    (setq which-key-popup-type 'side-window
-          which-key-side-window-location 'bottom
-          which-key-idle-delay 0.5
-          which-key-echo-keystrokes 0.2
-          which-key-show-prefix 'echo)
+    :custom
+    (which-key-separator " → ") ;; »
+    (which-key-ellipsis "") ;; "…"
+    (which-key-idle-delay 0.5)
+    (which-key-popup-type 'side-window)
+    (which-key-side-window-location 'bottom)
+    (which-key-echo-keystrokes 0.2)
+    (which-key-show-prefix 'echo)
     :config
     (which-key-mode 1))
 #+end_src

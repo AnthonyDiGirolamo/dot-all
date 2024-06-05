@@ -19,8 +19,7 @@
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
  '(safe-local-variable-values
-   '((lsp-clients-clangd-executable . "/usr/local/google/home/tonymd/projects.git/fuchsia/prebuilt/third_party/clang/linux-x64/bin/clangd")
-     (org-html-table-default-attributes :class "mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" :border "1" :cellspacing "0" :cellpadding "0" :rules "all" :frame "border")
+   '((org-html-table-default-attributes :class "mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" :border "1" :cellspacing "0" :cellpadding "0" :rules "all" :frame "border")
      (org-html-toplevel-hlevel . 1)
      (org-html-table-default-attributes :border "1" :cellspacing "0" :cellpadding "0" :rules "all" :frame "border")
      (org-html-table-data-tags "<td class=\"mdl-data-table__cell--non-numeric\" %s>" . "</td>")
