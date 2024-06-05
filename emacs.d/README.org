@@ -345,20 +345,21 @@
     (dashboard-no-items-face ((t (:weight normal))))
     :custom
     (dashboard-startup-banner 'ascii)
-    (dashboard-banner-ascii " ⊂_
-     ＼＼  Λ＿Λ
-       ＼(  ˇωˇ)
-        /   
-       /   ⋀ ＼
-      /   /  ＼ ＼
-      │  ╱     _⮌
-     /  / per
-    (  ( my
-    |  |、＼last
-    | ⎠  ＼ ＼ email
-    | |    ) /
-   _)    L⎠
-  ")
+    (dashboard-banner-ascii "
+   ╭──╮
+    ¯╲ ╲
+      ╲ ╲ Λ──Λ
+       ╲ ( ˇωˇ)
+       ╱   ──.
+      ╱    ⋀ ╲
+     ╱    ╱  ╲ ╲_
+     │   ╱    ╰──╯
+    ╱  ╱ ╲ per
+   (  ( ╲ ╲ my
+   │  │  ╲ ╲ last
+   │  )   ╲ ╲  email
+   | |     ) /
+  ╭╯_│     ╰/")
     (dashboard-page-separator "\n\f\n")
     (dashboard-projects-backend 'projectile)
     (dashboard-center-content t)
