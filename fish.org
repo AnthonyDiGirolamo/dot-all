@@ -18,7 +18,9 @@
 - [[#bash-releated][bash releated]]
   - [[#configfishfunctionssource-bash-aliasesfish][~/.config/fish/functions/source-bash-aliases.fish]]
 - [[#completions][completions]]
+  - [[#configfishfunctions__amd_complete_psfish][~/.config/fish/functions/__amd_complete_ps.fish]]
   - [[#configfishcompletionsdhcpcd-restartfish][~/.config/fish/completions/dhcpcd-restart.fish]]
+  - [[#configfishcompletionsdisownfish][~/.config/fish/completions/disown.fish]]
 
 * ~/.config/fish/config.fish
 
@@ -448,8 +450,28 @@ The =fish_mode_prompt= formats the vi mode part of the prompt.
 
 * completions
 
+** ~/.config/fish/functions/__amd_complete_ps.fish
+
+#+begin_src fish :tangle "~/.config/fish/functions/__amd_complete_ps.fish"
+  function __amd_complete_ps
+      # Pipe ps output to string and:
+      # - Remove fish from the list
+      # - Capture the pid, command and tty, replace with 'pid\tcommand [tty]'
+      ps -o pid=,command=,tty= | \
+          string match -r -v '^\s*'$fish_pid'\s' | \
+          string replace -r ' *([0-9]+) +([^ ].*[^ ]|[^ ]) +([^ ]+) *$' '$1\t$2 [$3]' | \
+          string replace -r ' *\[\?*\] *$' ''
+  end
+#+end_src
+
 ** ~/.config/fish/completions/dhcpcd-restart.fish
 
 #+begin_src fish :tangle "~/.config/fish/completions/dhcpcd-restart.fish"
-  complete --command dhcpcd-restart --no-files --arguments "(dhcpcd-restart)"
+  complete --command dhcpcd-restart --exclusive --arguments "(dhcpcd-restart)"
+#+end_src
+
+** ~/.config/fish/completions/disown.fish
+
+#+begin_src fish :tangle "~/.config/fish/completions/disown.fish"
+  complete --command disown -xa "(__amd_complete_ps)"
 #+end_src
