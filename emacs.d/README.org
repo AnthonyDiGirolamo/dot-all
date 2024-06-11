@@ -218,9 +218,10 @@
                          ((eq system-type 'gnu/linux) 18)
                          ((eq system-type 'darwin) 22)
                          (t 18))
-          amd/font-name "PragmataPro-%d")
+          amd/font-name "PragmataPro Mono"
+          amd/font-antialias t)
 
-    (defun amd/set-font (&optional fsize fname)
+    (defun amd/set-font (&optional fsize fname antialias)
       "Set preferred GUI font."
       (interactive)
       (when (display-graphic-p)
@@ -228,13 +229,17 @@
         (when fsize
           (setq amd/font-size fsize))
         (when fname
-          (setq amd/font-name
-                (if (string-suffix-p "-%d" fname)
-                    fname
-                  (concat fname "-%d"))))
+          (setq amd/font-name fname))
+        (when antialias
+          (setq amd/font-antialias
+                (if (eq 'yes antialias)
+                    t
+                  nil)))
 
-        (set-frame-font (format amd/font-name amd/font-size))
-        (add-to-list 'default-frame-alist `(font . ,(format amd/font-name amd/font-size)))
+        ;; (format amd/font-name amd/font-size)
+        (let ((amd/font-spec (font-spec :name amd/font-name :size amd/font-size :antialias amd/font-antialias)))
+          (set-frame-font amd/font-spec)
+          (add-to-list 'default-frame-alist `(font . ,amd/font-spec)))
 
         ;; Determine a good powerline height
         (setq amd/font-dpi 96) ;; default dpi assumption
@@ -293,18 +298,19 @@
 
     ;; Examples of setting a font with antialias on or off:
     ;; set-frame-font :size <int>pixel size <float>point size
-    ;; (set-frame-font (font-spec :name "PragmataPro" :antialias t :size 17.0))
+
+    ;; (set-frame-font (font-spec :name "PragmataPro Mono" :antialias nil :size amd/font-size :weight 'regular))
     ;; (set-frame-font (font-spec :name "Iosevka Term SS17 Light" :antialias t :size 16.0))
-    ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 18.0))
+    ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 26.0))
 
     (when (display-graphic-p)
       (cond
-       ((member "PragmataPro" (font-family-list))
-        (amd/set-font nil "PragmataPro"))
+       ((member "PragmataPro Mono" (font-family-list))
+        (amd/set-font amd/font-size "PragmataPro Mono"))
        ((member "Iosevka SS08" (font-family-list))
-        (amd/set-font nil "Iosevka SS08 Light"))
+        (amd/set-font amd/font-size "Iosevka SS08 Light"))
        ((member "Iosevka SS17" (font-family-list))
-        (amd/set-font nil "Iosevka SS17 Light"))
+        (amd/set-font amd/font-size "Iosevka SS17 Light"))
        (t
         (amd/set-font)))))
 #+end_src
@@ -3350,24 +3356,35 @@ This mode gives variables names unique colors.
     ;;           ))
     ;;   )
     :config
-    (defhydra hydra-font (:color red :columns 3)
-      ("h"  (lambda () (interactive) (amd/set-font (- amd/font-size 1.0) amd/font-name))
+    (defhydra hydra-font (:color red :columns 4)
+      ("h"  (lambda () (interactive)
+              (amd/set-font (- amd/font-size 1.0) amd/font-name))
        (format "smaller %.2f" amd/font-size))
-      ("l"  (lambda () (interactive) (amd/set-font (+ amd/font-size 1.0) amd/font-name))
+      ("l"  (lambda () (interactive)
+              (amd/set-font (+ amd/font-size 1.0) amd/font-name))
        (format "larger" amd/font-size))
+      ("j"  (lambda () (interactive)
+              (let ((new-value (if amd/font-antialias 'no 'yes)))
+                (message "%s" new-value)
+                (amd/set-font amd/font-size amd/font-name new-value)))
+       (format "[%s] antialias" (if amd/font-antialias "x" " ")))
       ("RET" keyboard-escape-quit "quit" :exit t)
-      ("a"  (lambda () (interactive) (amd/set-font amd/font-size "Iosevka SS08 Light"))
+      ("a"  (lambda () (interactive)
+              (amd/set-font amd/font-size "Iosevka SS08 Light"))
        (format "[%s] Iosevka SS08"
-               (if (string-equal amd/font-name "Iosevka SS08 Light-%d") "x" " ")))
-      ("r"  (lambda () (interactive) (amd/set-font amd/font-size "Iosevka Term SS17 Light"))
+               (if (string-equal amd/font-name "Iosevka SS08 Light") "x" " ")))
+      ("r"  (lambda () (interactive)
+              (amd/set-font amd/font-size "Iosevka Term SS17 Light"))
        (format "[%s] Iosevka Term SS17"
-               (if (string-equal amd/font-name "Iosevka Term SS17 Light-%d") "x" " ")))
-      ("s"  (lambda () (interactive) (amd/set-font amd/font-size "PragmataPro"))
-       (format "[%s] PragmataPro"
-               (if (string-equal amd/font-name "PragmataPro-%d") "x" " ")))
-      ("c"  (lambda () (interactive) (amd/set-font amd/font-size "CozetteVector"))
+               (if (string-equal amd/font-name "Iosevka Term SS17 Light") "x" " ")))
+      ("s"  (lambda () (interactive)
+              (amd/set-font amd/font-size "PragmataPro Mono"))
+       (format "[%s] PragmataPro Mono"
+               (if (string-equal amd/font-name "PragmataPro Mono") "x" " ")))
+      ("c"  (lambda () (interactive)
+              (amd/set-font amd/font-size "CozetteVector"))
        (format "[%s] CozetteVector"
-               (if (string-equal amd/font-name "CozetteVector-%d") "x" " "))))
+               (if (string-equal amd/font-name "CozetteVector") "x" " "))))
     (message "use-package: hydra :config"))
 
   (defun amd/hydra-column-hint (column-groups)
