@@ -215,10 +215,10 @@
 
     ;; Default font size and name
     (setq amd/font-size (cond
-                         ((eq system-type 'gnu/linux) 18)
-                         ((eq system-type 'darwin) 22)
-                         (t 18))
-          amd/font-name "PragmataPro Mono"
+                         ((eq system-type 'gnu/linux) 18.0)
+                         ((eq system-type 'darwin) 22.0)
+                         (t 18.0))
+          amd/font-name "PragmataPro"
           amd/font-antialias t)
 
     (defun amd/set-font (&optional fsize fname antialias)
@@ -237,9 +237,11 @@
                   nil)))
 
         ;; (format amd/font-name amd/font-size)
-        (let ((amd/font-spec (font-spec :name amd/font-name :size amd/font-size :antialias amd/font-antialias)))
-          (set-frame-font amd/font-spec)
-          (add-to-list 'default-frame-alist `(font . ,amd/font-spec)))
+        (let ((fspec (font-spec :family amd/font-name :size (float amd/font-size) :antialias amd/font-antialias)))
+          (set-frame-font fspec)
+          ;; This doesn't work when launching emacs for some reason.
+          ;; (add-to-list 'default-frame-alist `(font . ,fspec))
+          )
 
         ;; Determine a good powerline height
         (setq amd/font-dpi 96) ;; default dpi assumption
@@ -299,14 +301,14 @@
     ;; Examples of setting a font with antialias on or off:
     ;; set-frame-font :size <int>pixel size <float>point size
 
-    ;; (set-frame-font (font-spec :name "PragmataPro Mono" :antialias nil :size amd/font-size :weight 'regular))
+    ;; (set-frame-font (font-spec :name "PragmataPro" :antialias nil :size amd/font-size :weight 'regular))
     ;; (set-frame-font (font-spec :name "Iosevka Term SS17 Light" :antialias t :size 16.0))
     ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 26.0))
 
     (when (display-graphic-p)
       (cond
-       ((member "PragmataPro Mono" (font-family-list))
-        (amd/set-font amd/font-size "PragmataPro Mono"))
+       ((member "PragmataPro" (font-family-list))
+        (amd/set-font amd/font-size "PragmataPro"))
        ((member "Iosevka SS08" (font-family-list))
         (amd/set-font amd/font-size "Iosevka SS08 Light"))
        ((member "Iosevka SS17" (font-family-list))
@@ -3378,9 +3380,9 @@ This mode gives variables names unique colors.
        (format "[%s] Iosevka Term SS17"
                (if (string-equal amd/font-name "Iosevka Term SS17 Light") "x" " ")))
       ("s"  (lambda () (interactive)
-              (amd/set-font amd/font-size "PragmataPro Mono"))
-       (format "[%s] PragmataPro Mono"
-               (if (string-equal amd/font-name "PragmataPro Mono") "x" " ")))
+              (amd/set-font amd/font-size "PragmataPro"))
+       (format "[%s] PragmataPro"
+               (if (string-equal amd/font-name "PragmataPro") "x" " ")))
       ("c"  (lambda () (interactive)
               (amd/set-font amd/font-size "CozetteVector"))
        (format "[%s] CozetteVector"
