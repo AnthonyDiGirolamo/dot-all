@@ -100,14 +100,15 @@ function install_emacs29() {
     # "--with-tree-sitter "
 
     tarfile = make::download("emacs",
-        "https://ftpmirror.gnu.org/emacs/emacs-29.3.tar.xz",
-        "1e402f3f632b68a56cb9fab4dff8e313")
+        "https://ftpmirror.gnu.org/emacs/emacs-29.4.tar.xz",
+        "b9cc42f7d8066152535cf267418b8ced")
+
     make::compile(make::extract_tar(tarfile),
         "./configure --prefix=$HOME/apps/emacs29 " \
         "--with-modules " \
         "--with-cairo " \
         "--with-native-compilation " \
-        "--with-x-toolkit=gtk3 " \
+        "--with-pgtk " \
         "--without-xaw3d\n" \
         "make -j 8\n" \
         "make install\n")
