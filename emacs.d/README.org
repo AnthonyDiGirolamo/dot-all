@@ -4152,15 +4152,11 @@ This mode gives variables names unique colors.
   (use-package zone
     :config
     ;; (zone-when-idle 180)
-    (defun zone-choose (pgm)
+    (defun zone-choose ()
       "Choose a PGM to run for `zone'."
-      (interactive
-       (list
-        (completing-read
-         "Program: "
-         (mapcar 'symbol-name zone-programs))))
-      (let ((zone-programs (list (intern pgm))))
-        (zone))))
+      (interactive)
+      (let ((current-prefix-arg 4)) ;; emulate C-u
+        (call-interactively 'zone)))
 
   (use-package retris
     :commands retris
