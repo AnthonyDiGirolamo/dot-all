@@ -9,6 +9,7 @@
 * ~/.config/alacritty/alacritty.toml
 
 #+begin_src yaml :tangle "~/.config/alacritty/alacritty.toml"
+  [general]
   live_config_reload = true
 
   [bell]
@@ -60,7 +61,7 @@
   TERM = "xterm-256color"
 
   [font]
-  size = 18.0
+  size = 16.0
 
   [font.bold]
   # family = "Iosevka SS08"
@@ -361,9 +362,8 @@
 
 * ~/.config/alacritty/alacritty.yaml
 
-#+begin_src yaml :tangle "~/.config/alacritty/alacritty.yml"
+#+begin_src yaml :tangle "no"
   # Configuration for Alacritty, the GPU enhanced terminal emulator
-
 
   # Any items in the `env` entry below will be added as
   # environment variables. Some entries may override variables
