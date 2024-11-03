@@ -679,6 +679,8 @@
       (interactive)
       (amd/disable-loaded-themes)
       (load-theme 'doom-snazzy t)
+      (when (featurep 'airline-themes)
+        (load-theme 'airline-base16_snazzy t))
       (custom-theme-set-faces
        'doom-snazzy
        '(markdown-code-face ((t (:extend t :background "#242631"))) t t)
@@ -848,11 +850,11 @@
   ;; (amd/leuven-light-theme)
   ;; (amd/moe-dark-theme)
 
-  ;; (amd/doom-snazzy-theme)
+  (amd/doom-snazzy-theme)
   ;; (amd/doom-one-theme)
   ;; (load-theme 'airline-doom-one t)
 
-  (amd/catppuccin-theme)
+  ;; (amd/catppuccin-theme)
 
   ;; (amd/modus-light-theme)
   ;; (amd/modus-dark-theme)
@@ -4156,7 +4158,7 @@ This mode gives variables names unique colors.
       "Choose a PGM to run for `zone'."
       (interactive)
       (let ((current-prefix-arg 4)) ;; emulate C-u
-        (call-interactively 'zone)))
+        (call-interactively 'zone))))
 
   (use-package retris
     :commands retris

@@ -186,6 +186,10 @@
     tllll -L 4 $argv
   end
 
+  function ffd --description "find in ./ with wildcard"
+    find ./ -iname "*$argv[1]*" $argv[2..]
+  end
+
   # fish specific aliases
   alias o=prevd
   alias pd=prevd

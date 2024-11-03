@@ -1,7 +1,7 @@
 #!/bin/bash
 setinputprefs
 
-killall xcape
+# killall xcape
 setxkbmap -model pc105 -layout us -variant colemak -option caps:ctrl_modifier
-killall xcape
-xcape -e Caps_Lock=Escape
+# killall xcape
+# xcape -e Caps_Lock=Escape
