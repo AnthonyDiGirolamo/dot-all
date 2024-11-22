@@ -2433,15 +2433,13 @@ This mode gives variables names unique colors.
      "C-;" nil)
     (:states '(insert)
      :keymaps '(flyspell-mode-map)
+     "C-x C-s" 'flyspell-check-previous-highlighted-word
      "C-M-;" 'flyspell-correct-previous-word-generic
      "C-;" 'flyspell-auto-correct-previous-word))
 
   (use-package flyspell-correct-ivy
     :after flyspell
-    :general
-    (:states '(insert)
-     "C-x C-s" 'flyspell-correct-previous-word-generic))
-
+  )
   ;; (define-key ctl-x-map "\C-s"
   ;;   #'endless/ispell-word-then-abbrev)
 

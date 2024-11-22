@@ -118,7 +118,7 @@
 
 * Colors
 
-Some sample colors are here. Only should be added to =~/.tmux.conf= at a time.
+Some sample colors are here. Only one should be added to =~/.tmux.conf= at a time.
 
 ** purple
 
