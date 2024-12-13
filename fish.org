@@ -377,9 +377,17 @@ The =fish_mode_prompt= formats the vi mode part of the prompt.
 ** ~/.config/fish/functions/tarxz.fish
 
 #+begin_src fish :tangle "~/.config/fish/functions/tarxz.fish"
-  function tarxz --description "tar c DIR | xz -0 -T 0 > DIR.tar.xz"
-    set dir_name $argv[1]
-    tar c $dir_name | xz -0 -T 0 > "$dir_name.tar.xz"
+  function tarxz --description "tar c DIR | xz -0 -T 0 > DIR.tar.xz" --argument-names input_path
+    # Normalize the input path (remove trailing slashes)
+    set full_input_path (readlink -f $input_path)
+    # Output file name with spaces as underscores
+    set output_file_name (string replace --all " " "_" (basename "$full_input_path")).tar.xz
+
+    # Swich cwd so tar only saves the relative path.
+    pushd (dirname $full_input_path)
+    tar cv (basename "$full_input_path") | xz -v -0 -T 0 > $output_file_name
+    echo Archive saved: $PWD/$output_file_name
+    popd
   end
 #+end_src
 
