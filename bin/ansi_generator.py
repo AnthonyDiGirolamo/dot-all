@@ -170,14 +170,15 @@ def main() -> int:
         assert len(transparent_color) == 3
 
     with Image.open(args.image) as image:
+        rgba_image = image.convert('RGBA')
         if args.full_height_characters:
-            _draw(image,
+            _draw(rgba_image,
                   args.indentation,
                   output_file.write,
                   transparent_color=transparent_color,
                   colors_256=args.colors_256)
         else:
-            _draw_half_height(image,
+            _draw_half_height(rgba_image,
                               args.indentation,
                               output_file.write,
                               transparent_color=transparent_color,
