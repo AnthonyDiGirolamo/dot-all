@@ -65,6 +65,7 @@
   - [[#major-mode-leader-hydra-function][Major Mode Leader Hydra Function]]
   - [[#org-hydra][Org Hydra]]
   - [[#emacs-lisp-hydra][Emacs-Lisp Hydra]]
+  - [[#rust-mode-hydra][Rust-mode Hydra]]
 - [[#completion-frameworks][completion frameworks]]
   - [[#orderless][orderless]]
   - [[#consult][consult]]
@@ -2920,6 +2921,7 @@ This mode gives variables names unique colors.
     :init
     (setq lsp-keymap-prefix "s-l")
     (setq lsp-prefer-flymake nil)
+
     ;; example .dir-locals.el file for clangd:
     ;; ((nil
     ;;   (lsp-clients-clangd-args "--background-index=true" "--compile-commands-dir=~/project-root")
@@ -2927,8 +2929,10 @@ This mode gives variables names unique colors.
 
     ;; Run my-local-variables-hook after processing .dir-locals.el
     (defun my-local-variables-hook ()
-      (cond ((derived-mode-p 'c++-mode)
-             (lsp))))
+      (cond
+       ((derived-mode-p 'c++-mode) (lsp))
+       ((derived-mode-p 'rust-mode) (lsp))
+       ))
     (add-hook 'hack-local-variables-hook #'my-local-variables-hook)
 
     ;; Standard use-package hook setup
@@ -2936,16 +2940,25 @@ This mode gives variables names unique colors.
     ;;         ;; (lsp-mode . lsp-enable-which-key-integration)
     ;;         ;; (c++-mode . lsp)
     ;;       )
+
     :config
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection
-      (lsp-tramp-connection
-       'lsp-clients--clangd-command)
-      :major-modes '(c-mode c++-mode objc-mode)
-      :priority -1
-      :remote? t
-      :server-id 'clangd-remote)))
+    ;; Likely broken with last lsp update. Error on emacs startup:
+    ;;
+    ;; Error (use-package): lsp-mode/:config: Wrong type argument: (or
+    ;; string function (and list (satisfies (lambda (l) (seq-every-p
+    ;; (lambda (el) (stringp el)) l))))), lsp-clients--clangd-command,
+    ;; command
+    ;;
+    ;; (lsp-register-client
+    ;;  (make-lsp-client
+    ;;   :new-connection
+    ;;   (lsp-tramp-connection
+    ;;    'lsp-clients--clangd-command)
+    ;;   :major-modes '(c-mode c++-mode objc-mode)
+    ;;   :priority -1
+    ;;   :remote? t
+    ;;   :server-id 'clangd-remote))
+    )
 
   (use-package lsp-ui
     :commands lsp-ui-mode
@@ -3231,6 +3244,11 @@ This mode gives variables names unique colors.
     :after (flycheck eglot)
     :config
     (global-flycheck-eglot-mode 1))
+
+  (use-package flycheck-rust
+    :defer t
+    :init
+    (add-hook 'rust-mode-hook 'flycheck-rust-setup))
 
   (use-package flymake-ruby
     :defer t
@@ -3614,6 +3632,9 @@ This mode gives variables names unique colors.
                (eq major-mode 'emacs-lisp-mode))
            (hydra-elisp-menu/body))
 
+          ((eq major-mode 'rust-mode)
+           (hydra-rust-menu/body))
+
           ;; if no major-mode leader hydra defined, and an org-src buffer is active, use the org hydra
           ((member 'org-src-mode minor-mode-list)
            (hydra-org-menu/body))
@@ -3709,6 +3730,17 @@ This mode gives variables names unique colors.
      (("q"  keyboard-quit :exit t "close"))))
 #+end_src
 
+** Rust-mode Hydra
+
+#+begin_src emacs-lisp
+  (amd/define-hydra-with-columns
+   'hydra-rust-menu
+   'blue
+   '((("rt" rust-test "test"))
+     (("rr" rust-run "run"))
+     (("f"  rust-format-buffer "format"))
+     (("q"  keyboard-quit :exit t "close"))))
+#+end_src
 * completion frameworks
 
 ** orderless
