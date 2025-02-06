@@ -8,13 +8,13 @@
  '(doom-modeline-height 1)
  '(doom-modeline-icon nil)
  '(elfeed-feeds
-   '("https://hackaday.com/blog/feed/" "http://planet.emacsen.org/atom.xml"))
+   '("https://hackaday.com/blog/feed/" "http://planet.emacslife.com/atom.xml"))
  '(inhibit-startup-screen nil)
  '(mac-mouse-wheel-smooth-scroll nil)
  '(magit-log-arguments '("--graph" "--color" "--decorate"))
  '(magit-status-buffer-switch-function 'switch-to-buffer)
  '(package-selected-packages
-   '(page-break-lines catppuccin-theme bazel treesit-auto org-superstar org embark embark-consult consult marginalia vertico glsl-mode transient-posframe typescript-mode company-lsp jsonrpc counsel-gtags ggtags ibuffer-projectile highlight-indent-guides major-mode-hydra airline-themes hide-mode-line markdown-mode+ markdown-mode yasnippet gif-screencast gn-mode ox-gfm fennel-mode blimp ob-async dts-mode forth-mode jinja2-mode request fill-column-indicator sqlup-mode scad-mode scad-preview steam ssh-config-mode ssh-agency general ht paradox sql-indent pylint moonscript xterm-color vimrc-mode company-shell vlf exec-path-from-shell edit-server json-mode yari yaml-mode wgrep-pt subatomic256-theme scss-mode rainbow-delimiters pt pandoc-mode js2-mode htmlize haml-mode go-mode feature-mode esup emmet-mode edbi company-inf-ruby coffee-mode ag))
+   '(vterm elfeed flycheck-rust page-break-lines catppuccin-theme bazel treesit-auto org-superstar org embark embark-consult consult marginalia vertico glsl-mode transient-posframe typescript-mode company-lsp jsonrpc counsel-gtags ggtags ibuffer-projectile highlight-indent-guides major-mode-hydra airline-themes hide-mode-line markdown-mode+ markdown-mode yasnippet gif-screencast gn-mode ox-gfm fennel-mode blimp ob-async dts-mode forth-mode jinja2-mode request fill-column-indicator sqlup-mode scad-mode scad-preview steam ssh-config-mode ssh-agency general ht paradox sql-indent pylint moonscript xterm-color vimrc-mode company-shell vlf exec-path-from-shell edit-server json-mode yari yaml-mode wgrep-pt subatomic256-theme scss-mode rainbow-delimiters pt pandoc-mode js2-mode htmlize haml-mode go-mode feature-mode esup emmet-mode edbi company-inf-ruby coffee-mode ag))
  '(paradox-github-token t)
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
