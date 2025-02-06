@@ -38,6 +38,7 @@
   - [[#eww][eww]]
 - [[#vterm][vterm]]
 - [[#novel][nov.el]]
+- [[#elfeed][elfeed]]
 - [[#company-auto-completion][company auto-completion]]
 - [[#which-key][which-key]]
 - [[#snippets-yasnippet-yankpad][snippets (yasnippet yankpad)]]
@@ -362,21 +363,21 @@
     (dashboard-no-items-face ((t (:weight normal))))
     :custom
     (dashboard-startup-banner 'ascii)
-    (dashboard-banner-ascii "
-   ╭──╮
-    ¯╲ ╲
-      ╲ ╲ Λ──Λ
-       ╲ ( ˇωˇ)
-       ╱   ──.
-      ╱    ⋀ ╲
-     ╱    ╱  ╲ ╲_
-     │   ╱    ╰──╯
-    ╱  ╱ ╲ per
-   (  ( ╲ ╲ my
-   │  │  ╲ ╲ last
-   │  )   ╲ ╲  email
-   | |     ) /
-  ╭╯_│     ╰/")
+    ;;   (dashboard-banner-ascii "
+    ;;  ╭──╮
+    ;;   ¯╲ ╲
+    ;;     ╲ ╲ Λ──Λ
+    ;;      ╲ ( ˇωˇ)
+    ;;      ╱   ──.
+    ;;     ╱    ⋀ ╲
+    ;;    ╱    ╱  ╲ ╲_
+    ;;    │   ╱    ╰──╯
+    ;;   ╱  ╱ ╲ per
+    ;;  (  ( ╲ ╲ my
+    ;;  │  │  ╲ ╲ last
+    ;;  │  )   ╲ ╲  email
+    ;;  | |     ) /
+    ;; ╭╯_│     ╰/")
     (dashboard-page-separator "\n\f\n")
     (dashboard-projects-backend 'projectile)
     (dashboard-center-content t)
@@ -2237,6 +2238,27 @@ This mode gives variables names unique colors.
       (when (number-or-marker-p pt)
         (goto-char (1+ pt))
         (nov-browse-url))))
+#+end_src
+
+* elfeed
+
+#+begin_src emacs-lisp
+  (use-package elfeed
+    :general
+    (:states '(motion)
+     :keymaps '(elfeed-search-mode-map)
+     "RET" 'elfeed-search-show-entry
+     )
+    (:states '(motion)
+     :keymaps '(elfeed-show-mode-map)
+     "TAB" 'shr-next-link
+     "<backtab>" 'shr-previous-link
+     )
+
+    :config
+    (add-to-list 'evil-motion-state-modes 'elfeed-search-mode)
+    (add-to-list 'evil-motion-state-modes 'elfeed-show-mode)
+  )
 #+end_src
 
 * company auto-completion
