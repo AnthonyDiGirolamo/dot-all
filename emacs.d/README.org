@@ -156,6 +156,7 @@
     (setq-default tab-width 2)          ;; set tw=4
     (setq-default indent-tabs-mode nil) ;; set expandtab
 
+    ;; Mouse scrolling
     ;; Scroll just one line when hitting bottom of window
     (setq scroll-step 1)
     (setq scroll-conservatively 101)
@@ -167,8 +168,8 @@
     ;; (setq mouse-wheel-flip-direction nil) ;; Swap left/right scroll direction
 
     ;; Swap up/down scroll direction
-    (setq mouse-wheel-down-event 'mouse-5)
-    (setq mouse-wheel-up-event 'mouse-4)
+    ;; (setq mouse-wheel-down-event 'wheel-up)
+    ;; (setq mouse-wheel-up-event 'wheel-down)
 
     ;; cursor movement lag reduction?
     (setq auto-window-vscroll nil)
@@ -290,22 +291,29 @@
     (when (memq window-system '(mac ns))
       (exec-path-from-shell-initialize))
 
-    ;; General Settings
+    ;; Mouse scrolling
+    (if (display-graphic-p)
+        ;; Use smooth scrolling in gui mode
+        (progn
+          (pixel-scroll-precision-mode))
+      ;; Enable mouse events in terminal mode
+      (progn
+        (require 'mouse)
+        (xterm-mouse-mode t)))
 
-    (require 'mouse)
-    (xterm-mouse-mode t)
-
+    ;; Hide tool, scroll and menu bar
     (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
     (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
     (menu-bar-mode -1)
 
     ;; Examples of setting a font with antialias on or off:
     ;; set-frame-font :size <int>pixel size <float>point size
-
+    ;;
     ;; (set-frame-font (font-spec :name "PragmataPro" :antialias nil :size amd/font-size :weight 'regular))
     ;; (set-frame-font (font-spec :name "Iosevka Term SS17 Light" :antialias t :size 16.0))
     ;; (set-frame-font (font-spec :name "CozetteVector" :antialias nil :size 26.0))
 
+    ;; Set gui font
     (when (display-graphic-p)
       (cond
        ((member "PragmataPro" (font-family-list))
@@ -851,11 +859,11 @@
   ;; (amd/leuven-light-theme)
   ;; (amd/moe-dark-theme)
 
-  (amd/doom-snazzy-theme)
+  ;; (amd/doom-snazzy-theme)
   ;; (amd/doom-one-theme)
   ;; (load-theme 'airline-doom-one t)
 
-  ;; (amd/catppuccin-theme)
+  (amd/catppuccin-theme)
 
   ;; (amd/modus-light-theme)
   ;; (amd/modus-dark-theme)
@@ -1262,7 +1270,6 @@ This mode gives variables names unique colors.
     (evil-move-cursor-back nil)         ;; Don't move back one charachter when exiting insert
     (evil-search-module 'evil-search)   ;; Need to set this before loading evil and evil-visualstar
     :init
-
 
     ;; Make mouse wheel use evil mode C-d and C-u
     (setq mwheel-scroll-down-function 'evil-scroll-down
@@ -3332,6 +3339,10 @@ This mode gives variables names unique colors.
     (add-to-list 'auto-mode-alist '("\\.gni\\'" . gn-mode)))
 
   (use-package ninja-mode :defer t)
+
+  (use-package rust-mode
+    :custom
+    (rust-format-on-save nil))
 #+end_src
 
 * hydra
@@ -3736,11 +3747,14 @@ This mode gives variables names unique colors.
   (amd/define-hydra-with-columns
    'hydra-rust-menu
    'blue
-   '((("rt" rust-test "test"))
-     (("rr" rust-run "run"))
+   '((("t" rust-test "test"))
+     (("k" rust-check "check"))
+     (("l" rust-run-clippy "clippy"))
+     (("r" rust-run "run"))
      (("f"  rust-format-buffer "format"))
      (("q"  keyboard-quit :exit t "close"))))
 #+end_src
+
 * completion frameworks
 
 ** orderless
@@ -4713,7 +4727,7 @@ Supported Types: [[info:org#Easy%20templates][info:org#Easy templates]] ([[http:
 #+begin_src fundamental :tangle (if (eq system-type 'gnu/linux) "~/.local/share/applications/org-protocol.desktop" "no")
   [Desktop Entry]
   Name=org-protocol
-  Exec=emacsclient -n %u
+  Exec=<<homedir()>>/apps/emacs/bin/emacsclient -n %u
   Type=Application
   Terminal=false
   Categories=System;
