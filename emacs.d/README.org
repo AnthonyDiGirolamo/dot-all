@@ -11,7 +11,7 @@
   - [[#themes][themes]]
   - [[#leuven-light][leuven light]]
   - [[#moe-dark][moe dark]]
-  - [[#cattpuccin][cattpuccin]]
+  - [[#catppuccin][catppuccin]]
   - [[#doom-themes][doom-themes]]
   - [[#modus-themes][modus-themes]]
   - [[#solaire-mode][solaire-mode]]
@@ -405,6 +405,7 @@
 #+begin_src emacs-lisp
   ;; (defadvice load-theme (before theme-dont-propagate activate)
   (defun amd/disable-loaded-themes ()
+    "Remove custom theme settings so all colors are reset to defaults."
     (interactive)
     (cl-loop for theme-name in custom-enabled-themes
              do (funcall #'disable-theme theme-name)))
@@ -648,7 +649,7 @@
        '(term-color-yellow  ((t (:background "#303030" :foreground "#ffcc66"))) t))))
 #+end_src
 
-** cattpuccin
+** catppuccin
 
 #+begin_src emacs-lisp
   (use-package catppuccin-theme
@@ -1232,12 +1233,46 @@ This mode gives variables names unique colors.
     (let ((current-prefix-arg 4)) ;; emulate C-u
       (call-interactively 'eval-defun)))
 
+  (defvar rgbxmlcolour-keywords
+    '(("r=\"[0-9]+\" +g=\"[0-9]+\" +b=\"[0-9]+\""
+       (0 (put-text-property (match-beginning 0)
+                             (match-end 0)
+                             'face (list :background
+                                         (cl-loop
+                                          for color
+                                          in (split-string (replace-regexp-in-string "[rgb=\" ]+" " " (match-string-no-properties 0)) " " t)
+                                          concat (format "%02X" (string-to-number color)) into colorcode
+                                          finally return (concat "#" (downcase colorcode)))
+                                         ))))))
+
+  (defun rgb-to-hex-comment (beg end)
+    (interactive "r")
+    (save-excursion
+      (goto-char beg)
+      (while (re-search-forward "r=\"[0-9]+\" g=\"[0-9]+\" b=\"[0-9]+\"" end)
+        (let* ((selected-text (match-string-no-properties 0))
+               (hex-color-text (cl-loop
+                                for color
+                                in (split-string (replace-regexp-in-string "[rgb=\" ]+" " " selected-text) " " t)
+                                concat (format "%02X" (string-to-number color)) into colorcode
+                                finally return (concat "#" colorcode)))
+               )
+          (end-of-line)
+          (insert " <!-- ")
+          (insert hex-color-text)
+          (insert " -->")))))
+
+  (defun rgbxmlcolour-add-to-font-lock ()
+    (interactive)
+    (font-lock-add-keywords nil rgbxmlcolour-keywords))
+
   (defvar hexcolour-keywords
     '(("#[abcdef[:digit:]]\\{6\\}"
        (0 (put-text-property (match-beginning 0)
                              (match-end 0)
                              'face (list :background
                                          (match-string-no-properties 0)))))))
+
   (defun hexcolour-add-to-font-lock ()
     (interactive)
     (font-lock-add-keywords nil hexcolour-keywords))
@@ -3408,6 +3443,7 @@ This mode gives variables names unique colors.
     ;;           ;; posframe-poshandler-point-bottom-left-corner
     ;;           ))
     ;;   )
+
     :config
     (defhydra hydra-font (:color red :columns 4)
       ("h"  (lambda () (interactive)
