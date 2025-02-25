@@ -11,6 +11,7 @@ function help() {
     make::print_help("lint",              "awk linting")
     make::print_help("install_emacs28",   "download, compile and install emacs28")
     make::print_help("install_emacs29",   "download, compile and install emacs29")
+    make::print_help("install_emacs30",   "download, compile and install emacs30")
     make::print_help("install_emacs_git", "download, compile and install emacs from git")
     make::print_help("install_fish",      "download, compile and install fish")
     make::print_help("install_fish_git",  "download, compile and install fish from git")
@@ -105,6 +106,22 @@ function install_emacs29() {
 
     make::compile(make::extract_tar(tarfile),
         "./configure --prefix=$HOME/apps/emacs29 " \
+        "--with-modules " \
+        "--with-cairo " \
+        "--with-native-compilation " \
+        "--with-pgtk " \
+        "--without-xaw3d\n" \
+        "make -j 8\n" \
+        "make install\n")
+}
+
+function install_emacs30() {
+    tarfile = make::download("emacs",
+        "https://ftpmirror.gnu.org/emacs/emacs-30.1.tar.xz",
+        "88d665794fdecba7769c11ab1ccea6e4")
+
+    make::compile(make::extract_tar(tarfile),
+        "./configure --prefix=$HOME/apps/emacs30 " \
         "--with-modules " \
         "--with-cairo " \
         "--with-native-compilation " \
