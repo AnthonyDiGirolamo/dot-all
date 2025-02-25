@@ -960,9 +960,9 @@ function _init()
   planet_max_radius = 20
 end
 
--- ship functions
-ship = Object:extend()
-function ship:new(h)
+-- Ship functions
+Ship = Object:extend()
+function Ship:new(h)
   self.npc = false
   self.hostile = h
   self.sector_position = Vector()
@@ -979,7 +979,7 @@ function ship:new(h)
   self.last_fire_time = -6
 end
 
-function ship:buildship(seed, stype)
+function Ship:buildship(seed, stype)
   self.ship_type_index = stype or random_int(#ship_types) + 1
 
   local seed_value = seed or random_int(262144)
@@ -1064,7 +1064,7 @@ function ship:buildship(seed, stype)
   return self
 end
 
-function ship:get_sprite_canvas_rotated(angle, add_stroke)
+function Ship:get_sprite_canvas_rotated(angle, add_stroke)
   local size_factor = 2
   newcanvas = Canvas(ceil(pilot.sprite_rows * size_factor), ceil(pilot.sprite_columns * size_factor))
   self:draw_sprite_rotated(newcanvas, angle)
@@ -1075,7 +1075,7 @@ function ship:get_sprite_canvas_rotated(angle, add_stroke)
   end
 end
 
-function ship:draw_sprite_rotated(canvas, angle, pos)
+function Ship:draw_sprite_rotated(canvas, angle, pos)
   -- canvas center point minus spritesize/2 offset
   local sc = Vector(round(canvas.cols / 2), round(canvas.rows / 2)) -
                  Vector(round(self.sprite_columns / 2), round(self.sprite_rows / 2))
@@ -1212,9 +1212,9 @@ function simplex3d(x, y, z)
   return 32 * (n0 + n1 + n2 + n3)
 end
 
-planet = Object:extend()
+Planet = Object:extend()
 
-function planet:new(x, y, phase, r, ptype)
+function Planet:new(x, y, phase, r, ptype)
   local planet_type_index = ptype or random_int(#planet_types) + 1
   local planet_type = planet_types[planet_type_index]
 
@@ -1237,7 +1237,7 @@ function planet:new(x, y, phase, r, ptype)
   self.color = planet_type.mmap_color
 end
 
--- function planet:draw(ship_pos)
+-- function Planet:draw(ship_pos)
 --   if stellar_object_is_visible(self,ship_pos) then
 --     self:render_planet()
 --     love.graphics.draw(
@@ -1248,7 +1248,7 @@ end
 --   end
 -- end
 
-function planet:render_planet(fullmap, render_far_side)
+function Planet:render_planet(fullmap, render_far_side)
   local radius = self.radius - 1
   if fullmap then radius = 47 end
 
@@ -1430,7 +1430,7 @@ function cmd_draw_planet_map(planet_count, starting_seed, camera_x, camera_z)
       rad = random_int(8) + 10
     end
 
-    local p = planet(px, py, ((1 - Vector(px, py):angle()) - .25) % 1, rad, i)
+    local p = Planet(px, py, ((1 - Vector(px, py):angle()) - .25) % 1, rad, i)
     if p.planet_canvas.rows > max_rows then max_rows = p.planet_canvas.rows end
     local rendering_done = false
     while not rendering_done do rendering_done = p:render_planet() end
@@ -1465,7 +1465,7 @@ end
 -- terminal output routines
 
 function cmd_draw_shipyard(seed, type_index)
-  pilot = ship()
+  pilot = Ship()
 
   -- while true do
 
@@ -1570,7 +1570,7 @@ if ship_value_index or planet_value_index then
   if planet_value_index and arg[planet_value_index] then
     v = tonumber(arg[planet_value_index])
     if type(v) == "number" then
-      -- print("planet", v, type(v))
+      -- print("Planet", v, type(v))
       -- TODO make planet_count arg work as expected in cmd_draw_planet_map()
       cmd_draw_planet_map(v)
     else
@@ -1580,7 +1580,7 @@ if ship_value_index or planet_value_index then
 
 else
   -- if no options
-  -- cmd_draw_planet_map()
+  cmd_draw_planet_map()
   cmd_draw_shipyard()
 
   -- cmd_draw_shipyard(32132,5)
