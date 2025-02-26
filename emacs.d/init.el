@@ -41,10 +41,10 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/" ) t)
 
-;; (package-initialize)
+(package-initialize)
 
-(if (>= emacs-major-version 27)
-    (setq package-quickstart t))
+;; (if (>= emacs-major-version 27)
+;;    (setq package-quickstart t))
 
 (let ((elapsed (float-time (time-subtract (current-time) emacs-start-time))))
   (message "Loaded packages, elapsed time: %.3fs" elapsed))

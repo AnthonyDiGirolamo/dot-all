@@ -901,6 +901,7 @@ is used so the list is accessible inside use-package definitions.
           '(ruby-mode-hook
             c-mode-common-hook
             c++-mode-hook
+            rust-mode-hook
             python-mode-hook
             lua-mode-hook
             emacs-lisp-mode-hook
