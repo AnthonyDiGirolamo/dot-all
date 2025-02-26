@@ -39,6 +39,7 @@
 - [[#vterm][vterm]]
 - [[#novel][nov.el]]
 - [[#elfeed][elfeed]]
+- [[#completion-preview-mode][completion-preview-mode]]
 - [[#company-auto-completion][company auto-completion]]
 - [[#which-key][which-key]]
 - [[#snippets-yasnippet-yankpad][snippets (yasnippet yankpad)]]
@@ -356,6 +357,7 @@
 #+begin_src emacs-lisp
   (use-package dashboard
     :diminish dashboard-mode
+    ;; :disabled
     :demand
     :custom-face
     (dashboard-heading ((t (:inherit (font-lock-string-face bold)))))
@@ -2297,11 +2299,26 @@ This mode gives variables names unique colors.
   )
 #+end_src
 
+* completion-preview-mode
+
+#+begin_src emacs-lisp
+  (if (>= emacs-major-version 30)
+    (use-package completion-preview
+      :ensure nil
+      :hook (prog-mode . completion-preview-mode)
+      ;; :bind
+      ;; ( :map completion-preview-active-mode-map
+      ;;   ("M-n" . completion-preview-next-candidate)
+      ;;   ("M-p" . completion-preview-prev-candidate))
+      ))
+#+end_src
+
 * company auto-completion
 
 #+begin_src emacs-lisp
   (use-package pos-tip)
 
+  ;; Company mode
   (if window-system
       ;; doesn't work on the console and overwrites M-h keybinding
       (use-package company-quickhelp

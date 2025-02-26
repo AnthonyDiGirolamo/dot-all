@@ -10,7 +10,6 @@
  '(elfeed-feeds
    '("https://hackaday.com/blog/feed/"
      "http://planet.emacslife.com/atom.xml"))
- '(inhibit-startup-screen nil)
  '(mac-mouse-wheel-smooth-scroll nil)
  '(magit-log-arguments '("--graph" "--color" "--decorate"))
  '(magit-status-buffer-switch-function 'switch-to-buffer)
