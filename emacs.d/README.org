@@ -3041,7 +3041,6 @@ This mode gives variables names unique colors.
   (use-package lsp-ivy
     :commands lsp-ivy-workspace-symbol)
 
-  (use-package company-lsp :commands company-lsp)
   (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
   (use-package emacs-lisp

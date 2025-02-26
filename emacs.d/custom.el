@@ -35,7 +35,12 @@
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
  '(safe-local-variable-values
-   '((org-html-table-default-attributes :class
+   '((lsp-clients-clangd-executable
+      . "/home/tonymd/pigweed/environment/cipd/packages/pigweed/bin/clangd")
+     (lsp-clients-clangd-args "--background-index=true")
+     (eval add-to-list 'exec-path
+           (expand-file-name "./environment/cipd/packages/pigweed/bin"))
+     (org-html-table-default-attributes :class
                                         "mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp"
                                         :border "1" :cellspacing "0"
                                         :cellpadding "0" :rules "all"
