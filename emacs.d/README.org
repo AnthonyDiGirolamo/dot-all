@@ -392,7 +392,7 @@
             (bookmarks . 5)))
     :general
     (:states '(emacs) :keymaps 'dashboard-mode-map
-             "C-p" 'counsel-git
+             "C-p" 'amd/counsel-git-or-file-jump
              "n" 'dashboard-next-line
              "e" 'dashboard-previous-line
              "N" 'dashboard-next-section
@@ -1355,8 +1355,7 @@ This mode gives variables names unique colors.
      "g #" 'evil-ex-search-unbounded-word-forward)
     (:states '(normal)
      "C-s" 'save-buffer
-     "C-p" 'counsel-git
-     "C-M-t" 'amd/eshell-or-project-eshell
+     "C-p" 'amd/counsel-git-or-file-jump
      "C-M-c" 'amd/split-compilation
      "g j" 'amd/join-to-end-of-next-line
      "g s" 'count-words
@@ -1373,7 +1372,6 @@ This mode gives variables names unique colors.
     ;;  "" nil)
     (:states '(insert)
      "C-s" (lambda() (interactive) (save-buffer) (evil-normal-state))
-     "C-M-t" 'amd/eshell-or-project-eshell
      "C-y" 'counsel-yank-pop
      "M-t" 'counsel-ibuffer
      "M-b" 'ibuffer
@@ -1396,7 +1394,6 @@ This mode gives variables names unique colors.
      "M-D" (lambda() (interactive) (dired-jump t))
      amd/leader-key 'hydra-leader-menu/body)
     (:states '(motion emacs)
-     "C-M-t" 'amd/eshell-or-project-eshell
      "C-M-c" 'amd/split-compilation
      "C-w N" 'evil-window-move-very-bottom
      "C-w E" 'evil-window-move-very-top
@@ -1645,7 +1642,7 @@ This mode gives variables names unique colors.
      ;; "f" 'dired-find-file ;; default
      ;; "a" 'dired-find-alternate-file ;; default - open a file in the same buffer and close dired
      "RET" 'amd/dired-open-thing
-     "C-p" 'counsel-git
+     "C-p" 'amd/counsel-git-or-file-jump
      "C-l" (lambda() (interactive) (revert-buffer) (evil-ex-nohighlight) (recenter))
      "gr" 'revert-buffer
      "gg" 'evil-goto-first-line
@@ -2452,7 +2449,7 @@ This mode gives variables names unique colors.
                 magit-status-mode-map)
      "C-d" 'evil-scroll-down
      "C-u" 'evil-scroll-up
-     "C-p" 'counsel-git
+     "C-p" 'amd/counsel-git-or-file-jump
      "e" 'magit-section-backward
      "p" nil) ;; hit E for ediff popup instead
 
@@ -3635,7 +3632,7 @@ This mode gives variables names unique colors.
       ("fp" flycheck-previous-error "flycheck prev error")
       ("bb" switch-to-buffer        "buffer switch")
       ("bi" ibuffer                 "buffer ibuffer")
-      ("bk" kill-this-buffer        "buffer kill")
+      ("bk" kill-current-buffer     "buffer kill")
       ("br" revert-buffer           "buffer revert")
       ("yb" amd/copy-buffer         "yank buffer")
       ("yxy" amd/x-yank             "xsel yank")
@@ -4199,16 +4196,25 @@ This mode gives variables names unique colors.
            ([f9] . amd/take-svg-screenshot)
            ("C-h k" . counsel-descbinds)
            ("C-h C-k" . counsel-descbinds))
+    :custom
+    (counsel-grep-base-command "grep -niE \"%s\" %s")
     :init
-    (setq counsel-grep-base-command "grep -niE \"%s\" %s")
-
     (defun amd/counsel-ag-with-filename-regex (fileregex)
+      "counsel-ag with file regex input."
       (interactive "sFilename Regex: ")
       (let* ((ag-command (car (split-string counsel-ag-base-command "%s")))
              (counsel-ag-base-command (concat ag-command " -G '" fileregex "' %s")))
         (counsel-ag)))
 
+    (defun amd/counsel-git-or-file-jump ()
+      "Run counsel-git if in a git repo, counsel-file-jump otherwise."
+      (interactive)
+      (if (counsel--git-root)
+          (counsel-git)
+        (counsel-file-jump)))
+
     (defun amd/counsel-rg-with-initial-directory (initial-directory extra-args)
+      "counsel-rg with initial directory and extra args prompt."
       (interactive "DInitial Directory: \nsExtra Args: ")
       (counsel-rg nil initial-directory extra-args)))
 #+end_src
