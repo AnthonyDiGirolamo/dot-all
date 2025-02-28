@@ -4,7 +4,8 @@
 
 ;; Author: Oleh Krehel <ohwoeowho@gmail.com>
 ;; URL: https://github.com/abo-abo/lispy
-;; Version: 0.27.0
+;; Package-Version: 20230314.1738
+;; Package-Revision: fe44efd21573
 ;; Keywords: lisp
 
 ;; This file is not part of GNU Emacs
@@ -1690,25 +1691,29 @@ When ARG is more than 1, mark ARGth element."
           (t
            (lispy--mark (lispy--bounds-dwim))))))
 
+(defvar lispy-kill-at-point-hook nil)
+
 (defun lispy-kill-at-point ()
   "Kill the quoted string or the list that includes the point."
   (interactive)
-  (cond ((region-active-p)
-         (lispy--maybe-safe-kill-region (region-beginning)
-                                        (region-end)))
-        (t
-         (let ((bnd (or (lispy--bounds-comment)
-                        (lispy--bounds-string)
-                        (lispy--bounds-list)
-                        (and (derived-mode-p 'text-mode)
-                             (cons (save-excursion
-                                    (1+ (re-search-backward "[ \t\n]" nil t)))
-                                   (save-excursion
-                                    (1- (re-search-forward "[ \t\n]" nil t))))))))
-           (if buffer-read-only
-               (kill-new (buffer-substring
-                          (car bnd) (cdr bnd)))
-               (kill-region (car bnd) (cdr bnd)))))))
+  (cond
+   ((run-hook-with-args-until-success 'lispy-kill-at-point-hook))
+   ((region-active-p)
+    (lispy--maybe-safe-kill-region (region-beginning)
+                                   (region-end)))
+   (t
+    (let ((bnd (or (lispy--bounds-comment)
+                   (lispy--bounds-string)
+                   (lispy--bounds-list)
+                   (and (derived-mode-p 'text-mode)
+                        (cons (save-excursion
+                                (1+ (re-search-backward "[ \t\n]" nil t)))
+                              (save-excursion
+                                (1- (re-search-forward "[ \t\n]" nil t))))))))
+      (if buffer-read-only
+          (kill-new (buffer-substring
+                     (car bnd) (cdr bnd)))
+        (kill-region (car bnd) (cdr bnd)))))))
 
 (defun lispy-new-copy ()
   "Copy marked region or sexp to kill ring."
@@ -7389,7 +7394,9 @@ See https://clojure.org/guides/weird_characters#_character_literal.")
                   (lispy--read-replace " *,+" "clojure-commas"))
                 ;; ——— \ char syntax (LISP)————
                 (goto-char (point-min))
-                (while (re-search-forward "#\\\\\\(.\\)" nil t)
+                (while (let ((case-fold-search nil))
+                         ;; http://lispworks.com/documentation/HyperSpec/Body/02_ac.htm
+                         (re-search-forward "#\\\\\\(space\\|newline\\|.\\)" nil t))
                   (unless (lispy--in-string-or-comment-p)
                     (replace-match (format "(ly-raw lisp-char %S)"
                                            (substring-no-properties

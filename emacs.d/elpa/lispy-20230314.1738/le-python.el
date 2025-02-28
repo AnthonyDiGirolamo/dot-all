@@ -231,6 +231,10 @@ It didn't work great."
     (setq lispy-python-buf buf)
     (with-current-buffer lispy-python-buf
       (lispy-python-interaction-mode)
+      (setq lispy--python-middleware-file
+            (if (file-name-absolute-p lispy-python-middleware-file)
+                lispy-python-middleware-file
+              (expand-file-name "lispy-python.py" lispy-site-directory)))
       (setq lispy-python-buf buf)))
   (let ((lp (ignore-errors (lispy--eval-python-plain "lp"))))
     (unless (and lp (string-match-p "module 'lispy-python'" lp))
@@ -293,18 +297,42 @@ it at one time."
 
 (defvar lispy--python-init-file nil)
 
+(defun lispy--python-poetry-name ()
+  (let ((pyproject (expand-file-name "pyproject.toml" (counsel-locate-git-root))))
+    (and (file-exists-p pyproject)
+         (not (equal python-shell-interpreter "python"))
+         (with-current-buffer (find-file-noselect pyproject)
+           (goto-char (point-min))
+           (when (re-search-forward "\\[tool.poetry\\]\nname *= *\"\\([^\"]+\\)\"" nil t)
+             (match-string-no-properties 1))))))
+
+(defun lispy--python-proc-name ()
+  (or (and (process-live-p (get-buffer-process lispy-python-buf))
+           (process-name (get-buffer-process lispy-python-buf)))
+      (let ((name
+             (or (lispy--python-poetry-name)
+                 (if (string-match "\\(?::python \\|python_\\)\\(.*\\)\\'" python-shell-interpreter-args)
+                     (match-string 1 python-shell-interpreter-args)
+                   "default"))))
+        (concat "lispy-python-" name))))
+
 (defun lispy--python-proc (&optional name)
   (let* ((proc-name (or name
-                        (and (process-live-p (get-buffer-process lispy-python-buf))
-                             (process-name (get-buffer-process lispy-python-buf)))
-                        (if (string-match "\\(?::python \\|python_\\)\\(.*\\)\\'" python-shell-interpreter-args)
-                            (concat "lispy-python-" (match-string 1 python-shell-interpreter-args))
-                          "lispy-python-default")))
+                        (lispy--python-proc-name)))
          (process (get-process proc-name)))
     (if (process-live-p process)
         process
       (let* ((python-shell-font-lock-enable nil)
              (inferior-python-mode-hook nil)
+             (poetry-name (lispy--python-poetry-name))
+             (python-shell-interpreter
+              (if poetry-name
+                  "poetry"
+                python-shell-interpreter))
+             (python-shell-interpreter-args
+              (if poetry-name
+                  "run python"
+                python-shell-interpreter-args))
              ;; (python-shell-interpreter
              ;;  (cond
              ;;   ((and (file-exists-p python-shell-interpreter)
@@ -325,7 +353,10 @@ it at one time."
                    " "
                    python-shell-interpreter-args)))
              (buffer
-              (let ((python-shell-completion-native-enable nil))
+              (let ((python-shell-completion-native-enable nil)
+                    (default-directory (if poetry-name
+                                           (counsel-locate-git-root)
+                                         default-directory)))
                 (python-shell-make-comint
                  python-binary-name proc-name nil nil))))
         (setq lispy--python-middleware-file
@@ -538,7 +569,7 @@ If so, return an equivalent of ITEM = ARRAY_LIKE[IDX]; ITEM."
     (while (setq k (pop plist))
       (setq v (pop plist))
       (push (format
-             "\"%s\": %s"
+             "'%s': %s"
              (cond ((keywordp k)
                     (substring (symbol-name k) 1))
                    ((stringp k)
@@ -550,6 +581,8 @@ If so, return an equivalent of ITEM = ARRAY_LIKE[IDX]; ITEM."
                     "True")
                    ((eq v nil)
                     "None")
+                   ((stringp v)
+                    (format "'%s'" v))
                    (t
                     (prin1-to-string v)))) r))
     (concat "{"
@@ -585,18 +618,22 @@ If so, return an equivalent of ITEM = ARRAY_LIKE[IDX]; ITEM."
   (setq lispy-eval-output nil)
   (let* ((echo (if (eq current-prefix-arg 2) nil t))
          (fstr
-          (if (or (string-match-p ".\n+." str) (string-match-p "\"\"\"" str))
-              (let ((temp-file-name (python-shell--save-temp-file str)))
-                (format "lp.eval_to_json('', %s)"
-                        (lispy--dict
-                         :code temp-file-name
-                         :fname (buffer-file-name)
-                         :echo echo)))
+          (cond
+           ((eq current-prefix-arg 3)
+            (format "lp.eval_to_json(\"\"\"lp.select_item(\"%s\", 0)\"\"\")" str))
+           ((or (string-match-p ".\n+." str) (string-match-p "\"\"\"" str))
+            (let ((temp-file-name (python-shell--save-temp-file str)))
+              (format "lp.eval_to_json('', %s)"
+                      (lispy--dict
+                       :code temp-file-name
+                       :fname (buffer-file-name)
+                       :echo echo))))
+           (t
             (format "lp.eval_to_json(\"\"\"%s \"\"\", %s)"
                     (replace-regexp-in-string "\\\\n" "\\\\n" str nil t)
                     (lispy--dict :fname (buffer-file-name)
                                  :echo echo
-                                 :use-in-expr use-in-expr))))
+                                 :use-in-expr use-in-expr)))))
          (rs (python-shell-send-string-no-output
               fstr
               (lispy--python-proc)))
@@ -610,7 +647,7 @@ If so, return an equivalent of ITEM = ARRAY_LIKE[IDX]; ITEM."
     (when (eq current-prefix-arg 3)
       (kill-new fstr))
     (if err
-        (signal 'eval-error err)
+        (signal 'eval-error (concat out err))
       (unless (equal out "")
         (setq lispy-eval-output
               (concat (propertize out 'face 'font-lock-string-face) "\n")))
@@ -713,7 +750,12 @@ If so, return an equivalent of ITEM = ARRAY_LIKE[IDX]; ITEM."
            (list (point) (point)
                  (if (> (length quote_str) 0)
                      keys
-                   (mapcar (lambda (s) (concat "\"" s "\"")) keys)))))
+                   (mapcar
+                    (lambda (s)
+                      (if (stringp s)
+                          (concat "\"" s "\"")
+                        (prin1-to-string s)))
+                    keys)))))
         ((lispy-complete-fname-at-point))
         (t
          (let* ((bnd (lispy-python-symbol-bnd))
@@ -727,8 +769,14 @@ If so, return an equivalent of ITEM = ARRAY_LIKE[IDX]; ITEM."
                (lispy--eval-python-plain expr)))
            (list (car bnd)
                  (cdr bnd)
-                 (read (lispy--eval-python-plain
-                        (format "lp.print_elisp(lp.get_completions('%s'))" str-com))))))))
+                 (let ((out (lispy--eval-python-plain
+                             (format "lp.print_elisp(lp.get_completions('%s'))" str-com))))
+                   (with-temp-buffer
+                     (insert out)
+                     (goto-char (point-min))
+                     (when (re-search-forward "^(" nil t)
+                       (goto-char (match-beginning 0)))
+                     (read (current-buffer)))))))))
 
 (defvar lispy--python-arg-key-re "\\`\\(\\(?:\\sw\\|\\s_\\)+\\)=\\([^\\0]+\\)\\'"
   "Constant regexp for matching function keyword spec.")
@@ -975,18 +1023,34 @@ Otherwise, fall back to Jedi (static)."
   (setq lispy--python-middleware-loaded-p nil)
   (lispy--python-middleware-load))
 
+(defun lispy--python-slurp (f)
+  (with-temp-buffer
+    (insert-file-contents f)
+    (buffer-string)))
+
+(defun lispy--python-setup-cmd ()
+  (concat
+   "from importlib.machinery import SourceFileLoader;"
+   (format "lp=SourceFileLoader('lispy-python', '%s').load_module();"
+           lispy--python-middleware-file)
+   (format "lp.setup('%s')" lispy--python-init-file)))
+
 (defun lispy--python-middleware-load ()
   "Load the custom Python code in \"lispy-python.py\"."
   (unless lispy--python-middleware-loaded-p
-    (let ((default-directory (or (locate-dominating-file default-directory ".git")
-                                 default-directory)))
+    (let* ((default-directory (or (locate-dominating-file default-directory ".git")
+                                  default-directory))
+           out)
       ;; send single line so that python.el does no /tmp/*.py magic, which does not work in Docker
-      (lispy--eval-python-plain
-       (concat
-        "from importlib.machinery import SourceFileLoader;"
-        (format "lp=SourceFileLoader('lispy-python', '%s').load_module();"
-                lispy--python-middleware-file)
-        (format "lp.setup('%s')" lispy--python-init-file)))
+      (setq out (lispy--eval-python-plain (lispy--python-setup-cmd)))
+      (when (string-match "FileNotFoundError" out)
+        (let* ((text (lispy--python-slurp lispy--python-middleware-file))
+               (ben (replace-regexp-in-string "\n" "" (base64-encode-string text)))
+               (setup-cmd (let ((lispy--python-middleware-file "/tmp/lispy.py"))
+                            (lispy--python-setup-cmd))))
+          (lispy--eval-python-plain
+           (format "import base64; open('/tmp/lispy.py','w').write(base64.b64decode('%s').decode()); %s"
+                   ben setup-cmd))))
       (setq lispy--python-middleware-loaded-p t))))
 
 (defun lispy--python-arglist (symbol filename line column)

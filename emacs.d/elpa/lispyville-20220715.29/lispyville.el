@@ -2,12 +2,11 @@
 
 ;; Author: Fox Kiester <noct@posteo.net>
 ;; URL: https://github.com/noctuid/lispyville
-;; Package-Version: 20210702.2031
-;; Package-Commit: 9c14bed0359f659e246d345c706f895737c3d172
 ;; Created: March 03, 2016
 ;; Keywords: vim, evil, lispy, lisp, parentheses
 ;; Package-Requires: ((lispy "0") (evil "1.2.12") (cl-lib "0.5") (emacs "24.4"))
-;; Version: 0.1
+;; Package-Version: 20220715.29
+;; Package-Revision: 14ee8711d58b
 
 ;; This file is not part of GNU Emacs.
 

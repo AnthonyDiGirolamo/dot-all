@@ -9,26 +9,6 @@
 
 
 
-;;; Generated autoloads from modus-operandi-deuteranopia-theme.el
-
-(put 'modus-operandi-deuteranopia 'theme-properties '(:background-mode light :kind color-scheme :family modus))
-
-
-;;; Generated autoloads from modus-operandi-theme.el
-
-(put 'modus-operandi 'theme-properties '(:background-mode light :kind color-scheme :family modus))
-
-
-;;; Generated autoloads from modus-operandi-tinted-theme.el
-
-(put 'modus-operandi-tinted 'theme-properties '(:background-mode light :kind color-scheme :family modus))
-
-
-;;; Generated autoloads from modus-operandi-tritanopia-theme.el
-
-(put 'modus-operandi-tritanopia 'theme-properties '(:background-mode light :kind color-scheme :family modus))
-
-
 ;;; Generated autoloads from modus-themes.el
 
 (autoload 'modus-themes-contrast "modus-themes" "\
@@ -50,6 +30,16 @@ practically the same as the `modus-themes-select' command).
 
 Run `modus-themes-after-load-theme-hook' after loading the theme.
 Disable other themes per `modus-themes-disable-other-themes'." t)
+(function-put 'modus-themes-toggle 'interactive-only 't)
+(autoload 'modus-themes-rotate "modus-themes" "\
+Rotate to the next theme among THEMES.
+When called interactively THEMES is the value of `modus-themes-to-rotate'.
+
+If the current theme is already the next in line, then move to the one
+after.  Perform the rotation rightwards, such that the first element in
+the list becomes the last.  Do not modify THEMES in the process.
+
+(fn THEMES)" t)
 (autoload 'modus-themes-theme "modus-themes" "\
 Bind NAME's color PALETTE around face specs and variables.
 Face specifications are passed to `custom-theme-set-faces'.
@@ -64,26 +54,6 @@ corresponding entries.
 (function-put 'modus-themes-theme 'lisp-indent-function 0)
 (when load-file-name (let ((dir (file-name-directory load-file-name))) (unless (equal dir (expand-file-name "themes/" data-directory)) (add-to-list 'custom-theme-load-path dir))))
 (register-definition-prefixes "modus-themes" '("modus-themes-"))
-
-
-;;; Generated autoloads from modus-vivendi-deuteranopia-theme.el
-
-(put 'modus-vivendi-deuteranopia 'theme-properties '(:background-mode dark :kind color-scheme :family modus))
-
-
-;;; Generated autoloads from modus-vivendi-theme.el
-
-(put 'modus-vivendi 'theme-properties '(:background-mode dark :kind color-scheme :family modus))
-
-
-;;; Generated autoloads from modus-vivendi-tinted-theme.el
-
-(put 'modus-vivendi-tinted 'theme-properties '(:background-mode dark :kind color-scheme :family modus))
-
-
-;;; Generated autoloads from modus-vivendi-tritanopia-theme.el
-
-(put 'modus-vivendi-tritanopia 'theme-properties '(:background-mode dark :kind color-scheme :family modus))
 
 ;;; End of scraped data
 

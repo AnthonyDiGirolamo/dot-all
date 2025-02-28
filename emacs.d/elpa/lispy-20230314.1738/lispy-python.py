@@ -20,6 +20,7 @@
 #* Imports
 import ast
 import collections
+import importlib
 import inspect
 import io
 import json
@@ -53,11 +54,14 @@ except:
 try:
     import jedi
 except:
-    pyenv_version = sh("pyenv global")
-    pyversion = ".".join(pyenv_version.split(".")[:-1])
-    site_packages = os.path.expanduser(f"~/.pyenv/versions/{pyenv_version}/lib/python{pyversion}/site-packages/")
-    sys.path.append(site_packages)
-    import jedi
+    try:
+        pyenv_version = sh("pyenv global")
+        pyversion = ".".join(pyenv_version.split(".")[:-1])
+        site_packages = os.path.expanduser(f"~/.pyenv/versions/{pyenv_version}/lib/python{pyversion}/site-packages/")
+        sys.path.append(site_packages)
+        import jedi
+    except:
+        print("Failed to load jedi. Some features won't work")
 
 #* Classes
 class Stack:
@@ -138,15 +142,32 @@ class Autocall:
         return ""
 
 #* Functions
+def get_import_name(fname: str) -> str:
+    for p in sys.path:
+        if p == "":
+            continue
+        if fname.startswith(p):
+            return fname[len(p) + 1:].partition(".")[0].replace("/", ".")
+    return os.path.splitext(os.path.basename(fname))[0]
+
 def chfile(f: str) -> None:
     tf = top_level()
     tf.f_globals["__file__"] = f
-    tf.f_globals["__name__"] = os.path.splitext(os.path.basename(f))[0]
+    name = get_import_name(f)
+    tf.f_globals["__name__"] = name
     d = os.path.dirname(f)
     try:
         os.chdir(d)
+        if "sys" not in tf.f_globals:
+            tf.f_globals["sys"] = importlib.import_module("sys")
+        if name not in tf.f_globals["sys"].modules:
+            try:
+                mod = importlib.import_module(name)
+                tf.f_globals["sys"].modules[name] = mod
+            except:
+                pass
     except:
-        pass
+        raise
 
 def arglist(sym: Callable) -> List[str]:
     def format_arg(arg_pair: Tuple[str, Optional[str]]) -> str:
@@ -174,6 +195,9 @@ def arglist(sym: Callable) -> List[str]:
 
 def print_elisp(obj: Any, end: str = "\n") -> None:
     if hasattr(obj, "_asdict") and obj._asdict is not None:
+        if hasattr(type(obj), "__repr__"):
+            print('"' + str(obj).replace('"', '') + '"')
+            return
         # namedtuple
         try:
             print_elisp(obj._asdict(), end)
@@ -209,14 +233,14 @@ def print_elisp(obj: Any, end: str = "\n") -> None:
         print_elisp(list(obj))
     elif isinstance(obj, int):
         print(obj)
+    elif isinstance(obj, list) or isinstance(obj, tuple):
+        print("(", end="")
+        for x in obj:
+            print_elisp(x)
+        print(")")
     else:
         if obj is not None:
-            if type(obj) is list or type(obj) is tuple:
-                print("(", end="")
-                for x in obj:
-                    print_elisp(x)
-                print(")")
-            elif type(obj) is str:
+            if type(obj) is str:
                 # quote strings?
                 # print("\"'" + re.sub("\"", "\\\"", obj) + "'\"", end=" ")
                 print('"' + re.sub("\"", "\\\"", obj) + '"', end=" ")
@@ -576,7 +600,7 @@ def setup(init_file=None):
     tl.f_globals["pm"] = Autocall(pm)
     if init_file and os.path.exists(init_file):
         try:
-            exec(open(init_file).read(), globals())
+            exec(open(init_file).read(), tl.f_globals)
         except:
             pass
 
@@ -586,9 +610,11 @@ def reload():
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     top_level().f_globals["lp"] = mod
+    sys._getframe().f_back.f_globals["lp"] = mod
+    sys._getframe().f_back.f_locals["lp"] = mod
+    return mod
 
 def reload_module(fname):
-    import importlib
     to_reload = []
     for (name, module) in sys.modules.copy().items():
         try:
@@ -688,7 +714,7 @@ def select_item(code: str, idx: int, _f: Optional[FrameType] = None) -> Any:
     locals_1 = locals()
     locals_2 = locals_1.copy()
     # pylint: disable=exec-used
-    exec(f"{l} = list({r})[{idx}]", _f.f_globals, locals_2)
+    exec(f"{l} = list({r})[{idx}]", _f.f_locals | _f.f_globals, locals_2)
     for bind in [k for k in locals_2.keys() if k not in locals_1.keys()]:
         _f.f_globals[bind] = locals_2[bind]
     # pylint: disable=eval-used
@@ -728,7 +754,7 @@ def to_elisp(code: str, _f: Optional[FrameType] = None) -> str:
     _f = _f or top_level()
     with io.StringIO() as buf, redirect_stdout(buf):
         # pylint: disable=eval-used
-        print_elisp(eval(code, _f.f_globals))
+        print_elisp(eval(code, _f.f_locals | _f.f_globals))
         return buf.getvalue().strip()
 
 def translate(code: str, _f: Optional[FrameType] = None, use_in_expr: bool = False) -> Any:
@@ -768,38 +794,41 @@ def eval_code(_code: str, _env: Dict[str, Any] = {}) -> EvalResult:
         _locals = {}
         locals_1 = _locals
         locals_2 = locals_1.copy()
+        locals_globals = _f.f_locals | _f.f_globals
+        if "debug" in _env:
+            print(f"{ast.unparse(last)=}")
         with io.StringIO() as buf, redirect_stdout(buf):
-            # pylint: disable=exec-used
-            exec(ast.unparse(butlast), _f.f_globals, locals_2)
-            for bind in [k for k in locals_2.keys() if k not in locals_1.keys()]:
-                _f.f_globals[bind] = locals_2[bind]
+            if butlast:
+                # pylint: disable=exec-used
+                exec(ast.unparse(butlast), locals_globals, locals_2)
+                for bind in [k for k in locals_2.keys() if k not in locals_1.keys()]:
+                    _f.f_globals[bind] = locals_2[bind]
             try:
                 # pylint: disable=eval-used
-                _res = eval(ast.unparse(last), _f.f_globals, locals_2)
-            except:
+                _res = eval(ast.unparse(last), locals_globals, locals_2)
+            except SyntaxError:
                 locals_1 = _locals
                 locals_2 = locals_1.copy()
-                exec(ast.unparse(last), _f.f_globals, locals_2)
+                exec(ast.unparse(last), locals_globals, locals_2)
             out = buf.getvalue().strip()
         binds1 = [k for k in locals_2.keys() if k not in locals_1.keys()]
-        for sym in ["_res", "binds", "out", "err", "_env", "new_code", "last", "butlast", "locals_1", "locals_2"]:
-            try:
-                if id(locals_1[sym]) != id(locals_2[sym]):
-                    binds1.append(sym)
-            except:
-                pass
         for bind in binds1:
             _f.f_globals[bind] = locals_2[bind]
         binds2 = [bind for bind in binds1 if bind not in ["__res__", "__return__"]]
         print_fn = cast(Callable[..., str], to_str if _env.get("echo") else str)
         binds = {bind: print_fn(locals_2[bind]) for bind in binds2}
-    except RuntimeError as e:
-        if str(e) == "break":
-            pm()
+    # except RuntimeError as e:
+    #     if str(e) == "break":
+    #         pm()
+    #     else:
+    #         raise
     # pylint: disable=broad-except
     except Exception as e:
         err = f"{e.__class__.__name__}: {e}\n{e.__dict__}"
         _f.f_globals["e"] = e
+        locs = e.__traceback__.tb_frame.f_locals.get("locals_2", {})
+        for bind in locs:
+            _f.f_globals[bind] = locs[bind]
     return {
         "res": to_str(_res) if _env.get("echo") else repr(_res),
         "binds": binds,

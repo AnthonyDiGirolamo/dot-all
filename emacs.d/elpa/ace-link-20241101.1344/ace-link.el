@@ -4,9 +4,8 @@
 
 ;; Author: Oleh Krehel <ohwoeowho@gmail.com>
 ;; URL: https://github.com/abo-abo/ace-link
-;; Package-Version: 20220901.1710
-;; Package-Commit: 06ab398df85e81d1dc763b3210732dd26cba60a1
-;; Version: 0.5.0
+;; Package-Version: 20241101.1344
+;; Package-Revision: d9bd4a25a02b
 ;; Package-Requires: ((avy "0.4.0"))
 ;; Keywords: convenience, links, avy
 
@@ -45,63 +44,55 @@
 (defvar ace-link-fallback-function nil
   "When non-nil, called by `ace-link' when `major-mode' isn't recognized.")
 
+(defvar ace-link-minor-mode-actions
+  '((ace-link-compilation compilation-shell-minor-mode))
+  "Mapping of minor modes to ace-link actions.")
+
+(defvar ace-link-major-mode-actions
+  '((ace-link-org org-mode erc-mode elfeed-show-mode term-mode vterm-mode eshell-mode telega-chat-mode org-roam-mode)
+    (ace-link-org-agenda org-agenda-mode)
+    (ace-link-info Info-mode)
+    (ace-link-help help-mode package-menu-mode geiser-doc-mode elbank-report-mode elbank-overview-mode slime-trace-dialog-mode helpful-mode)
+    (ace-link-man Man-mode)
+    (ace-link-woman woman-mode)
+    (ace-link-eww eww-mode)
+    (ace-link-w3m w3m-mode)
+    (ace-link-compilation compilation-mode grep-mode)
+    (ace-link-gnus gnus-article-mode gnus-summary-mode)
+    (ace-link-mu4e mu4e-view-mode)
+    (ace-link-notmuch notmuch-show-mode)
+    (ace-link-custom Custom-mode)
+    (ace-link-sldb sldb-mode)
+    (ace-link-slime-xref slime-xref-mode)
+    (ace-link-slime-inspector slime-inspector-mode)
+    (ace-link-indium-inspector indium-inspector-mode)
+    (ace-link-indium-debugger-frames indium-debugger-frames-mode)
+    (ace-link-commit magit-commit-mode)
+    (ace-link-cider-inspector cider-inspector-mode))
+  "Reverse mapping of `major-mode' to ace-link actions.")
+
 ;;;###autoload
 (defun ace-link ()
   "Call the ace link function for the current `major-mode'"
   (interactive)
-  (cond ((eq major-mode 'Info-mode)
-         (ace-link-info))
-        ((member major-mode '(help-mode
-                              package-menu-mode geiser-doc-mode elbank-report-mode
-                              elbank-overview-mode slime-trace-dialog-mode helpful-mode))
-         (ace-link-help))
-        ((eq major-mode 'Man-mode)
-         (ace-link-man))
-        ((eq major-mode 'woman-mode)
-         (ace-link-woman))
-        ((eq major-mode 'eww-mode)
-         (ace-link-eww))
-        ((eq major-mode 'w3m-mode)
-         (ace-link-w3m))
-        ((or (member major-mode '(compilation-mode grep-mode))
-             (bound-and-true-p compilation-shell-minor-mode))
-         (ace-link-compilation))
-        ((memq major-mode '(gnus-article-mode gnus-summary-mode))
-         (ace-link-gnus))
-        ((eq major-mode 'mu4e-view-mode)
-         (ace-link-mu4e))
-        ((eq major-mode 'notmuch-show-mode)
-         (ace-link-notmuch))
-        ((memq major-mode '(org-mode
-                            erc-mode elfeed-show-mode
-                            term-mode vterm-mode
-                            eshell-mode
-                            telega-chat-mode))
-         (ace-link-org))
-        ((eq major-mode 'org-agenda-mode)
-         (ace-link-org-agenda))
-        ((eq major-mode 'Custom-mode)
-         (ace-link-custom))
-        ((eq major-mode 'sldb-mode)
-         (ace-link-sldb))
-        ((eq major-mode 'slime-xref-mode)
-         (ace-link-slime-xref))
-        ((eq major-mode 'slime-inspector-mode)
-         (ace-link-slime-inspector))
-        ((eq major-mode 'indium-inspector-mode)
-         (ace-link-indium-inspector))
-        ((eq major-mode 'indium-debugger-frames-mode)
-         (ace-link-indium-debugger-frames))
-        ((eq major-mode 'magit-commit-mode)
-         (ace-link-commit))
-        ((eq major-mode 'cider-inspector-mode)
-         (ace-link-cider-inspector))
-        ((and ace-link-fallback-function
-              (funcall ace-link-fallback-function)))
-        (t
-         (error
-          "%S isn't supported"
-          major-mode))))
+  (let (action)
+    (cond ((setq action
+                 (cl-find-if
+                  (lambda (c) (memq major-mode c))
+                  ace-link-major-mode-actions))
+           (funcall (car action)))
+          ((setq action
+                 (cl-find-if
+                  (lambda (c)
+                    (cl-some (lambda (minor-mode) (bound-and-true-p minor-mode))
+                             (cdr c)))
+                  ace-link-minor-mode-actions))
+           (funcall (car action)))
+          ((and ace-link-fallback-function
+                (funcall ace-link-fallback-function)))
+          (t
+           (error "%S isn't supported" major-mode)))))
+
 
 ;;* `ace-link-info'
 ;;;###autoload
@@ -142,7 +133,7 @@
 
 (defun ace-link--info-collect ()
   "Collect the positions of visible links in the current `Info-mode' buffer."
-  (let ((end (window-end))
+  (let ((end (window-end (selected-window) t))
         points)
     (save-excursion
       (goto-char (window-start))
@@ -174,7 +165,7 @@
 (defun ace-link--help-collect ()
   "Collect the positions of visible links in the current `help-mode' buffer."
   (let ((skip (text-property-any
-               (window-start) (window-end) 'button nil))
+               (window-start) (window-end (selected-window) t) 'button nil))
         candidates)
     (save-excursion
       (while (setq skip (text-property-not-all
@@ -254,7 +245,7 @@ we'd miss actual links by only collecting button overlays.
 The workaround for non-button links is to search for strings that
 looks like manpages with a regular expression."
   (save-excursion
-    (let ((end (window-end nil t))
+    (let ((end (window-end (selected-window) t))
           (pt (window-start))
           candidates)
       (while (and (setq pt (next-property-change pt))
@@ -284,7 +275,7 @@ looks like manpages with a regular expression."
 
 (defun ace-link--woman-collect ()
   "Collect all links visible in the current `woman-mode' buffer."
-  (let ((end (window-end))
+  (let ((end (window-end (selected-window) t))
         candidates)
     (save-excursion
       (goto-char (window-start))
@@ -325,7 +316,7 @@ If EXTERNAL is double prefix, browse in new buffer."
     (save-restriction
       (narrow-to-region
        (window-start)
-       (window-end))
+       (window-end (selected-window) t))
       (goto-char (point-min))
       (let (beg end candidates)
         (setq end
@@ -378,7 +369,7 @@ If EXTERNAL is double prefix, browse in new buffer."
     (save-restriction
       (narrow-to-region
        (window-start)
-       (window-end))
+       (window-end (selected-window) t))
       (goto-char (point-min))
       (let ((anchor-prop 'w3m-anchor-sequence)
             (beg (point))
@@ -459,7 +450,7 @@ If EXTERNAL is double prefix, browse in new buffer."
         (save-restriction
           (narrow-to-region
            (window-start)
-           (window-end))
+           (window-end (selected-window) t))
           (goto-char (point-min))
           (setq pt (point))
           (while (progn (widget-forward 1)
@@ -479,7 +470,7 @@ Only consider the links in 'text/plain'."
       (save-restriction
         (narrow-to-region
          (window-start)
-         (window-end))
+         (window-end (selected-window) t))
         (goto-char (point-min))
         (while (re-search-forward "https?://" nil t)
           (setq pt (- (point) (length (match-string 0))))
@@ -519,7 +510,7 @@ consider mu4e’s links."
     (save-restriction
       (narrow-to-region
        (window-start)
-       (window-end))
+       (window-end (selected-window) t))
       (goto-char (point-min))
       (let (link pos candidates)
         (setq pos (point))
@@ -624,6 +615,40 @@ call at PT."
              (cons (cdr x) #'ace-link--notmuch-html-action))
            (ace-link--email-view-html-collect))))
 
+;;* `ace-link-widget'
+;;;###autoload
+(defun ace-link-widget ()
+  "Open or go to a visible widget."
+  (interactive)
+  (let ((pt (avy-with ace-link-widget
+              (avy-process
+               (ace-link--widget-collect)
+               (avy--style-fn avy-style)))))
+    (ace-link--widget-action pt)))
+
+(defun ace-link--widget-action (pt)
+  (when (number-or-marker-p pt)
+    (goto-char pt)
+    (let ((button (get-char-property pt 'button)))
+      (when button
+	(widget-apply-action button)))))
+
+(defun ace-link--widget-collect ()
+  "Collect the positions of visible widgets in current buffer."
+  (let (candidates pt)
+    (save-excursion
+      (save-restriction
+        (narrow-to-region
+         (window-start)
+         (window-end))
+        (goto-char (point-min))
+        (setq pt (point))
+        (while (progn (widget-forward 1)
+                      (> (point) pt))
+          (setq pt (point))
+          (push (point) candidates))))
+    (nreverse candidates)))
+
 ;;* `ace-link-org'
 ;;;###autoload
 (defun ace-link-org ()
@@ -646,7 +671,7 @@ call at PT."
     (org-open-at-point)))
 
 (defun ace-link--org-collect ()
-  (let ((end (window-end))
+  (let ((end (window-end (selected-window) t))
         res)
     (save-excursion
       (goto-char (window-start))
@@ -685,7 +710,7 @@ call at PT."
 
 (defun ace-link--org-agenda-collect ()
   (let ((skip (text-property-any
-               (window-start) (window-end) 'org-marker nil))
+               (window-start) (window-end (selected-window) t) 'org-marker nil))
         candidates)
     (save-excursion
       (while (setq skip (text-property-not-all
@@ -716,7 +741,7 @@ call at PT."
 
 (defun ace-link--xref-collect ()
   (let ((skip (text-property-any
-               (window-start) (window-end) 'xref-item nil))
+               (window-start) (window-end (selected-window) t) 'xref-item nil))
         candidates)
     (save-excursion
       (while (setq skip (text-property-not-all
@@ -751,7 +776,7 @@ call at PT."
       (save-restriction
         (narrow-to-region
          (window-start)
-         (window-end))
+         (window-end (selected-window) t))
         (goto-char (point-min))
         (setq pt (point))
         (while (progn (widget-forward 1)
@@ -779,7 +804,8 @@ call at PT."
 
 (defun ace-link--addr-collect ()
   (let (candidates)
-    (dolist (overlay (overlays-in (window-start) (window-end)))
+    (dolist (overlay (overlays-in (window-start)
+                                  (window-end (selected-window) t)))
       (if (overlay-get overlay 'goto-address)
           (push (overlay-start overlay) candidates)))
     (nreverse candidates)))
@@ -812,7 +838,7 @@ call at PT."
         (var-face 'sldb-local-value-face))
     (save-excursion
       (goto-char (window-start))
-      (while (< (point) (window-end))
+      (while (< (point) (window-end (selected-window) t))
         (when (get-text-property (point) frame-prop)
           (if (get-text-property (point) 'var)
               (push (text-property-any
@@ -848,7 +874,7 @@ call at PT."
   (let ((candidates (list))
         (prop 'slime-location)
         (pt (window-start)))
-    (while (and pt (< pt (window-end)))
+    (while (and pt (< pt (window-end (selected-window) t)))
       (when (get-text-property pt prop)
         (push pt candidates))
       (setq pt (next-single-property-change pt prop)))
@@ -883,7 +909,7 @@ call at PT."
         (range 'slime-range-button)
         (action 'slime-action-number)
         (pt (window-start)))
-    (while (and pt (< pt (window-end)))
+    (while (and pt (< pt (window-end (selected-window) t)))
       (when (or (get-text-property pt part)
                 (get-text-property pt range)
                 (get-text-property pt action))
@@ -969,7 +995,7 @@ call at PT."
 (defun ace-link--cider-inspector-collect ()
   "Collect the positions of visible links in the current
 `cider-inspector-mode' buffer."
-  (let ((end (window-end))
+  (let ((end (window-end (selected-window) t))
         points)
     (save-excursion
       (goto-char (window-start))
@@ -1013,6 +1039,8 @@ call at PT."
   (add-to-list 'avy-styles-alist
                '(ace-link-mu4e . post))
   (add-to-list 'avy-styles-alist
+               '(ace-link-widget . pre))
+  (add-to-list 'avy-styles-alist
                '(ace-link-org . pre))
   (add-to-list 'avy-styles-alist
                '(ace-link-org-agenda . pre))
@@ -1033,7 +1061,9 @@ call at PT."
   (eval-after-load "info"
     `(define-key Info-mode-map ,key 'ace-link-info))
   (eval-after-load "notmuch"
-    `(define-key notmuch-show-mode-map ,key 'ace-link-notmuch))
+    `(progn
+       (define-key notmuch-show-mode-map ,key 'ace-link-notmuch)
+       (define-key notmuch-hello-mode-map ,key 'ace-link-widget)))
   (eval-after-load "compile"
     `(define-key compilation-mode-map ,key 'ace-link-compilation))
   (eval-after-load "help-mode"
