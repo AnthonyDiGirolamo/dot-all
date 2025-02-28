@@ -900,18 +900,17 @@ is used so the list is accessible inside use-package definitions.
   (eval-and-compile
     (setq amd/appearance-modes nil)
     (setq amd/appearance-mode-hooks
-          '(ruby-mode-hook
-            c-mode-common-hook
+          '(awk-mode-hook
             c++-mode-hook
-            rust-mode-hook
-            python-mode-hook
-            lua-mode-hook
+            c-mode-common-hook
             emacs-lisp-mode-hook
-            latex-mode-hook
             js2-mode-hook
+            latex-mode-hook
+            lua-mode-hook
             makefile-mode
-            ;; nxml-mode-hook
-            ;; sql-mode-hook
+            python-mode-hook
+            ruby-mode-hook
+            rust-mode-hook
             sh-mode-hook)))
 
   (defun amd/add-appearance-mode (mode-to-add)
@@ -2644,23 +2643,40 @@ This mode gives variables names unique colors.
        )
       )
 
-    (defhydra hydra-tab-bar (:color red :columns 4)
+    (defhydra hydra-tab-bar (:color red :columns 5)
       "
     %s(amd/tab-bar-string-for-hydra)"
       ("h"  tab-previous                "← prev")
       ("l"  amd/tab-bar-next-or-new-tab "→ next/new")
-      ("N"  tab-bar-new-tab          "new")
-      ("o"  tab-bar-undo-close-tab   "reopen")
+      ("N"  tab-bar-new-tab             "new")
+      ("o"  tab-bar-undo-close-tab      "reopen")
+      ("w"  hydra-window-size/body      "window size" :exit t)
 
       ("H" tab-bar-move-tab-backward "← move")
       ("L"  tab-bar-move-tab         "→ move")
       ("c"  tab-bar-close-tab        "close")
-      ("r"  tab-rename              "rename")
+      ("r"  tab-rename               "rename")
+      ("f"  hydra-window-frame/body  "window frame" :exit t)
 
-      ("T"  tab-bar-move-window-to-tab  "split → new Tab")
-      ("F"  tab-bar-detach-tab       "tab → new Frame")
-      ("t"  tab-bar-switch-to-tab       "switch" :color blue)
-      ("RET" keyboard-escape-quit   "quit" :exit t))
+      ("T"  tab-bar-move-window-to-tab "split → new Tab")
+      ("F"  tab-bar-detach-tab         "tab → new Frame")
+      ("t"  tab-bar-switch-to-tab      "switch")
+      ("RET" keyboard-escape-quit      "quit" :exit t))
+
+    (defhydra hydra-window-size (:color red)
+      "Window size"
+      ("w" evil-window-set-height      "maximize")
+      ("h" shrink-window-horizontally  "shrink horizontal")
+      ("n" shrink-window               "shrink vertical")
+      ("e" enlarge-window              "enlarge vertical")
+      ("l" enlarge-window-horizontally "enlarge horizontal"))
+
+    (defhydra hydra-window-frame (:color blue)
+      "Frame"
+      ("m" toggle-frame-maximized  "toggle maximize-window")
+      ("f" toggle-frame-fullscreen "toggle fullscreen")
+      ("n" make-frame              "new frame")
+      ("c" delete-frame            "delete frame"))
     )
 #+end_src
 
@@ -2742,25 +2758,9 @@ This mode gives variables names unique colors.
     ;; (ace-window-display-mode t)
     (set-face-attribute 'aw-leading-char-face nil :foreground "deep sky blue" :weight 'bold :height 3.0)
     ;; :background "#303030"
-
-    (when (fboundp 'defhydra)
-      (defhydra hydra-window-size (:color red)
-        "Windows size"
-        ("w" evil-window-set-height "maximize")
-        ("h" shrink-window-horizontally "shrink horizontal")
-        ("n" shrink-window "shrink vertical")
-        ("e" enlarge-window "enlarge vertical")
-        ("l" enlarge-window-horizontally "enlarge horizontal"))
-
-      (defhydra hydra-window-frame (:color blue)
-        "Frame"
-        ("m" toggle-frame-maximized "toggle maximize-window")
-        ("f" toggle-frame-fullscreen "toggle fullscreen")
-        ("n" make-frame "new frame")
-        ("c" delete-frame "delete frame"))
-
-      (add-to-list 'aw-dispatch-alist '(?w hydra-window-size/body) t)
-      (add-to-list 'aw-dispatch-alist '(?f hydra-window-frame/body) t)))
+    (add-to-list 'aw-dispatch-alist '(?w hydra-window-size/body) t)
+    (add-to-list 'aw-dispatch-alist '(?f hydra-window-frame/body) t)
+    )
 #+end_src
 
 ** ace-link
@@ -3572,7 +3572,7 @@ This mode gives variables names unique colors.
                    "\n" ))))
         hint)))
 
-  (defun amd/define-hydra-with-columns (name color columns)
+  (defun amd/defhydra-with-columns (name color columns)
     "Create a column based hydra with the given NAME, COLOR, and COLUMNS."
     (interactive)
 
@@ -3633,7 +3633,7 @@ This mode gives variables names unique colors.
       ("ff" hydra-font/body "Font" :color blue)
       )))
 
-  (amd/define-hydra-with-columns 'hydra-leader-menu 'blue
+  (amd/defhydra-with-columns 'hydra-leader-menu 'blue
    `((("d" counsel-find-file      "find-file")
       ("g" magit-status           "git")
       ("s" hydra-set-toggles/body "set-toggles")
@@ -3761,7 +3761,7 @@ This mode gives variables names unique colors.
         (org-edit-special)
         (recenter))))
 
-  (amd/define-hydra-with-columns
+  (amd/defhydra-with-columns
    'hydra-org-menu
    'blue
    '((("cc" org-capture "capture")
@@ -3825,7 +3825,7 @@ This mode gives variables names unique colors.
 ** Emacs-Lisp Hydra
 
 #+begin_src emacs-lisp
-  (amd/define-hydra-with-columns
+  (amd/defhydra-with-columns
    'hydra-elisp-menu
    'blue
    '((("e" amd/toggle-org-edit-code-block "[org] toggle code edit"))
@@ -3837,7 +3837,7 @@ This mode gives variables names unique colors.
 ** Rust-mode Hydra
 
 #+begin_src emacs-lisp
-  (amd/define-hydra-with-columns
+  (amd/defhydra-with-columns
    'hydra-rust-menu
    'blue
    '((("t" rust-test "test"))
