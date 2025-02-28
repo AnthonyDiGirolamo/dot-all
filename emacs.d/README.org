@@ -2628,19 +2628,40 @@ This mode gives variables names unique colors.
             (tab-bar-new-tab)
           (tab-bar-select-tab (1+ to-index)))))
 
-    (defhydra hydra-tab-bar (:color red :columns 3)
+    (defun amd/tab-bar-string-for-hydra ()
+      "Return current tabs as a formatted string."
+      (cl-loop
+       for tab being the elements of (funcall tab-bar-tabs-function)
+       using (index i)
+       with current-index = (tab-bar--current-tab-index)
+       concat
+       (let ((tab-name (alist-get 'name tab)))
+         (if (eq i current-index)
+             (propertize (format " %s " tab-name) 'face 'tab-bar-tab)
+           (propertize (format " %s " tab-name) 'face 'tab-bar-tab-inactive)))
+       ;; into current-tab-list
+       ;; finally return (format "| %s |" current-tab-list)
+       )
+      )
+
+    (defhydra hydra-tab-bar (:color red :columns 4)
+      "
+    %s(amd/tab-bar-string-for-hydra)"
       ("h"  tab-previous                "← prev")
       ("l"  amd/tab-bar-next-or-new-tab "→ next/new")
-      ("N"  tab-bar-new-tab             "new")
+      ("N"  tab-bar-new-tab          "new")
+      ("o"  tab-bar-undo-close-tab   "reopen")
 
-      ("H" (lambda() (interactive)
-             (tab-bar-move-tab -1)) "← move")
-      ("L"  tab-bar-move-tab        "→ move")
-      ("c"  tab-bar-close-tab       "close")
+      ("H" tab-bar-move-tab-backward "← move")
+      ("L"  tab-bar-move-tab         "→ move")
+      ("c"  tab-bar-close-tab        "close")
+      ("r"  tab-rename              "rename")
 
-      ("."  tab-bar-switch-to-tab  "switch" :color blue)
-      ("r"  tab-rename             "rename")
-      ("RET" keyboard-escape-quit  "quit" :exit t)))
+      ("T"  tab-bar-move-window-to-tab  "split → new Tab")
+      ("F"  tab-bar-detach-tab       "tab → new Frame")
+      ("t"  tab-bar-switch-to-tab       "switch" :color blue)
+      ("RET" keyboard-escape-quit   "quit" :exit t))
+    )
 #+end_src
 
 ** eyebrowse - tabs
@@ -4120,6 +4141,8 @@ This mode gives variables names unique colors.
     (:keymaps '(ivy-minibuffer-map)
       "<escape>" 'minibuffer-keyboard-quit
       "C-e" 'previous-line
+      "C-u" 'ivy-scroll-down-command
+      "C-d" 'ivy-scroll-up-command
       ;; "C-n" 'next-line  ;; this is the default
       "<C-return>" 'ivy-alt-done
       "<C-M-return>" 'ivy-immediate-done)
