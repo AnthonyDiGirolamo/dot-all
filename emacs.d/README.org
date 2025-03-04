@@ -3511,7 +3511,7 @@ This mode gives variables names unique colors.
                (if (string-equal amd/font-name "CozetteVector") "x" " "))))
     (message "use-package: hydra :config"))
 
-  (defun amd/hydra-column-hint (column-groups)
+  (defun amd/generate-hydra-column-hint (column-groups)
     "Generate a hydra hint string from a list of COLUMN-GROUPS."
     (require 's)
     (require 'dash)
@@ -3572,21 +3572,61 @@ This mode gives variables names unique colors.
                    "\n" ))))
         hint)))
 
+  ;; Old amd/defhydra-with-columns using 'dash.
+  ;;
+  ;; (defun amd/defhydra-with-columns (name color columns)
+  ;;   "Create a column based hydra with the given NAME, COLOR, and COLUMNS."
+  ;;   (interactive)
+  ;;   (eval `(defhydra ,name (:color ,color :hint nil)
+  ;;            ,(amd/hydra-column-hint columns)
+  ;;            ,@(-flatten-n 1 (-map (lambda (column-group)
+  ;;                                    (--filter (not (null it))
+  ;;                                              (-map (lambda (column-head)
+  ;;                                                      (-remove-last 'stringp column-head))
+  ;;                                                    column-group)))
+  ;;                                  (-clone columns))))))
+
+  (defun amd/generate-hydra-column-heads (columns)
+    "Flatten column group hydras and remove the last string item in each head."
+    (cl-loop
+     for column-group in columns
+     ;; Flatten each column into a single list.
+     append
+     (cl-loop
+      for head in column-group
+      unless (null head)
+      ;; Create a list of each non-empty hydra-head item
+      collect
+      (cl-loop
+       with first-string-found = nil ;; track if a string is found
+       with result-head              ;; result list of head items
+       ;; loop through in reverse order
+       for item in (nreverse head)
+       do
+       ;; If the first-string-found
+       (if first-string-found
+           ;; Push the item to the front of result-head list
+           (push item result-head)
+         ;; else check if we have a string
+         (if (stringp item)
+             (setq first-string-found t)
+           ;; push if not a string
+           (push item result-head)))
+       finally return result-head))))
+
   (defun amd/defhydra-with-columns (name color columns)
     "Create a column based hydra with the given NAME, COLOR, and COLUMNS."
     (interactive)
+    (eval
+     `(defhydra ,name (:color ,color :hint nil)
+        ;; Hydra hint text.
+        ,(amd/generate-hydra-column-hint columns)
+        ;; Flattened hydra heads with description string removed.
+        ,@(amd/generate-hydra-column-heads columns))))
 
-    (eval `(defhydra ,name (:color ,color :hint nil)
-             ,(amd/hydra-column-hint columns)
-             ,@(-flatten-n 1 (-map (lambda (column-group)
-                                     (--filter (not (null it))
-                                               (-map (lambda (column-head)
-                                                       (-remove-last 'stringp column-head))
-                                                     column-group)))
-                                   (-clone columns))))))
-
-  ;; ;; For quoting with , and ,@ see:
-  ;; ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
+  ;; For quoting with , and ,@ see:
+  ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
+  ;;
   ;; (eval `(defhydra hydra-org-menu (:color blue :hint nil :columns ,(length amd/hydra-org-columns))
   ;;          "Hydra-Org"
   ;;          ,@(->> (-iterate '1+ 0 (length (car amd/hydra-org-columns))) ;; (0 1 2 3 4 ... )
