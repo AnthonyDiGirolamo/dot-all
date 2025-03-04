@@ -22,13 +22,14 @@
         gif-screencast glsl-mode gn-mode go-mode haml-mode
         hide-mode-line highlight-indent-guides ht htmlize
         ibuffer-projectile jinja2-mode js2-mode json-mode jsonrpc
-        major-mode-hydra markdown-mode markdown-mode+ moonscript
+        llama major-mode-hydra markdown-mode markdown-mode+ moonscript
         ob-async org-superstar ox-gfm page-break-lines pandoc-mode
         paradox pt pylint rainbow-delimiters request scad-mode
         scad-preview scss-mode sql-indent sqlup-mode ssh-agency
-        ssh-config-mode steam subatomic256-theme transient-posframe
-        treesit-auto typescript-mode vimrc-mode vlf vterm wgrep-pt
-        which-key xterm-color yaml-mode yari yasnippet))
+        ssh-config-mode steam subatomic256-theme transient
+        transient-posframe treesit-auto typescript-mode vimrc-mode vlf
+        vterm wgrep-pt which-key with-editor xterm-color yaml-mode
+        yari yasnippet))
  '(paradox-github-token t)
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
