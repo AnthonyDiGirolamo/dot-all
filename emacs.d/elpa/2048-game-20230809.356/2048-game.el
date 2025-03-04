@@ -3,9 +3,11 @@
 ;; Copyright 2014 Zachary Kanfer
 
 ;; Author: Zachary Kanfer <zkanfer@gmail.com>
-;; Version: 2014.03.27
-;; Package-Version: 20151026.1933
-;; URL: https://bitbucket.org/zck/2048.el
+;; Package-Version: 20230809.356
+;; Package-Revision: 8175ca519117
+;; URL: https://hg.sr.ht/~zck/game-2048
+
+;; Package-Requires: ((emacs "24.3"))
 
 ;; This file is not part of GNU Emacs
 
@@ -26,6 +28,8 @@
 ;;; Commentary:
 
 ;; This program is an implementation of 2048 for Emacs.
+;; Its source repository is https://hg.sr.ht/~zck/game-2048
+
 ;; To begin playing, call `M-x 2048-game`, then use the arrow keys,
 ;; p/n/b/f, or C-p/C-n/C-b/C-f to move the tiles around.
 
@@ -84,7 +88,7 @@ Instead of accessing this directly, use 2048-get-cell.")
   "The height of the board.  It could be customized, if you wanted to make the game very very tall, or very very short.")
 
 (defvar *2048-possible-values-to-insert* (cons 4 (make-list 9 2))
-  "When a new element is inserted into the board, randomly choose a number from this sequence.")
+  "To get the value of a new element, randomly choose a number from this sequence.")
 
 (defvar *2048-victory-value* nil
   "When this number is reached, the user wins! Yay!")
@@ -112,7 +116,10 @@ Instead of accessing this directly, use 2048-get-cell.")
 (defvar *2048-game-has-been-added-to-history* nil
   "Whether the current game has been added to the history yet.
 
-Right now, it's only for use when the game has been lost.  Since the user can choose to not start a new game, we want to add the score to the history the first time the game is lost, but not any other time.")
+Right now, it's only for use when the game has been lost.  Since
+the user can choose to not start a new game, we want to add the
+score to the history the first time the game is lost, but not any
+other time.")
 
 (defvar *2048-game-epoch* nil
   "The time the current game started.")
@@ -120,17 +127,17 @@ Right now, it's only for use when the game has been lost.  Since the user can ch
 ;; These are prefixed with "twentyfortyeight-face-", not "2048-face"
 ;; because face names starting with numbers break htmlfontify-buffer,
 ;; as CSS classes beginning with numbers are ignored.
-(defface twentyfortyeight-face-2    '((t . (:background "khaki" :foreground "black"))) "Face for the tile 2" :group '2048-faces)
-(defface twentyfortyeight-face-4    '((t . (:background "burlywood" :foreground "black"))) "Face for the tile 4" :group '2048-faces)
-(defface twentyfortyeight-face-8    '((t . (:background "orange3" :foreground "black"))) "Face for the tile 8" :group '2048-faces)
-(defface twentyfortyeight-face-16   '((t . (:background "orange" :foreground "black"))) "Face for the tile 16" :group '2048-faces)
-(defface twentyfortyeight-face-32   '((t . (:background "orange red" :foreground "black"))) "Face for the tile 32" :group '2048-faces)
-(defface twentyfortyeight-face-64   '((t . (:background "firebrick" :foreground "white"))) "Face for the tile 64" :group '2048-faces)
-(defface twentyfortyeight-face-128  '((t . (:background "dark red" :foreground "white"))) "Face for the tile 128" :group '2048-faces)
-(defface twentyfortyeight-face-256  '((t . (:background "dark magenta" :foreground "white"))) "Face for the tile 256" :group '2048-faces)
-(defface twentyfortyeight-face-512  '((t . (:background "magenta" :foreground "black"))) "Face for the tile 512" :group '2048-faces)
-(defface twentyfortyeight-face-1024 '((t . (:background "gold" :foreground "black"))) "Face for the tile 1024" :group '2048-faces)
-(defface twentyfortyeight-face-2048 '((t . (:background "yellow" :foreground "black"))) "Face for the tile 2048" :group '2048-faces)
+(defface twentyfortyeight-face-2    '((t . (:background "khaki" :foreground "black"))) "Face for the tile 2." :group '2048-faces)
+(defface twentyfortyeight-face-4    '((t . (:background "burlywood" :foreground "black"))) "Face for the tile 4." :group '2048-faces)
+(defface twentyfortyeight-face-8    '((t . (:background "orange3" :foreground "black"))) "Face for the tile 8." :group '2048-faces)
+(defface twentyfortyeight-face-16   '((t . (:background "orange" :foreground "black"))) "Face for the tile 16." :group '2048-faces)
+(defface twentyfortyeight-face-32   '((t . (:background "orange red" :foreground "black"))) "Face for the tile 32." :group '2048-faces)
+(defface twentyfortyeight-face-64   '((t . (:background "firebrick" :foreground "white"))) "Face for the tile 64." :group '2048-faces)
+(defface twentyfortyeight-face-128  '((t . (:background "dark red" :foreground "white"))) "Face for the tile 128." :group '2048-faces)
+(defface twentyfortyeight-face-256  '((t . (:background "dark magenta" :foreground "white"))) "Face for the tile 256." :group '2048-faces)
+(defface twentyfortyeight-face-512  '((t . (:background "magenta" :foreground "black"))) "Face for the tile 512." :group '2048-faces)
+(defface twentyfortyeight-face-1024 '((t . (:background "gold" :foreground "black"))) "Face for the tile 1024." :group '2048-faces)
+(defface twentyfortyeight-face-2048 '((t . (:background "yellow" :foreground "black"))) "Face for the tile 2048." :group '2048-faces)
 
 (defun 2048-get-face (number)
   "Return the face for squares holding NUMBER."
@@ -182,7 +189,7 @@ This macro is used to do some housekeeping around the move."
 	    (get-buffer-create "2048-debug"))))
 
 (defun 2048-init-tiles ()
-  "Initialize each variable 2048-empty-N and 2048-tile-N with appropriate string and face."
+  "Initialize each variable 2048-empty-N and 2048-tile-N with string and face."
   (mapc #'2048-init-tile
         *2048-numbers*))
 
@@ -256,13 +263,13 @@ That is, print zeros as empty strings, and all other numbers as themselves."
     (format "%d" num)))
 
 (defun 2048-was-combined-this-turn (row column)
-  "Return whether the number in (ROW, COLUMN) was generated this turn by two numbers combining."
+  "Return whether (ROW, COLUMN) was filled this turn by two numbers combining."
   (elt *2048-combines-this-move*
        (+ (* row *2048-columns*)
           column)))
 
 (defun 2048-set-was-combined-this-turn (row column)
-  "Set that the number in (ROW, COLUMN) was generated this turn by two numbers combining."
+  "Set that (ROW, COLUMN) was filled this turn by two numbers combining."
   (2048-debug (format "setting (%d, %d) as combined this turn." row column))
   (aset *2048-combines-this-move*
         (+ (* row *2048-columns*)
@@ -282,7 +289,9 @@ That is, print zeros as empty strings, and all other numbers as themselves."
     (2048-set-cell row column number-to-insert)))
 
 (defun 2048-check-game-end ()
-  "Check whether the game has either been won or lost.  If so, notify the user and restarting."
+  "Check whether the game has either been won or lost, and act accordingly.
+
+This acts by notifying the user and restarting."
   (cond ((2048-game-was-won)
          (2048-print-board)
          (if (y-or-n-p "Yay! You beat the game!  y to start again; n to continue.  Start again? ")

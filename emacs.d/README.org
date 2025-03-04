@@ -219,7 +219,7 @@
 
     ;; Default font size and name
     (setq amd/font-size (cond
-                         ((eq system-type 'gnu/linux) 18.0)
+                         ((eq system-type 'gnu/linux) 15.0)
                          ((eq system-type 'darwin) 22.0)
                          (t 18.0))
           amd/font-name "PragmataPro"
