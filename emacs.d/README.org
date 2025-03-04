@@ -8,7 +8,7 @@
 - [[#appearance][appearance]]
   - [[#page-break-lines][page-break-lines]]
   - [[#dashboard][dashboard]]
-  - [[#themes][themes]]
+  - [[#theme-related-functions][theme related functions]]
   - [[#leuven-light][leuven light]]
   - [[#moe-dark][moe dark]]
   - [[#catppuccin][catppuccin]]
@@ -16,7 +16,7 @@
   - [[#modus-themes][modus-themes]]
   - [[#solaire-mode][solaire-mode]]
   - [[#modeline][modeline]]
-  - [[#load-theme][load theme]]
+  - [[#default-startup-theme][default startup theme]]
   - [[#appearance-minor-modes][appearance minor-modes]]
 - [[#amdfunctions][amd/functions]]
 - [[#evil-mode][evil-mode]]
@@ -201,6 +201,7 @@
     (put 'erase-buffer 'disabled nil)
 
     (defun amd/tangle-init ()
+      "Manually copy code from README.org into README.el."
       (interactive)
       (require 'ob-tangle)
       (org-babel-tangle-file "~/.emacs.d/README.org" "~/.emacs.d/README.el" "emacs-lisp"))
@@ -402,7 +403,7 @@
     (dashboard-setup-startup-hook))
 #+end_src
 
-** themes
+** theme related functions
 
 #+begin_src emacs-lisp
   ;; (defadvice load-theme (before theme-dont-propagate activate)
@@ -676,7 +677,8 @@
        '(avy-lead-face-0 ((t (:foreground "#5fd7ff"))) t)
        '(avy-lead-face-1 ((t (:foreground "#66ffaa"))) t)
        '(avy-lead-face-2 ((t (:foreground "#ff6666"))) t))
-      (load-theme 'airline-catppuccin_frappe t)))
+      (when (featurep 'airline-themes)
+        (load-theme 'airline-catppuccin_frappe t))))
 #+end_src
 
 ** doom-themes
@@ -857,7 +859,7 @@
     :hook (after-init . doom-modeline-mode))
 #+end_src
 
-** load theme
+** default startup theme
 
 #+begin_src emacs-lisp
   ;; (amd/leuven-light-theme)

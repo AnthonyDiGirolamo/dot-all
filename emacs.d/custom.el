@@ -14,19 +14,17 @@
  '(magit-log-arguments '("--graph" "--color" "--decorate"))
  '(magit-status-buffer-switch-function 'switch-to-buffer)
  '(package-selected-packages
-   '(ag airline-themes bazel blimp catppuccin-theme coffee-mode
-        company-inf-ruby company-lsp company-shell counsel-gtags
-        dts-mode edbi edit-server elfeed emmet-mode esup evil
-        exec-path-from-shell feature-mode fennel-mode
-        fill-column-indicator flycheck-rust forth-mode general ggtags
-        gif-screencast glsl-mode gn-mode go-mode haml-mode
-        hide-mode-line highlight-indent-guides ht htmlize
-        ibuffer-projectile jinja2-mode js2-mode json-mode jsonrpc
-        llama major-mode-hydra markdown-mode markdown-mode+ moonscript
-        ob-async org-superstar ox-gfm page-break-lines pandoc-mode
-        paradox pt pylint rainbow-delimiters request scad-mode
-        scad-preview scss-mode sql-indent sqlup-mode ssh-agency
-        ssh-config-mode steam subatomic256-theme transient
+   '(ag airline-themes bazel blimp coffee-mode company-inf-ruby
+        company-lsp company-shell counsel-gtags dts-mode edbi
+        edit-server elfeed emmet-mode esup evil exec-path-from-shell
+        feature-mode fennel-mode fill-column-indicator flycheck-rust
+        forth-mode general ggtags gif-screencast glsl-mode gn-mode
+        go-mode haml-mode hide-mode-line ht htmlize ibuffer-projectile
+        jinja2-mode js2-mode json-mode jsonrpc llama major-mode-hydra
+        markdown-mode markdown-mode+ moonscript ob-async org-superstar
+        ox-gfm page-break-lines pandoc-mode paradox pt pylint request
+        scad-mode scad-preview scss-mode sql-indent sqlup-mode
+        ssh-agency ssh-config-mode steam subatomic256-theme transient
         transient-posframe treesit-auto typescript-mode vimrc-mode vlf
         vterm wgrep-pt which-key with-editor xterm-color yaml-mode
         yari yasnippet))
