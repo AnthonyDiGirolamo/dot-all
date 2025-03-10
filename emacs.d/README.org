@@ -1374,7 +1374,7 @@ This mode gives variables names unique colors.
     (:states '(insert)
      "C-s" (lambda() (interactive) (save-buffer) (evil-normal-state))
      "C-y" 'counsel-yank-pop
-     "M-t" 'counsel-ibuffer
+     "M-t" 'switch-to-buffer
      "M-b" 'ibuffer
      "C-x C-l" 'evil-complete-previous-line
      ;; The C-w insert bindings require 'evil-want-C-w-delete nil

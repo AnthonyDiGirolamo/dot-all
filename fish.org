@@ -298,10 +298,10 @@ The =fish_prompt= function is responsible for setting the prompt.
   set -x fish_custom_prompt_show_user 0
 
   function fish_prompt
-    if set -q INSIDE_EMACS
-      echo -n (prompt_pwd) ' $ '
-      return
-    end
+    # if set -q INSIDE_EMACS
+    #   echo -n (prompt_pwd) ' $ '
+    #   return
+    # end
 
     set_color -b $powerline_blue1 black
     if test 1 = $fish_custom_prompt_show_user
