@@ -32,11 +32,19 @@
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
  '(safe-local-variable-values
-   '((lsp-clients-clangd-executable
-      . "/home/tonymd/pigweed/environment/cipd/packages/pigweed/bin/clangd")
-     (lsp-clients-clangd-args "--background-index=true")
+   '((eval setq lsp-clients-clangd-executable
+           (expand-file-name
+            (concat (projectile-project-root)
+                    "/prebuilt/third_party/clang/linux-x64/bin/clangd")))
      (eval add-to-list 'exec-path
-           (expand-file-name "./environment/cipd/packages/pigweed/bin"))
+           (expand-file-name
+            (concat (projectile-project-root)
+                    "/prebuilt/third_party/clang/linux-x64/bin")))
+     (eval add-to-list 'exec-path
+           (expand-file-name
+            (concat (projectile-project-root)
+                    "/environment/cipd/packages/pigweed/bin")))
+     (lsp-clients-clangd-args "--background-index=true")
      (org-html-table-default-attributes :class
                                         "mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp"
                                         :border "1" :cellspacing "0"

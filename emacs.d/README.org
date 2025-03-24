@@ -3006,9 +3006,10 @@ This mode gives variables names unique colors.
 #+end_src
 
 #+begin_src emacs-lisp
-  ;; (use-package eglot
-  ;;   :init
-  ;;   (add-hook 'c++-mode-hook 'eglot-ensure))
+  (use-package eglot
+    :disabled
+    :init
+    (add-hook 'c++-mode-hook 'eglot-ensure))
 
   (use-package lsp-mode
     :commands lsp
@@ -3016,8 +3017,9 @@ This mode gives variables names unique colors.
     ;; (lsp-restart 'auto-restart)
     (lsp-restart 'interactive)
     (lsp-headerline-breadcrumb-enable nil)
+    (lsp-enable-file-watchers nil)
     :general
-    (:keymaps '(lsp-mode-map)
+    (:keymaps '(lsp-signature-mode-map)
      ;; was lsp-signature-next
      "M-n" 'tmux-window-navigation/move-down)
     :init
@@ -3071,6 +3073,10 @@ This mode gives variables names unique colors.
      "RET" 'lsp-ui-imenu--view)
     :config
     (add-to-list 'evil-motion-state-modes 'lsp-ui-imenu-mode))
+
+  (use-package lsp-rust
+    :custom
+    (lsp-rust-analyzer-cargo-watch-enable nil))
 
   (use-package company-lsp
     :commands company-lsp)
@@ -3129,6 +3135,12 @@ This mode gives variables names unique colors.
   ;; Markdown mode
   (use-package markdown-mode
     :defer t
+    :general
+    (:states
+     '(normal visual)
+     :keymaps '(markdown-mode-map)
+     "N" 'markdown-outline-next
+     "E" 'markdown-outline-previous)
     :init
     (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
     (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
@@ -3187,6 +3199,7 @@ This mode gives variables names unique colors.
   (use-package python
     :commands python-mode
     :init
+    (add-hook 'python-mode-hook (lambda () (setq-local fill-column 80)))
     (setq python-shell-interpreter "ipython"
           python-shell-interpreter-args "-i"))
 
