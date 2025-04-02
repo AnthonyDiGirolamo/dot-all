@@ -12,9 +12,10 @@ BEGIN {
 
     cli::LOG_DEBUG = 0
 
-    _myshortopts = "vg:ih"
-    _mylongopts = "verbose,file-pattern:ignore-case,help"
+    _myshortopts = "vSg:ih"
+    _mylongopts = "verbose,chop-long-lines,file-pattern:ignore-case,help"
 
+    chop_lines = 0
     file_pattern = ""
     search_pattern = ""
     search_path = "."
@@ -25,6 +26,10 @@ BEGIN {
         case "v":
         case "verbose":
             cli::LOG_DEBUG = 1
+            break
+        case "S":
+        case "chop-long-lines":
+            chop_lines = 1
             break
         case "g":
         case "file-pattern":
@@ -71,6 +76,11 @@ BEGIN {
         usage()
     }
 
+    if (!path::is_dir(search_path)) {
+        print cli::error("Error: ") "Search path does not exist: " search_path
+        usage()
+    }
+
     # Collect files matching the pattern
     path::glob(search_path, file_pattern)
     with::sort_index_string_asc("ripawk::search_all_files")
@@ -102,8 +112,15 @@ function search(file_path, search_pattern,
                 print "\n" cli::magenta(file_path)
                 _firstmatch_found = 1
             }
-            # Print line number and matching line
-            print cli::green(_linenumber) ":" _line
+            # Print line number
+            printf cli::green(_linenumber) ":"
+            # Print the matching line
+            if (chop_lines) {
+                print substr(_line, 0, 80)
+            }
+            else {
+                print _line
+            }
         }
         _linenumber++
     }
@@ -123,7 +140,7 @@ function readfile(file_path,
 
 
 function usage() {
-    print "usage: rip.awk [-v] [-g] PATTERN PATH"
+    print "usage: rip.awk [-v] [-g] [-i] PATTERN PATH"
     print "options:"
     print "  -v, --verbose       Show debug output."
     print "  -g, --file-pattern  Regex pattern to pre-filter files to be searched."

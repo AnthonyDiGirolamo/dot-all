@@ -594,11 +594,12 @@ function trim_whitespace(text,
     return trimmed_text
 }
 
-function _get_uname_system_type(_system_type) {
-    while (("uname -a" |& getline line) > 0) {
+function _get_uname_system_type(_system_type, _command) {
+    _command = "uname -a"
+    while ((_command |& getline line) > 0) {
         uname = line
     }
-    close("uname -a")
+    close(_command)
     _DEBUG("uname = " uname)
     _system_type = "gnu/linux"
     if (uname ~ uname_msys_regex)

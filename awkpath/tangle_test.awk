@@ -12,6 +12,8 @@ BEGIN {
 }
 
 function run_tests() {
+    assert::Equal(tangle::_get_uname_system_type(),
+                  "gnu/linux")
     assert::Equal(tangle::trim_whitespace("  something   "),
                   "something")
     assert::Equal(tangle::trim_whitespace("  \nhello\nthere\n\n "),
