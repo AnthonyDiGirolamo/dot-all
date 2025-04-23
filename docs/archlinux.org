@@ -2,6 +2,52 @@
 #+STARTUP: content indent
 #+PROPERTY: header-args :mkdirp yes
 
+* libvirt
+
+1. Install
+
+   #+begin_src sh
+     sudo pacman -S virt-manager libvirt qemu-full dnsmasq
+   #+end_src
+
+2. Setup
+
+   #+begin_src sh
+     sudo usermod anthony -a -G libvirt
+   #+end_src
+
+3. Disable dnsmasq, libvirt will start it.
+
+   #+begin_src sh
+     sudo systemctl status dnsmasq.service
+   #+end_src
+
+4. If using ufw set networking to use iptables. dhcp will be blocked otherwise
+
+   #+begin_src sh
+     sudo echo 'firewall_backend = "iptables"' >> /etc/libvirt/network.conf
+   #+end_src
+
+5. Start libvirt and enable networking
+
+   #+begin_src sh
+     sudo systemctl start libvirtd.service
+   #+end_src
+
+   #+begin_src sh
+     sudo virsh net-autostart --network default
+     sudo virsh net-start default
+     sudo virsh net-list --all
+   #+end_src
+
+   See [[https://www.haiku-os.org/guides/virtualizing/KVM][Emulating Haiku in KVM]] for more network details.
+
+6. Stop libvirt
+
+   #+begin_src sh
+     sudo systemctl stop libvirtd.service libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket
+   #+end_src
+
 * wpa
 
 ** setup script
@@ -61,7 +107,6 @@
   ExecStart=
   ExecStart=/usr/bin/dhcpcd -q -b %I
 #+end_src
-
 
 * packages
 
