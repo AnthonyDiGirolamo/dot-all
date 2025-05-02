@@ -5,7 +5,8 @@
 ;; Created: February 17, 2016
 ;; Keywords: vim, evil, leader, keybindings, keys
 ;; Package-Requires: ((emacs "24.4") (cl-lib "0.5"))
-;; Version: 0.1
+;; Package-Version: 20240410.1650
+;; Package-Revision: 826bf2b97a0f
 
 ;; This file is not part of GNU Emacs.
 
@@ -2253,7 +2254,7 @@ with `general-translate-key') and optionally keyword arguments for
   `(general-translate-key ,states ,keymaps ,@args))
 
 ;; ** Automatic Key Unbinding
-(defun general-unbind-non-prefix-key (define-key keymap key def &rest _)
+(defun general-unbind-non-prefix-key (define-key keymap key &rest args)
   "Use DEFINE-KEY in KEYMAP to unbind an existing non-prefix subsequence of KEY.
 When a general key definer is in use and a subsequnece of KEY is already bound
 in KEYMAP, unbind it using DEFINE-KEY. Always bind KEY to DEF using DEFINE-KEY."
@@ -2264,7 +2265,7 @@ in KEYMAP, unbind it using DEFINE-KEY. Always bind KEY to DEF using DEFINE-KEY."
       (while (numberp (lookup-key keymap key))
         (setq key (cl-subseq key 0 -1)))
       (funcall define-key keymap key nil)))
-  (funcall define-key keymap key def))
+  (apply define-key keymap key args))
 
 ;;;###autoload
 (defun general-auto-unbind-keys (&optional undo)
@@ -2639,6 +2640,19 @@ Return something like '((some-command-to-autoload . command) ...)."
                         ,@arglist
                         :package ',name)))
                  args))))
+
+  ;; ** :general-config Keyword
+  (setq use-package-keywords
+        (cl-loop for item in use-package-keywords
+                 if (eq item :config)
+                 collect :config and collect :general-config
+                 else
+                 ;; don't add duplicates
+                 unless (eq item :general-config)
+                 collect item))
+  (defalias 'use-package-normalize/:general-config
+    #'use-package-normalize/:general)
+  (defalias 'use-package-handler/:general-config #'use-package-handler/:general)
 
   ;; ** :ghook and :gfhook Keyword
   (setq use-package-keywords
