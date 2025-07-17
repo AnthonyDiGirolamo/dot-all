@@ -36,6 +36,7 @@
   - [[#calc][calc]]
   - [[#winner---window-layout-undoredo][winner - window layout undo/redo]]
   - [[#eww][eww]]
+  - [[#info-mode][info-mode]]
 - [[#vterm][vterm]]
 - [[#novel][nov.el]]
 - [[#elfeed][elfeed]]
@@ -423,7 +424,7 @@
   (use-package leuven-theme
     :custom
     (leuven-scale-org-agenda-structure nil)
-    (leuven-scale-outline-headlines nil))
+    (leuven-scale-outline-headlines t))
 
   (defun amd/leuven-light-theme ()
     "Light background theme"
@@ -1472,8 +1473,8 @@ This mode gives variables names unique colors.
     (add-to-list 'evil-motion-state-modes 'help-mode)
     (add-to-list 'evil-motion-state-modes 'compilation-mode)
     (add-to-list 'evil-motion-state-modes 'woman-mode)
+    (add-to-list 'evil-motion-state-modes 'Info-mode)
 
-    (add-to-list 'evil-normal-state-modes 'Info-mode)
     (add-to-list 'evil-normal-state-modes 'eww-mode)
     (add-to-list 'evil-normal-state-modes 'Custom-mode)
 
@@ -2200,6 +2201,32 @@ This mode gives variables names unique colors.
     (add-to-list 'evil-motion-state-modes 'eww-bookmark-mode))
 #+end_src
 
+** info-mode
+
+#+begin_src emacs-lisp
+  (use-package info-mode
+    :general
+    (:states '(motion) :keymaps '(Info-mode-map)
+      amd/leader-key 'hydra-leader-menu/body
+      "M-n" 'tmux-window-navigation/move-down ;; was clone-buffer
+      "f"   'ace-link-info
+      "gg"  'evil-goto-first-line
+      "TAB" 'Info-history-forward
+      "C-o" 'Info-history-back
+      "RET" 'Info-follow-nearest-node
+      ;; Not sure why these need redefining here and are not inherited
+      ;; from evil default motion map.
+      "w"   'evil-forward-word-begin
+      "b"   'evil-backword-word-begin
+      "n"   'evil-next-line
+      "e"   'evil-previous-line
+      "k" 'evil-ex-search-next
+      "K" 'evil-ex-search-previous
+      "q"   'Info-exit)
+    :init
+    :config)
+#+end_src
+
 * vterm
 
 #+begin_src emacs-lisp
@@ -2776,18 +2803,7 @@ This mode gives variables names unique colors.
       "TAB" 'help-go-forward
       "C-o" 'help-go-back)
     (:states '(motion) :keymaps '(Info-mode-map)
-      amd/leader-key 'hydra-leader-menu/body
-      "M-n" 'tmux-window-navigation/move-down ;; was clone-buffer
-      "f"   'ace-link-info
-      "gg"  'evil-goto-first-line
-      "TAB" 'Info-history-forward
-      "C-o" 'Info-history-back
-      "RET" 'Info-follow-nearest-node
-      "w"   'evil-forward-word-begin
-      "b"   'evil-backword-word-begin
-      "n"   'evil-next-line
-      "e"   'evil-previous-line
-      "q"   'Info-exit)
+      "f"   'ace-link-info)
     (:states '(motion) :keymaps '(compilation-mode-map)
       "f" 'ace-link-compilation)
     (:states '(motion) :keymaps '(woman-mode-map)
@@ -3517,7 +3533,7 @@ This mode gives variables names unique colors.
        (format "[%s] Iosevka Term SS17"
                (if (string-equal amd/font-name "Iosevka Term SS17 Light") "x" " ")))
       ("s"  (lambda () (interactive)
-              (amd/set-font amd/font-size "PragmataPro"))
+              (amd/set-font amd/font-size "PragmataPro Mono"))
        (format "[%s] PragmataPro"
                (if (string-equal amd/font-name "PragmataPro") "x" " ")))
       ("c"  (lambda () (interactive)
@@ -4648,7 +4664,8 @@ This mode gives variables names unique colors.
         (switch-to-buffer output-buffer)
         (shell-command-on-region
          1 (point-max)
-         "xclip -selection clipboard -i -t text/html &> /dev/null")
+         ;; "xclip -selection clipboard -i -t text/html &> /dev/null"
+         "wl-copy -t text/html &> /dev/null")
         (delete-window))
       (recenter)
       (evil-normal-state))
@@ -4657,13 +4674,18 @@ This mode gives variables names unique colors.
     (defun amd/clipboard-html-to-org-pandoc-mac ()
       "Convert clipboard contents from HTML to Org and then paste (yank)."
       (interactive)
-      (kill-new (shell-command-to-string "osascript -e 'the clipboard as \"HTML\"' | ruby -ne 'puts([$_[10..-3]].pack(\"H*\"))' | pandoc -f html -t org"))
+      (kill-new
+       (shell-command-to-string
+        "osascript -e 'the clipboard as \"HTML\"' | ruby -ne 'puts([$_[10..-3]].pack(\"H*\"))' | pandoc -f html -t org"))
       (yank))
 
     (defun amd/clipboard-html-to-org-pandoc-linux ()
       "Convert clipboard contents from HTML to Org and then paste (yank)."
       (interactive)
-      (kill-new (shell-command-to-string "xclip -selection clipboard -o -t text/html | pandoc -f html -t org"))
+      (kill-new
+       (shell-command-to-string
+        ;; "xclip -selection clipboard -o -t text/html | pandoc -f html -t org"
+        "wl-paste -t text/html | pandoc -f html -t org"))
       (yank))
 
     (defun amd/clipboard-org-to-html-mac ()

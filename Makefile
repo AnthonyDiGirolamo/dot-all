@@ -43,7 +43,11 @@ clean:  ## delete .cache
 
 .PHONY: test
 test: ## tangle_test.awk
-	@gawk -f ./tangle_test.awk
+	@pushd awkpath
+	@env AWKPATH=. gawk -f ./cli_test.awk
+	@env AWKPATH=. gawk -f ./tangle_test.awk
+	@env AWKPATH=. gawk -f ./path_test.awk
+	@popd
 
 .PHONY: lint
 lint: ## Lint: tangle.awk
