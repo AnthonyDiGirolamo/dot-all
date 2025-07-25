@@ -61,6 +61,9 @@
   - [[#ibuffer][ibuffer]]
   - [[#tmux-window-navigation][tmux-window-navigation]]
   - [[#which-func][which-func]]
+- [[#language-servers][language servers]]
+  - [[#eglot][eglot]]
+  - [[#lsp-mode][lsp-mode]]
 - [[#language-major-modes][language major-modes]]
 - [[#hydra][hydra]]
 - [[#hydra-leader-menus][hydra leader menus]]
@@ -2983,50 +2986,58 @@ This mode gives variables names unique colors.
     (which-function-mode t))
 #+end_src
 
-* language major-modes
+* language servers
 
-#+begin_src emacs-lisp
-  (use-package prog-mode
-    :config
-    (when (display-graphic-p)
-      ;; (global-prettify-symbols-mode 1)
-      (setq
-       prettify-symbols-unprettify-at-point t
-       prettify-symbols-alist
-       '(("lambda" . ?ƛ)
-         ("self." . ?ⓢ)
-         ;; ("->" . (?\s (Br . Bl) ?))
-         ;; ("-->" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
-         ;; ("==>" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
-         ;; ("=>" . (?\s (Br . Bl) ?))
-         ;; ("--" . (?\s (Br . Bl) ?))
-         ;; ("!=" . (?\s (Br . Bl) ?))
-         ;; ("==" . (?\s (Br . Bl) ?))
-         ;; (">=" . (?\s (Br . Bl) ?))
-         ;; ("<=" . (?\s (Br . Bl) ?))
-         ;; ("~=" . (?\s (Br . Bl) ?))
-         ;; ("&&" . (?\s (Br . Bl) ?))
-         ;; ("#{" . (?\s (Br . Bl) ?))
-         ;; ("ERROR" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
-         ;; ("DEBUG" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
-         ))))
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package treesit-auto
-    ;; :demand t
-    :disabled
-    :config
-    (setq treesit-auto-install 'prompt)
-    (global-treesit-auto-mode))
-#+end_src
+** eglot
 
 #+begin_src emacs-lisp
   (use-package eglot
     :disabled
     :init
     (add-hook 'c++-mode-hook 'eglot-ensure))
+#+end_src
 
+** lsp-mode
+
+For lsp-mode to work with rust or clangd it works best if these files
+are available in the project root folder:
+
+- ~rust-project.json~ is available or symlinked
+
+- ~rustc~ and ~rust-analyzer~ are available on the path
+
+- ~compile_commands.json~ is available or symlinked
+
+- Create an empty ~.projectile~ file in the project root.
+
+- Create a ~.dir-locals.el~ with the following (as an example). This
+  sets the local clangd executable to one relative to the project
+  root.
+
+  #+begin_src emacs-lisp :tangle no
+    ;;; Directory Local Variables            -*- no-byte-compile: t -*-
+    ;;; For more information see (info "(emacs) Directory Variables")
+
+    (
+     (nil
+      . ((eval
+          . (add-to-list 'exec-path
+                         (expand-file-name
+                          (concat (projectile-project-root) "/prebuilt/third_party/clang/linux-x64/bin"))))
+         (lsp-clients-clangd-args . ("--background-index=true"))
+         (eval
+          . (setq lsp-clients-clangd-executable (expand-file-name (concat (projectile-project-root) "/prebuilt/third_party/clang/linux-x64/bin/clangd"))))
+         )
+      )
+     (magit-status-mode
+      . ((eval
+          . (magit-disable-section-inserter 'magit-insert-tags-header))
+         )
+      )
+     )
+  #+end_src
+
+#+begin_src emacs-lisp
   (use-package lsp-mode
     :commands lsp
     :custom
@@ -3100,7 +3111,49 @@ This mode gives variables names unique colors.
   (use-package lsp-ivy
     :commands lsp-ivy-workspace-symbol)
 
-  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+  (use-package lsp-ivy
+    :commands lsp-ivy-workspace-symbol)
+#+end_src
+
+* language major-modes
+
+#+begin_src emacs-lisp
+  (use-package prog-mode
+    :config
+    (when (display-graphic-p)
+      ;; (global-prettify-symbols-mode 1)
+      (setq
+       prettify-symbols-unprettify-at-point t
+       prettify-symbols-alist
+       '(("lambda" . ?ƛ)
+         ("self." . ?ⓢ)
+         ;; ("->" . (?\s (Br . Bl) ?))
+         ;; ("-->" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
+         ;; ("==>" . (?\s (Br . Bl) ?\s (Br . Bl) ?))
+         ;; ("=>" . (?\s (Br . Bl) ?))
+         ;; ("--" . (?\s (Br . Bl) ?))
+         ;; ("!=" . (?\s (Br . Bl) ?))
+         ;; ("==" . (?\s (Br . Bl) ?))
+         ;; (">=" . (?\s (Br . Bl) ?))
+         ;; ("<=" . (?\s (Br . Bl) ?))
+         ;; ("~=" . (?\s (Br . Bl) ?))
+         ;; ("&&" . (?\s (Br . Bl) ?))
+         ;; ("#{" . (?\s (Br . Bl) ?))
+         ;; ("ERROR" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
+         ;; ("DEBUG" . (?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?\s (Br . Bl) ?))
+         ))))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package treesit-auto
+    ;; :demand t
+    :disabled
+    :config
+    (setq treesit-auto-install 'prompt)
+    (global-treesit-auto-mode))
+#+end_src
+
+#+begin_src emacs-lisp
 
   (use-package emacs-lisp
     :general
