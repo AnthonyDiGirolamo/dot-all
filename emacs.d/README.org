@@ -416,6 +416,20 @@
     (interactive)
     (cl-loop for theme-name in custom-enabled-themes
              do (funcall #'disable-theme theme-name)))
+
+  (defun amd/clear-and-load-theme (theme-name)
+    "Disable all loaded themes and load the provided theme."
+    (amd/disable-loaded-themes)
+    (load-theme (intern theme-name) t))
+
+  (defun amd/load-theme ()
+    "Interactively load a theme."
+    (interactive)
+    (let ((this-command 'amd/load-theme))
+      (ivy-read
+       "Switch theme: "
+       (custom-available-themes)
+       :action #'amd/clear-and-load-theme)))
 #+end_src
 
 ** leuven light
@@ -873,28 +887,36 @@
   ;; (amd/doom-one-theme)
   ;; (load-theme 'airline-doom-one t)
 
-  (amd/catppuccin-theme)
+  ;; (amd/catppuccin-theme)
 
   ;; (amd/modus-light-theme)
   ;; (amd/modus-dark-theme)
 
-  ;; (load-theme 'doom-palenight)
-  ;; (custom-theme-set-faces
-  ;;  'doom-palenight
-  ;;  '(org-level-1 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#aa88ff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
-  ;;  '(org-level-2 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88aaff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
-  ;;  '(org-level-3 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88ffff" :underline nil))) t) ;; cyan
-  ;;  '(org-level-4 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#66ffaa" :underline nil))) t) ;; sea-green
-  ;;  '(org-level-5 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffff66" :underline nil))) t) ;; yellow
-  ;;  '(org-level-6 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffaa00" :underline nil))) t) ;; orange
-  ;;  '(org-level-7 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff6666" :underline nil))) t) ;; red
-  ;;  '(org-level-8 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff66aa" :underline nil))) t) ;; pink
-  ;;  )
+  (defun amd/doom-palenight-theme ()
+    "load doom-palenight-theme"
+    (interactive)
+    (amd/disable-loaded-themes)
+    (when (featurep 'airline-themes)
+      (load-theme 'airline-base16_material_palenight t)
+      ;; (custom-theme-set-faces
+      ;;  'airline-base16_material_palenight
+      ;;  '(tab-bar-tab-inactive ((t (:foreground "#32374D":background "#444267" :inherit))) t))
+      )
+    (load-theme 'doom-palenight)
+    (custom-theme-set-faces
+     'doom-palenight
+     '(org-level-1 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#aa88ff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
+     '(org-level-2 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88aaff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
+     '(org-level-3 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88ffff" :underline nil))) t) ;; cyan
+     '(org-level-4 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#66ffaa" :underline nil))) t) ;; sea-green
+     '(org-level-5 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffff66" :underline nil))) t) ;; yellow
+     '(org-level-6 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffaa00" :underline nil))) t) ;; orange
+     '(org-level-7 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff6666" :underline nil))) t) ;; red
+     '(org-level-8 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff66aa" :underline nil))) t) ;; pink
+     )
+    )
 
-  ;; (load-theme 'airline-base16_material_palenight t)
-  ;; (custom-theme-set-faces
-  ;;  'airline-base16_material_palenight
-  ;;  '(tab-bar-tab-inactive ((t (:foreground "#32374D":background "#444267" :inherit))) t))
+  (amd/doom-palenight-theme)
 #+end_src
 
 ** appearance minor-modes
