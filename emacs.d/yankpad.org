@@ -244,4 +244,27 @@ with open('/dev/pts/2', 'w') as term:
   #!/usr/bin/env fish
   set PROJECT_DIR (readlink -f (dirname (status --current-filename)))
   cd $PROJECT_DIR
+
+  # If args provided on the command line run that and exit.
+  if test (count $argv) -gt 0
+    exec $argv
+  end
+#+end_src
+
+* sh-mode
+
+** projdir: script to cd to a project directory             :src:indent_nil:
+
+#+begin_src sh
+  #!/usr/bin/zsh
+  if test -n "$BASH"; then
+    SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
+  elif test -n "$ZSH_NAME"; then
+    SCRIPT_DIR="${0:a:h}"
+  fi
+
+  export PROJECT_ROOT=$(readlink -f "${SCRIPT_DIR}")
+  cd $PROJECT_ROOT
+
+  exec $*
 #+end_src
