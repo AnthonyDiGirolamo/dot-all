@@ -3608,7 +3608,7 @@ are available in the project root folder:
        (format "[%s] Iosevka Term SS17"
                (if (string-equal amd/font-name "Iosevka Term SS17 Light") "x" " ")))
       ("s"  (lambda () (interactive)
-              (amd/set-font amd/font-size "PragmataPro Mono"))
+              (amd/set-font amd/font-size "PragmataPro"))
        (format "[%s] PragmataPro"
                (if (string-equal amd/font-name "PragmataPro") "x" " ")))
       ("c"  (lambda () (interactive)

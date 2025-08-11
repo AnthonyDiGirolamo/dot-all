@@ -221,6 +221,7 @@ with open('/dev/pts/2', 'w') as term:
 #+end_src
 
 * conf-mode
+
 #+begin_src conf
   [Desktop Entry]
   Encoding=UTF-8
@@ -233,4 +234,14 @@ with open('/dev/pts/2', 'w') as term:
   Exec="/home/anthony/.local/share/Steam/steam.sh"
   Categories=Game;
   Path=/home/anthony/.local/share/Steam/
+#+end_src
+
+* fish-mode
+
+** projdir: script to cd to a project directory             :src:indent_nil:
+
+#+begin_src fish
+  #!/usr/bin/env fish
+  set PROJECT_DIR (readlink -f (dirname (status --current-filename)))
+  cd $PROJECT_DIR
 #+end_src
