@@ -1,11 +1,11 @@
 ;; -*- no-byte-compile: t; lexical-binding: nil -*-
-(define-package "color-identifiers-mode" "20241023.2217"
+(define-package "color-identifiers-mode" "20250709.134"
   "Color identifiers based on their names."
   '((dash  "2.5.0")
     (emacs "24.4"))
   :url "https://github.com/ankurdave/color-identifiers-mode"
-  :commit "89343c624ae64f568b5305ceca3db48d65711863"
-  :revdesc "89343c624ae6"
+  :commit "162e56caa183c16f252b3e0a9dc816e5baaaea28"
+  :revdesc "162e56caa183"
   :keywords '("faces" "languages")
   :authors '(("Ankur Dave" . "ankurdave@gmail.com"))
   :maintainers '(("Ankur Dave" . "ankurdave@gmail.com")))

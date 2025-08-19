@@ -887,7 +887,7 @@
   ;; (amd/doom-one-theme)
   ;; (load-theme 'airline-doom-one t)
 
-  ;; (amd/catppuccin-theme)
+  (amd/catppuccin-theme)
 
   ;; (amd/modus-light-theme)
   ;; (amd/modus-dark-theme)
@@ -916,7 +916,7 @@
      )
     )
 
-  (amd/doom-palenight-theme)
+  ;; (amd/doom-palenight-theme)
 #+end_src
 
 ** appearance minor-modes
@@ -1006,11 +1006,11 @@ This mode gives variables names unique colors.
     :init
     (amd/add-appearance-mode 'color-identifiers-mode)
     :config
-    ;; (add-to-list
-    ;;  'color-identifiers:modes-alist
-    ;;  `(lua-mode . ("[^.][[:space:]]*"
-    ;;                "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
-    ;;                (nil font-lock-variable-name-face))))
+    (add-to-list
+     'color-identifiers:modes-alist
+     `(lua-mode . (""
+                   "\\_<\\([a-zA-Z_$]\\(?:\\s_\\|\\sw\\)*\\)"
+                   (nil font-lock-variable-name-face tree-sitter-hl-face:variable))))
     (setq color-identifiers:num-colors 16))
 #+end_src
 
