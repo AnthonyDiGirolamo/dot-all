@@ -1357,33 +1357,63 @@ function cmd_draw_planet_map(planet_count, starting_seed, camera_x, camera_z)
   local planets = {}
   local planet_sprites = {}
   local planet_maps = {}
+  if DEBUG then print("pcount: " .. pcount) end
+  if DEBUG then print("seed_value: " .. seed_value) end
 
   local max_rows = 0
+  local used_row_columns = 0
   for i = 1, pcount do
-    -- for i=5,6 do
     local ptype = 1
-    local rad = 5
-    if i <= 6 then
+    local radius = 5
+
+    -- Set the planet type based on the curren planet count. Loop
+    -- around if we draw more planets than available types
+    local planet_type_index = ((i - 1) % #planet_types) + 1
+
+    if planet_type_index <= 6 then
+      -- Set small radius rocky planets for types 1-6
       ptype = random_int(7, 1)
-      rad = random_int(8) + 5
+      radius = random_int(8) + 5
     else
+      -- Set large radius for gas giant planets
       ptype = random_int(5, 1) + 6
-      rad = random_int(8) + 10
+      radius = random_int(8) + 10
     end
 
-    local p = Planet(px, py, ((1 - Vector(px, py):angle()) - .25) % 1, rad, i)
+    -- Init the planet and render to the canvas
+    local p = Planet(px, py, ((1 - Vector(px, py):angle()) - .25) % 1, radius, ptype)
     if p.planet_canvas.rows > max_rows then max_rows = p.planet_canvas.rows end
     local rendering_done = false
     while not rendering_done do rendering_done = p:render_planet() end
-    add(planets, p)
-    add(planet_sprites, p.planet_canvas)
-    if i == 6 or i == 10 then
+
+    -- check the total width consumed by the planets so far
+    local last_planet_cols = p.planet_canvas.cols
+    used_row_columns = used_row_columns + last_planet_cols
+
+    -- if the last planet is wider than the screen, print everything before
+    if used_row_columns >= term.screen_width then
       local c = concat_canvases(planet_sprites, 0)
       -- add(planet_maps, c)
       term:draw_canvas_half_height(c, WITH_TRANSPARENCY)
+      -- reset the sprites list
       planet_sprites = {}
+      -- set the used columns to the current planet columns
+      used_row_columns = last_planet_cols
+      -- if DEBUG then used_row_columns = 4 end
     end
+
+    -- save this planet and sprite
+    add(planets, p)
+    add(planet_sprites, p.planet_canvas)
   end
+
+  -- done looping, check if any unprinted sprites remain
+  if next(planet_sprites) ~= nil then
+    local c = concat_canvases(planet_sprites, 0)
+    term:draw_canvas_half_height(c, WITH_TRANSPARENCY)
+    planet_sprites = {}
+  end
+
 
   -- -- local planet_map_canvas = concat_canvases(planet_sprites, 0)
   -- for i, p in ipairs(planet_maps) do
@@ -1427,9 +1457,6 @@ function cmd_draw_shipyard(seed, type_index)
   -- term:draw_canvas(s, NO_TRANSPARENCY)
   -- term:draw_canvas_half_height(s, NO_TRANSPARENCY)
 
-  term:update_screen_width()
-  term:update_screen_height()
-  if DEBUG then term.screen_width = term.screen_width - 3 end
   -- term:draw_canvas(s, WITH_TRANSPARENCY)
   term:draw_canvas_half_height(s, WITH_TRANSPARENCY)
 
@@ -1449,17 +1476,6 @@ function cmd_draw_shipyard(seed, type_index)
   -- end
 end
 
-sed = os.time() + (os.clock() * 1000000)
-randomseed(sed)
--- randomseed(1615252340.0)
--- print(sed)
-
-_init()
-planet_max_radius = floor(term.screen_width / 2)
-
--- DEBUG = true
--- COLORS_256 = true
-
 function dir(prefix, tablename)
   if not prefix then prefix = "" end
   for i, v in pairs(tablename) do
@@ -1472,6 +1488,7 @@ function dir(prefix, tablename)
     end
   end
 end
+
 function globals()
   dir('_G', _G)
 end
@@ -1485,13 +1502,42 @@ end
 -- check for command line flags
 ship_value_index = nil
 planet_value_index = nil
+seed_value_index = nil
+
 for index, token in pairs(arg) do
   if token == "--ships" then
     ship_value_index = index + 1
   elseif token == "--planets" then
     planet_value_index = index + 1
+  elseif token == "--seed" then
+    seed_value_index = index + 1
+  elseif token == "--debug" or token == "-v" or token == "--verbose" then
+    DEBUG = true
   end
 end
+
+if seed_value_index and arg[seed_value_index] then
+  -- print("seed arg: ", arg[seed_value_index])
+  v = tonumber(arg[seed_value_index])
+  if type(v) == "number" then
+    -- print("seed number: ", v, type(v))
+    randomseed(v)
+  end
+else
+  time_based_seed = os.time() + (os.clock() * 1000000)
+  randomseed(time_based_seed)
+end
+
+term:update_screen_width()
+term:update_screen_height()
+if DEBUG then term.screen_width = term.screen_width - 4 end
+
+_init()
+planet_max_radius = floor(term.screen_width / 2)
+
+-- DEBUG = true
+-- COLORS_256 = true
+
 
 if ship_value_index or planet_value_index then
 
@@ -1511,8 +1557,6 @@ if ship_value_index or planet_value_index then
   if planet_value_index and arg[planet_value_index] then
     v = tonumber(arg[planet_value_index])
     if type(v) == "number" then
-      -- print("Planet", v, type(v))
-      -- TODO make planet_count arg work as expected in cmd_draw_planet_map()
       cmd_draw_planet_map(v)
     else
       print("unknown number of planets: " .. arg[planet_value_index])
@@ -1520,7 +1564,7 @@ if ship_value_index or planet_value_index then
   end
 
 else
-  -- if no options
+  -- if no ship or planet options print some planets then ships
   cmd_draw_planet_map()
   cmd_draw_shipyard()
 
@@ -1546,6 +1590,4 @@ else
   -- cmd_draw_shipyard(16950,2)
   -- cmd_draw_shipyard(25433,2)
   -- cmd_draw_shipyard(199584,2)
-
 end
-
