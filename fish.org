@@ -13,6 +13,7 @@
   - [[#configfishfunctionstarxzfish][~/.config/fish/functions/tarxz.fish]]
   - [[#configfishfunctionsufish][~/.config/fish/functions/u.fish]]
   - [[#configfishfunctionsdlfish][~/.config/fish/functions/dl.fish]]
+  - [[#configfishfunctionsffdfish][~/.config/fish/functions/ffd.fish]]
 - [[#ssh][ssh]]
   - [[#configfishfunctionsauthmefish][~/.config/fish/functions/authme.fish]]
 - [[#bash-releated][bash releated]]
@@ -184,10 +185,6 @@
   end
   function tll4 --description "tree ls -l style with maxdepth of 4"
     tllll -L 4 $argv
-  end
-
-  function ffd --description "find in ./ with wildcard"
-    find ./ -iname "*$argv[1]*" $argv[2..]
   end
 
   # fish specific aliases
@@ -424,6 +421,19 @@ The =fish_mode_prompt= formats the vi mode part of the prompt.
     set_color normal
     for dir in $dirnext
       echo $dir
+    end
+  end
+#+end_src
+
+** ~/.config/fish/functions/ffd.fish
+
+#+begin_src fish :tangle "~/.config/fish/functions/ffd.fish"
+  function ffd --description "find argv[2..] -iname '*argv[1]*'" --argument-names input_str optional_path
+    # echo "'*$input_str*'"
+    if test (count $argv) -gt 1
+      find $argv[2..] -iname "*$argv[1]*"
+    else
+      find ./ -iname "*$argv[1]*"
     end
   end
 #+end_src
