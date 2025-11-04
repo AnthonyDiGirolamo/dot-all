@@ -117,8 +117,8 @@ function install_emacs29() {
 
 function install_emacs30() {
     tarfile = make::download("emacs",
-        "https://ftpmirror.gnu.org/emacs/emacs-30.1.tar.xz",
-        "88d665794fdecba7769c11ab1ccea6e4")
+        "https://ftpmirror.gnu.org/emacs/emacs-30.2.tar.xz",
+        "0adba4843ac864ba8c3c9b2a7deea176")
 
     make::compile(make::extract_tar(tarfile),
         "./configure --prefix=$HOME/apps/emacs30 " \
