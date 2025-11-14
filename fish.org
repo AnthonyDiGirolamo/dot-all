@@ -14,6 +14,8 @@
   - [[#configfishfunctionsufish][~/.config/fish/functions/u.fish]]
   - [[#configfishfunctionsdlfish][~/.config/fish/functions/dl.fish]]
   - [[#configfishfunctionsffdfish][~/.config/fish/functions/ffd.fish]]
+- [[#ffmpeg][ffmpeg]]
+  - [[#configfishfunctionsffmpeg-to-giffish][~/.config/fish/functions/ffmpeg-to-gif.fish]]
 - [[#ssh][ssh]]
   - [[#configfishfunctionsauthmefish][~/.config/fish/functions/authme.fish]]
 - [[#bash-releated][bash releated]]
@@ -435,6 +437,30 @@ The =fish_mode_prompt= formats the vi mode part of the prompt.
     else
       find ./ -iname "*$argv[1]*"
     end
+  end
+#+end_src
+
+* ffmpeg
+
+** ~/.config/fish/functions/ffmpeg-to-gif.fish
+
+#+begin_src fish :tangle "~/.config/fish/functions/ffmpeg-to-gif.fish"
+  function ffmpeg-to-gif --argument-names inputfile width fps
+    set outputfile $(string split -f 1 . $inputfile).gif
+
+    if not set -q width[1]
+      set width 320
+    end
+    if not set -q fps[1]
+      set fps 10
+    end
+
+    # For reference
+    # set two_times_speed "setpts=0.5*PTS"
+
+    ffmpeg -i $inputfile \
+        -vf "fps=$fps,scale=$width:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" \
+        $outputfile
   end
 #+end_src
 
