@@ -65,8 +65,8 @@ $0
 
 ** ppimport
 import pprint
-_pretty_print = pprint.PrettyPrinter(indent=1, width=120).pprint
-_pretty_format = pprint.PrettyPrinter(indent=1, width=120).pformat
+_pp = pprint.PrettyPrinter(indent=1, width=120).pprint
+_pf = pprint.PrettyPrinter(indent=1, width=120).pformat
 
 ** rc: regex compile
 menu_regex = re.compile(
@@ -255,12 +255,18 @@ with open('/dev/pts/2', 'w') as term:
 
 ** projdir: script to cd to a project directory             :src:indent_nil:
 
+*zsh expansion modifiers*
+
+- ~:h[digit]~ goes up one directory level
+- ~:A~ makes the path absolute and resolves symlinks.
+- https://zsh.sourceforge.io/Doc/Release/Expansion.html
+
 #+begin_src sh
   #!/usr/bin/zsh
   if test -n "$BASH"; then
     SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
   elif test -n "$ZSH_NAME"; then
-    SCRIPT_DIR="${0:a:h}"
+    SCRIPT_DIR="${0:h:A}"
   fi
 
   export PROJECT_ROOT=$(readlink -f "${SCRIPT_DIR}")
@@ -268,3 +274,14 @@ with open('/dev/pts/2', 'w') as term:
 
   exec $*
 #+end_src
+
+** echorun: echo a command and run it
+
+#+begin_src sh
+  ACTION_ARROW="\x1b[36m==>\x1b[0m"
+  function echorun () {
+      echo -e $ACTION_ARROW $*
+      $*
+  }
+#+end_src
+

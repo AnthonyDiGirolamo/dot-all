@@ -1,38 +1,19 @@
-;;; -*- lexical-binding: t; -*-
+;;; tmux-window-navigation.el -*- lexical-binding: t; -*-
 
 ;; Author: Anthony DiGirolamo <anthony.digirolamo@gmail.com>
-;; URL: http://github.com/AnthonyDiGirolamo/tmux-window-navigation
 ;; Version: 0.1
 ;; Keywords: tmux, window, plugin
 
-;; This file is NOT part of GNU Emacs.
-
-;;; License:
-;;
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ;;; Commentary:
 ;;
-;; This package provides some extra operators for Emacs Evil, to evaluate codes,
-;; search via google, translate text, folding region, etc.
+;; Provides functions for navigating in and out of tmux panes when
+;; running emacs within a tmux session.
 ;;
-;; Installation:
+;;; Installation:
 ;;
-;; put tmux-window-navigation.el somewhere in your load-path and add these
-;; lines to your .emacs:
-;; (require 'tmux-window-navigation)
-;; (global-tmux-window-navigation-mode 1)
+;; (use-package tmux-window-navigation
+;;   :config
+;;   (global-tmux-window-navigation-mode 1))
 
 ;;; Code:
 
@@ -116,16 +97,20 @@
 ;; (define-key tmux-window-navigation-mode-map (kbd "M-h") 'windmove-left)
 ;; (define-key tmux-window-navigation-mode-map (kbd "M-l") 'windmove-right)
 
-(defun amd/tmux-dispatch-below (beg end)
-  (interactive "r")
+(defun amd/tmux-dispatch-below (dispatch-text)
+  (interactive "sText: ")
   (require 's)
   (let* ((tmux-panes        (shell-command-to-string "tmux list-panes"))
          (tmux-pane-number  (s-chomp (shell-command-to-string "tmux list-panes|grep -v active|head -n 1|cut -d: -f1")))
-         (text-to-send      (s-trim (s-chomp (buffer-substring-no-properties beg end))))
+         (text-to-send      (s-trim (s-chomp dispatch-text)))
          (tmux-send-command (concat "tmux send -t " tmux-pane-number " \'" text-to-send "\'")))
     ;; (shell-command-to-string tmux-send-command)))
     (shell-command-to-string (concat "tmux send -t " tmux-pane-number " 'C-c'"))
     (shell-command-to-string (concat tmux-send-command "\r"))))
+
+(defun amd/tmux-dispatch-below-reigon (beg end)
+  (interactive "r")
+  (amd/tmux-dispatch-below (buffer-substring-no-properties beg end)))
 
 (provide 'tmux-window-navigation)
 ;;; tmux-window-navigation.el ends here
