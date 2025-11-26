@@ -1287,8 +1287,10 @@ function Planet:render_planet(fullmap, render_far_side)
         local c = nil
 
         -- if fullmap or phasevalue==1 then
-        if fullmap or (phasevalue ~= 0 and xvalueindex <= #self.xvalues and -- left edge of planet circle
-        self.x >= self.radius - self.xvalues[xvalueindex] - 1 and self.x < self.radius + self.xvalues[xvalueindex]) then
+        if fullmap or
+          (phasevalue ~= 0 and xvalueindex <= #self.xvalues -- left edge of planet circle
+             and self.x >= self.radius - self.xvalues[xvalueindex] - 1
+             and self.x < self.radius + self.xvalues[xvalueindex]) then
           -- and sget(self.x,self.y)~=self.planet_type.transparent_color then
           local freq = self.planet_type.noise_zoom
           local max_amp = 0
@@ -1343,7 +1345,7 @@ function Planet:render_planet(fullmap, render_far_side)
   return self.rendered_terrain
 end
 
-function cmd_draw_planet_map(planet_count, starting_seed, camera_x, camera_z)
+function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_x, camera_z)
   if DEBUG then print("Terminal width: " .. term.screen_width) end
 
   local camera_angle = random()
@@ -1351,8 +1353,14 @@ function cmd_draw_planet_map(planet_count, starting_seed, camera_x, camera_z)
   local py = sin(camera_angle) * 100
   -- local px = camera_x or 50 -- sector_position.x
   -- local py = camera_z or -100 -- sector_position.y
-  local seed_value = starting_seed or random_int(262144)
-  -- randomseed(seed_value)
+  local seed_value
+  if starting_seed then
+    seed_value = starting_seed -- or random_int(262144)
+  else
+    seed_value = random_int(262144)
+  end
+  randomseed(seed_value)
+
   local pcount = planet_count or #planet_types
   local planets = {}
   local planet_sprites = {}
@@ -1370,15 +1378,23 @@ function cmd_draw_planet_map(planet_count, starting_seed, camera_x, camera_z)
     -- around if we draw more planets than available types
     local planet_type_index = ((i - 1) % #planet_types) + 1
 
-    if planet_type_index <= 6 then
-      -- Set small radius rocky planets for types 1-6
-      ptype = random_int(7, 1)
-      radius = random_int(8) + 5
+    if planet_type then
+      ptype = planet_type
+      radius = 38
     else
-      -- Set large radius for gas giant planets
-      ptype = random_int(5, 1) + 6
-      radius = random_int(8) + 10
+      if planet_type_index <= 6 then
+        -- Set small radius rocky planets for types 1-6
+        ptype = random_int(7, 1)
+        radius = random_int(8) + 5
+      else
+        -- Set large radius for gas giant planets
+        ptype = random_int(5, 1) + 6
+        radius = random_int(8) + 10
+      end
     end
+
+    if DEBUG then print("planet_type: " .. ptype) end
+    if DEBUG then print("planet_radius: " .. radius) end
 
     -- Init the planet and render to the canvas
     local p = Planet(px, py, ((1 - Vector(px, py):angle()) - .25) % 1, radius, ptype)
@@ -1501,14 +1517,20 @@ end
 
 -- check for command line flags
 ship_value_index = nil
-planet_value_index = nil
+planet_count_value_index = nil
+planet_type_value_index = nil
 seed_value_index = nil
+custom_starting_seed = nil
 
 for index, token in pairs(arg) do
   if token == "--ships" then
     ship_value_index = index + 1
+  elseif token == "--planet-radius" then
+    planet_radius_index = index + 1
   elseif token == "--planets" then
-    planet_value_index = index + 1
+    planet_count_value_index = index + 1
+  elseif token == "--planet-type" then
+    planet_type_value_index = index + 1
   elseif token == "--seed" then
     seed_value_index = index + 1
   elseif token == "--debug" or token == "-v" or token == "--verbose" then
@@ -1518,10 +1540,10 @@ end
 
 if seed_value_index and arg[seed_value_index] then
   -- print("seed arg: ", arg[seed_value_index])
-  v = tonumber(arg[seed_value_index])
+  custom_starting_seed = tonumber(arg[seed_value_index])
   if type(v) == "number" then
     -- print("seed number: ", v, type(v))
-    randomseed(v)
+    randomseed(custom_starting_seed)
   end
 else
   time_based_seed = os.time() + (os.clock() * 1000000)
@@ -1539,7 +1561,7 @@ planet_max_radius = floor(term.screen_width / 2)
 -- COLORS_256 = true
 
 
-if ship_value_index or planet_value_index then
+if ship_value_index or planet_count_value_index then
 
   -- if option '--ships 5' print 5 ships
   if ship_value_index and arg[ship_value_index] then
@@ -1553,13 +1575,22 @@ if ship_value_index or planet_value_index then
     end
   end
 
-  -- if option '--planets 2' print 2 planets
-  if planet_value_index and arg[planet_value_index] then
-    v = tonumber(arg[planet_value_index])
+  cmd_line_planet_type = nil
+  if planet_type_value_index and arg[planet_type_value_index] then
+    v = tonumber(arg[planet_type_value_index])
     if type(v) == "number" then
-      cmd_draw_planet_map(v)
+      cmd_line_planet_type = v
+    end
+  end
+
+  -- if option '--planets 2' print 2 planets
+  if planet_count_value_index and arg[planet_count_value_index] then
+    v = tonumber(arg[planet_count_value_index])
+    if type(v) == "number" then
+
+      cmd_draw_planet_map(v, custom_starting_seed, cmd_line_planet_type)
     else
-      print("unknown number of planets: " .. arg[planet_value_index])
+      print("unknown number of planets: " .. arg[planet_count_value_index])
     end
   end
 
