@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'tmpdir'
 require 'socket'
-require 'webrick'
 require 'logger'
+require 'uri'
 
 module Robe
   class Server
@@ -18,7 +20,7 @@ module Robe
     end
 
     def start
-      access = File.open("#{Dir.tmpdir}/robe-access-#{@port}.log", "w")
+      access = File.open("#{Dir.tmpdir}/robe-access-#{@port}.log", 'w')
       access.sync = true
 
       error_logger = Logger.new($stderr)
@@ -35,34 +37,34 @@ module Robe
             next
           end
 
-          req = WEBrick::HTTPRequest.new(:InputBufferSize => 1024,
-                                         :Logger => error_logger,
-                                         :RequestTimeout => REQUEST_TIMEOUT)
-          req.parse(client)
-          access_logger.info "#{req.request_method} #{req.path}"
+          # Only read the first line. To support reading the body,
+          # we'll have to parse the headers.
+          /\A(?<request_method>[A-Z]+) (?<path>[^ ]+)/ =~ client.gets
+
+          path = URI.decode_www_form_component(path)
+
+          access_logger.info "#{request_method} #{path}"
 
           begin
-            body = @handler.call(req.path, req.body)
+            body = @handler.call(path, nil)
             status = 200
           rescue Exception => e
-            error_logger.error "Request failed: #{req.path}. Please file an issue."
-            error_logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
+            body = "#{e.message}\n#{e.backtrace.join("\n")}"
+            error_logger.error "Request failed: #{path}. Please file an issue."
+            error_logger.error body
             status = 500
           end
 
-          resp = WEBrick::HTTPResponse.new(:OutputBufferSize => 1024,
-                                           :Logger => error_logger,
-                                           :HTTPVersion => "1.1")
-          resp.status = status
-          resp.content_type = "application/json; charset=utf-8"
           # XXX: If freezes continue, try: resp.keep_alive = false
-          resp.body = body
-
           begin
-            resp.send_response(client)
+            client.write("HTTP/1.1 #{status} OK\r\n" \
+"Content-Length: #{body.bytesize}\r\n" \
+"Content-Type: application/json; charset=utf-8\r\n" \
+"Connection: close\r\n\r\n")
+            client.write(body)
             client.close
           rescue Errno::EPIPE
-            error_logger.error "Connection lost, unsent response:"
+            error_logger.error 'Connection lost, unsent response:'
             error_logger.error body
           end
         rescue Errno::EINVAL
@@ -75,17 +77,15 @@ module Robe
     end
 
     def wait_for_it
-      begin
-        TCPSocket.new("127.0.0.1", @port).close
-      rescue
-        sleep 0.05
-        retry
-      end
+      TCPSocket.new('127.0.0.1', @port).close
+    rescue StandardError
+      sleep 0.05
+      retry
     end
 
     def shutdown
       @running = false
-      @server && @server.close
+      @server&.close
     end
 
     private

@@ -3322,6 +3322,7 @@ are available in the project root folder:
 
   ;; Ruby Settings
   (use-package robe
+    :disabled
     :defer t
     :init
     (setq ruby-deep-indent-paren nil)
@@ -3347,7 +3348,8 @@ are available in the project root folder:
             (function (lambda ()
                         (setq evil-shift-width ruby-indent-level))))
 
-  (use-package yari)
+  (use-package yari
+    :disabled)
 
   (add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
   (add-to-list 'auto-mode-alist '("\\.p8\\'" . lua-mode))

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'robe/sash/doc_for'
 require 'robe/sash/const_locations'
 require 'robe/type_space'
@@ -30,10 +32,10 @@ module Robe
         module_methods = obj.methods.map { |m| method_spec(obj.method(m)) }
         instance_methods = (obj.__instance_methods__ +
                             obj.__private_instance_methods__(false))
-          .map { |m| method_spec(obj.instance_method(m)) }
+                           .map { |m| method_spec(obj.instance_method(m)) }
         [name_cache[obj]] + module_methods + instance_methods
       else
-        self.targets(obj.class.to_s)
+        targets(obj.class.to_s)
       end
     end
 
@@ -42,17 +44,17 @@ module Robe
     end
 
     def find_method_owner(mod, inst, sym)
-      begin
-        find_method(mod, inst, sym).owner
-      rescue NameError
-      end
+      find_method(mod, inst, sym).owner
+    rescue NameError
     end
 
     def method_spec(method)
-      owner, inst = method.owner, nil
-      if owner.__singleton_class__?
+      owner = method.owner
+      inst = nil
+      if owner.singleton_class?
+        # FIXME: Use https://docs.ruby-lang.org/en/3.2/Class.html#method-i-attached_object
         name = owner.to_s[/Class:([A-Z][^\(> ]*)/, 1] # defined in an eigenclass
-      elsif name = name_cache[owner]
+      elsif (name = name_cache[owner])
         inst = true
       elsif !owner.is_a?(Class)
         name, inst = IncludesTracker.method_owner_and_inst(owner, name_cache)
@@ -96,23 +98,26 @@ module Robe
       end
 
       if targets.empty? && (target || !conservative) && !special_method
-        unless target
-          scanner.scan_methods(Kernel, :__private_instance_methods__)
-        end
+        scanner.scan_methods(Kernel, :__private_instance_methods__) unless target
         scanner.check_private = false
         scanner.scan(visor.each_object(Module), true, true)
         targets = scanner.candidates
       end
 
+      unless target
+        scanner.scan_methods(Object, :__instance_methods__)
+        scanner.scan_methods(Object, :__private_instance_methods__)
+      end
+
       targets.map { |method| method_spec(method) }
-        .sort_by { |(mname)| mname ? mname.scan(/::/).length : 99 }
+             .sort_by { |(mname)| mname ? mname.scan(/::/).length : 99 }
     end
 
     def filter_targets!(space, targets, instance, sym)
       owner = find_method_owner(space.target_type, instance, sym)
       if owner
         targets.reject! do |method|
-          !(method.owner <= owner) &&
+          method.owner > owner &&
             targets.find { |other| other.owner < method.owner }
         end
       end
@@ -124,6 +129,11 @@ module Robe
 
       space.scan_with(scanner)
 
+      unless target
+        scanner.scan_methods(Object, :__instance_methods__)
+        scanner.scan_methods(Object, :__private_instance_methods__)
+      end
+
       if scanner.candidates.empty?
         scanner.check_private = false
         scanner.scan(visor.each_object(Module), true, true)
@@ -133,17 +143,23 @@ module Robe
     end
 
     def complete_const(prefix, mod)
-      colons = prefix.rindex("::")
+      colons = prefix.rindex('::')
       tail = colons ? prefix[colons + 2..-1] : prefix
       if !colons
         path = [Object]
-        path += visor.resolve_path(mod) if mod
+
+        begin
+          path += visor.resolve_path(mod) if mod
+        rescue Visor::SearchError
+          # Containing module not resolved, but we can still search globally.
+        end
+
         path.flat_map do |m|
           complete_const_in_module(tail, m)
         end
       else
         base_name = prefix[0..colons + 1]
-        base = unless colons == 0
+        base = unless colons.zero?
                  if mod
                    visor.resolve_context(base_name[0..-3], mod)
                  else
@@ -170,15 +186,15 @@ module Robe
     end
 
     def load_path
-      $LOAD_PATH
+      $LOAD_PATH.map { |e| File.absolute_path(e) }
     end
 
     def ping
       {pong: true}
     end
 
-    def call(path, body)
-      _, endpoint, *args = path.split("/").map { |s| s == "-" ? nil : s }
+    def call(path, _body)
+      _, endpoint, *args = path.split('/').map { |s| s == '-' ? nil : s }
       value = public_send(endpoint.to_sym, *args)
 
       # Yajl 1.4.1 encoder is weirdly slow on our data.
@@ -192,7 +208,7 @@ module Robe
     private
 
     def pick_visor
-      if RUBY_ENGINE == "jruby"
+      if RUBY_ENGINE == 'jruby'
         JVisor.new
       else
         Visor.new
