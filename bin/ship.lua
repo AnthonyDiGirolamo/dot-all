@@ -1102,16 +1102,18 @@ function draw_sprite_circle(canvas, xc, yc, radius, filled, color)
 end
 
 perms = {}
-for i = 0, 255 do perms[i] = i end
-for i = 0, 255 do
-  local r = random_int(32767) % 256
-  perms[i], perms[r] = perms[r], perms[i]
-end
-
 perms12 = {}
-for i = 0, 255 do
-  local x = perms[i] % 12
-  perms[i + 256], perms12[i], perms12[i + 256] = perms[i], x, x
+function define_simplex_perms()
+  for i = 0, 255 do perms[i] = i end
+  for i = 0, 255 do
+    local r = random_int(32767) % 256
+    perms[i], perms[r] = perms[r], perms[i]
+  end
+
+  for i = 0, 255 do
+    local x = perms[i] % 12
+    perms[i + 256], perms12[i], perms12[i + 256] = perms[i], x, x
+  end
 end
 
 function getn_3d(ix, iy, iz, x, y, z)
@@ -1159,7 +1161,13 @@ function Planet:new(x, y, phase, r, ptype)
   local planet_type_index = ptype or random_int(#planet_types) + 1
   local planet_type = planet_types[planet_type_index]
 
-  local radius = r or random_int(planet_type.min_size + 10, planet_type.min_size)
+  local radius = r
+  if r == nil then
+    r = random_int(planet_type.min_size + 10, planet_type.min_size)
+  else
+    random_int()
+  end
+
   local planet_canvas = Canvas(radius * 2 + 1, radius * 2 + 1)
 
   self.planet_canvas = planet_canvas
@@ -1257,7 +1265,8 @@ function Planet:render_planet(fullmap, render_far_side)
     else
 
       local partialshadow = self.planet_type.full_shadow ~= 1
-      local phase_values, phase = {}, self.phase
+      local phase_values = {}
+      local phase = self.phase
 
       local x, doublex, x1, x2, i, c1, c2
       local y = radius - self.y
@@ -1345,14 +1354,9 @@ function Planet:render_planet(fullmap, render_far_side)
   return self.rendered_terrain
 end
 
-function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_x, camera_z)
+function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_angle, camera_x, camera_z)
   if DEBUG then print("Terminal width: " .. term.screen_width) end
 
-  local camera_angle = random()
-  local px = cos(camera_angle) * 100
-  local py = sin(camera_angle) * 100
-  -- local px = camera_x or 50 -- sector_position.x
-  -- local py = camera_z or -100 -- sector_position.y
   local seed_value
   if starting_seed then
     seed_value = starting_seed -- or random_int(262144)
@@ -1360,6 +1364,18 @@ function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_x,
     seed_value = random_int(262144)
   end
   randomseed(seed_value)
+
+  if camera_angle == nil then
+    -- local px = camera_x or 50 -- sector_position.x
+    -- local py = camera_z or -100 -- sector_position.y
+    camera_angle = random()
+  else
+    random()
+  end
+  local px = cos(camera_angle) * 100
+  local py = sin(camera_angle) * 100
+
+  -- if DEBUG then print("px: " .. px .. " py: " .. py) end
 
   local pcount = planet_count or #planet_types
   local planets = {}
@@ -1381,6 +1397,10 @@ function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_x,
     if planet_type then
       ptype = planet_type
       radius = 38
+      random()
+      random()
+      random()
+      random()
     else
       if planet_type_index <= 6 then
         -- Set small radius rocky planets for types 1-6
@@ -1395,12 +1415,17 @@ function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_x,
 
     if DEBUG then print("planet_type: " .. ptype) end
     if DEBUG then print("planet_radius: " .. radius) end
+    local phase = ((1 - Vector(px, py):angle()) - .25) % 1
+    if DEBUG then print("planet_phase: " .. phase) end
 
     -- Init the planet and render to the canvas
-    local p = Planet(px, py, ((1 - Vector(px, py):angle()) - .25) % 1, radius, ptype)
+
+    local p = Planet(px, py, phase, radius, ptype)
     if p.planet_canvas.rows > max_rows then max_rows = p.planet_canvas.rows end
     local rendering_done = false
-    while not rendering_done do rendering_done = p:render_planet() end
+    while not rendering_done do
+      rendering_done = p:render_planet()
+    end
 
     -- check the total width consumed by the planets so far
     local last_planet_cols = p.planet_canvas.cols
@@ -1501,6 +1526,12 @@ function dir(prefix, tablename)
       elseif type(v) == 'function' then
         print(prefix .. '.' .. i .. '()')
       end
+    else
+      if type(v) == 'table' then
+        dir(prefix .. '.' .. i, v)
+      elseif type(v) == 'function' then
+        print(prefix .. '.' .. i .. '()')
+      end
     end
   end
 end
@@ -1510,45 +1541,123 @@ function globals()
 end
 
 function locals(a)
-  for i, v in pairs(a) do print(i, v) end
-end
-
--- print(locals(arg))
-
--- check for command line flags
-ship_value_index = nil
-planet_count_value_index = nil
-planet_type_value_index = nil
-seed_value_index = nil
-custom_starting_seed = nil
-
-for index, token in pairs(arg) do
-  if token == "--ships" then
-    ship_value_index = index + 1
-  elseif token == "--planet-radius" then
-    planet_radius_index = index + 1
-  elseif token == "--planets" then
-    planet_count_value_index = index + 1
-  elseif token == "--planet-type" then
-    planet_type_value_index = index + 1
-  elseif token == "--seed" then
-    seed_value_index = index + 1
-  elseif token == "--debug" or token == "-v" or token == "--verbose" then
-    DEBUG = true
+  for i, v in pairs(a) do
+    print(i, v)
   end
 end
 
-if seed_value_index and arg[seed_value_index] then
-  -- print("seed arg: ", arg[seed_value_index])
-  custom_starting_seed = tonumber(arg[seed_value_index])
-  if type(v) == "number" then
-    -- print("seed number: ", v, type(v))
-    randomseed(custom_starting_seed)
+CliOption = Object:extend()
+function CliOption:new(short_option, long_option, type_str)
+  self.short_option = short_option
+  self.long_option = long_option
+  self.expected_type = nil
+  if type_str ~= nil then
+    self.expected_type = type_str
   end
+  self.value_index = nil
+  self.value = nil
+end
+
+function CliOption:check(token)
+  if token == self.short_option or token == self.long_option then
+    if not self.expected_type then
+      self.value = true
+    end
+
+    return true
+  end
+  return false
+end
+
+function CliOption:set_index(index)
+  self.value_index = index
+end
+
+function CliOption:set_value(input_args)
+  if not self.value_index or not self.expected_type then
+    return
+  end
+
+  v = input_args[self.value_index]
+  if self.expected_type == "number" then
+     converted_v = tonumber(v)
+     if type(converted_v) == "number" then
+       self.value = converted_v
+     end
+  else
+    self.value = v
+  end
+end
+
+function CliOption:__tostring()
+  out = "CliOption("
+  for i, v in pairs(self) do
+    out = out .. i .. "=" .. tostring(v) .. ", "
+  end
+  return out .. ")\n"
+end
+
+CliArgparse = Object:extend()
+function CliArgparse:new()
+  self.options = {}
+end
+
+function CliArgparse:add_option(new_option)
+  self.options[new_option.long_option] = new_option
+end
+
+function CliArgparse:get(name)
+  opt = self.options[name]
+  if not opt then return nil end
+  return opt.value
+end
+
+function CliArgparse:parse_args(input_args)
+  -- check options and set value indexes
+  for index, token in ipairs(input_args) do
+    for name, opt in pairs(self.options) do
+      if opt:check(token) then
+        opt:set_index(index + 1)
+      end
+    end
+  end
+  -- set values
+  for i, opt in pairs(self.options) do
+    opt:set_value(input_args)
+  end
+end
+
+function CliArgparse:__tostring()
+  out = "CliArgparse(\n"
+  for name, opt in pairs(self.options) do
+    out = out .. "  ".. tostring(opt)
+  end
+  return out
+end
+
+ap = CliArgparse()
+ap:add_option(CliOption(nil, "--ships", "number"))
+ap:add_option(CliOption(nil, "--planets", "number"))
+ap:add_option(CliOption(nil, "--planet-type", "number"))
+ap:add_option(CliOption(nil, "--planet-radius", "number"))
+ap:add_option(CliOption(nil, "--planet-phase", "number"))
+ap:add_option(CliOption(nil, "--seed", "number"))
+ap:add_option(CliOption("-v", "--verbose", nil))
+ap:parse_args(arg)
+
+DEBUG = ap:get("--verbose")
+if DEBUG then print(ap) end
+
+custom_starting_seed = ap:get("--seed")
+
+if custom_starting_seed then
+  -- if DEBUG then print("Seed: ", custom_starting_seed) end
+  randomseed(custom_starting_seed)
 else
   time_based_seed = os.time() + (os.clock() * 1000000)
   randomseed(time_based_seed)
 end
+define_simplex_perms()
 
 term:update_screen_width()
 term:update_screen_height()
@@ -1560,65 +1669,47 @@ planet_max_radius = floor(term.screen_width / 2)
 -- DEBUG = true
 -- COLORS_256 = true
 
+custom_ship_count = ap:get("--ships")
+custom_planet_count = ap:get("--planets")
 
-if ship_value_index or planet_count_value_index then
-
-  -- if option '--ships 5' print 5 ships
-  if ship_value_index and arg[ship_value_index] then
-    v = tonumber(arg[ship_value_index])
-    if type(v) == "number" then
-      -- print("ship",  v, type(v))
-
-      for i = 1, v do cmd_draw_shipyard() end
-    else
-      print("unknown number of ships: " .. arg[ship_value_index])
-    end
-  end
-
-  cmd_line_planet_type = nil
-  if planet_type_value_index and arg[planet_type_value_index] then
-    v = tonumber(arg[planet_type_value_index])
-    if type(v) == "number" then
-      cmd_line_planet_type = v
-    end
-  end
-
-  -- if option '--planets 2' print 2 planets
-  if planet_count_value_index and arg[planet_count_value_index] then
-    v = tonumber(arg[planet_count_value_index])
-    if type(v) == "number" then
-
-      cmd_draw_planet_map(v, custom_starting_seed, cmd_line_planet_type)
-    else
-      print("unknown number of planets: " .. arg[planet_count_value_index])
-    end
-  end
-
-else
+if not custom_ship_count and not custom_planet_count then
   -- if no ship or planet options print some planets then ships
   cmd_draw_planet_map()
   cmd_draw_shipyard()
-
-  -- cmd_draw_shipyard(32132,5)
-  -- cmd_draw_shipyard(147828, 2)
-  -- cmd_draw_shipyard(30718,1)
-  -- cmd_draw_shipyard(122414,1)
-  -- cmd_draw_shipyard(174969,1)
-  -- cmd_draw_shipyard(160782,2)
-  -- cmd_draw_shipyard(70182,2)
-  -- cmd_draw_shipyard(35957,2)
-  -- cmd_draw_shipyard(160921,2)
-
-  -- cmd_draw_shipyard(19741,2)
-  -- cmd_draw_shipyard(157247,2)
-  -- cmd_draw_shipyard(50110,2)
-  -- cmd_draw_shipyard(63953,2)
-  -- cmd_draw_shipyard(5725,2)
-  -- cmd_draw_shipyard(202915,2)
-  -- cmd_draw_shipyard(9266,2)
-  -- cmd_draw_shipyard(97515,1)
-  -- cmd_draw_shipyard(131525,2)
-  -- cmd_draw_shipyard(16950,2)
-  -- cmd_draw_shipyard(25433,2)
-  -- cmd_draw_shipyard(199584,2)
+  return
 end
+
+if custom_planet_count then
+  cmd_line_planet_type = ap:get("--planet-type")
+  cmd_line_planet_phase = ap:get("--planet-phase")
+  cmd_draw_planet_map(custom_planet_count, custom_starting_seed, cmd_line_planet_type, cmd_line_planet_phase)
+end
+
+if custom_ship_count then
+  for i = 1, custom_ship_count do
+    cmd_draw_shipyard()
+  end
+end
+
+-- cmd_draw_shipyard(32132,5)
+-- cmd_draw_shipyard(147828, 2)
+-- cmd_draw_shipyard(30718,1)
+-- cmd_draw_shipyard(122414,1)
+-- cmd_draw_shipyard(174969,1)
+-- cmd_draw_shipyard(160782,2)
+-- cmd_draw_shipyard(70182,2)
+-- cmd_draw_shipyard(35957,2)
+-- cmd_draw_shipyard(160921,2)
+
+-- cmd_draw_shipyard(19741,2)
+-- cmd_draw_shipyard(157247,2)
+-- cmd_draw_shipyard(50110,2)
+-- cmd_draw_shipyard(63953,2)
+-- cmd_draw_shipyard(5725,2)
+-- cmd_draw_shipyard(202915,2)
+-- cmd_draw_shipyard(9266,2)
+-- cmd_draw_shipyard(97515,1)
+-- cmd_draw_shipyard(131525,2)
+-- cmd_draw_shipyard(16950,2)
+-- cmd_draw_shipyard(25433,2)
+-- cmd_draw_shipyard(199584,2)
