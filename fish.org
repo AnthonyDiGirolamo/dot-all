@@ -161,6 +161,7 @@
   alias la='ls -a'
   alias l='ls -CF'
 
+  alias gl='git log --abbrev-commit --decorate --date=relative --pretty=format:\'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset\''
   alias gll='git log --abbrev-commit --graph --decorate --date=relative --all --pretty=format:\'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset\''
   alias gllo='git log --abbrev-commit --graph --decorate --date=relative --pretty=format:\'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset\''
   alias gs='git status'

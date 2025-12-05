@@ -1354,7 +1354,7 @@ function Planet:render_planet(fullmap, render_far_side)
   return self.rendered_terrain
 end
 
-function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_angle, camera_x, camera_z)
+function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_angle, radius_factor, camera_x, camera_z)
   if DEBUG then print("Terminal width: " .. term.screen_width) end
 
   local seed_value
@@ -1396,7 +1396,6 @@ function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_an
 
     if planet_type then
       ptype = planet_type
-      radius = 38
       random()
       random()
       random()
@@ -1412,6 +1411,10 @@ function cmd_draw_planet_map(planet_count, starting_seed, planet_type, camera_an
         radius = random_int(8) + 10
       end
     end
+    if radius_factor then
+      radius = round(radius * radius_factor)
+    end
+
 
     if DEBUG then print("planet_type: " .. ptype) end
     if DEBUG then print("planet_radius: " .. radius) end
@@ -1639,7 +1642,7 @@ ap = CliArgparse()
 ap:add_option(CliOption(nil, "--ships", "number"))
 ap:add_option(CliOption(nil, "--planets", "number"))
 ap:add_option(CliOption(nil, "--planet-type", "number"))
-ap:add_option(CliOption(nil, "--planet-radius", "number"))
+ap:add_option(CliOption(nil, "--planet-radius-factor", "number"))
 ap:add_option(CliOption(nil, "--planet-phase", "number"))
 ap:add_option(CliOption(nil, "--seed", "number"))
 ap:add_option(CliOption("-v", "--verbose", nil))
@@ -1671,24 +1674,24 @@ planet_max_radius = floor(term.screen_width / 2)
 
 custom_ship_count = ap:get("--ships")
 custom_planet_count = ap:get("--planets")
+cmd_line_planet_type = ap:get("--planet-type")
+cmd_line_planet_phase = ap:get("--planet-phase")
+cmd_line_planet_radius_factor = ap:get("--planet-radius-factor")
 
-if not custom_ship_count and not custom_planet_count then
-  -- if no ship or planet options print some planets then ships
-  cmd_draw_planet_map()
-  cmd_draw_shipyard()
-  return
-end
-
-if custom_planet_count then
-  cmd_line_planet_type = ap:get("--planet-type")
-  cmd_line_planet_phase = ap:get("--planet-phase")
-  cmd_draw_planet_map(custom_planet_count, custom_starting_seed, cmd_line_planet_type, cmd_line_planet_phase)
-end
+cmd_draw_planet_map(
+  custom_planet_count,
+  custom_starting_seed,
+  cmd_line_planet_type,
+  cmd_line_planet_phase,
+  cmd_line_planet_radius_factor)
 
 if custom_ship_count then
   for i = 1, custom_ship_count do
     cmd_draw_shipyard()
   end
+else
+  -- Print one ship if no --ships on the cmdline
+  cmd_draw_shipyard()
 end
 
 -- cmd_draw_shipyard(32132,5)

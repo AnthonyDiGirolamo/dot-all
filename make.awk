@@ -133,8 +133,8 @@ function install_emacs30() {
 
 function install_lua54() {
     tarfile = make::download("lua54",
-        "https://www.lua.org/ftp/lua-5.4.4.tar.gz",
-        "bd8ce7069ff99a400efd14cf339a727b")
+        "https://www.lua.org/ftp/lua-5.4.8.tar.gz",
+        "81cf5265b8634967d8a7480d238168ce")
     make::compile(make::extract_tar(tarfile),
         "make linux -j 4\n" \
         "make CC=clang INSTALL_TOP=$HOME/apps/lua54 install\n")
@@ -142,8 +142,8 @@ function install_lua54() {
 
 function install_fish() {
     tarfile = make::download("fish",
-        "https://github.com/fish-shell/fish-shell/releases/download/3.7.0/fish-3.7.0.tar.xz",
-        "22c3fab479b185faf620a3b3f43443c3")
+        "https://github.com/fish-shell/fish-shell/releases/download/4.2.1/fish-4.2.1.tar.xz",
+        "f7dddce65ab1985bc033aa1c19095559")
     make::compile(make::extract_tar(tarfile),
         "cmake -S . -B build " \
         "-DCMAKE_INSTALL_PREFIX=~/apps/fish\n" \
