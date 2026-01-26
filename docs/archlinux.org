@@ -2,6 +2,28 @@
 #+STARTUP: content indent
 #+PROPERTY: header-args :mkdirp yes
 
+* install guide
+
+- Guide Links
+  - [[https://wiki.archlinux.org/title/Installation_guide][arch wiki install guide]],
+  - [[https://jpetazzo.github.io/2024/02/23/archlinux-luks-tpm-secureboot-install/][Installing Archlinux with LUKS, SecureBoot, TPM]]
+  - [[https://gist.github.com/noghartt/8388f7d8543e3eb1777cb6ed4a3d7807][My Arch Linux installation - systemd-boot + LUKS + LVM + Btrfs + swapfile + xmonad]]
+  - [[https://github.com/mtalexan/arch-systemd-boot][LVM on LUKS with systemd-boot]]
+  - [[https://gist.github.com/OdinsPlasmaRifle/e16700b83624ff44316f87d9cdbb5c94]]
+
+- set double size large font
+
+  #+begin_src sh
+  setfont -d ter-132b
+  #+end_src
+
+- connect to wifi
+
+  #+begin_src sh
+    ip addr
+    iwctl station wlan0 connect SSID
+  #+end_src
+
 * libvirt
 
 1. Install
