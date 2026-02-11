@@ -1248,14 +1248,14 @@ This mode gives variables names unique colors.
       (call-interactively 'align-regexp)))
 
   (defun amd/x-paste ()
-    "Paste from the x clipboard with xsel."
+    "Paste from the clipboard with wl-paste."
     (interactive)
-    (insert (shell-command-to-string "xsel -o -b")))
+    (insert (shell-command-to-string "wl-paste")))
 
   (defun amd/x-yank (begin end)
-    "Yank to the x clipboard with xsel."
+    "Yank to the x clipboard with wl-copy."
     (interactive "r")
-    (shell-command-on-region begin end "xsel -i -b"))
+    (shell-command-on-region begin end "wl-copy -p"))
 
   (defun amd/edebug-eval-defun ()
     "Run eval-defun with C-u."
