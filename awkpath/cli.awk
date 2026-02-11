@@ -44,6 +44,10 @@ function print_debug(text) {
         print debug("[DEBUG] ") text
 }
 
+function print_error(text) {
+    print error("[ERROR] ") text
+}
+
 function print_debug_array(a, prefix,
                            _pattern, i) {
     if (!prefix)
@@ -68,9 +72,9 @@ function get_uname_a(_result) {
     # Return previously fetched uname
     if (uname_a != "")
         return uname_a
-    "uname -a" | getline _result
-    close("uname -a")
-    uname_a = _result
+    "uname -a" | getline _output
+    _exit_status = close("uname -a")
+    uname_a = _output
     return uname_a
 }
 
@@ -92,9 +96,13 @@ function get_hostname(_result) {
     # Return previously fetched hostname
     if (hostname != "")
         return hostname
-    "hostname" | getline _result
-    close("hostname")
-    hostname = _result
+
+    _run_cmd = "uname -n"
+    _run_cmd | getline _output
+    _exit_status = close(_run_cmd)
+    if (_exit_status != 0)
+        print_error("uname -n failed with: " _output)
+    hostname = _output
     return hostname
 }
 
