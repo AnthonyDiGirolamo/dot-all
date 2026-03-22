@@ -471,7 +471,8 @@ The =fish_mode_prompt= formats the vi mode part of the prompt.
 
 #+begin_src fish :tangle "~/.config/fish/functions/authme.fish"
   function authme
-      ssh $argv 'cat >>.ssh/authorized_keys' <~/.ssh/id_rsa.pub
+      set -l localkeyfile (ls -t ~/.ssh/*.pub | head -n 1)
+      ssh $argv 'cat >>.ssh/authorized_keys' <$localkeyfile
   end
 #+end_src
 
