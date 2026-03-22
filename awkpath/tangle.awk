@@ -449,6 +449,8 @@ function write_tangled_file(_outfile, _index_name, _expanded_file_name) {
         if (DRYRUN)
             return
         # always mkdir -p
+        # TODO: Check exit status of mkdirp -
+        # TODO: handle case if no permissions to write file
         system("mkdir -v -p " dirname(_expanded_file_name))
         # output contents string to the file all at once
         print tangled_files[_index_name] > _expanded_file_name

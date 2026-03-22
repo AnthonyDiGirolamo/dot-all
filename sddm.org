@@ -8,23 +8,23 @@
 
 * ~/etc/sddm.conf.d/10-wayland.conf~
 
-#+begin_src conf :tangle "/etc/sddm.conf.d/10-wayland.conf"
+#+begin_src conf :tangle no
   [General]
   # DisplayServer=wayland
-  # GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell,QT_SCREEN_SCALE_FACTORS=2
+  GreeterEnvironment=QT_SCREEN_SCALE_FACTORS=1.5
   # ,QT_FONT_DPI=192
+  # ,QT_WAYLAND_SHELL_INTEGRATION=layer-shell
 
-  [Wayland]
-  CompositorCommand=kwin_wayland --drm --no-lockscreen --no-global-shortcuts --locale1 --inputmethod plasma-keyboard
+  [Theme]
+  Current=breeze
 #+end_src
 
 * ~/etc/sddm.conf.d/virtualkbd.conf~
 
-#+begin_src conf :tangle "/etc/sddm.conf.d/virtualkbd.conf"
-  [Theme]
-  Current=breeze
-
+#+begin_src conf :tangle no
   [General]
-  InputMethod=qtvirtualkeyboard
-  GreeterEnvironment=QT_SCREEN_SCALE_FACTORS=1.5
+  # InputMethod=qtvirtualkeyboard
+
+  [Wayland]
+  # CompositorCommand=kwin_wayland --drm --no-lockscreen --no-global-shortcuts --locale1 --inputmethod plasma-keyboard
 #+end_src
