@@ -2241,6 +2241,7 @@ This mode gives variables names unique colors.
       "RET" 'Info-follow-nearest-node
       ;; Not sure why these need redefining here and are not inherited
       ;; from evil default motion map.
+      "C-l" (lambda() (interactive) (evil-ex-nohighlight) (redraw-display))
       "w"   'evil-forward-word-begin
       "b"   'evil-backword-word-begin
       "n"   'evil-next-line

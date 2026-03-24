@@ -1,11 +1,12 @@
 ;;; leuven-theme.el --- Elegant Emacs color theme for a white background -*- lexical-binding: t -*-
 
-;; Copyright (C) 2003-2023 Free Software Foundation, Inc.
+;; Copyright (C) 2003-2025 Free Software Foundation, Inc.
 
 ;; Author: Fabrice Niessen <(concat "fniessen" at-sign "pirilampo.org")>
 ;; URL: https://github.com/fniessen/emacs-leuven-theme
-;; Version: 1.1.5
-;; Last-Updated: 2023-05-23 10:40
+;; Package-Version: 20260213.1052
+;; Package-Revision: c3546e6a84c1
+;; Last-Updated: 2025-12-23 17:47
 ;; Keywords: color theme
 
 ;; This file is part of GNU Emacs.
@@ -25,14 +26,13 @@
 
 ;;; Commentary:
 
-;; The "leuven" color theme is an elegant and visually appealing theme designed
-;; to enhance the appearance of Emacs, particularly in Org mode and other
-;; contexts.  It provides a carefully crafted color scheme optimized for a white
-;; background, creating a pleasant and readable environment for your Emacs
-;; sessions.
+;; The "leuven" color theme offers a clean, elegant, and visually appealing
+;; design for Emacs. While especially suited for Org mode, it enhances
+;; readability across various contexts. Designed for white backgrounds, it
+;; provides a pleasant and highly readable environment for extended use.
 
-;; To use the "leuven" theme, simply add the following line to your Emacs
-;; configuration file:
+;; To enable the "leuven" theme, add the following line to your Emacs
+;; configuration:
 
 ;;   (load-theme 'leuven t)
 
@@ -41,12 +41,8 @@
 ;; Requirements:
 ;; - Emacs 24 or later.
 
-;; If you are interested in creating a version of the "leuven" theme for dark
-;; backgrounds, please feel free to contribute.  I am open to integrating dark
-;; variants into the project to provide more customization options for users.
-
 ;; For more information and updates, visit the theme's GitHub repository at:
-;;https://github.com/fniessen/emacs-leuven-theme
+;; https://github.com/fniessen/emacs-leuven-theme
 
 ;;; Code:
 
@@ -114,10 +110,10 @@ more...")
 
       ;; Leuven generic colors.
       (cancel '(:slant italic :strike-through t :foreground "#A9A9A9"))
-      (clock-line '(:box (:line-width 1 :color "#335EA8") :foreground "black" :background "#EEC900"))
+      ;; (clock-line '(:box (:line-width 1 :color "#335EA8") :foreground "black" :background "#EEC900"))
       (code-block '(:foreground "#000088" :background "#FFFFE0"))
-      (code-inline '(:foreground "#006400" :background "#FDFFF7"))
-      (column '(:height 1.0 :weight normal :slant normal :underline nil :strike-through nil :foreground "#E6AD4F" :background "#FFF2DE"))
+      (code-inline '(:foreground "#006400" :background "#F4FFF4" :inherit fixed-pitch-serif))
+      (column '(:height 1.0 :weight normal :slant normal :underline nil :strike-through unspecified :foreground "#E6AD4F" :background "#FFF2DE"))
       (completion-inline '(:weight normal :foreground "#C0C0C0" :inherit hl-line)) ; Like Google.
       (completion-other-candidates '(:foreground "black" :background "#F7F7F7"))
       (completion-selected-candidate '(:weight bold :foreground "black" :background "#C1E0FD"))
@@ -125,7 +121,7 @@ more...")
       (diff-changed '(:foreground "#0000FF" :background "#DDDDFF"))
       (diff-header '(:weight bold :foreground "#800000" :background "#FFFFAF"))
       (diff-hunk-header '(:foreground "#990099" :background "#FFEEFF"))
-      (diff-none '(:foreground "#888888"))
+      (diff-none '(:foreground "#A0A1A7"))
       (diff-refine-added '(:background "#97F295"))
       (diff-refine-removed '(:background "#FFB6BA"))
       (diff-removed '(:background "#FEE8E9"))
@@ -136,8 +132,8 @@ more...")
       (grep-line-number '(:weight bold :foreground "#A535AE"))
       (highlight-blue '(:background "#B6D6FD"))
       (highlight-gray '(:background "#E4E4E3"))
-      (highlight-green '(:background "#D5F1CF"))
-      (highlight-red '(:background "#FFC8C8"))
+      ;; (highlight-green '(:background "#D5F1CF"))
+      ;; (highlight-red '(:background "#FFC8C8"))
       (highlight-yellow '(:background "#F6FECD"))
       (link '(:weight normal :underline t :foreground "#006DAF"))
       (link-no-underline '(:weight normal :foreground "#006DAF"))
@@ -146,7 +142,7 @@ more...")
       (mail-read '(:foreground "#8C8C8C"))
       (mail-read-high '(:foreground "#808080"))
       (mail-ticked '(:foreground "#FF3300"))
-      (mail-to '(:family "Sans Serif" :underline nil :foreground "#006DAF"))
+      (mail-to '(:family "Sans Serif" :underline unspecified :foreground "#006DAF"))
       (mail-unread '(:weight bold :foreground "#000000"))
       (mail-unread-high '(:weight bold :foreground "#135985"))
       (marked-line '(:foreground "#AA0000" :background "#FFAAAA"))
@@ -168,8 +164,8 @@ more...")
       (symlink '(:foreground "#1F8DD6"))
       (tab '(:foreground "#E8E8E8" :background "white"))
       (trailing '(:foreground "#E8E8E8" :background "#FFFFAB"))
-      (volatile-highlight '(:underline nil :foreground "white" :background "#9E3699"))
-      (volatile-highlight-supersize `(,@(leuven-scale-font leuven-scale-volatile-highlight 1.1) :underline nil :foreground "white" :background "#9E3699")) ; flash-region
+      (volatile-highlight '(:underline unspecified :foreground "white" :background "#9E3699"))
+      (volatile-highlight-supersize `(,@(leuven-scale-font leuven-scale-volatile-highlight 1.1) :underline unspecified :foreground "white" :background "#9E3699")) ; flash-region
       (vc-branch '(:box (:line-width 1 :color "#00CC33") :foreground "black" :background "#AAFFAA"))
       (xml-attribute '(:foreground "#F36335"))
       (xml-tag '(:foreground "#AE1B9A"))
@@ -181,7 +177,7 @@ more...")
    `(default ((,class (:foreground "#333333" :background "#FFFFFF"))))
    `(bold ((,class (:weight bold :foreground "black"))))
    `(bold-italic ((,class (:weight bold :slant italic :foreground "black"))))
-   `(italic ((,class (:slant italic :foreground "#1A1A1A"))))
+   `(italic ((,class (:slant italic :foreground "#999999"))))
    `(underline ((,class (:underline t))))
    `(cursor ((,class (:background "#21BDFF"))))
 
@@ -217,18 +213,18 @@ more...")
    `(escape-glyph ((,class (:foreground "#008ED1"))))
    `(error ((,class (:foreground "red"))))
    `(warning ((,class (:weight bold :foreground "orange"))))
-   `(success ((,class (:foreground "green"))))
+   `(success ((,class (:foreground "green4"))))
 
    ;; Font lock faces.
    `(font-lock-builtin-face ((,class (:foreground "#006FE0"))))
    `(font-lock-comment-delimiter-face ((,class (:foreground "#8D8D84")))) ; #696969
-   `(font-lock-comment-face ((,class (:slant italic :foreground "#8D8D84")))) ; #696969
+   `(font-lock-comment-face ((,class (:slant italic :foreground "#A0A1A7")))) ; #696969
    `(font-lock-constant-face ((,class (:foreground "#D0372D"))))
    `(font-lock-doc-face ((,class (:foreground "#036A07"))))
    `(font-lock-function-name-face ((,class (:weight normal :foreground "#006699"))))
-   `(font-lock-keyword-face ((,class (:bold nil :foreground "#0000FF")))) ; #3654DC
+   `(font-lock-keyword-face ((,class (:foreground "#0000FF")))) ; #3654DC
    `(font-lock-preprocessor-face ((,class (:foreground "#808080"))))
-   `(font-lock-regexp-grouping-backslash ((,class (:weight bold :inherit nil))))
+   `(font-lock-regexp-grouping-backslash ((,class (:weight bold :inherit unspecified))))
    `(font-lock-regexp-grouping-construct ((,class (:weight bold :inherit nil))))
    `(font-lock-string-face ((,class ,string)))
    `(font-lock-type-face ((,class (:weight normal :foreground "#6434A3"))))
@@ -374,7 +370,7 @@ more...")
 
    ;; Flyspell.
    (if (version< emacs-version "24.4")
-       `(flyspell-duplicate ((,class (:underline "#F4EB80" :inherit nil))))
+       `(flyspell-duplicate ((,class (:underline "#F4EB80" :inherit unspecified))))
      `(flyspell-duplicate ((,class (:underline (:style wave :color "#F4EB80") :background "#FAF7CC" :inherit nil)))))
    (if (version< emacs-version "24.4")
        `(flyspell-incorrect ((,class (:underline "#FAA7A5" :inherit nil))))
@@ -397,7 +393,7 @@ more...")
    `(ace-jump-face-foreground ((,class (:weight bold :foreground "black" :background "#FEA500"))))
    `(ahs-face ((,class (:background "#E4E4FF"))))
    `(ahs-definition-face ((,class (:background "#FFB6C6"))))
-   `(ahs-plugin-defalt-face ((,class (:background "#FFE4FF")))) ; Current.
+   `(ahs-plugin-default-face ((,class (:background "#FFE4FF")))) ; Current.
    `(anzu-match-1 ((,class (:foreground "black" :background "aquamarine"))))
    `(anzu-match-2 ((,class (:foreground "black" :background "springgreen"))))
    `(anzu-match-3 ((,class (:foreground "black" :background "red"))))
@@ -407,7 +403,8 @@ more...")
    `(anzu-replace-to ((,class (:weight bold :foreground "#BD33FD" :background "#FDBD33"))))
    `(auto-dim-other-buffers-face ((,class (:background "#F7F7F7"))))
    `(avy-background-face ((,class (:background "#A9A9A9"))))
-   `(avy-lead-face ((,class (:weight bold :foreground "black" :background "#FEA500"))))
+   `(avy-lead-face ((,class (:weight bold :foreground "black" :background "#F6F707"))))
+   `(avy-lead-face-0 ((,class (:weight bold :foreground "white" :background "#4E8D12"))))
    `(bbdb-company ((,class (:slant italic :foreground "steel blue"))))
    `(bbdb-field-name ((,class (:weight bold :foreground "steel blue"))))
    `(bbdb-field-value ((,class (:foreground "steel blue"))))
@@ -501,6 +498,8 @@ more...")
    `(doom-modeline-buffer-path ((t (:inherit ,'mode-line-emphasis :weight ,'bold))))
    `(doom-modeline-buffer-project-root ((t (:inherit ,'mode-line-emphasis))))
 
+   `(comint-highlight-input ((,class (:weight bold :foreground "#005A9E"))))
+   `(comint-highlight-prompt ((,class (:weight bold :foreground "#003366"))))
    `(compare-windows ((,class (:background "#FFFF00"))))
    ;; `(completions-common-part ((,class (:foreground "red" :weight bold))))
    ;; `(completions-first-difference ((,class (:foreground "green" :weight bold))))
@@ -594,6 +593,7 @@ more...")
    ;; `(eww-form-submit ((,class ())))
    `(eww-form-text ((,class (:weight bold :foreground "#40586F" :background "#A7CDF1"))))
    ;; `(eww-form-textarea ((,class ())))
+   `(fill-column-indicator ((,class (:foreground "#E0E0E0" :background unspecified))))
    `(file-name-shadow ((,class ,shadow)))
    `(flycheck-error ((,class (:underline (:color "#FE251E" :style wave) :weight bold :background "#FFE1E1"))))
    `(flycheck-error-list-line-number ((,class (:foreground "#A535AE"))))
@@ -749,6 +749,8 @@ more...")
    `(magit-diff-del ((,class ,diff-removed)))
    `(magit-diff-file-header ((,class (:height 1.1 :weight bold :foreground "#4183C4"))))
    `(magit-diff-hunk-header ((,class ,diff-hunk-header)))
+   `(magit-diff-hunk-heading ((,class (:foreground "grey20" :background "grey80"))))
+   `(magit-diff-hunk-heading-highlight ((,class ,diff-header)))
    `(magit-diff-none ((,class ,diff-none)))
    `(magit-header ((,class (:foreground "white" :background "#FF4040"))))
    `(magit-item-highlight ((,class (:background "#EAF2F5"))))
@@ -807,13 +809,13 @@ more...")
    `(nxml-tag-delimiter-face ((,class (:foreground "blue"))))
    `(nxml-tag-slash-face ((,class (:foreground "blue"))))
    `(org-agenda-block-count ((,class (:weight bold :foreground "#A5A5A5"))))
-   `(org-agenda-calendar-event ((,class (:weight bold :foreground "#3774CC" :background "#E4EBFE"))))
-   `(org-agenda-calendar-sexp ((,class (:foreground "#327ACD" :background "#F3F7FC"))))
+   `(org-agenda-calendar-event ((,class (:weight bold :foreground "#0078D4" :background "#C8E0F2"))))
+   `(org-agenda-calendar-sexp ((,class (:foreground "#327ACD" :background "#CCE4F6"))))
    `(org-agenda-clocking ((,class (:foreground "black" :background "#EEC900"))))
    `(org-agenda-column-dateline ((,class ,column)))
    `(org-agenda-current-time ((,class (:underline t :foreground "#1662AF"))))
-   `(org-agenda-date ((,class (,@(leuven-scale-font leuven-scale-org-agenda-structure 1.6) :weight bold :foreground "#1662AF"))))
-   `(org-agenda-date-today ((,class (,@(leuven-scale-font leuven-scale-org-agenda-structure 1.6) :weight bold :foreground "#4F4A3D" :background "#FFFFCC"))))
+   `(org-agenda-date ((,class (,@(leuven-scale-font leuven-scale-org-agenda-structure 1.6) :weight bold :foreground "#0078D4")))) ; "#1662AF"
+   `(org-agenda-date-today ((,class (,@(leuven-scale-font leuven-scale-org-agenda-structure 1.6) :weight bold :foreground "#4F4A3D" :background "#FFFFCC")))) ; "#FFF160"
    `(org-agenda-date-weekend ((,class (,@(leuven-scale-font leuven-scale-org-agenda-structure 1.6) :weight bold :foreground "#4E4E4E"))))
    `(org-agenda-diary ((,class (:weight bold :foreground "green4" :background "light blue"))))
    `(org-agenda-dimmed-todo-face ((,class (:foreground "gold2"))))
@@ -830,7 +832,7 @@ more...")
    `(org-block-background ((,class (:background "#FFFFE0")))) ;; :inherit fixed-pitch))))
    `(org-block-begin-line ((,class (:underline "#A7A6AA" :foreground "#555555" :background "#E2E1D5"))))
    `(org-block-end-line ((,class (:overline "#A7A6AA" :foreground "#555555" :background "#E2E1D5"))))
-   `(org-checkbox ((,class (:weight bold :box (:line-width 1 :style pressed-button) :foreground "#123555" :background "#D4D4D4"))))
+   `(org-checkbox ((,class (:weight bold :foreground "#5D1715" :background "#FFE2DD"))))
    `(org-clock-overlay ((,class (:foreground "white" :background "SkyBlue4"))))
    `(org-code ((,class ,code-inline)))
    `(org-column ((,class ,column)))
@@ -841,10 +843,10 @@ more...")
    `(org-document-info ((,class (:foreground "#484848"))))
    `(org-document-info-keyword ((,class (:foreground "#008ED1" :background "#EAEAFF"))))
    `(org-document-title ((,class (,@(leuven-scale-font leuven-scale-org-document-title 1.8)  :weight bold :foreground "black"))))
-   `(org-done ((,class (:weight bold :box (:line-width 1 :color "#BBBBBB") :foreground "#BBBBBB" :background "#F0F0F0"))))
-   `(org-drawer ((,class (:weight bold :foreground "#00BB00" :background "#EAFFEA"))))
+   `(org-done ((,class (:weight bold :box "#89C58F" :foreground "#89C58F" :background "#E2FEDE"))))
+   `(org-drawer ((,class (:weight bold :foreground "#6B8E23" :background "#EEFFEE"))))
    `(org-ellipsis ((,class (:underline nil :foreground "#999999")))) ; #FFEE62
-   `(org-example ((,class (:foreground "blue" :background "#EAFFEA"))))
+   `(org-example ((,class (:foreground "blue" :background "#EEFFEE"))))
    `(org-footnote ((,class (:underline t :foreground "#008ED1"))))
    `(org-formula ((,class (:foreground "chocolate1"))))
    ;; org-habit colours are thanks to zenburn
@@ -881,12 +883,15 @@ more...")
    `(org-scheduled-previously ((,class (:foreground "#1466C6"))))
    `(org-scheduled-today ((,class (:weight bold :foreground "#4F4A3D" :background "#FFFFCC"))))
    `(org-sexp-date ((,class (:foreground "#3774CC"))))
-   `(org-special-keyword ((,class (:weight bold :foreground "#00BB00" :background "#EAFFEA"))))
-   `(org-table ((,class (:foreground "dark green" :background "#EAFFEA")))) ;; :inherit fixed-pitch))))
+   `(org-special-keyword ((,class (:weight bold :foreground "#4682B4" :background "#EEFFEE"))))
+   `(org-table ((,class (:foreground "dark green" :background "#EEFFEE")))) ;; :inherit fixed-pitch))))
    `(org-tag ((,class (:weight normal :slant italic :foreground "#9A9FA4" :background "white"))))
    `(org-target ((,class (:foreground "#FF6DAF"))))
    `(org-time-grid ((,class (:foreground "#B8B8B8"))))
    `(org-todo ((,class (:weight bold :box (:line-width 1 :color "#D8ABA7") :foreground "#D8ABA7" :background "#FFE6E4"))))
+   ;; `(org-modern-todo ((,class (:weight semibold :inherit (org-todo org-modern-label)))))
+   `(org-modern-todo ((,class (:foreground "#5D1715" :background "#FFE2DD"))))
+   `(org-modern-tag ((,class (:foreground "#312F2B" :background "#F1F0EF"))))
    `(org-upcoming-deadline ((,class (:foreground "#FF5555"))))
    `(org-verbatim ((,class (:foreground "#0066CC" :background "#F7FDFF"))))
    `(org-verse ((,class (:slant italic :foreground "dim gray" :background "#EEEEEE"))))
@@ -985,6 +990,7 @@ more...")
    `(vc-annotate-face-FF993F ((,class (:foreground "#FF993F" :background "black"))))
    `(vc-annotate-face-FFC63F ((,class (:foreground "#FF993F" :background "black"))))
    `(vc-annotate-face-FFF33F ((,class (:foreground "#FFF33F" :background "black"))))
+   `(vc-git-log-edit-summary-max-warning ((,class (:weight bold :foreground "red"))))
 
    ;; ;; vc
    ;; (vc-up-to-date-state    ((,c :foreground ,(gc 'green-1))))
