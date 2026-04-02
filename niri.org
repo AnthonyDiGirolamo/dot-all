@@ -1,0 +1,35 @@
+#+TITLE: niri
+#+STARTUP: content indent
+#+PROPERTY: header-args :mkdirp yes
+
+* Table of Contents                                                     :TOC:
+- [[#configniriconfigkdl][~/.config/niri/config.kdl]]
+- [[#configniridmsbindskdl][~/.config/niri/dms/binds.kdl]]
+
+* ~/.config/niri/config.kdl
+
+#+begin_src text :tangle no
+  input {
+      keyboard {
+          xkb {
+              layout "us"
+              variant "colemak"
+              options "caps:ctrl_modifier"
+          }
+
+          repeat-delay 200
+          repeat-rate 30
+          numlock
+      }
+  }
+
+  include "dms/binds.kdl"
+#+end_src
+
+* ~/.config/niri/dms/binds.kdl
+
+#+begin_src text :tangle "~/.config/niri/dms/binds.kdl"
+  binds {
+      Mod+D hotkey-overlay-title="dms spotlight" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
+  }
+#+end_src
