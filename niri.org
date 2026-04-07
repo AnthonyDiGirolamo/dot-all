@@ -3,8 +3,29 @@
 #+PROPERTY: header-args :mkdirp yes
 
 * Table of Contents                                                     :TOC:
+- [[#installation][Installation]]
 - [[#configniriconfigkdl][~/.config/niri/config.kdl]]
 - [[#configniridmsbindskdl][~/.config/niri/dms/binds.kdl]]
+
+* Installation
+
+#+begin_src sh
+  sudo pacman -Syu niri xwayland-satellite \
+       xdg-desktop-portal-gnome xdg-desktop-portal-gtk \
+       alacritty fuzzel cava qt6-multimedia-ffmpeg matugen \
+       cups-pk-helper power-profiles-daemon
+#+end_src
+
+#+begin_src sh
+  mkdir -p ~/aurpkgs && cd ~/aurpkgs
+  git clone https://aur.archlinux.org/dms-shell-bin.git
+  cd dms-shell-bin
+  makepkg -is
+#+end_src
+
+#+begin_src sh
+  systemctl --user add-wants niri.service dms
+#+end_src
 
 * ~/.config/niri/config.kdl
 

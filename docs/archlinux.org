@@ -1,28 +1,206 @@
 #+TITLE: Arch Linux Notes
-#+STARTUP: content indent
+#+STARTUP: showall
+#+STARTUP: indent
 #+PROPERTY: header-args :mkdirp yes
 
-* install guide
+* Install Guide
 
-- Guide Links
+- Links
   - [[https://wiki.archlinux.org/title/Installation_guide][arch wiki install guide]],
   - [[https://jpetazzo.github.io/2024/02/23/archlinux-luks-tpm-secureboot-install/][Installing Archlinux with LUKS, SecureBoot, TPM]]
   - [[https://gist.github.com/noghartt/8388f7d8543e3eb1777cb6ed4a3d7807][My Arch Linux installation - systemd-boot + LUKS + LVM + Btrfs + swapfile + xmonad]]
   - [[https://github.com/mtalexan/arch-systemd-boot][LVM on LUKS with systemd-boot]]
   - [[https://gist.github.com/OdinsPlasmaRifle/e16700b83624ff44316f87d9cdbb5c94]]
 
-- set double size large font
+* Install Steps
+:PROPERTIES:
+:header-args: :dir /ssh:root@192.168.0.32:~/ :results output :session :async yes :var ROOTDISK=ROOTDISK
+:END:
 
-  #+begin_src sh
+** Set a password, connect to wifi/or ethernet
+
+Run these manually on the new install, then update the ip address in the above ~header-args~.
+
+#+begin_src bash
+  ip addr
+  iwctl station wlan0 connect SSID
+#+end_src
+
+#+begin_src bash
+  passwd root
+  systemctl start sshd
+  systemctl status sshd
+#+end_src
+
+ #+begin_src bash
+   uname -n
+ #+end_src
+
+ #+RESULTS:
+ : archiso
+
+** Set console font size
+
+#+begin_src bash
+  ls /usr/share/kbd/consolefonts/ter-1*
+#+end_src
+
+#+RESULTS:
+#+begin_example
+/usr/share/kbd/consolefonts/ter-112n.psf.gz
+/usr/share/kbd/consolefonts/ter-114b.psf.gz
+/usr/share/kbd/consolefonts/ter-114n.psf.gz
+/usr/share/kbd/consolefonts/ter-116b.psf.gz
+/usr/share/kbd/consolefonts/ter-116n.psf.gz
+/usr/share/kbd/consolefonts/ter-118b.psf.gz
+/usr/share/kbd/consolefonts/ter-118n.psf.gz
+/usr/share/kbd/consolefonts/ter-120b.psf.gz
+/usr/share/kbd/consolefonts/ter-120n.psf.gz
+/usr/share/kbd/consolefonts/ter-122b.psf.gz
+/usr/share/kbd/consolefonts/ter-122n.psf.gz
+/usr/share/kbd/consolefonts/ter-124b.psf.gz
+/usr/share/kbd/consolefonts/ter-124n.psf.gz
+/usr/share/kbd/consolefonts/ter-128b.psf.gz
+/usr/share/kbd/consolefonts/ter-128n.psf.gz
+/usr/share/kbd/consolefonts/ter-132b.psf.gz
+/usr/share/kbd/consolefonts/ter-132n.psf.gz
+#+end_example
+
+#+begin_src bash :results silent
+  setfont -d ter-118b
+#+end_src
+
+Large size for 4k screens:
+
+#+begin_src bash :results silent
   setfont -d ter-132b
-  #+end_src
+#+end_src
 
-- connect to wifi
+** Partition and format disk
+- 1G EFI System
+- The rest as a Linux filesystem
 
-  #+begin_src sh
-    ip addr
-    iwctl station wlan0 connect SSID
-  #+end_src
+#+name: ROOTDISK
+/dev/nvme0n1
+
+You can run ~cfdisk /dev/nvme0n1~ interactively to setup the
+partitions. Or use sgdisk commands as shown below.
+
+*** Printing disk status
+
+#+begin_src bash
+  lsblk -f $ROOTDISK
+#+end_src
+
+#+RESULTS:
+: NAME FSTYPE FSVER LABEL UUID                                 FSAVAIL FSUSE% MOUNTPOINTS
+: nvme0n1
+: │
+: ├─nvme0n1p1
+: │    vfat   FAT32       865D-4D25
+: └─nvme0n1p2
+:      btrfs              99ca6edc-dae2-44bb-ad61-b17903d5f267
+
+#+begin_src bash
+  sgdisk $ROOTDISK --print
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Disk /dev/nvme0n1: 976773168 sectors, 465.8 GiB
+Model: Samsung SSD 970 EVO 500GB
+Sector size (logical/physical): 512/512 bytes
+Disk identifier (GUID): 3BA0E131-5C6C-4047-A328-C79FAB2970CA
+Partition table holds up to 128 entries
+Main partition table begins at sector 2 and ends at sector 33
+First usable sector is 34, last usable sector is 976773134
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 2014 sectors (1007.0 KiB)
+
+Number  Start (sector)    End (sector)  Size       Code  Name
+   1            2048         2099199   1024.0 MiB  EF00  boot
+   2         2099200       976773134   464.8 GiB   8304  archlinux
+#+end_example
+
+*** GPT partition from scratch
+
+#+begin_src bash
+  sgdisk $ROOTDISK --clear
+#+end_src
+
+1G boot EFI partition
+#+begin_src bash
+  sgdisk $ROOTDISK --new=0:0:+1G --change-name=0:boot --typecode=0:ef00
+#+end_src
+
+The rest as / linux filesystem
+#+begin_src bash
+  sgdisk $ROOTDISK --new=0:0:+ --change-name=0:archlinux --typecode=0:8304
+#+end_src
+
+#+RESULTS:
+: The operation has completed successfully.
+
+*** format boot
+
+#+begin_src bash
+  mkfs.fat -F 32 /dev/disk/by-partlabel/boot
+#+end_src
+
+*** encryption and lvm
+
+Format and open interactively entering passphrases:
+#+begin_src bash
+  # cryptsetup luksFormat /dev/disk/by-partlabel/archlinux
+  # cryptsetup open /dev/disk/by-partlabel/archlinux cryptlvm
+#+end_src
+
+#+begin_src bash
+  cryptsetup status /dev/mapper/cryptlvm
+#+end_src
+
+*** setup lvm
+
+#+begin_src bash
+  pvcreate /dev/mapper/cryptlvm
+#+end_src
+
+#+begin_src bash
+  vgcreate vg /dev/mapper/cryptlvm
+#+end_src
+
+#+begin_src bash
+  lvcreate -l 100%FREE vg -n root
+#+end_src
+
+*** format /
+
+#+begin_src bash
+  mkfs.btrfs -L root -f /dev/mapper/vg-root
+#+end_src
+
+#+begin_src bash
+  mount /dev/mapper/vg-root /mnt
+#+end_src
+
+Not sure about btrfs subvolumes. Are they easier to resize than lvms?
+
+#+begin_src bash
+  btrfs subvolume create /mnt/root
+  btrfs subvolume create /mnt/home
+#+end_src
+
+*** mount the partitions
+
+#+begin_src bash
+  #TBD
+#+end_src
+
+*** create a swapfile
+
+#+begin_src bash
+  mkswap -U clear --size 4G --file /swapfile
+#+end_src
 
 * libvirt
 
@@ -138,132 +316,11 @@ Explicitly installed packages
   pacman -Qe
 #+end_src
 
-#+RESULTS:
-| alacritty                   |
-| alsa-utils                  |
-| ark                         |
-| arm-none-eabi-binutils      |
-| arm-none-eabi-gcc           |
-| arm-none-eabi-gdb           |
-| arm-none-eabi-newlib        |
-| avr-gcc                     |
-| avr-libc                    |
-| base-devel                  |
-| btop                        |
-| chromium                    |
-| dfu-programmer              |
-| dfu-util                    |
-| dhcpcd                      |
-| discover                    |
-| dnsmasq                     |
-| efibootmgr                  |
-| emacs                       |
-| emscripten                  |
-| fish                        |
-| gamescope                   |
-| git                         |
-| grub                        |
-| inetutils                   |
-| iptables-nft                |
-| keepassxc                   |
-| kicad                       |
-| kicad-library               |
-| kicad-library-3d            |
-| konsole                     |
-| lib32-systemd               |
-| libgccjit                   |
-| libvirt                     |
-| lightdm                     |
-| lightdm-gtk-greeter         |
-| linux                       |
-| linux-firmware              |
-| lua                         |
-| luarocks                    |
-| mangohud                    |
-| noto-fonts-emoji            |
-| nvidia                      |
-| nvidia-settings             |
-| openssh                     |
-| p7zip                       |
-| qemu-full                   |
-| rsync                       |
-| ruby                        |
-| sudo                        |
-| tmux                        |
-| ttc-iosevka-ss08            |
-| ttc-iosevka-ss17            |
-| unrar                       |
-| vim                         |
-| virt-manager                |
-| xclip                       |
-| xorg-xinput                 |
-| xsel                        |
-| zsh                         |
-
 Explicitly installed by parent group
 
 #+begin_src sh
   pacman -Qeg
 #+end_src
-
-#+RESULTS:
-| kde-applications | ark                         |
-| kde-applications | dolphin                     |
-| kde-applications | konsole                     |
-| kde-applications | kwalletmanager              |
-| kde-utilities    | ark                         |
-| kde-utilities    | konsole                     |
-| kde-utilities    | kwalletmanager              |
-| plasma           | bluedevil                   |
-| plasma           | breeze-gtk                  |
-| plasma           | breeze-plymouth             |
-| plasma           | discover                    |
-| plasma           | drkonqi                     |
-| plasma           | flatpak-kcm                 |
-| plasma           | kde-gtk-config              |
-| plasma           | kdeplasma-addons            |
-| plasma           | kgamma5                     |
-| plasma           | khotkeys                    |
-| plasma           | kinfocenter                 |
-| plasma           | kscreen                     |
-| plasma           | ksshaskpass                 |
-| plasma           | kwallet-pam                 |
-| plasma           | kwayland-integration        |
-| plasma           | kwrited                     |
-| plasma           | oxygen                      |
-| plasma           | plasma-browser-integration  |
-| plasma           | plasma-desktop              |
-| plasma           | plasma-disks                |
-| plasma           | plasma-firewall             |
-| plasma           | plasma-nm                   |
-| plasma           | plasma-pa                   |
-| plasma           | plasma-sdk                  |
-| plasma           | plasma-systemmonitor        |
-| plasma           | plasma-thunderbolt          |
-| plasma           | plasma-vault                |
-| plasma           | plasma-welcome              |
-| plasma           | plasma-workspace-wallpapers |
-| plasma           | plymouth-kcm                |
-| plasma           | sddm-kcm                    |
-| plasma           | xdg-desktop-portal-kde      |
-| kde-system       | dolphin                     |
-| xfce4            | exo                         |
-| xfce4            | garcon                      |
-| xfce4            | thunar                      |
-| xfce4            | thunar-volman               |
-| xfce4            | tumbler                     |
-| xfce4            | xfce4-appfinder             |
-| xfce4            | xfce4-panel                 |
-| xfce4            | xfce4-power-manager         |
-| xfce4            | xfce4-session               |
-| xfce4            | xfce4-settings              |
-| xfce4            | xfce4-terminal              |
-| xfce4            | xfconf                      |
-| xfce4            | xfdesktop                   |
-| xfce4            | xfwm4                       |
-| xfce4            | xfwm4-themes                |
-| xorg             | xorg-xinput                 |
-| xorg-apps        | xorg-xinput                 |
 
 * aur packages
 
