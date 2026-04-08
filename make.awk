@@ -127,7 +127,7 @@ function install_emacs30() {
         "--with-native-compilation " \
         "--with-pgtk " \
         "--without-xaw3d\n" \
-        "make -j 8\n" \
+        "make -j\n" \
         "make install\n")
 }
 

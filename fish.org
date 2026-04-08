@@ -255,7 +255,7 @@
     bind -M insert \ce forward-char
 
     # Up arrow: sync history accross sessions before reverse history search
-    bind -M insert -k up 'history --merge; up-or-search'
+    bind -M insert up 'history --merge; up-or-search'
     bind -M insert \e\[A 'history --merge; up-or-search'
 
     # Also Use Ctrl-p and Ctrl-n for reverse history search
