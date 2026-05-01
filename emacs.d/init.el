@@ -68,7 +68,19 @@
 (setq gc-cons-threshold 16000000)
 
 ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-(setq read-process-output-max (* 1024 1024))
+(setq read-process-output-max (* 4 1024 1024)) ;; 4MB
+
+;; Disable Bidirectional Text Scanning
+(setq-default bidi-display-reordering 'left-to-right
+              bidi-paragraph-direction 'left-to-right)
+(setq bidi-inhibit-bpa t)
+
+;; Disable syntax-highlighting on text you’re actively typing.
+(setq redisplay-skip-fontification-on-input t)
+
+;; Hide cursors in non focused windows.
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
 
 ;; https://www.masteringemacs.org/article/speed-up-emacs-libjansson-native-elisp-compilation
 (if (and (fboundp 'native-comp-available-p)

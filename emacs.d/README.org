@@ -204,6 +204,19 @@
     (put 'narrow-to-region 'disabled nil)
     (put 'erase-buffer 'disabled nil)
 
+    ;; Prevent ffap from Pinging Hostnames
+    (setq ffap-machine-p-known 'reject)
+
+    ;; Save the existing clipboard content into the kill ring before overwriting it
+    (setq save-interprogram-paste-before-kill t)
+
+    ;; No Duplicates in the Kill Ring
+    (setq kill-do-not-save-duplicates t)
+
+    ;; Don’t Render Cursors in Non-Focused Windows
+    (setq-default cursor-in-non-selected-windows nil)
+    (setq highlight-nonselected-windows nil)
+
     (defun amd/tangle-init ()
       "Manually copy code from README.org into README.el."
       (interactive)
@@ -291,9 +304,12 @@
     ;;       #'command-completion-default-include-p)
 
     :config
-    ;; $PATH
     ;; Erase trailing whitespace before save
     (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+    ;; chmod +x scripts that start with #!
+    (add-hook 'after-save-hook
+          #'executable-make-buffer-file-executable-if-script-p)
 
     (when (memq window-system '(mac ns))
       (exec-path-from-shell-initialize))
