@@ -27,9 +27,9 @@
         ox-gfm ox-pandoc page-break-lines pandoc-mode paradox pt
         pylint request scad-mode scad-preview scss-mode sql-indent
         sqlup-mode ssh-agency ssh-config-mode steam subatomic256-theme
-        transient transient-posframe treesit-auto typescript-mode
-        vimrc-mode vlf vterm wgrep-pt which-key with-editor
-        xterm-color yaml-mode yari yasnippet))
+        tokyo-night transient transient-posframe treesit-auto
+        typescript-mode vimrc-mode vlf vterm wgrep-pt which-key
+        with-editor xterm-color yaml-mode yari yasnippet))
  '(paradox-github-token t)
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)

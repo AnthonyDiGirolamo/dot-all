@@ -12,6 +12,7 @@
   - [[#leuven-light][leuven light]]
   - [[#moe-dark][moe dark]]
   - [[#catppuccin][catppuccin]]
+  - [[#tokyo-night][tokyo-night]]
   - [[#doom-themes][doom-themes]]
   - [[#modus-themes][modus-themes]]
   - [[#solaire-mode][solaire-mode]]
@@ -722,6 +723,20 @@
        '(avy-lead-face-0 ((t (:foreground "#5fd7ff"))) t)
        '(avy-lead-face-1 ((t (:foreground "#66ffaa"))) t)
        '(avy-lead-face-2 ((t (:foreground "#ff6666"))) t))
+      (when (featurep 'airline-themes)
+        (load-theme 'airline-catppuccin_frappe t))))
+#+end_src
+
+** tokyo-night
+
+#+begin_src emacs-lisp
+  (use-package tokyo-night-theme
+    :config
+    (defun amd/tokyo-night-theme ()
+      "load catppuccin"
+      (interactive)
+      (amd/disable-loaded-themes)
+      (load-theme 'tokyo-night-moon t)
       (when (featurep 'airline-themes)
         (load-theme 'airline-catppuccin_frappe t))))
 #+end_src
