@@ -3567,9 +3567,15 @@ are available in the project root folder:
           graphviz-dot-dot-program "dot"
           graphviz-dot-preview-extension "svg"))
 
+  (use-package mmm-mode)
+  (use-package mmm-jinja2
+    :config
+    (add-to-list 'auto-mode-alist '("\\.rs.jinja\\'" . rust-mode))
+    (mmm-add-mode-ext-class 'rust-mode "\\.rs.jinja'" 'jinja2))
   (use-package jinja2-mode
     :config
-    (add-to-list 'auto-mode-alist '("\\.jinja\\'" . jinja2-mode)))
+    ;; (add-to-list 'auto-mode-alist '("\\.jinja\\'" . jinja2-mode))
+    )
 
   (use-package forth-mode :defer t)
   (use-package forth-block-mode :defer t)

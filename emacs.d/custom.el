@@ -22,14 +22,15 @@
         fill-column-indicator flycheck-rust flymake-ruby forth-mode
         gcode-mode general ggtags gif-screencast glsl-mode gn-mode
         go-mode haml-mode hide-mode-line ht htmlize ibuffer-projectile
-        jinja2-mode js2-mode json-mode jsonrpc llama major-mode-hydra
-        markdown-mode markdown-mode+ moonscript ob-async org-superstar
-        ox-gfm ox-pandoc page-break-lines pandoc-mode paradox pt
-        pylint request scad-mode scad-preview scss-mode sql-indent
-        sqlup-mode ssh-agency ssh-config-mode steam subatomic256-theme
-        tokyo-night transient transient-posframe treesit-auto
-        typescript-mode vimrc-mode vlf vterm wgrep-pt which-key
-        with-editor xterm-color yaml-mode yari yasnippet))
+        js2-mode json-mode jsonrpc llama major-mode-hydra
+        markdown-mode markdown-mode+ mmm-jinja2 mmm-mode moonscript
+        ob-async org-superstar ox-gfm ox-pandoc page-break-lines
+        pandoc-mode paradox pt pylint request scad-mode scad-preview
+        scss-mode sql-indent sqlup-mode ssh-agency ssh-config-mode
+        steam subatomic256-theme tokyo-night transient
+        transient-posframe treesit-auto typescript-mode vimrc-mode vlf
+        vterm wgrep-pt which-key with-editor xterm-color yaml-mode
+        yari yasnippet))
  '(paradox-github-token t)
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
