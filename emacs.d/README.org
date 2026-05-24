@@ -33,6 +33,7 @@
   - [[#eshell][eshell]]
   - [[#shell][shell]]
   - [[#ansi-color][ansi-color]]
+  - [[#proced][proced]]
   - [[#compilation][compilation]]
   - [[#calc][calc]]
   - [[#winner---window-layout-undoredo][winner - window layout undo/redo]]
@@ -2095,6 +2096,23 @@ This mode gives variables names unique colors.
   (use-package ansi-color
    :custom
    (ansi-color-for-comint-mode 'filter))
+#+end_src
+
+** proced
+
+#+begin_src emacs-lisp
+  (use-package proced
+    :general
+    (:states '(emacs)
+     :keymaps 'proced-mode-map
+     "zz" 'recenter
+     "/" 'swiper
+     "n" 'next-line
+     "g" (lambda() (interactive) (revert-buffer) (recenter))
+     "e" 'previous-line)
+   :custom
+   (proced-sort 'pid)
+   (proced-tree-flag t))
 #+end_src
 
 ** compilation
