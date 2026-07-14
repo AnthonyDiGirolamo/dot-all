@@ -285,3 +285,24 @@ with open('/dev/pts/2', 'w') as term:
   }
 #+end_src
 
+* lisp-data-mode
+
+** dir-locals-lsp-path                                                 :src:
+
+Create a ~.projectile~ file in the project root folder if needed for ~(projectile-project-root)~ to work correctly.
+
+#+begin_src lisp-data
+  ;;; Directory Local Variables            -*- no-byte-compile: t -*-
+  ;;; For more information see (info "(emacs) Directory Variables")
+
+  ((nil
+    . ((eval
+        . (add-to-list 'exec-path
+                       (expand-file-name "~/.cargo/bin")))
+       (lsp-clients-clangd-args . ("--background-index=true"))
+       (eval
+        . (setq lsp-clients-clangd-executable
+                (expand-file-name (concat (projectile-project-root) "/some/local/project/path/bin/clangd"))))))
+   (magit-status-mode
+    . ((eval . (magit-disable-section-inserter 'magit-insert-tags-header)))))
+#+end_src

@@ -35,7 +35,8 @@
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
  '(safe-local-variable-values
-   '((eval setq lsp-clients-clangd-executable
+   '((eval add-to-list 'exec-path (expand-file-name "~/.cargo/bin"))
+     (eval setq lsp-clients-clangd-executable
            (expand-file-name
             (concat (projectile-project-root)
                     "/prebuilt/third_party/clang/linux-x64/bin/clangd")))
