@@ -225,7 +225,7 @@ install-pip:  ## install python3 pip
 .PHONY: rm-removed-files
 .ONESHELL:
 rm-removed-files:  ## rm files removed since last make tangle
-	@for f in $(ORG_OUT_FILES); do
+	for f in $(ORG_OUT_FILES); do
 		! test -f $$f.last && continue
 		cat $$f.last | sort > $$f.1
 		cat $$f | sort > $$f.2
@@ -250,6 +250,7 @@ rm-all-tangled-files:  ## rm all tangled files
 # Rule to convert a *.org file to a .cache/*.out
 $(CACHEDIR)/%.out: %.org
 	@$(ECHO_TAG_MESSAGE) "TANGLE" "$<"
+	@touch $@
 	@test -f $@ && cp $@ $@.last
 	@rm -f $@
 	@emacs -Q --batch --eval "(progn \
@@ -258,8 +259,8 @@ $(CACHEDIR)/%.out: %.org
 	(setq make-backup-files nil) \
 	(defalias 'yes-or-no-p 'y-or-n-p) \
 	(setq org-confirm-babel-evaluate nil) \
-	(setq hostname \"$(HOSTNAME)\")
-	(defun tangle-file-if (file p) (if (eval p) file \"no\"))
+	(setq hostname \"$(HOSTNAME)\") \
+	(defun tangle-file-if (file p) (if (eval p) file \"no\")) \
 	(defun amd/post-tangle () \
 	  (let ((tangled-output-file (buffer-file-name)) \
 		(dot-out-file (car command-line-args-left))) \
@@ -274,7 +275,7 @@ $(CACHEDIR)/%.out: %.org
 	(add-hook 'org-babel-post-tangle-hook 'amd/post-tangle) \
 	(org-babel-tangle-file \"$<\") \
 	(org-babel-map-src-blocks \"$<\" \
-	  (when (string-match-p \":eval yes\" header-args)
+	  (when (string-match-p \":eval yes\" header-args) \
 	    (princ (format \"%s\" (org-babel-execute-src-block))))) \
 	)" $(abspath $@) 2>/dev/null
 	@touch $@
