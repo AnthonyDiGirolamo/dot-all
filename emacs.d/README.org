@@ -2246,6 +2246,35 @@ This mode gives variables names unique colors.
                (calcFunc-hms (calcFunc-mul business-days worktime-per-day) 0 0)
                (calcFunc-sub (calcFunc-time date1) (calcFunc-time date2))))
           0))))
+
+  (require 'thingatpt)
+
+  (defun multiply-number-at-point (factor)
+    "Multiply the number at point by FACTOR using `calc-eval` and replace it.
+  If called with a prefix argument (e.g., C-u 3 M-x multiply-number-at-point),
+  uses that as the factor; otherwise, prompts in the minibuffer."
+    (interactive
+     (list (if current-prefix-arg
+               (prefix-numeric-value current-prefix-arg)
+             (read-number "Multiply by: "))))
+    (let ((bounds (bounds-of-thing-at-point 'number))
+          (num (number-at-point)))
+      (if (null bounds)
+          (user-error "No number found at point")
+        (let* ((num-str (number-to-string num))
+               (factor-str (number-to-string factor))
+               (expr (format "%s * %s" num-str factor-str))
+               (result (calc-eval expr)))
+          (delete-region (car bounds) (cdr bounds))
+          (insert result)))))
+
+  (defun divide-number-at-point-by-two ()
+    (interactive)
+    (multiply-number-at-point 0.5))
+
+  (defun divide-number-at-point-by-four ()
+    (interactive)
+    (multiply-number-at-point 0.25))
 #+end_src
 
 ** winner - window layout undo/redo
