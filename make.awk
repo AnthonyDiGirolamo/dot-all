@@ -131,6 +131,22 @@ function install_emacs30() {
         "make install\n")
 }
 
+function install_emacs31() {
+    tarfile = make::download("emacs",
+        "https://mirrors.ocf.berkeley.edu/gnu/emacs/emacs-31.1.tar.xz",
+        "8ea039d695b91c5c0778f8eb2f1b18fa")
+
+    make::compile(make::extract_tar(tarfile),
+        "./configure --prefix=$HOME/apps/emacs31 " \
+        "--with-modules " \
+        "--with-cairo " \
+        "--with-native-compilation " \
+        "--with-pgtk " \
+        "--without-xaw3d\n" \
+        "make -j\n" \
+        "make install\n")
+}
+
 function install_lua54() {
     tarfile = make::download("lua54",
         "https://www.lua.org/ftp/lua-5.4.8.tar.gz",
