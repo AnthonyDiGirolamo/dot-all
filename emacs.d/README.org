@@ -2732,8 +2732,23 @@ This mode gives variables names unique colors.
 
 #+begin_src emacs-lisp
   (use-package vundo
-    :ensure t
-    :bind ("C-x u" . vundo))
+    :init
+    (setq vundo-window-side 'bottom)
+    (setq vundo-window-max-height 3)
+    (setq vundo-glyph-alist
+          vundo-ascii-symbols
+          ;; vundo-unicode-symbols
+          ;; '((selected-node . ?♦)
+          ;;   (node . ?♢)
+          ;;   (horizontal-stem . ?─)
+          ;;   (vertical-stem . ?│)
+          ;;   (branch . ?├)
+          ;;   (last-branch . ?└))
+          )
+    :bind ("C-x u" . vundo)
+    :config
+    (add-to-list 'evil-emacs-state-modes 'vundo-mode)
+    (add-to-list 'evil-emacs-state-modes 'vundo-diff-mode))
 #+end_src
 
 ** undo-tree
@@ -3016,6 +3031,8 @@ This mode gives variables names unique colors.
 
        ('dired-mode :other t :align left :size 0.3)
 
+       ;; ('vundo-mode :align below :same t)
+       ;; ("\\*vundo-diff.*\\*" :align below :same t)
        ('undo-tree-mode :align right :size 0.4)))
     :config
     (shackle-mode))
@@ -3895,7 +3912,7 @@ are available in the project root folder:
    `((("d" counsel-find-file      "find-file")
       ("g" magit-status           "git")
       ("s" hydra-set-toggles/body "set-toggles")
-      ("u" undo-tree-visualize    "undo-tree")
+      ("u" vundo                  "vundo")
       ("w" ace-window             "window")
       ("t" hydra-tab-bar/body     "tabs")
       ("c" calc-dispatch          "calc")
