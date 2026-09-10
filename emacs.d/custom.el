@@ -19,17 +19,17 @@
         company-lsp company-shell counsel-gtags dart-mode dts-mode
         edbi edit-server elfeed emmet-mode esup exec-path-from-shell
         feature-mode fennel-mode fill-column-indicator flycheck-rust
-        flymake-ruby forth-mode gcode-mode general ggtags
-        gif-screencast glsl-mode gn-mode go-mode haml-mode
-        hide-mode-line ht htmlize ibuffer-projectile js2-mode
-        json-mode jsonrpc major-mode-hydra markdown-mode
-        markdown-mode+ mmm-jinja2 mmm-mode moonscript ob-async
-        org-superstar ox-gfm ox-pandoc page-break-lines pandoc-mode
-        paradox pt pylint request scad-mode scad-preview scss-mode
-        sql-indent sqlup-mode ssh-agency ssh-config-mode steam
-        subatomic256-theme tokyo-night transient-posframe treesit-auto
-        typescript-mode vimrc-mode vlf vterm vundo wgrep-pt which-key
-        xterm-color yaml-mode yari))
+        flymake-ruby forth-mode gcode-mode ggtags gif-screencast
+        glsl-mode gn-mode go-mode haml-mode hide-mode-line ht htmlize
+        ibuffer-projectile js2-mode json-mode jsonrpc major-mode-hydra
+        markdown-mode markdown-mode+ mmm-jinja2 mmm-mode moonscript
+        ob-async org-superstar ox-gfm ox-pandoc page-break-lines
+        pandoc-mode paradox pt pylint request scad-mode scad-preview
+        scss-mode sql-indent sqlup-mode ssh-agency ssh-config-mode
+        steam subatomic256-theme tokyo-night transient-posframe
+        treesit-auto typescript-mode vertico vertico-posframe
+        vimrc-mode vlf vterm vundo wgrep-pt which-key xterm-color
+        yaml-mode yari))
  '(paradox-github-token t)
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
