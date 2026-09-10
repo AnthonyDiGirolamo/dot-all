@@ -4331,6 +4331,12 @@ are available in the project root folder:
 
 #+begin_src emacs-lisp
   (use-package vertico
+    :general
+    (:keymaps '(vertico-map)
+      ;; "C-n" 'vertico-next ;; this is the default
+      "C-e" 'vertico-previous
+      "C-u" 'vertico-scroll-down
+      "C-d" 'vertico-scroll-up)
     :init
     ;; Different scroll margin
     ;; (setq vertico-scroll-margin 0)
