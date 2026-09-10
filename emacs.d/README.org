@@ -53,6 +53,7 @@
 - [[#spell-checking][spell checking]]
 - [[#navigation][navigation]]
   - [[#avy][avy]]
+  - [[#vundo][vundo]]
   - [[#undo-tree][undo-tree]]
   - [[#tab-bar-mode][tab-bar-mode]]
   - [[#eyebrowse---tabs][eyebrowse - tabs]]
@@ -75,6 +76,7 @@
   - [[#emacs-lisp-hydra][Emacs-Lisp Hydra]]
   - [[#rust-mode-hydra][Rust-mode Hydra]]
 - [[#completion-frameworks][completion frameworks]]
+  - [[#vanilla][vanilla]]
   - [[#orderless][orderless]]
   - [[#consult][consult]]
   - [[#embark][embark]]
@@ -1360,9 +1362,10 @@ This mode gives variables names unique colors.
 #+begin_src emacs-lisp
   (use-package evil
     :demand
-    :after undo-tree
+    ;; :after undo-tree
     :custom
-    (evil-undo-system 'undo-tree)
+    ;; (evil-undo-system 'undo-tree)
+    (evil-undo-system 'undo-redo) ;; for vundo
     (x-select-enable-clipboard t)
     (x-select-enable-clipboard-manager nil)
     (evil-regexp-search t)  ;; Whether to use regular expressions for searching.
@@ -1476,7 +1479,7 @@ This mode gives variables names unique colors.
      "gf" 'find-file-at-point)
 
     :config
-    (add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
+    ;; (add-hook 'evil-local-mode-hook 'turn-on-undo-tree-mode)
     (evil-mode 1)
 
     ;; (defun amd/get-inner-symbol ()
@@ -1933,7 +1936,7 @@ This mode gives variables names unique colors.
 
     ;; Disable Company mode
     (add-hook 'eshell-mode-hook (lambda () (company-mode -1)))
-    (add-hook 'eshell-mode-hook (lambda () (undo-tree-mode -1)))
+    ;; (add-hook 'eshell-mode-hook (lambda () (undo-tree-mode -1)))
 
     ;; Visual commands
     (with-eval-after-load 'em-term
@@ -2544,6 +2547,7 @@ This mode gives variables names unique colors.
     (yas-global-mode))
 
   (use-package yankpad
+    :demand
     :commands (yankpad-edit yankpad-set-category yankpad-expand yankpad-insert)
     :after yasnippet
     :custom
@@ -2724,14 +2728,24 @@ This mode gives variables names unique colors.
       "T"   #'avy-goto-word-0))
 #+end_src
 
+** vundo
+
+#+begin_src emacs-lisp
+  (use-package vundo
+    :ensure t
+    :bind ("C-x u" . vundo))
+#+end_src
+
 ** undo-tree
 
 #+begin_src emacs-lisp
   (use-package undo-tree
+    :disabled
     :diminish
     :demand
     ;; :commands (undo-tree-visualize)
     :custom
+    (undo-tree-enable-undo-in-region nil)
     (undo-tree-auto-save-history nil)
     (undo-tree-history-directory-alist
      '(("." . "~/.emacs.d/undo-tree-history")))
@@ -4095,6 +4109,53 @@ are available in the project root folder:
 
 * completion frameworks
 
+** vanilla
+
+#+begin_src emacs-lisp
+  ;;(use-package minibuffer
+  ;;  :ensure nil
+  ;;  :config
+  ;;  ;; Do not inform me about the default keybindings to select a
+  ;;  ;; candidate.
+  ;;  (setq completion-show-help nil)
+
+  ;;  ;; Do not print messages in the echo area that pertain to
+  ;;  ;; completion---those are distracting.
+  ;;  (setq completion-show-inline-help nil)
+
+  ;;  ;; Show useful annotations in various minibuffer prompts (though the
+  ;;  ;; `marginalia' package greatly improves this).
+  ;;  (setq completions-detailed t)
+
+  ;;  ;; Do not use rows and columns for completions: a single vertical
+  ;;  ;; list is easier to follow.
+  ;;  (setq completions-format 'one-column)
+
+  ;;  ;; Put an upper limit to the Completions window, so that it does not
+  ;;  ;; disorient me.
+  ;;  (setq completions-max-height 12)
+
+  ;;  ;; Rely on previous inputs to surface candidates towards the top of
+  ;;  ;; the list (enable the built-in `savehist-mode' to persist
+  ;;  ;; history).
+  ;;  (setq completions-sort 'historical)
+
+  ;;  ;; Show the Completions buffer if I hit TAB but there is no unique match yet.
+  ;;  (setq completion-auto-help t)
+
+  ;;  ;; Never switch to the Completions buffer when I type TAB, because I
+  ;;  ;; want to select candidates while the minibuffer is still in focus,
+  ;;  ;; per `minibuffer-visible-completions'.  This has the advantage of
+  ;;  ;; auto-updating the completions as I type.
+  ;;  (setq completion-auto-select nil
+  ;;        minibuffer-visible-completions t)
+
+  ;;  ;; Those two are also relevant for the `completion-category-overrides', which I
+  ;;  ;; cover elsewhere in this article.
+  ;;  (setq completion-eager-display t)
+  ;;  (setq completion-eager-update t))
+#+end_src
+
 ** orderless
 
 #+begin_src emacs-lisp
@@ -4381,6 +4442,7 @@ are available in the project root folder:
 
 #+begin_src emacs-lisp
   (use-package swiper
+    ;; :disabled
     :diminish ivy-mode
     :general
     (:keymaps '(ivy-minibuffer-map)
@@ -4458,6 +4520,7 @@ are available in the project root folder:
     (amx-mode))
 
   (use-package counsel
+    ;; :disabled
     :after amx
     :demand
     :bind (("M-x" . counsel-M-x)

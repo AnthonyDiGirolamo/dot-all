@@ -1,4 +1,20 @@
 
+* 4bit asm
+#+begin_src asm
+  mov R8, 2
+  mov R2, 1
+  mov R1, 0
+  mov R3, 0
+  mov R0, R8                      ; R0 <- R8
+  mov [15 0], R0                  ; [NN] <- R0  ; move contents of R0 into data memory address by literal [NN]
+  mov R0, 6                       ; R0 <- 6
+  mov [15 1], R0                  ; [NN] <- R0
+  mov R0, R1                      ; R0 <- R1
+  cp R0, 0                        ; compare R0 with 4bit literal
+  skip F, M
+
+#+end_src
+
 * ATX Spec
 
 | ! |               | in           | mm               | final              |
