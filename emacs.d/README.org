@@ -416,7 +416,7 @@
             (bookmarks . 5)))
     :general
     (:states '(emacs) :keymaps 'dashboard-mode-map
-             "C-p" 'amd/counsel-git-or-file-jump
+             "C-p" 'amd/consult-git-or-file-jump
              "n" 'dashboard-next-line
              "e" 'dashboard-previous-line
              "N" 'dashboard-next-section
@@ -1427,7 +1427,7 @@ This mode gives variables names unique colors.
      "g #" 'evil-ex-search-unbounded-word-forward)
     (:states '(normal)
      "C-s" 'save-buffer
-     "C-p" 'amd/counsel-git-or-file-jump
+     "C-p" 'amd/consult-git-or-file-jump
      "C-M-c" 'amd/split-compilation
      "g j" 'amd/join-to-end-of-next-line
      "g s" 'count-words
@@ -1452,7 +1452,6 @@ This mode gives variables names unique colors.
      "C-w c" 'evil-window-delete
      "C-w o" 'delete-other-windows
      "C-b" 'yankpad-insert ;; Was evil-scroll-page-up
-     "C-t" 'yankpad-insert
      amd/leader-key-insert 'hydra-leader-menu/body)
     (:states '(motion visual)
      "RET" 'evil-ex ;; Enter opens : prompt
@@ -1714,7 +1713,7 @@ This mode gives variables names unique colors.
      ;; "f" 'dired-find-file ;; default
      ;; "a" 'dired-find-alternate-file ;; default - open a file in the same buffer and close dired
      "RET" 'amd/dired-open-thing
-     "C-p" 'amd/counsel-git-or-file-jump
+     "C-p" 'amd/consult-git-or-file-jump
      "C-l" (lambda() (interactive) (revert-buffer) (evil-ex-nohighlight) (recenter))
      "gr" 'revert-buffer
      "gg" 'evil-goto-first-line
@@ -2555,10 +2554,7 @@ This mode gives variables names unique colors.
     :commands (yankpad-edit yankpad-set-category yankpad-expand yankpad-insert)
     :after yasnippet
     :custom
-    (yankpad-file "~/.emacs.d/yankpad.org")
-    :general
-    (:states '(insert)
-      "C-t" 'yankpad-expand))
+    (yankpad-file "~/.emacs.d/yankpad.org"))
 #+end_src
 
 * wgrep
@@ -2600,7 +2596,7 @@ This mode gives variables names unique colors.
                 magit-status-mode-map)
      "C-d" 'evil-scroll-down
      "C-u" 'evil-scroll-up
-     "C-p" 'amd/counsel-git-or-file-jump
+     "C-p" 'amd/consult-git-or-file-jump
      "e" 'magit-section-backward
      "p" nil) ;; hit E for ediff popup instead
 
@@ -3007,8 +3003,7 @@ This mode gives variables names unique colors.
     ;;   (message "%s" arguments)
     ;;   (apply old-function arguments))
     ;; (advice-add 'projectile-switch-project-by-name :around #'amd/projectile-switch-project)
-    :config
-    (projectile-global-mode t))
+    )
 #+end_src
 
 ** shackle
@@ -3314,7 +3309,6 @@ are available in the project root folder:
 #+end_src
 
 #+begin_src emacs-lisp
-
   (use-package emacs-lisp
     :general
     (:states
@@ -3980,7 +3974,7 @@ are available in the project root folder:
       ("pc" project-compile                  "project compile")
       ("pr" project-recompile                "project recompile")
       ("pi" projectile-invalidate-cache      "project clear")
-      ("rf" counsel-recentf                  "counsel-recentf")
+      ("rf" consult-recent-file              "recentf")
       ("rt" run-current-test                 "run test")
       ("rF" (run-current-test nil t)         "run file")
       ("rp" run-pico8                        "run pico8")
@@ -4202,67 +4196,73 @@ are available in the project root folder:
 ** consult
 
 #+begin_src emacs-lisp
-  ;; Example configuration for Consult
   (use-package consult
+    ;; :disabled
     ;; Replace bindings. Lazily loaded due by `use-package'.
     :bind
-    (;; C-c bindings (mode-specific-map)
-     ("C-c h" . consult-history)
-     ("C-c m" . consult-mode-command)
-     ("C-c k" . consult-kmacro)
-     ;; C-x bindings (ctl-x-map)
-     ("C-x M-:" . consult-complex-command) ;; orig. repeat-complex-command
-     ("C-x b" . consult-buffer)            ;; orig. switch-to-buffer
-     ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-     ("C-x 5 b" . consult-buffer-other-frame) ;; orig. switch-to-buffer-other-frame
-     ("C-x r b" . consult-bookmark)           ;; orig. bookmark-jump
-     ("C-x p b" . consult-project-buffer)     ;; orig. project-switch-to-buffer
-     ;; Custom M-# bindings for fast register access
-     ("M-#" . consult-register-load)
-     ("M-'" . consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
-     ("C-M-#" . consult-register)
-     ;; Other custom bindings
-     ("M-y" . consult-yank-pop)           ;; orig. yank-pop
-     ("<help> a" . consult-apropos)       ;; orig. apropos-command
-     ;; M-g bindings (goto-map)
-     ("M-g e" . consult-compile-error)
-     ("M-g f" . consult-flymake)           ;; Alternative: consult-flycheck
-     ("M-g g" . consult-goto-line)         ;; orig. goto-line
-     ("M-g M-g" . consult-goto-line)       ;; orig. goto-line
-     ("M-g o" . consult-outline)           ;; Alternative: consult-org-heading
-     ("M-g m" . consult-mark)
-     ("M-g k" . consult-global-mark)
-     ("M-g i" . consult-imenu)
-     ("M-g I" . consult-imenu-multi)
-     ;; M-s bindings (search-map)
-     ("M-s d" . consult-find)
-     ("M-s D" . consult-locate)
-     ("M-s g" . consult-grep)
-     ("M-s G" . consult-git-grep)
-     ("M-s r" . consult-ripgrep)
-     ("M-s l" . consult-line)
-     ("M-s L" . consult-line-multi)
-     ("M-s m" . consult-multi-occur)
-     ("M-s k" . consult-keep-lines)
-     ("M-s u" . consult-focus-lines)
-     ;; Isearch integration
-     ("M-s e" . consult-isearch-history)
-     :map isearch-mode-map
-     ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-     ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-     ("M-s l" . consult-line) ;; needed by consult-line to detect isearch
-     ("M-s L" . consult-line-multi) ;; needed by consult-line to detect isearch
-     ;; Minibuffer history
-     :map minibuffer-local-map
-     ("M-s" . consult-history)        ;; orig. next-matching-history-element
-     ("M-r" . consult-history))       ;; orig. previous-matching-history-element
+    ;; (;; C-c bindings (mode-specific-map)
+    ;;  ("C-c h" . consult-history)
+    ;;  ("C-c m" . consult-mode-command)
+    ;;  ("C-c k" . consult-kmacro)
+    ;;  ;; C-x bindings (ctl-x-map)
+    ;;  ("C-x M-:" . consult-complex-command) ;; orig. repeat-complex-command
+    ;;  ("C-x b" . consult-buffer)            ;; orig. switch-to-buffer
+    ;;  ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+    ;;  ("C-x 5 b" . consult-buffer-other-frame) ;; orig. switch-to-buffer-other-frame
+    ;;  ("C-x r b" . consult-bookmark)           ;; orig. bookmark-jump
+    ;;  ("C-x p b" . consult-project-buffer)     ;; orig. project-switch-to-buffer
+    ;;  ;; Custom M-# bindings for fast register access
+    ;;  ("M-#" . consult-register-load)
+    ;;  ("M-'" . consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
+    ;;  ("C-M-#" . consult-register)
+    ;;  ;; Other custom bindings
+    ;;  ("M-y" . consult-yank-pop)           ;; orig. yank-pop
+    ;;  ("<help> a" . consult-apropos)       ;; orig. apropos-command
+    ;;  ;; M-g bindings (goto-map)
+    ;;  ("M-g e" . consult-compile-error)
+    ;;  ("M-g f" . consult-flymake)           ;; Alternative: consult-flycheck
+    ;;  ("M-g g" . consult-goto-line)         ;; orig. goto-line
+    ;;  ("M-g M-g" . consult-goto-line)       ;; orig. goto-line
+    ;;  ("M-g o" . consult-outline)           ;; Alternative: consult-org-heading
+    ;;  ("M-g m" . consult-mark)
+    ;;  ("M-g k" . consult-global-mark)
+    ;;  ("M-g i" . consult-imenu)
+    ;;  ("M-g I" . consult-imenu-multi)
+    ;;  ;; M-s bindings (search-map)
+    ;;  ("M-s d" . consult-find)
+    ;;  ("M-s D" . consult-locate)
+    ;;  ("M-s g" . consult-grep)
+    ;;  ("M-s G" . consult-git-grep)
+    ;;  ("M-s r" . consult-ripgrep)
+    ;;  ("M-s l" . consult-line)
+    ;;  ("M-s L" . consult-line-multi)
+    ;;  ("M-s m" . consult-multi-occur)
+    ;;  ("M-s k" . consult-keep-lines)
+    ;;  ("M-s u" . consult-focus-lines)
+    ;;  ;; Isearch integration
+    ;;  ("M-s e" . consult-isearch-history)
+    ;;  :map isearch-mode-map
+    ;;  ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+    ;;  ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+    ;;  ("M-s l" . consult-line) ;; needed by consult-line to detect isearch
+    ;;  ("M-s L" . consult-line-multi) ;; needed by consult-line to detect isearch
+    ;;  ;; Minibuffer history
+    ;;  :map minibuffer-local-map
+    ;;  ("M-s" . consult-history)        ;; orig. next-matching-history-element
+    ;;  ("M-r" . consult-history))       ;; orig. previous-matching-history-element
 
     ;; Enable automatic preview at point in the *Completions* buffer. This is
     ;; relevant when you use the default completion UI.
-    :hook (completion-list-mode . consult-preview-at-point-mode)
+    ;; :hook (completion-list-mode . consult-preview-at-point-mode)
 
     ;; The :init configuration is always executed (Not lazy)
     :init
+    (defun amd/consult-git-or-file-jump ()
+      "Run counsel-git if in a git repo, counsel-file-jump otherwise."
+      (interactive)
+      (if (consult-ls-git--get-project-root)
+          (consult-ls-git-ls-files)
+        (consult-find)))
 
     ;; Optionally configure the register formatting. This improves the register
     ;; preview for `consult-register', `consult-register-load',
@@ -4289,14 +4289,14 @@ are available in the project root folder:
     ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
     ;; For some commands and buffer sources it is useful to configure the
     ;; :preview-key on a per-command basis using the `consult-customize' macro.
-    (consult-customize
-     consult-theme :preview-key '(:debounce 0.2 any)
-     consult-ripgrep consult-git-grep consult-grep
-     consult-bookmark consult-recent-file consult-xref
-     consult--source-bookmark consult--source-file-register
-     consult--source-recent-file consult--source-project-recent-file
-     ;; :preview-key (kbd "M-.")
-     :preview-key '(:debounce 0.4 any))
+    ;; (consult-customize
+    ;;  consult-theme :preview-key '(:debounce 0.2 any)
+    ;;  consult-ripgrep consult-git-grep consult-grep
+    ;;  ;; consult-bookmark consult-recent-file consult-xref
+    ;;  ;; consult--source-bookmark consult--source-file-register
+    ;;  ;; consult--source-recent-file consult--source-project-recent-file
+    ;;  ;; :preview-key (kbd "M-.")
+    ;;  :preview-key '(:debounce 0.4 any))
 
     ;; Optionally make narrowing help available in the minibuffer.
     ;; You may want to use `embark-prefix-help-command' or which-key instead.
@@ -4305,27 +4305,31 @@ are available in the project root folder:
     ;; By default `consult-project-function' uses `project-root' from project.el.
     ;; Optionally configure a different project root function.
     ;; There are multiple reasonable alternatives to chose from.
-  ;;;; 1. project.el (the default)
+    ;;;; 1. project.el (the default)
     ;; (setq consult-project-function #'consult--default-project--function)
-  ;;;; 2. projectile.el (projectile-project-root)
+    ;;;; 2. projectile.el (projectile-project-root)
     ;; (autoload 'projectile-project-root "projectile")
     ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
-  ;;;; 3. vc.el (vc-root-dir)
+    ;;;; 3. vc.el (vc-root-dir)
     ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
-  ;;;; 4. locate-dominating-file
+    ;;;; 4. locate-dominating-file
     ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
 
     ;; Optionally configure the narrowing key.
     ;; Both < and C-+ work reasonably well. ;; (kbd "C-+")
     (setq consult-narrow-key "<"))
+
+  (use-package consult-ls-git)
 #+end_src
 
 ** embark
 
 #+begin_src emacs-lisp
   (use-package embark
+    ;; :disabled
     :bind
-    (("C-." . embark-act)         ;; pick some comfortable binding
+    (("C-t" . embark-act)         ;; pick some comfortable binding
+     ("C-c C-o" . embark-export)
      ("C-;" . embark-dwim)        ;; good alternative: M-.
      ("C-h C-k" . embark-bindings)) ;; alternative for `describe-bindings'
 
@@ -4350,10 +4354,13 @@ are available in the project root folder:
 
 #+begin_src emacs-lisp
   (use-package vertico
+    ;; :disabled
     :general
     (:keymaps '(vertico-map)
       ;; "C-n" 'vertico-next ;; this is the default
       "C-e" 'vertico-previous
+      "<prior>" 'vertico-scroll-down
+      "<next>" 'vertico-scroll-up
       "C-u" 'vertico-scroll-down
       "C-d" 'vertico-scroll-up)
     :init
@@ -4361,7 +4368,7 @@ are available in the project root folder:
     ;; (setq vertico-scroll-margin 0)
 
     ;; Show more candidates
-    ;; (setq vertico-count 20)
+    (setq vertico-count 9)
 
     ;; Grow and shrink the Vertico minibuffer
     ;; (setq vertico-resize t)
@@ -4378,6 +4385,7 @@ are available in the project root folder:
 
 #+begin_src emacs-lisp
   (use-package marginalia
+    ;; :disabled
     :bind (:map minibuffer-local-map
                 ("M-A" . marginalia-cycle))
     ;; The :init configuration is always executed (Not lazy!)
@@ -4517,6 +4525,7 @@ are available in the project root folder:
     :config
     (add-to-list 'evil-normal-state-modes 'ivy-occur-grep-mode)
     (add-to-list 'evil-normal-state-modes 'grep-mode)
+    ;; Enable ivy for all completions
     ;; (ivy-mode 1)
 
     (defun amd/update-evil-search (&optional arg1 &rest args)
@@ -4558,11 +4567,11 @@ are available in the project root folder:
     ;; :disabled
     :after amx
     ;; :demand
-    :bind (;; ("M-x" . counsel-M-x)
-           ([f9] . amd/take-svg-screenshot)
-           ;; ("C-h k" . counsel-descbinds)
-           ;; ("C-h C-k" . counsel-descbinds)
-           )
+    :bind
+    (;; ("M-x" . counsel-M-x)
+     ;; ("C-h k" . counsel-descbinds)
+     ;; ("C-h C-k" . counsel-descbinds)
+     ([f9] . amd/take-svg-screenshot))
     :custom
     (counsel-grep-base-command "grep -niE \"%s\" %s")
     :init

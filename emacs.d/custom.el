@@ -8,32 +8,34 @@
  '(doom-modeline-height 1)
  '(doom-modeline-icon nil)
  '(elfeed-feeds
-   '("https://hackaday.com/blog/feed/"
-     "http://planet.emacslife.com/atom.xml"))
+   '("https://hackaday.com/blog/feed/" "http://planet.emacslife.com/atom.xml"))
  '(mac-mouse-wheel-smooth-scroll nil)
  '(magit-log-arguments '("--graph" "--color" "--decorate"))
  '(magit-status-buffer-switch-function 'switch-to-buffer)
  '(markdown-asymmetric-header t)
  '(package-selected-packages
-   '(ag airline-themes bazel blimp coffee-mode company-inf-ruby corfu
-        counsel-gtags dart-mode dts-mode edbi edit-server elfeed
+   '(ag airline-themes bazel blimp coffee-mode company-inf-ruby consult-ls-git
+        corfu counsel-gtags dart-mode dts-mode edbi edit-server elfeed
         emmet-mode esup exec-path-from-shell feature-mode fennel-mode
-        fill-column-indicator flycheck-rust flymake-ruby forth-mode
-        gcode-mode ggtags gif-screencast glsl-mode gn-mode go-mode
-        haml-mode hide-mode-line ht htmlize ibuffer-projectile
-        js2-mode json-mode jsonrpc major-mode-hydra markdown-mode
-        markdown-mode+ mmm-jinja2 mmm-mode moonscript ob-async
-        org-superstar ox-gfm ox-pandoc page-break-lines pandoc-mode
-        paradox pt pylint request scad-mode scad-preview scss-mode
+        fill-column-indicator flycheck-rust flymake-ruby forth-mode gcode-mode
+        ggtags gif-screencast glsl-mode gn-mode go-mode haml-mode hide-mode-line
+        ht htmlize ibuffer-projectile js2-mode json-mode jsonrpc
+        major-mode-hydra markdown-mode markdown-mode+ mmm-jinja2 mmm-mode
+        moonscript ob-async org-superstar ox-gfm ox-pandoc page-break-lines
+        pandoc-mode paradox pt pylint request scad-mode scad-preview scss-mode
         sql-indent sqlup-mode ssh-agency ssh-config-mode steam
         subatomic256-theme tokyo-night transient-posframe treesit-auto
-        typescript-mode vertico vertico-posframe vimrc-mode vlf vterm
-        vundo wgrep-pt which-key xterm-color yaml-mode yari))
+        typescript-mode vertico vertico-posframe vimrc-mode vlf vterm vundo
+        wgrep-pt which-key xterm-color yaml-mode yari))
  '(paradox-github-token t)
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)
  '(safe-local-variable-values
-   '((eval add-to-list 'exec-path (expand-file-name "~/.cargo/bin"))
+   '((eval setq lsp-clients-clangd-executable
+           (expand-file-name
+            (concat (projectile-project-root)
+                    "/environment/cipd/packages/pigweed/bin/clangd")))
+     (eval add-to-list 'exec-path (expand-file-name "~/.cargo/bin"))
      (eval setq lsp-clients-clangd-executable
            (expand-file-name
             (concat (projectile-project-root)
@@ -50,12 +52,12 @@
      (org-html-table-default-attributes :class
                                         "mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp"
                                         :border "1" :cellspacing "0"
-                                        :cellpadding "0" :rules "all"
-                                        :frame "border")
+                                        :cellpadding "0" :rules "all" :frame
+                                        "border")
      (org-html-toplevel-hlevel . 1)
      (org-html-table-default-attributes :border "1" :cellspacing "0"
-                                        :cellpadding "0" :rules "all"
-                                        :frame "border")
+                                        :cellpadding "0" :rules "all" :frame
+                                        "border")
      (org-html-table-data-tags
       "<td class=\"mdl-data-table__cell--non-numeric\" %s>" . "</td>")
      (org-html-table-header-tags
