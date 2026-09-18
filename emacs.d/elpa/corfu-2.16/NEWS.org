@@ -1,0 +1,246 @@
+#+title: corfu.el - News
+#+author: Daniel Mendler
+#+language: en
+
+* Version 2.16 (2026-09-13)
+
+- Improve completion field handling in =corfu--in-region=.
+
+* Version 2.15 (2026-09-03)
+
+- Minor optimizations during candidate computation.
+- Do not remove a file from the candidate list if it matches the input exactly,
+  even if it should be filtered according to =completion-ignored-extensions=.
+
+* Version 2.14 (2026-08-21)
+
+- =corfu-popupinfo=: Bugfixes.
+
+* Version 2.13 (2026-08-13)
+
+- =corfu-popupinfo=: Bugfix when =corfu-popupinfo-delay= is set to nil.
+
+* Version 2.12 (2026-08-01)
+
+- =corfu-mouse=, =corfu-popupinfo=: Improve mouse scrolling, bugfixes.
+
+* Version 2.11 (2026-07-22)
+
+- More reliable child frame resizing and positioning.
+- Fix EXWM =delete-frame= problem.
+- New =corfu-mouse= extension.
+
+* Version 2.10 (2026-05-19)
+
+- Improve deduplication of candidates.
+- Require Compat 31.
+
+* Version 2.9 (2026-03-09)
+
+- Optimize frame repositioning.
+
+* Version 2.8 (2026-01-18)
+
+- Auto completion code factored out to =corfu-auto.el=.
+- Overall code simplifications.
+- Optimized completion of non-exclusive Capfs.
+- Use =when-let*= instead of =when-let=.
+
+* Version 2.7 (2025-12-28)
+
+- ~corfu-popupinfo-hide~: Change default to nil.
+- ~corfu-popupinfo-delay~: Reduce delay when changing candidates to 0.5.
+- ~corfu-popupinfo-margin-width~: New customization variable.
+- ~corfu-border-width~: New customization variable.
+- ~corfu-popupinfo~: Faster scrolling speed.
+- ~corfu-popupinfo~: Fix Emacs 30 deprecation warning.
+- Fix Corfu popup position at the right edge of the parent frame.
+- Work around Emacs bug#79792, where the ~*Help*~ buffer is replaced unexpectedly.
+- Use new function =set-frame-size-and-position-pixelwise= on Emacs 31.
+
+* Version 2.6 (2025-12-07)
+
+- Bugfixes.
+- Add name to Corfu child frame to improve readability of =(frame-list)=.
+- TTY: Fix child frame misalignment due to internal border.
+- TTY: Hide frame immediately.
+- TTY: Adjust default faces for low-color terminals.
+
+* Version 2.5 (2025-11-15)
+
+- =corfu-auto-trigger=: New customization variable to trigger immediate completion
+  after certain characters. See also =cape-capf-trigger=.
+- =corfu-on-exact-match=: Change default from =insert= to =nil=, which is more
+  compatible with auto completion and template/snippet/abbreviation expansion.
+- Improve compatibility with Eglot. Fix a manual completion bug in the case when
+  Eglot provided no matching candidates.
+- Experimental: Use new function =set-frame-position-and-size= if available.
+
+* Version 2.4 (2025-10-13)
+
+- Require Emacs 29.1.
+- Handle mixed tty/graphical displays.
+- Do not enable Corfu in read-only buffers.
+
+* Version 2.3 (2025-06-12)
+
+- Minor corrections and fixes.
+
+* Version 2.2 (2025-05-26)
+
+- Guard Corfu hooks to automatically print stack traces in order to ease
+  debugging.
+
+* Version 2.1 (2025-04-22)
+
+- =corfu-history-duplicate= and =corfu-history-decay=: New customization options to
+  adjust the rank of duplicate history elements, such that they appear earlier
+  in the completion list.
+- =corfu-history-mode=: Add =corfu-history= to =savehist-minibuffer-history-variables=
+  in order to save the history if =savehist-mode= is enabled.
+
+* Version 2.0 (2025-03-28)
+
+- ~corfu-quick~: Ensure that popup does not move.
+
+* Version 1.7 (2025-01-28)
+
+- Bugfixes only.
+
+* Version 1.6 (2024-12-22)
+
+- Require Emacs 28.1.
+- Use fringe to display scroll bar. This change improves performance and makes
+  sure that the scroll bar cannot be pushed outside the child frame by the
+  content. This affects for example ~cape-emoji~.
+- Improve suffix alignment.
+- Remember popup width during completion to avoid width fluctuations. Basically
+  the popup is only allowed to grow.
+- ~corfu-insert-separator~: Jump back to prompt if a candidate is previewed.
+
+* Version 1.5 (2024-07-26)
+
+- New customization variable =global-corfu-minibuffer= to enable Corfu in the
+  minibuffer.
+- Unbind =C-a= in =corfu-map=. This binding is only needed in modes which override
+  =C-a= instead of remapping ~move-beginning-of-line~.
+- Unbind =<tab>= in ~corfu-map~. This binding is only needed in modes which bind
+  =<tab>= instead of =TAB=, as was the case in old versions of Org. If you use such
+  a mode, please report this as a bug for this mode. In the meantime you can use
+  =(keymap-set corfu-map "<tab>" #'corfu-complete)=.
+- Add new command ~corfu-send~ as alternative to ~corfu-insert~.
+- =corfu-popupinfo=: Support both =face= and =font-lock-face= highlighting.
+- Bump Compat dependency to Compat 30.
+
+* Version 1.4 (2024-05-23)
+
+- ~corfu-auto-commands~: Add ~delete-backward-char~.
+
+* Version 1.3 (2024-04-05)
+
+- Preserve currently selected candidate on further input. This matters if
+  candidate preview is disabled (~corfu-preview-current=nil~).
+- Add new command ~corfu-expand~ bound to ~M-TAB~ by default. The command expands
+  the input via ~completion-try-completion~, for example the ~basic~ completion
+  style expands the common prefix of all candidates.
+
+* Version 1.2 (2024-01-23)
+
+- Support the EXWM window manager.
+- Optimization: Reduce auto completion timer overhead.
+- Use ~internal-border-width~ instead of ~child-frame-border-width~.
+- Internal refactoring: Do not use buffer-local variables.
+- Internal refactoring: Store ~completion-extra-properties~ as part of
+  ~completion-in-region--data~.
+
+* Version 1.1 (2023-12-27)
+
+- Deduplicate candidates with respect to ~equal-including-properties~, such that
+  backends can provide equal candidate strings, which only differ in their text
+  properties and annotations.
+- Ensure that the string passed to the ~:exit-function~ retains the candidate
+  properties, when possible. The properties are guaranteed to exist when a
+  candidate is selected explicitly, but may be missing when candidates are
+  completed in a stepwise manner.
+- ~corfu-on-exact-match~: Add value ~show~ to the customization option. With this
+  setting the Corfu popup will be shown even if there is only a single matching
+  candidate.
+
+* Version 1.0 (2023-12-01)
+
+- Bug fixes.
+- =corfu-quick=: Use a slightly different scheme to support more candidates.
+- =corfu-reset=: Quit immediately if input did not change.
+- Support =completion-lazy-hilit=.
+
+* Version 0.38 (2023-08-14)
+
+- =corfu-quick=: Bugfix.
+- =corfu-mode-map=: Add mode map.
+- Replace =corfu-excluded-modes= with =global-corfu-modes=, the Emacs 28 convention
+  for globalized minor modes.
+
+* Version 0.37 (2023-07-02)
+
+- Bugfixes.
+- Improve child frame display code, =corfu--popup-show= takes a =posn= argument.
+- Ensure that the popup font matches the font of the parent frame.
+- Close popup when window selection changes.
+- Remove =corfu-history-length=. Instead set the =history-length= property of
+  =corfu-history= variable.
+- =corfu-info-documentation=, =corfu-info-location=: Make buffer and window
+  persistent if called with prefix argument.
+
+* Version 0.36 (2023-03-27)
+
+- Drop obsolete =corfu-preselect-first=.
+- =corfu-popupinfo-delay= and =corfu-echo-delay=: Remove support for value =t=.
+  Instant updates are not recommended. It is still possible to use a small value
+  for the delay.
+- Rename =corfu-excluded-modes= to =corfu-exclude-modes= (Naming convention).
+- Remove call to =undo-boundary=, which caused issues with auto completion.
+
+* Version 0.35 (2023-02-17)
+
+- =corfu-popupinfo=: Take more text into account when computing popup width.
+- =corfu-popupinfo=: Change keybindings, remap =corfu-info-documentation/location=.
+- =corfu-popupinfo=: Add commands =corfu-popupinfo-beginning/end=.
+- =corfu-popupinfo=: Improve popup placement.
+- Add =corfu-prompt-beginning= and =corfu-prompt-end= commands.
+- Add =corfu-preselect= option, deprecate =corfu-preselect-first=.
+- Use =cl-defgeneric= internally as mechanism to allow extensions to override
+  functionality, e.g., the candidate formatting and display.
+
+* Version 0.34 (2022-12-03)
+
+- Bugfixes
+- Popup frame code updated for Emacs 29. Please report any issues.
+- =corfu-popupinfo-direction=: Variable must be a list of directions.
+- Support height adjustments of =corfu-default= face
+
+* Version 0.33 (2022-11-21)
+
+- =corfu-popupinfo=: Bugfixes
+
+* Version 0.31 (2022-11-20)
+
+- =corfu-echo=, =corfu-quick=: Bugfixes for interaction issue.
+
+* Version 0.30 (2022-11-19)
+
+- =corfu-popupinfo=: Bugfixes and improvements.
+
+* Version 0.29 (2022-11-19)
+
+- BREAKING: Extract the =corfu-echo= extension from =corfu.el=. In order to see echo
+  messages, enable =corfu-echo-mode=. You probably want to enable either
+  =corfu-echo-mode= or =corfu-popupinfo-mode=.
+- BREAKING: Rename =corfu-echo-documentation= to =corfu-echo-delay=.
+- Add =corfu-popupinfo= extension to display candidate documentation and location
+  in a small child frame next to the candidate menu. This extension has been
+  contributed by Yuwei Tian who assigned copyright to the FSF. The extension
+  supersedes Yuwei's =corfu-doc= package.
+
+* Version 0.28 (2022-10-16)
+
+- Start of changelog.

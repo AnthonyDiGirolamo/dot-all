@@ -43,6 +43,7 @@
 - [[#novel][nov.el]]
 - [[#elfeed][elfeed]]
 - [[#completion-preview-mode][completion-preview-mode]]
+- [[#corfu-auto-completion][corfu auto-completion]]
 - [[#company-auto-completion][company auto-completion]]
 - [[#which-key][which-key]]
 - [[#snippets-yasnippet-yankpad][snippets (yasnippet yankpad)]]
@@ -1933,7 +1934,7 @@ This mode gives variables names unique colors.
     ;; (setq eshell-smart-space-goes-to-end t)
 
     ;; Disable Company mode
-    (add-hook 'eshell-mode-hook (lambda () (company-mode -1)))
+    ;; (add-hook 'eshell-mode-hook (lambda () (company-mode -1)))
     ;; (add-hook 'eshell-mode-hook (lambda () (undo-tree-mode -1)))
 
     ;; Visual commands
@@ -2443,15 +2444,19 @@ This mode gives variables names unique colors.
 * completion-preview-mode
 
 #+begin_src emacs-lisp
-  (if (>= emacs-major-version 30)
-    (use-package completion-preview
-      :ensure nil
-      :hook (prog-mode . completion-preview-mode)
-      ;; :bind
-      ;; ( :map completion-preview-active-mode-map
-      ;;   ("M-n" . completion-preview-next-candidate)
-      ;;   ("M-p" . completion-preview-prev-candidate))
-      ))
+  (use-package completion-preview
+    :if (>= emacs-major-version 30)
+    :ensure nil
+    ;; :bind
+    ;; ( :map completion-preview-active-mode-map
+    ;;   ("M-n" . completion-preview-next-candidate)
+    ;;   ("M-p" . completion-preview-prev-candidate))
+    :hook (prog-mode . completion-preview-mode))
+#+end_src
+
+* corfu auto-completion
+
+#+begin_src emacs-lisp
 #+end_src
 
 * company auto-completion
@@ -2460,16 +2465,17 @@ This mode gives variables names unique colors.
   (use-package pos-tip)
 
   ;; Company mode
-  (if window-system
-      ;; doesn't work on the console and overwrites M-h keybinding
-      (use-package company-quickhelp
-        :init
-        (set-face-attribute 'tooltip nil :background "#303030" :foreground "#c6c6c6")
-        :after pos-tip
-        :config
-        (company-quickhelp-mode 1)))
+  (use-package company-quickhelp
+    :disabled
+    :if window-system  ;; doesn't work on the console and overwrites M-h keybinding
+    :init
+    (set-face-attribute 'tooltip nil :background "#303030" :foreground "#c6c6c6")
+    :after pos-tip
+    :config
+    (company-quickhelp-mode 1))
 
   (use-package company
+    :disabled
     :diminish
     :init
     (setq company-idle-delay 0.2)
@@ -2625,6 +2631,22 @@ This mode gives variables names unique colors.
     (setq transient-display-buffer-action
           '(display-buffer-below-selected))
     :config
+    ;; (transient-define-prefix my-leader-menu ()
+    ;;   "My Custom Leader Key Menu"
+    ;;   ;; Group 1: File Actions
+    ;;   [["Files"
+    ;;     ("ff" "Find File" find-file)
+    ;;     ("s" "Save Buffer" save-buffer)]
+    ;;    ;; Group 2: Buffer Actions
+    ;;    ["Buffers"
+    ;;     ("b" "Switch Buffer" switch-to-buffer)
+    ;;     ("k" "Kill Buffer" kill-buffer)]]
+    ;;   ;; Group 3: Sub-menus
+    ;;   [["Tools"
+    ;;     ("g" "Magit Status" magit-status)
+    ;;     ("p" "Project Switch" projectile-switch-project)]])
+    ;; (global-set-key (kbd "M-SPC") 'my-leader-menu)
+
     (transient-bind-q-to-quit))
 #+end_src
 
@@ -3246,9 +3268,6 @@ are available in the project root folder:
     :custom
     (lsp-rust-analyzer-cargo-watch-enable nil))
 
-  (use-package company-lsp
-    :commands company-lsp)
-
   (use-package lsp-ivy
     :commands lsp-ivy-workspace-symbol)
 
@@ -3420,7 +3439,7 @@ are available in the project root folder:
     :custom
     (elpy-rpc-python-command "python3")
     (elpy-modules '(elpy-module-sane-defaults
-                    elpy-module-company
+                    ;; elpy-module-company
                     elpy-module-eldoc
                     elpy-module-flymake
                     ;; elpy-module-highlight-indentation
@@ -4653,7 +4672,6 @@ are available in the project root folder:
 
 - [[info:org#Using header arguments][info:org#Using header arguments]]
 - [[info:org#Specific header arguments][info:org#Specific header arguments]]
-- [[info:org#Structural markup elements][info:org#Structural markup elements]] ([[http://orgmode.org/org.html#Markup][The Org Manual - Markup Syntax]])
 - Clock table info [[info:org#The clock table][info:org#The clock table]]
 - Exporting Options: [[info:org#Export Settings][info:org#Export Settings]]
 
@@ -4791,7 +4809,7 @@ are available in the project root folder:
     ;; (add-hook 'org-mode-hook 'pandoc-mode)
 
     ;; Org Completion
-    (add-hook 'org-mode-hook (lambda () (company-mode -1)))
+    ;; (add-hook 'org-mode-hook (lambda () (company-mode -1)))
     (add-hook 'org-mode-hook
               (lambda ()
                 (setq completion-at-point-functions
@@ -4867,10 +4885,10 @@ are available in the project root folder:
                 (define-key evil-inner-text-objects-map "c" #'er/mark-org-code-block)
                 (setq evil-want-fine-undo 'yes)))
 
-    (add-hook 'org-mode-hook
-              (lambda ()
-                (add-to-list (make-local-variable 'company-backends)
-                             'company-ispell)))
+    ;; (add-hook 'org-mode-hook
+    ;;           (lambda ()
+    ;;             (add-to-list (make-local-variable 'company-backends)
+    ;;                          'company-ispell)))
 
     ;; (advice-add 'org-next-visible-heading :after #'recenter) ;; this doesn't work with recenter?
     ;; (advice-add 'org-previous-visible-heading :after #'recenter) ;; this doesn't work with recenter?
@@ -5248,7 +5266,7 @@ links into property lists.
 
 * elisp links
 
-[[info:elisp#Prefix%20Command%20Arguments][info:elisp#Prefix Command Arguments]]
+[[info:elisp#Prefix Command Arguments][elisp#Prefix Command Arguments]]
 
 * edit-with-emacs and cvim
 
