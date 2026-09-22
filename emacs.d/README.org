@@ -69,6 +69,7 @@
   - [[#eglot][eglot]]
   - [[#lsp-mode][lsp-mode]]
 - [[#language-major-modes][language major-modes]]
+- [[#posframe][posframe]]
 - [[#hydra][hydra]]
 - [[#hydra-leader-menus][hydra leader menus]]
   - [[#main-leader-hydra][Main Leader Hydra]]
@@ -2623,9 +2624,11 @@ This mode gives variables names unique colors.
 
 #+begin_src emacs-lisp
   (use-package transient
+    :demand
     :init
-    (setq transient-display-buffer-action
-          '(display-buffer-below-selected))
+    ;; NOTE: using transient-posframe instead
+    ;; (setq transient-display-buffer-action
+    ;;       '(display-buffer-below-selected))
     :config
     ;; (transient-define-prefix my-leader-menu ()
     ;;   "My Custom Leader Key Menu"
@@ -3032,11 +3035,11 @@ This mode gives variables names unique colors.
        ('flycheck-error-list-mode :select t :align bottom :size 0.2)
        ('ivy-occur-grep-mode :align bottom :size 0.5)
        ('grep-mode :align bottom :size 0.5)
-       ("*Warnings*" :select nil :inhibit-window-quit t :other t)
+       ("*Warnings*" :select nil :ignore t :other t)
 
        ("\\*e?shell.*\\*" :regexp t :popup t :size 0.5 :align bottom)
 
-       ('magit-status-mode :popup t :same t)
+       ('magit-status-mode :popup t :same t) ;; NOTE: This seems to match transient buffers too?
        ;; ('magit-log-mode :same t)
        ;; Magit buffers other than status should replace the current buffer.
        ("magit-.*" :same t)
@@ -3683,6 +3686,19 @@ are available in the project root folder:
     (rust-format-on-save nil))
 #+end_src
 
+* posframe
+
+#+begin_src emacs-lisp
+  (use-package transient-posframe
+    :after transient
+    :config
+    (transient-posframe-mode)
+    (setq transient-posframe-border-width 0)
+    (setq transient-posframe-poshandler #'posframe-poshandler-window-bottom-left-corner)
+    (setq transient-display-buffer-action '(transient-posframe--show-buffer))
+    )
+#+end_src
+
 * hydra
 
 | color    | toggle                     |
@@ -3695,35 +3711,35 @@ are available in the project root folder:
 
 #+begin_src emacs-lisp
   (use-package hydra
-    ;; :init
-    ;; (when (display-graphic-p)
-    ;;   ;; Use posframe for hydra display
-    ;;   (setq hydra-hint-display-type 'posframe
-    ;;         hydra-posframe-show-params
-    ;;         '(:internal-border-width
-    ;;           1
-    ;;           :internal-border-color
-    ;;           "cyan"
-    ;;           :poshandler
-    ;;           posframe-poshandler-frame-top-left-corner
-    ;;           ;; posframe-poshandler-window-center
-    ;;           ;; posframe-poshandler-frame-center
-    ;;           ;; posframe-poshandler-frame-top-center
-    ;;           ;; posframe-poshandler-frame-top-right-corner
-    ;;           ;; posframe-poshandler-frame-bottom-center
-    ;;           ;; posframe-poshandler-frame-bottom-left-corner
-    ;;           ;; posframe-poshandler-frame-bottom-right-corner
-    ;;           ;; posframe-poshandler-window-center
-    ;;           ;; posframe-poshandler-window-top-center
-    ;;           ;; posframe-poshandler-window-top-left-corner
-    ;;           ;; posframe-poshandler-window-top-right-corner
-    ;;           ;; posframe-poshandler-window-bottom-center
-    ;;           ;; posframe-poshandler-window-bottom-left-corner
-    ;;           ;; posframe-poshandler-window-bottom-right-corner
-    ;;           ;; posframe-poshandler-point-top-left-corner
-    ;;           ;; posframe-poshandler-point-bottom-left-corner
-    ;;           ))
-    ;;   )
+    :init
+    ;; Use posframe for hydra display
+    (setq
+     hydra-hint-display-type 'posframe
+     hydra-posframe-show-params
+     '(:internal-border-width
+       0
+       :internal-border-color
+       "cyan"
+       :poshandler
+       ;; posframe-poshandler-frame-top-left-corner
+       posframe-poshandler-window-center
+       ;; posframe-poshandler-frame-center
+       ;; posframe-poshandler-frame-top-center
+       ;; posframe-poshandler-frame-top-right-corner
+       ;; posframe-poshandler-frame-bottom-center
+       ;; posframe-poshandler-frame-bottom-left-corner
+       ;; posframe-poshandler-frame-bottom-right-corner
+       ;; posframe-poshandler-window-center
+       ;; posframe-poshandler-window-top-center
+       ;; posframe-poshandler-window-top-left-corner
+       ;; posframe-poshandler-window-top-right-corner
+       ;; posframe-poshandler-window-bottom-center
+       ;; posframe-poshandler-window-bottom-left-corner
+       ;; posframe-poshandler-window-bottom-right-corner
+       ;; posframe-poshandler-point-top-left-corner
+       ;; posframe-poshandler-point-bottom-left-corner
+       )
+     )
 
     :config
     (defhydra hydra-font (:color red :columns 4)
@@ -3889,15 +3905,32 @@ are available in the project root folder:
   (defun amd/pretty-hydra-strip-header (docstring)
     (replace-regexp-in-string "\n\\([^\n]+\n\\)[-=─]+\n" "\\1" docstring))
 
+
+  (transient-define-prefix amd/transient-align-menu ()
+    "Align Menu"
+    [["Characters"
+      (":" "align :" align-to-colon)
+      ("=" "align =" align-to-equals)
+      ("," "align ," align-to-comma)
+      ("s" "align whitespace" align-to-space)]
+     ;; Group 2: Buffer Actions
+     ["Regex"
+      ("r" "align repeat" align-repeat)
+      ("n" "align no-repeat" align-no-repeat)
+      ("i" "align interactive" align-interactively)]]
+    )
+
   (pretty-hydra-define hydra-align-menu (:color blue)
     ("a: Align"
-     (("r" align-repeat "align repeat")
+     (
+      ("r" align-repeat "align repeat")
       ("n" align-no-repeat "align no-repeat")
       (":" align-to-colon "align :")
       ("=" align-to-equals "align =")
       ("," align-to-comma "align ,")
       ("s" align-to-space "align whitespace")
-      ("i" align-interactively "align interactive"))))
+      ("i" align-interactively "align interactive")
+      )))
 
   (pretty-hydra-define hydra-set-toggles (:color blue :quit-key "q" :formatter (lambda (docstring) (replace-regexp-in-string "\n\\([^\n]+\n\\)[-=─]+\n" "\\1" docstring)))
     ("Line Endings"
@@ -3920,80 +3953,80 @@ are available in the project root folder:
       )))
 
   (amd/defhydra-with-columns 'hydra-leader-menu 'blue
-   `((("d" counsel-find-file      "find-file")
-      ("g" magit-status           "git")
-      ("s" hydra-set-toggles/body "set-toggles")
-      ("u" vundo                  "vundo")
-      ("w" ace-window             "window")
-      ("t" hydra-tab-bar/body     "tabs")
-      ("c" calc-dispatch          "calc")
-      ("j" counsel-imenu          "jump-imenu")
-      ("v" (find-file
-            ;; user-emacs-directory
-            "~/dot-all/"
-            )  "open .emacs")
-      ("V" (find-file amd/settings-org-file) "open README.org"))
+                             `((("d" counsel-find-file      "find-file")
+                                ("g" magit-status           "git")
+                                ("s" hydra-set-toggles/body "set-toggles")
+                                ("u" vundo                  "vundo")
+                                ("w" ace-window             "window")
+                                ("t" hydra-tab-bar/body     "tabs")
+                                ("c" calc-dispatch          "calc")
+                                ("j" counsel-imenu          "jump-imenu")
+                                ("v" (find-file
+                                      ;; user-emacs-directory
+                                      "~/dot-all/"
+                                      )  "open .emacs")
+                                ("V" (find-file amd/settings-org-file) "open README.org"))
 
-     (("fc" flycheck-list-errors    "flycheck")
-      ("fn" flycheck-next-error     "flycheck next error")
-      ("fp" flycheck-previous-error "flycheck prev error")
-      ("bb" switch-to-buffer        "buffer switch")
-      ("bi" ibuffer                 "buffer ibuffer")
-      ("bk" kill-current-buffer     "buffer kill")
-      ("br" revert-buffer           "buffer revert")
-      ("yb" amd/copy-buffer         "yank buffer")
-      ("yxy" amd/x-yank             "xsel yank")
-      ("yxp" amd/x-paste            "xsel paste"))
+                               (("fc" flycheck-list-errors    "flycheck")
+                                ("fn" flycheck-next-error     "flycheck next error")
+                                ("fp" flycheck-previous-error "flycheck prev error")
+                                ("bb" switch-to-buffer        "buffer switch")
+                                ("bi" ibuffer                 "buffer ibuffer")
+                                ("bk" kill-current-buffer     "buffer kill")
+                                ("br" revert-buffer           "buffer revert")
+                                ("yb" amd/copy-buffer         "yank buffer")
+                                ("yxy" amd/x-yank             "xsel yank")
+                                ("yxp" amd/x-paste            "xsel paste"))
 
-     (("a" hydra-align-menu/body "align")
-      ("G"  counsel-git-grep       "search git grep")
-      ;; ("rgg"  counsel-rg       "ripgrep")
-      ("rg"  amd/counsel-rg-with-initial-directory  "ripgrep w/ dir")
-      ("pa" counsel-ag             "search ag counsel")
-      ("pf" amd/counsel-ag-with-filename-regex "search ag filename regex")
-      ;; ("pt" counsel-pt             "search pt counsel")
-      ;; ("pp" projectile-pt          "search pt project")
-      ;; ("po" pt-regexp              "search pt other")
-      ("/"  counsel-grep-or-swiper "search grep/swiper")
-      ("bu"  browse-url "browse-url")
-      (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra"))
+                               (("a" hydra-align-menu/body "align")
+                                ("G"  counsel-git-grep       "search git grep")
+                                ;; ("rgg"  counsel-rg       "ripgrep")
+                                ("rg"  amd/counsel-rg-with-initial-directory  "ripgrep w/ dir")
+                                ("pa" counsel-ag             "search ag counsel")
+                                ("pf" amd/counsel-ag-with-filename-regex "search ag filename regex")
+                                ;; ("pt" counsel-pt             "search pt counsel")
+                                ;; ("pp" projectile-pt          "search pt project")
+                                ;; ("po" pt-regexp              "search pt other")
+                                ("/"  counsel-grep-or-swiper "search grep/swiper")
+                                ("bu"  browse-url "browse-url")
+                                (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra"))
 
-     (("la" counsel-linux-app                "linux apps")
-      ("lt" load-theme                       "load theme")
-      ("lc" list-colors-display              "list colors")
-      ("lf" list-faces-display               "list faces")
-      ("lp" package-list-packages            "list packages")
-      ("hk" counsel-descbinds                "help keys")
-      ("hK" which-key-show-top-level         "help whichkey")
-      ("hm" (describe-variable 'major-mode)  "help mode")
-      ("hr" yari                             "help ruby")
-      ("bu" browse-url-generic               "browse url"))
+                               (("la" counsel-linux-app                "linux apps")
+                                ("lt" load-theme                       "load theme")
+                                ("lc" list-colors-display              "list colors")
+                                ("lf" list-faces-display               "list faces")
+                                ("lp" package-list-packages            "list packages")
+                                ("hk" counsel-descbinds                "help keys")
+                                ("hK" which-key-show-top-level         "help whichkey")
+                                ("hm" (describe-variable 'major-mode)  "help mode")
+                                ("hr" yari                             "help ruby")
+                                ("bu" browse-url-generic               "browse url"))
 
-     (("ps" ivy-switch-project               "project switch")
-      ("pe" amd/eshell-or-project-eshell     "project eshell")
-      ("pc" project-compile                  "project compile")
-      ("pr" project-recompile                "project recompile")
-      ("pi" projectile-invalidate-cache      "project clear")
-      ("rf" consult-recent-file              "recentf")
-      ("rt" run-current-test                 "run test")
-      ("rF" (run-current-test nil t)         "run file")
-      ("rp" run-pico8                        "run pico8")
-      ("rl" run-love2d                       "run love2d")
-      )
+                               (("ps" ivy-switch-project               "project switch")
+                                ("pe" amd/eshell-or-project-eshell     "project eshell")
+                                ("pc" project-compile                  "project compile")
+                                ("pr" project-recompile                "project recompile")
+                                ("pi" projectile-invalidate-cache      "project clear")
+                                ("rf" consult-recent-file              "recentf")
+                                ("rt" run-current-test                 "run test")
+                                ("rF" (run-current-test nil t)         "run file")
+                                ("rp" run-pico8                        "run pico8")
+                                ("rl" run-love2d                       "run love2d")
+                                )
 
-     (("zi" (text-scale-increase 0.5)  "zoom-in" :color pink)
-      ("zo" (text-scale-decrease 0.5)  "zoom-out" :color pink)
-      ("DS" desktop-save               "desktop-save")
-      ("DC" desktop-clear              "desktop-clear")
-      ("DL" desktop-read               "desktop-read")
-      ("zz" server-edit                "server-edit done")
-      ("WC" count-words                "word-count")
-      ("xf" (shell-command-on-region
-             (point-min) (point-max)
-             "xmllint --format -" (current-buffer) t)
-                                       "xml format")
-      ("xx"  counsel-M-x               "M-x")
-      ("q"  keyboard-quit :exit t      "close"))))
+                               (("zi" (text-scale-increase 0.5)  "zoom-in" :color pink)
+                                ("zo" (text-scale-decrease 0.5)  "zoom-out" :color pink)
+                                ("DS" desktop-save               "desktop-save")
+                                ("DC" desktop-clear              "desktop-clear")
+                                ("DL" desktop-read               "desktop-read")
+                                ("zz" server-edit                "server-edit done")
+                                ("WC" count-words                "word-count")
+                                ("xf" (shell-command-on-region
+                                       (point-min) (point-max)
+                                       "xmllint --format -" (current-buffer) t)
+                                 "xml format")
+                                ("xx"  counsel-M-x               "M-x")
+                                ("q"  keyboard-quit :exit t      "close"))))
 
   ;; ("y"  counsel-yank-pop            "yank hist--ory") use ctrl-y in evil insert mode
   ;; ("im" counsel-imenu "imenu")
@@ -4633,7 +4666,6 @@ are available in the project root folder:
 
 #+begin_src emacs-lisp
   (use-package helpful
-    :after counsel
     :bind (("C-h v"   . helpful-variable)
            ("C-h C-v" . helpful-variable)
            ("C-h f"   . helpful-function)

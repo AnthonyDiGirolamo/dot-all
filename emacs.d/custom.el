@@ -24,9 +24,9 @@
         moonscript ob-async org-superstar ox-gfm ox-pandoc page-break-lines
         pandoc-mode paradox pt pylint request scad-mode scad-preview scss-mode
         sql-indent sqlup-mode ssh-agency ssh-config-mode steam
-        subatomic256-theme tokyo-night transient-posframe treesit-auto
-        typescript-mode vertico vertico-posframe vimrc-mode vlf vterm vundo
-        wgrep-pt which-key xterm-color yaml-mode yari))
+        subatomic256-theme tokyo-night treesit-auto typescript-mode vertico
+        vertico-posframe vimrc-mode vlf vterm vundo wgrep-pt which-key
+        xterm-color yaml-mode yari))
  '(paradox-github-token t)
  '(projectile-mode-line '(:eval (format " p[%s]" (projectile-project-name))))
  '(python-indent-guess-indent-offset t)

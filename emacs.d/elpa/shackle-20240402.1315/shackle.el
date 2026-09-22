@@ -4,11 +4,10 @@
 
 ;; Author: Vasilij Schneidermann <mail@vasilij.de>
 ;; URL: https://depp.brause.cc/shackle
-;; Package-Version: 1.0.4
-;; Package-Commit: 171c3f437d853f34782b201d86ef765665b755e2
-;; Version: 1.0.3
+;; Package-Version: 20240402.1315
+;; Package-Revision: ae25e7e0e593
 ;; Keywords: convenience
-;; Package-Requires: ((cl-lib "0.5"))
+;; Package-Requires: ((emacs "24.3") (cl-lib "0.5"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -230,6 +229,16 @@ It's a plist with the same keys and values as described in
                           ((const :tag "Frame" :frame) boolean)))
   :group 'shackle)
 
+(defcustom shackle-display-buffer-frame-function
+  'shackle--display-buffer-frame
+  "Handler function for `:frame t'.
+
+This function will receive the same (BUFFER ALIST PLIST) as
+`shackle-display-buffer', which see.  It should return the window
+displaying BUFFER, or 'fail if it hasn't displayed it."
+  :type 'function
+  :group 'shackle)
+
 (defun shackle--match (buffer-or-name condition plist)
   "Internal match function.
 Used by `shackle-match', when BUFFER-OR-NAME matches CONDITION,
@@ -311,7 +320,7 @@ which has been dropped in Emacs 27.  Considering that this
 package never supported marking a window as dedicated and earlier
 Emacsen just passed `display-buffer-mark-dedicated' for its
 value, it's safe to just omit that argument if not necessary."
-  (if (< emacs-major-version 27)
+  (if (version< emacs-version "27")
       (window--display-buffer buffer window type alist
                               display-buffer-mark-dedicated)
     (window--display-buffer buffer window type alist)))
@@ -330,11 +339,12 @@ afterwards."
 (defun shackle--display-buffer-same (buffer alist)
   "Display BUFFER in the currently selected window.
 ALIST is passed to `shackle--window-display-buffer' internally."
-  (let ((window (shackle--window-display-buffer buffer (selected-window)
-                                                'window alist)))
-    (prog1 window
-      (when shackle-inhibit-window-quit-on-same-windows
-        (shackle--inhibit-window-quit window)))))
+  (unless (window-minibuffer-p)
+    (let ((window (shackle--window-display-buffer
+                   buffer (selected-window) 'window alist)))
+      (prog1 window
+        (when shackle-inhibit-window-quit-on-same-windows
+          (shackle--inhibit-window-quit window))))))
 
 (defun shackle--display-buffer-frame (buffer alist plist)
   "Display BUFFER in a popped up frame.
@@ -443,7 +453,7 @@ Displays BUFFER according to ALIST and PLIST."
                   (not (cdr (assq 'inhibit-same-window alist))))))
     (shackle--display-buffer-same buffer alist))
    ((plist-get plist :frame)
-    (shackle--display-buffer-frame buffer alist plist))
+    (funcall shackle-display-buffer-frame-function buffer alist plist))
    ((plist-get plist :align)
     (shackle--display-buffer-aligned-window buffer alist plist))
    (t

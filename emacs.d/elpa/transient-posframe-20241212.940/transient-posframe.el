@@ -5,11 +5,10 @@
 ;; Author: Yanghao Xie
 ;; Maintainer: Yanghao Xie <yhaoxie@gmail.com>
 ;; URL: https://github.com/yanghaoxie/transient-posframe
-;; Package-Version: 20210102.130
-;; Package-Commit: dcd898d1d35183a7d4f2c8f0ebcb43b4f8e70ebe
-;; Version: 0.1.0
+;; Package-Version: 20241212.940
+;; Package-Revision: 1eb4ed61ad9f
 ;; Keywords: convenience, bindings, tooltip
-;; Package-Requires: ((emacs "26.0")(posframe "0.4.3")(transient "0.2.0"))
+;; Package-Requires: ((emacs "26.1") (posframe "1.4.4") (transient "0.8.2"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -40,24 +39,14 @@
 
 (defcustom transient-posframe-font nil
   "The font used by transient-posframe.
-When nil, Using current frame's font as fallback."
+When nil, use current frame's font as fallback."
   :group 'transient-posframe
-  :type 'string)
+  :type '(choice string (const :tag "Use font of current frame")))
 
 (defcustom transient-posframe-poshandler #'posframe-poshandler-frame-center
   "The poshandler of transient-posframe."
   :group 'transient-posframe
   :type 'function)
-
-(defcustom transient-posframe-min-width 80
-  "The width of transient-min-posframe."
-  :group 'transient-posframe
-  :type 'number)
-
-(defcustom transient-posframe-min-height 30
-  "The height of transient-min-posframe."
-  :group 'transient-posframe
-  :type 'number)
 
 (defcustom transient-posframe-border-width 1
   "The border width used by transient-posframe.
@@ -68,7 +57,7 @@ When 0, no border is showed."
 (defcustom transient-posframe-parameters nil
   "The frame parameters used by transient-posframe."
   :group 'transient-posframe
-  :type 'string)
+  :type '(alist :key-type symbol :value-type sexp))
 
 (defface transient-posframe
   '((t (:inherit default)))
@@ -85,25 +74,21 @@ When 0, no border is showed."
 
 (defun transient-posframe--show-buffer (buffer _alist)
   "Show BUFFER in posframe and we do not use _ALIST at this period."
-  (when (posframe-workable-p)
-    (let* ((posframe
-	    (posframe-show buffer
-			   :font transient-posframe-font
-			   :position (point)
-			   :poshandler transient-posframe-poshandler
-			   :background-color (face-attribute 'transient-posframe :background nil t)
-			   :foreground-color (face-attribute 'transient-posframe :foreground nil t)
-			   :min-width transient-posframe-min-width
-			   :min-height transient-posframe-min-height
-			   :internal-border-width transient-posframe-border-width
-			   :internal-border-color (face-attribute 'transient-posframe-border :background nil t)
-			   :override-parameters transient-posframe-parameters)))
-      (frame-selected-window posframe))))
-
-(defun transient-posframe--delete ()
-  "Delete transient posframe."
-  (posframe-delete-frame transient--buffer-name)
-  (posframe--kill-buffer transient--buffer-name))
+  (unless (posframe-workable-p)
+    (error "Posframe is not workable"))
+  (posframe-show
+   buffer
+   :font transient-posframe-font
+   :position (point)
+   :poshandler transient-posframe-poshandler
+   :background-color (face-attribute 'transient-posframe :background nil t)
+   :foreground-color (face-attribute 'transient-posframe :foreground nil t)
+   :min-width transient-minimal-frame-width
+   :internal-border-width transient-posframe-border-width
+   :internal-border-color (face-attribute 'transient-posframe-border
+                                          :background nil t)
+   :override-parameters transient-posframe-parameters)
+  (get-buffer-window transient--buffer-name t))
 
 ;;;###autoload
 (define-minor-mode transient-posframe-mode
@@ -111,18 +96,21 @@ When 0, no border is showed."
   :group 'transient-posframe
   :global t
   :lighter nil
-  (if transient-posframe-mode
-      (progn
-	(setq transient-posframe-display-buffer-action--previous transient-display-buffer-action
-	      transient-display-buffer-action '(transient-posframe--show-buffer))
-	(advice-add 'transient--delete-window :override #'transient-posframe--delete))
-    (setq transient-display-buffer-action transient-posframe-display-buffer-action--previous)
-    (advice-remove 'transient--delete-window #'transient-posframe--delete)))
+  (cond
+   (transient-posframe-mode
+    (setq transient-posframe-display-buffer-action--previous
+          transient-display-buffer-action)
+    (setq transient-display-buffer-action
+          '(transient-posframe--show-buffer)))
+   (t
+    (setq transient-display-buffer-action
+          transient-posframe-display-buffer-action--previous))))
 
 (provide 'transient-posframe)
 
 ;; Local Variables:
-;; coding: utf-8-unix
+;; coding: utf-8
+;; indent-tabs-mode: nil
 ;; End:
 
 ;;; transient-posframe.el ends here

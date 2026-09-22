@@ -4,7 +4,8 @@
 
 ;; Author: Jerry Peng <pr2jerry@gmail.com>
 ;; URL: https://github.com/jerrypnz/major-mode-hydra.el
-;; Version: 0.2.2
+;; Package-Version: 20250310.2303
+;; Package-Revision: 2494d71e24b6
 ;; Package-Requires: ((hydra "0.15.0") (s "1.12.0") (dash "2.18.0") (emacs "24") (compat "29.1.4.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -240,8 +241,7 @@ See `pretty-hydra-define' and `pretty-hydra-define+'."
          (docstring (->> heads-plist
                          (pretty-hydra--gen-body-docstring separator)
                          (pretty-hydra--maybe-add-title title title-body-format-spec)
-                         (funcall formatter)
-                         (s-prepend "\n"))) ;; This is required, otherwise the docstring won't show up correctly
+                         (funcall formatter)))
          (heads (pretty-hydra--get-heads heads-plist))
          (heads (if quit-key
                     (if (listp quit-key)

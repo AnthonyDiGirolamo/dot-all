@@ -11,8 +11,8 @@
 
 ;;; Generated autoloads from pretty-hydra.el
 
-(autoload 'pretty-hydra-define "pretty-hydra" "\
-Define a pretty hydra with given NAME, BODY options and HEADS-PLIST.
+(autoload 'pretty-hydra-define "pretty-hydra"
+"Define a pretty hydra with given NAME, BODY options and HEADS-PLIST.
 The generated hydra has a nice-looking docstring which is a table
 with columns of command keys and hints.
 
@@ -56,17 +56,15 @@ docstring.  The following additional options are supported:
        (\"n\" `linum-mode' \"line number\" :toggle t)
 
 (fn NAME BODY HEADS-PLIST)" nil t)
-(function-put 'pretty-hydra-define 'lisp-indent-function 'defun)
-(autoload 'pretty-hydra-define+ "pretty-hydra" "\
-Redefine an existing pretty-hydra by adding new HEADS-PLIST.
+(autoload 'pretty-hydra-define+ "pretty-hydra"
+"Redefine an existing pretty-hydra by adding new HEADS-PLIST.
 If heads are added to a column already in NAME, the heads are
 appended to that column.  Existing BODY is replaced with the new
 one if specified.  Arguments are the same as `pretty-hydra-define'.
 
 (fn NAME BODY HEADS-PLIST)" nil t)
-(function-put 'pretty-hydra-define+ 'lisp-indent-function 'defun)
-(autoload 'pretty-hydra-toggle "pretty-hydra" "\
-Create a dynamic hint that look like a radio button with given NAME.
+(autoload 'pretty-hydra-toggle "pretty-hydra"
+"Create a dynamic hint that look like a radio button with given NAME.
 Radio is considered on when STATUS is non-nil, otherwise off.
 
 (fn NAME STATUS)")
