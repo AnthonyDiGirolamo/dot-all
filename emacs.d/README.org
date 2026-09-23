@@ -2626,9 +2626,10 @@ This mode gives variables names unique colors.
   (use-package transient
     :demand
     :init
-    ;; NOTE: using transient-posframe instead
-    ;; (setq transient-display-buffer-action
-    ;;       '(display-buffer-below-selected))
+    ;; Show transient pop-up directly below the focused window.
+    ;; The default is the bottom of the screen (frame).
+    (setq transient-display-buffer-action
+          '(display-buffer-below-selected))
     :config
     ;; (transient-define-prefix my-leader-menu ()
     ;;   "My Custom Leader Key Menu"
@@ -3690,11 +3691,12 @@ are available in the project root folder:
 
 #+begin_src emacs-lisp
   (use-package transient-posframe
+    :disabled
     :after transient
     :config
     (transient-posframe-mode)
     (setq transient-posframe-border-width 0)
-    (setq transient-posframe-poshandler #'posframe-poshandler-window-bottom-left-corner)
+    (setq transient-posframe-poshandler #'posframe-poshandler-frame-bottom-left-corner)
     (setq transient-display-buffer-action '(transient-posframe--show-buffer))
     )
 #+end_src
@@ -3713,33 +3715,33 @@ are available in the project root folder:
   (use-package hydra
     :init
     ;; Use posframe for hydra display
-    (setq
-     hydra-hint-display-type 'posframe
-     hydra-posframe-show-params
-     '(:internal-border-width
-       0
-       :internal-border-color
-       "cyan"
-       :poshandler
-       ;; posframe-poshandler-frame-top-left-corner
-       posframe-poshandler-window-center
-       ;; posframe-poshandler-frame-center
-       ;; posframe-poshandler-frame-top-center
-       ;; posframe-poshandler-frame-top-right-corner
-       ;; posframe-poshandler-frame-bottom-center
-       ;; posframe-poshandler-frame-bottom-left-corner
-       ;; posframe-poshandler-frame-bottom-right-corner
-       ;; posframe-poshandler-window-center
-       ;; posframe-poshandler-window-top-center
-       ;; posframe-poshandler-window-top-left-corner
-       ;; posframe-poshandler-window-top-right-corner
-       ;; posframe-poshandler-window-bottom-center
-       ;; posframe-poshandler-window-bottom-left-corner
-       ;; posframe-poshandler-window-bottom-right-corner
-       ;; posframe-poshandler-point-top-left-corner
-       ;; posframe-poshandler-point-bottom-left-corner
-       )
-     )
+    ;; (setq
+    ;;  hydra-hint-display-type 'posframe
+    ;;  hydra-posframe-show-params
+    ;;  '(:internal-border-width
+    ;;    0
+    ;;    :internal-border-color
+    ;;    "cyan"
+    ;;    :poshandler
+    ;;    ;; posframe-poshandler-frame-top-left-corner
+    ;;    ;; posframe-poshandler-window-center
+    ;;    ;; posframe-poshandler-frame-center
+    ;;    ;; posframe-poshandler-frame-top-center
+    ;;    ;; posframe-poshandler-frame-top-right-corner
+    ;;    ;; posframe-poshandler-frame-bottom-center
+    ;;    posframe-poshandler-frame-bottom-left-corner
+    ;;    ;; posframe-poshandler-frame-bottom-right-corner
+    ;;    ;; posframe-poshandler-window-center
+    ;;    ;; posframe-poshandler-window-top-center
+    ;;    ;; posframe-poshandler-window-top-left-corner
+    ;;    ;; posframe-poshandler-window-top-right-corner
+    ;;    ;; posframe-poshandler-window-bottom-center
+    ;;    ;; posframe-poshandler-window-bottom-left-corner
+    ;;    ;; posframe-poshandler-window-bottom-right-corner
+    ;;    ;; posframe-poshandler-point-top-left-corner
+    ;;    ;; posframe-poshandler-point-bottom-left-corner
+    ;;    )
+    ;;  )
 
     :config
     (defhydra hydra-font (:color red :columns 4)
