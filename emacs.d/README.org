@@ -4142,8 +4142,6 @@ are available in the project root folder:
           (point-min) (point-max)
           "xmllint --format -" (current-buffer) t)))
       ("xx"  "M-x"                     counsel-M-x)]])
-
-
 #+end_src
 
 ** Major Mode Leader Hydra Function
@@ -4164,6 +4162,25 @@ are available in the project root folder:
           ;; if no major-mode leader hydra defined, and an org-src buffer is active, use the org hydra
           ((member 'org-src-mode minor-mode-list)
            (hydra-org-menu/body))
+
+          (t
+           (keyboard-quit))))
+
+  (defun amd/major-mode-leader-transient ()
+    (interactive)
+    (cond ((eq major-mode 'org-mode)
+           (amd/transient-org-menu))
+
+          ((or (eq major-mode 'lisp-interaction-mode)
+               (eq major-mode 'emacs-lisp-mode))
+           (amd/transient-elisp-menu))
+
+          ((eq major-mode 'rust-mode)
+           (amd/transient-rust-menu))
+
+          ;; if no major-mode leader hydra defined, and an org-src buffer is active, use the org hydra
+          ((member 'org-src-mode minor-mode-list)
+           (amd/transient-org-menu))
 
           (t
            (keyboard-quit))))
@@ -4308,7 +4325,8 @@ are available in the project root folder:
       ;; ("d" "pandoc" pandoc-main-hydra/body)
       ("hy" "org→html→yank" amd/clipboard-org-buffer-to-html-xclip)
       ("hp" "html→org→paste" amd/clipboard-html-to-org-pandoc-linux)
-      ("x" "export" org-export-dispatch)]])
+      ("x" "export" org-export-dispatch)
+      ("," "Quit" transient-quit-one)]])
 #+end_src
 
 ** Emacs-Lisp Hydra
@@ -4321,6 +4339,16 @@ are available in the project root folder:
      (("d" eval-defun            "eval defun"))
      (("D" amd/edebug-eval-defun "eDebug defun"))
      (("q"  keyboard-quit :exit t "close"))))
+
+  (transient-define-prefix amd/transient-elisp-menu ()
+    "emacs-lisp-mode leader menu"
+    :transient-non-suffix #'transient--do-exit
+    [["Functions"
+      ("e" "[org] toggle code edit" amd/toggle-org-edit-code-block)
+      ("d" "eval defun"             eval-defun)
+      ("D" "eDebug defun"           amd/edebug-eval-defun)
+      ("," "Quit" transient-quit-one)]])
+
 #+end_src
 
 ** Rust-mode Hydra
@@ -4335,6 +4363,17 @@ are available in the project root folder:
      (("r" rust-run "run"))
      (("f"  rust-format-buffer "format"))
      (("q"  keyboard-quit :exit t "close"))))
+
+  (transient-define-prefix amd/transient-rust-menu ()
+    "rust-mode leader menu"
+    :transient-non-suffix #'transient--do-exit
+    [["Functions"
+      ("t" "test" rust-test)
+      ("k" "check" rust-check)
+      ("l" "clippy" rust-run-clippy)
+      ("r" "run" rust-run)
+      ("f"  "format" rust-format-buffer)
+      ("," "Quit" transient-quit-one)]])
 #+end_src
 
 * completion frameworks
