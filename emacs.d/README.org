@@ -2627,9 +2627,14 @@ This mode gives variables names unique colors.
     :demand
     :init
     ;; Show transient pop-up directly below the focused window.
-    ;; The default is the bottom of the screen (frame).
     (setq transient-display-buffer-action
-          '(display-buffer-below-selected))
+          '(display-buffer-below-selected
+            (dedicated . t)
+            (inhibit-same-window . t))
+          transient-show-during-minibuffer-read t)
+
+    ;; The default is the bottom of the screen (frame):
+    ;; (display-buffer-in-side-window (side . bottom) (dedicated . t) (inhibit-same-window . t))
     :config
     ;; (transient-define-prefix my-leader-menu ()
     ;;   "My Custom Leader Key Menu"
@@ -3017,9 +3022,21 @@ This mode gives variables names unique colors.
     :custom
     (help-window-select t) ;; (not shackle) select new help windows when they open
     (shackle-select-reused-windows nil)
-    (shackle-default-rule '(:select t))
+    ;; WARNING: This default rule causes transients to always appear
+    ;;          on the right side if there is only one window in the frame.
+    ;;   (shackle-default-rule '(:select t))
+    (shackle-default-rule nil)
     (shackle-default-alignment 'below)
     (shackle-default-size 0.5)
+    (shackle-trace-functions
+     '(display-buffer
+       pop-to-buffer
+       pop-to-buffer-same-window
+       switch-to-buffer-other-window
+       switch-to-buffer-other-frame
+       display-buffer-below-selected
+       display-buffer-at-bottom
+       display-buffer-in-side-window))
     :init
     (setq
      shackle-rules
@@ -3040,10 +3057,10 @@ This mode gives variables names unique colors.
 
        ("\\*e?shell.*\\*" :regexp t :popup t :size 0.5 :align bottom)
 
-       ('magit-status-mode :popup t :same t) ;; NOTE: This seems to match transient buffers too?
+       ('magit-status-mode :popup t :same t)
        ;; ('magit-log-mode :same t)
        ;; Magit buffers other than status should replace the current buffer.
-       ("magit-.*" :same t)
+       ;; ("magit-.*" :same t)
        ;; eww popups should just replace current buffer
        ('eww-bookmark-mode :same t)
        ('eww-history-mode :same t)
@@ -3907,7 +3924,6 @@ are available in the project root folder:
   (defun amd/pretty-hydra-strip-header (docstring)
     (replace-regexp-in-string "\n\\([^\n]+\n\\)[-=─]+\n" "\\1" docstring))
 
-
   (transient-define-prefix amd/transient-align-menu ()
     "Align Menu"
     [["Characters"
@@ -3919,8 +3935,7 @@ are available in the project root folder:
      ["Regex"
       ("r" "align repeat" align-repeat)
       ("n" "align no-repeat" align-no-repeat)
-      ("i" "align interactive" align-interactively)]]
-    )
+      ("i" "align interactive" align-interactively)]])
 
   (pretty-hydra-define hydra-align-menu (:color blue)
     ("a: Align"
@@ -3954,81 +3969,82 @@ are available in the project root folder:
       ("ff" hydra-font/body "Font" :color blue)
       )))
 
-  (amd/defhydra-with-columns 'hydra-leader-menu 'blue
-                             `((("d" counsel-find-file      "find-file")
-                                ("g" magit-status           "git")
-                                ("s" hydra-set-toggles/body "set-toggles")
-                                ("u" vundo                  "vundo")
-                                ("w" ace-window             "window")
-                                ("t" hydra-tab-bar/body     "tabs")
-                                ("c" calc-dispatch          "calc")
-                                ("j" counsel-imenu          "jump-imenu")
-                                ("v" (find-file
-                                      ;; user-emacs-directory
-                                      "~/dot-all/"
-                                      )  "open .emacs")
-                                ("V" (find-file amd/settings-org-file) "open README.org"))
+  (amd/defhydra-with-columns
+   'hydra-leader-menu 'blue
+   `((("d" counsel-find-file      "find-file")
+      ("g" magit-status           "git")
+      ("s" hydra-set-toggles/body "set-toggles")
+      ("u" vundo                  "vundo")
+      ("w" ace-window             "window")
+      ("t" hydra-tab-bar/body     "tabs")
+      ("c" calc-dispatch          "calc")
+      ("j" counsel-imenu          "jump-imenu")
+      ("v" (find-file
+            ;; user-emacs-directory
+            "~/dot-all/"
+            )  "open .emacs")
+      ("V" (find-file amd/settings-org-file) "open README.org"))
 
-                               (("fc" flycheck-list-errors    "flycheck")
-                                ("fn" flycheck-next-error     "flycheck next error")
-                                ("fp" flycheck-previous-error "flycheck prev error")
-                                ("bb" switch-to-buffer        "buffer switch")
-                                ("bi" ibuffer                 "buffer ibuffer")
-                                ("bk" kill-current-buffer     "buffer kill")
-                                ("br" revert-buffer           "buffer revert")
-                                ("yb" amd/copy-buffer         "yank buffer")
-                                ("yxy" amd/x-yank             "xsel yank")
-                                ("yxp" amd/x-paste            "xsel paste"))
+     (("fc" flycheck-list-errors    "flycheck")
+      ("fn" flycheck-next-error     "flycheck next error")
+      ("fp" flycheck-previous-error "flycheck prev error")
+      ("bb" switch-to-buffer        "buffer switch")
+      ("bi" ibuffer                 "buffer ibuffer")
+      ("bk" kill-current-buffer     "buffer kill")
+      ("br" revert-buffer           "buffer revert")
+      ("yb" amd/copy-buffer         "yank buffer")
+      ("yxy" amd/x-yank             "xsel yank")
+      ("yxp" amd/x-paste            "xsel paste"))
 
-                               (("a" hydra-align-menu/body "align")
-                                ("G"  counsel-git-grep       "search git grep")
-                                ;; ("rgg"  counsel-rg       "ripgrep")
-                                ("rg"  amd/counsel-rg-with-initial-directory  "ripgrep w/ dir")
-                                ("pa" counsel-ag             "search ag counsel")
-                                ("pf" amd/counsel-ag-with-filename-regex "search ag filename regex")
-                                ;; ("pt" counsel-pt             "search pt counsel")
-                                ;; ("pp" projectile-pt          "search pt project")
-                                ;; ("po" pt-regexp              "search pt other")
-                                ("/"  counsel-grep-or-swiper "search grep/swiper")
-                                ("bu"  browse-url "browse-url")
-                                (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra"))
+     (("a" hydra-align-menu/body "align")
+      ("G"  counsel-git-grep       "search git grep")
+      ;; ("rgg"  counsel-rg       "ripgrep")
+      ("rg"  amd/counsel-rg-with-initial-directory  "ripgrep w/ dir")
+      ("pa" counsel-ag             "search ag counsel")
+      ("pf" amd/counsel-ag-with-filename-regex "search ag filename regex")
+      ;; ("pt" counsel-pt             "search pt counsel")
+      ;; ("pp" projectile-pt          "search pt project")
+      ;; ("po" pt-regexp              "search pt other")
+      ("/"  counsel-grep-or-swiper "search grep/swiper")
+      ("bu"  browse-url "browse-url")
+      (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra"))
 
-                               (("la" counsel-linux-app                "linux apps")
-                                ("lt" load-theme                       "load theme")
-                                ("lc" list-colors-display              "list colors")
-                                ("lf" list-faces-display               "list faces")
-                                ("lp" package-list-packages            "list packages")
-                                ("hk" counsel-descbinds                "help keys")
-                                ("hK" which-key-show-top-level         "help whichkey")
-                                ("hm" (describe-variable 'major-mode)  "help mode")
-                                ("hr" yari                             "help ruby")
-                                ("bu" browse-url-generic               "browse url"))
+     (("la" counsel-linux-app                "linux apps")
+      ("lt" load-theme                       "load theme")
+      ("lc" list-colors-display              "list colors")
+      ("lf" list-faces-display               "list faces")
+      ("lp" package-list-packages            "list packages")
+      ("hk" counsel-descbinds                "help keys")
+      ("hK" which-key-show-top-level         "help whichkey")
+      ("hm" (describe-variable 'major-mode)  "help mode")
+      ("hr" yari                             "help ruby")
+      ("bu" browse-url-generic               "browse url"))
 
-                               (("ps" ivy-switch-project               "project switch")
-                                ("pe" amd/eshell-or-project-eshell     "project eshell")
-                                ("pc" project-compile                  "project compile")
-                                ("pr" project-recompile                "project recompile")
-                                ("pi" projectile-invalidate-cache      "project clear")
-                                ("rf" consult-recent-file              "recentf")
-                                ("rt" run-current-test                 "run test")
-                                ("rF" (run-current-test nil t)         "run file")
-                                ("rp" run-pico8                        "run pico8")
-                                ("rl" run-love2d                       "run love2d")
-                                )
+     (("ps" projectile-switch-project        "project switch")
+      ("pe" amd/eshell-or-project-eshell     "project eshell")
+      ("pc" project-compile                  "project compile")
+      ("pr" project-recompile                "project recompile")
+      ("pi" projectile-invalidate-cache      "project clear")
+      ("rf" consult-recent-file              "recentf")
+      ("rt" run-current-test                 "run test")
+      ("rF" (run-current-test nil t)         "run file")
+      ("rp" run-pico8                        "run pico8")
+      ("rl" run-love2d                       "run love2d")
+      )
 
-                               (("zi" (text-scale-increase 0.5)  "zoom-in" :color pink)
-                                ("zo" (text-scale-decrease 0.5)  "zoom-out" :color pink)
-                                ("DS" desktop-save               "desktop-save")
-                                ("DC" desktop-clear              "desktop-clear")
-                                ("DL" desktop-read               "desktop-read")
-                                ("zz" server-edit                "server-edit done")
-                                ("WC" count-words                "word-count")
-                                ("xf" (shell-command-on-region
-                                       (point-min) (point-max)
-                                       "xmllint --format -" (current-buffer) t)
-                                 "xml format")
-                                ("xx"  counsel-M-x               "M-x")
-                                ("q"  keyboard-quit :exit t      "close"))))
+     (("zi" (text-scale-increase 0.5)  "zoom-in" :color pink)
+      ("zo" (text-scale-decrease 0.5)  "zoom-out" :color pink)
+      ("DS" desktop-save               "desktop-save")
+      ("DC" desktop-clear              "desktop-clear")
+      ("DL" desktop-read               "desktop-read")
+      ("zz" server-edit                "server-edit done")
+      ("WC" count-words                "word-count")
+      ("xf" (shell-command-on-region
+             (point-min) (point-max)
+             "xmllint --format -" (current-buffer) t)
+       "xml format")
+      ("xx"  counsel-M-x               "M-x")
+      ("q"  keyboard-quit :exit t      "close"))))
 
   ;; ("y"  counsel-yank-pop            "yank hist--ory") use ctrl-y in evil insert mode
   ;; ("im" counsel-imenu "imenu")
@@ -4044,6 +4060,90 @@ are available in the project root folder:
   ;;   "Doc"
   ;;   (format (format "%%%ds %%%ds" key-width (- -1 doc-width))
   ;;           key doc))
+
+  (transient-define-prefix amd/transient-leader-menu ()
+    "Top level leader menu"
+    :transient-non-suffix #'transient--do-exit
+    [["G1"
+      ("d" "find-file"                 counsel-find-file)
+      ("g" "git"                       magit-status)
+      ("s" "set-toggles"               hydra-set-toggles/body)
+      ("u" "vundo"                     vundo)
+      ("w" "window"                    ace-window)
+      ("t" "tabs"                      hydra-tab-bar/body)
+      ("c" "calc"                      calc-dispatch)
+      ("j" "jump-imenu"                counsel-imenu)
+      ("v" "open .emacs"               (lambda () (interactive) (find-file "~/dot-all/")))
+      ("V" "open README.org"           (lambda () (interactive) (find-file amd/settings-org-file)))]
+
+     ["G2"
+      ("fc" "flycheck"                 flycheck-list-errors)
+      ("fn" "flycheck next error"      flycheck-next-error)
+      ("fp" "flycheck prev error"      flycheck-previous-error)
+      ("bb" "buffer switch"            switch-to-buffer)
+      ("bi" "buffer ibuffer"           ibuffer)
+      ("bk" "buffer kill"              kill-current-buffer)
+      ("br" "buffer revert"            revert-buffer)
+      ("yb" "yank buffer"              amd/copy-buffer)
+      ("yxy" "xsel yank"               amd/x-yank)
+      ("yxp" "xsel paste"              amd/x-paste)]
+
+     ["G3"
+      ("a" "align"                     amd/transient-align-menu)
+      ("G"  "search git grep"          counsel-git-grep)
+      ;; ("rgg"  "ripgrep"                counsel-rg)
+      ("rg"  "ripgrep w/ dir"          amd/counsel-rg-with-initial-directory)
+      ("pa" "search ag counsel"        counsel-ag)
+      ("pf" "search ag filename regex" amd/counsel-ag-with-filename-regex)
+      ;; ("pt" "search pt counsel"        counsel-pt)
+      ;; ("pp" "search pt project"        projectile-pt)
+      ;; ("po" "search pt other"          pt-regexp)
+      ("/"  "search grep/swiper"       counsel-grep-or-swiper)
+      ("bu"  "browse-url"              browse-url)
+      ("," "major-mode hydra" amd/transient-org-menu)]
+
+     ["G4"
+      ("lt" "load theme"               load-theme)
+      ("lc" "list colors"              list-colors-display)
+      ("lf" "list faces"               list-faces-display)
+      ("lp" "list packages"            package-list-packages)
+      ("hk" "help keys"                counsel-descbinds)
+      ("hK" "help whichkey"            which-key-show-top-level)
+      ("hm" "help mode"
+       (lambda () (interactive) (describe-variable 'major-mode)))
+      ("bu" "browse url"               browse-url-generic)]
+
+     ["G5"
+      ("ps" "project switch"           projectile-switch-project)
+      ("pe" "project eshell"           amd/eshell-or-project-eshell)
+      ("pc" "project compile"          project-compile)
+      ("pr" "project recompile"        project-recompile)
+      ("pi" "project clear"            projectile-invalidate-cache)
+      ("rf" "recentf"                  consult-recent-file)
+      ("rt" "run test"                 run-current-test)
+      ("rF" "run file"
+       (lambda () (interactive) (run-current-test nil t)))
+      ("rp" "run pico8"                run-pico8)
+      ("rl" "run love2d"               run-love2d)]
+
+     ["G6"
+      ("zi" "zoom-in"
+       (lambda () (interactive) (text-scale-increase 0.5)) :transient t )
+      ("zo" "zoom-out"
+       (lambda () (interactive) (text-scale-decrease 0.5)) :transient t )
+      ("DS" "desktop-save"             desktop-save)
+      ("DC" "desktop-clear"            desktop-clear)
+      ("DL" "desktop-read"             desktop-read)
+      ("zz" "server-edit done"         server-edit)
+      ("WC" "word-count"               count-words)
+      ("xf" "xml format"
+       (lambda () (interactive)
+         (shell-command-on-region
+          (point-min) (point-max)
+          "xmllint --format -" (current-buffer) t)))
+      ("xx"  "M-x"                     counsel-M-x)]])
+
+
 #+end_src
 
 ** Major Mode Leader Hydra Function
@@ -4142,6 +4242,73 @@ are available in the project root folder:
       ("hp" amd/clipboard-html-to-org-pandoc-linux "html→org→paste")
       ("x" org-export-dispatch "export")
       ("q"  keyboard-quit :exit t "close"))))
+
+  (transient-define-prefix amd/transient-org-menu ()
+    "org-mode leader menu"
+    :transient-non-suffix #'transient--do-exit
+    [["Capture"
+      ("cc" "capture" org-capture)
+      ("cl" "store link" org-store-link)
+      ("ci" "clock in" org-clock-in)
+      ("co" "clock out" org-clock-out)
+      ("cd" "clock display" org-clock-display)
+      ("o" "open todos" (lambda() (interactive) (find-file org-default-notes-file)))]
+
+     ["Formula"
+      ("fc" "formula coords" org-table-toggle-coordinate-overlays)
+      ("fd" "formula debug" org-table-toggle-formula-debugger)
+      ("fe" "formula edit"
+       (lambda() (interactive)
+         (let ((current-prefix-arg '(16))) ;; emulate C-u C-u
+           (call-interactively 'org-table-eval-formula)
+           (evil-insert-state))))
+      ("fr" "formula recalc"
+       (lambda() (interactive)
+         (let ((current-prefix-arg '(4))) ;; emulate C-u
+           (call-interactively 'org-table-recalculate))))
+      ("tp" "tangle at point"
+       (lambda() (interactive)
+         ;; (let ((current-prefix-arg 4)) ;; emulate C-u
+         ;;   (call-interactively 'org-babel-tangle))
+         (org-narrow-to-element)
+         (org-babel-tangle)
+         (widen)))
+      ("ta" "tangle all" org-babel-tangle)]
+
+     ["Headings"
+      ("P" "property" org-set-property)
+      ("S" "schedule" org-schedule)
+      ("D" "due" org-deadline)
+      ("r" "refile" org-refile)
+      ("p" "priority" org-priority)
+      ("ih" "insert header" org-babel-insert-header-arg)]
+
+     ["Agenda/Edit"
+      ("a" "agenda" org-agenda)
+      ("y" "archive subtree" org-archive-subtree)
+      ("R" "restart" org-mode-restart)
+      ("l" "change tag (label)" counsel-org-tag)
+      ("e" "code edit" amd/toggle-org-edit-code-block)]
+
+     ["Trees"
+      ("tt" "todo tree" org-show-todo-tree)
+      ("A" "show all"
+       (lambda() (interactive) (show-all) (org-remove-occur-highlights)))
+      ("w" "widen" widen)
+      ("n" "subtree" org-narrow-to-subtree)
+      ("gl" "tag tree" org-match-sparse-tree)]
+
+     ;; ["Shift"
+     ;;  ("h" "←" org-shiftmetaleft  :transient t)
+     ;;  ("l" "→" org-shiftmetaright :transient t)
+     ;;  ("n" "↓" org-shiftmetadown  :transient t)
+     ;;  ("e" "↑" org-shiftmetaup    :transient t)]
+
+     ["Export"
+      ;; ("d" "pandoc" pandoc-main-hydra/body)
+      ("hy" "org→html→yank" amd/clipboard-org-buffer-to-html-xclip)
+      ("hp" "html→org→paste" amd/clipboard-html-to-org-pandoc-linux)
+      ("x" "export" org-export-dispatch)]])
 #+end_src
 
 ** Emacs-Lisp Hydra
@@ -4366,7 +4533,7 @@ are available in the project root folder:
     (("C-t" . embark-act)         ;; pick some comfortable binding
      ("C-c C-o" . embark-export)
      ("C-;" . embark-dwim)        ;; good alternative: M-.
-     ("C-h C-k" . embark-bindings)) ;; alternative for `describe-bindings'
+     ("C-h C-k" . (lambda () (interactive) (embark-bindings t)))) ;; alternative for `describe-bindings'
 
     :init
     ;; Optionally replace the key help with a completing-read interface
