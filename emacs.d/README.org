@@ -1453,7 +1453,7 @@ This mode gives variables names unique colors.
      "C-w c" 'evil-window-delete
      "C-w o" 'delete-other-windows
      "C-b" 'yankpad-insert ;; Was evil-scroll-page-up
-     amd/leader-key-insert 'hydra-leader-menu/body)
+     amd/leader-key-insert 'amd/transient-leader-menu)
     (:states '(motion visual)
      "RET" 'evil-ex ;; Enter opens : prompt
      ";" 'evil-ex)  ;; semicolon also enters : prompt
@@ -1464,7 +1464,7 @@ This mode gives variables names unique colors.
      "M-b" 'ibuffer
      "M-d" (lambda() (interactive) (dired-other-window (projectile-project-root)))
      "M-D" (lambda() (interactive) (dired-jump t))
-     amd/leader-key 'hydra-leader-menu/body)
+     amd/leader-key 'amd/transient-leader-menu)
     (:states '(motion emacs)
      "C-M-c" 'amd/split-compilation
      "C-w N" 'evil-window-move-very-bottom
@@ -2323,7 +2323,7 @@ This mode gives variables names unique colors.
   (use-package info-mode
     :general
     (:states '(motion) :keymaps '(Info-mode-map)
-      amd/leader-key 'hydra-leader-menu/body
+      amd/leader-key 'amd/transient-leader-menu
       "M-n" 'tmux-window-navigation/move-down ;; was clone-buffer
       "f"   'ace-link-info
       "gg"  'evil-goto-first-line
@@ -3949,7 +3949,11 @@ are available in the project root folder:
       ("i" align-interactively "align interactive")
       )))
 
-  (pretty-hydra-define hydra-set-toggles (:color blue :quit-key "q" :formatter (lambda (docstring) (replace-regexp-in-string "\n\\([^\n]+\n\\)[-=─]+\n" "\\1" docstring)))
+  (pretty-hydra-define hydra-set-toggles
+    (:color blue :quit-key "q"
+            ;; TODO: this formatter broke sometime recently
+            ;; :formatter (lambda (docstring) (replace-regexp-in-string "\n\\([^\n]+\n\\)[-=─]+\n" "\\1" docstring))
+            )
     ("Line Endings"
      (("t" toggle-truncate-lines "truncate-lines" :toggle truncate-lines :color amaranth)
       ("a" auto-fill-mode "auto-fill-mode" :toggle auto-fill-function :color amaranth)
@@ -4051,9 +4055,9 @@ are available in the project root folder:
   ;; ("q"  keyboard-escape-quit :exit t  "close")
   ;; ("m" mu4e "mu4e")
 
-  ;; (define-key evil-normal-state-map amd/leader-key 'hydra-leader-menu/body)
-  ;; (define-key evil-motion-state-map amd/leader-key 'hydra-leader-menu/body)
-  ;; (define-key evil-visual-state-map amd/leader-key 'hydra-leader-menu/body)
+  ;; (define-key evil-normal-state-map amd/leader-key 'amd/transient-leader-menu)
+  ;; (define-key evil-motion-state-map amd/leader-key 'amd/transient-leader-menu)
+  ;; (define-key evil-visual-state-map amd/leader-key 'amd/transient-leader-menu)
 
   ;; (setq hydra-key-doc-function 'amd/hydra-key-doc-function)
   ;; (defun amd/hydra-key-doc-function (key key-width doc doc-width)
@@ -4100,7 +4104,7 @@ are available in the project root folder:
       ;; ("po" "search pt other"          pt-regexp)
       ("/"  "search grep/swiper"       counsel-grep-or-swiper)
       ("bu"  "browse-url"              browse-url)
-      ("," "major-mode hydra" amd/transient-org-menu)]
+      ("," "major-mode hydra"          amd/major-mode-leader-transient)]
 
      ["G4"
       ("lt" "load theme"               load-theme)
