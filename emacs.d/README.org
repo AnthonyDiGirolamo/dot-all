@@ -417,7 +417,7 @@
             (bookmarks . 5)))
     :general
     (:states '(emacs) :keymaps 'dashboard-mode-map
-             "C-p" 'amd/consult-git-or-file-jump
+             "C-p" 'amd/counsel-git-or-file-jump
              "n" 'dashboard-next-line
              "e" 'dashboard-previous-line
              "N" 'dashboard-next-section
@@ -1428,7 +1428,7 @@ This mode gives variables names unique colors.
      "g #" 'evil-ex-search-unbounded-word-forward)
     (:states '(normal)
      "C-s" 'save-buffer
-     "C-p" 'amd/consult-git-or-file-jump
+     "C-p" 'amd/counsel-git-or-file-jump
      "C-M-c" 'amd/split-compilation
      "g j" 'amd/join-to-end-of-next-line
      "g s" 'count-words
@@ -1714,7 +1714,7 @@ This mode gives variables names unique colors.
      ;; "f" 'dired-find-file ;; default
      ;; "a" 'dired-find-alternate-file ;; default - open a file in the same buffer and close dired
      "RET" 'amd/dired-open-thing
-     "C-p" 'amd/consult-git-or-file-jump
+     "C-p" 'amd/counsel-git-or-file-jump
      "C-l" (lambda() (interactive) (revert-buffer) (evil-ex-nohighlight) (recenter))
      "gr" 'revert-buffer
      "gg" 'evil-goto-first-line
@@ -2597,7 +2597,7 @@ This mode gives variables names unique colors.
                 magit-status-mode-map)
      "C-d" 'evil-scroll-down
      "C-u" 'evil-scroll-up
-     "C-p" 'amd/consult-git-or-file-jump
+     "C-p" 'amd/counsel-git-or-file-jump
      "e" 'magit-section-backward
      "p" nil) ;; hit E for ediff popup instead
 
@@ -2952,14 +2952,15 @@ This mode gives variables names unique colors.
   (use-package projectile
     :diminish
     :custom
-    (projectile-completion-system 'ivy)
+    ;; (projectile-completion-system 'ivy)
     (projectile-require-project-root t)  ;; require .git or similar to mark a project
     (projectile-enable-caching nil)
     (projectile-indexing-method 'alien)
     (projectile-globally-ignored-directories '("vendor/ruby"))
     (projectile-switch-project-action
-     ;; 'projectile-dired
-     'projectile-find-file)
+     'projectile-dired
+     ;; 'projectile-find-file
+     )
     :commands (ibuffer
                ivy-switch-project
                projectile-project-root
@@ -4309,7 +4310,7 @@ are available in the project root folder:
         ("w" "window"                    ace-window)
         ("t" "tabs"                      hydra-tab-bar/body)
         ("c" "calc"                      calc-dispatch)
-        ("j" "jump-imenu"                counsel-imenu)
+        ("j" "jump-imenu"                consult-imenu)
         ("v" "open .emacs"               (lambda () (interactive) (find-file "~/dot-all/")))
         ("V" "open README.org"           (lambda () (interactive) (find-file amd/settings-org-file)))]
 
@@ -4529,19 +4530,21 @@ are available in the project root folder:
 
     ;; Optionally configure preview. The default value
     ;; is 'any, such that any key triggers the preview.
-    ;; (setq consult-preview-key 'any)
+    (setq consult-preview-key nil)
     ;; (setq consult-preview-key (kbd "M-."))
     ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
     ;; For some commands and buffer sources it is useful to configure the
     ;; :preview-key on a per-command basis using the `consult-customize' macro.
-    ;; (consult-customize
-    ;;  consult-theme :preview-key '(:debounce 0.2 any)
-    ;;  consult-ripgrep consult-git-grep consult-grep
-    ;;  ;; consult-bookmark consult-recent-file consult-xref
-    ;;  ;; consult--source-bookmark consult--source-file-register
-    ;;  ;; consult--source-recent-file consult--source-project-recent-file
-    ;;  ;; :preview-key (kbd "M-.")
-    ;;  :preview-key '(:debounce 0.4 any))
+    (consult-customize
+     consult-imenu :preview-key 'any
+     consult-theme :preview-key '(:debounce 0.2 any)
+     ;; consult-ripgrep consult-git-grep consult-grep
+     ;; consult-bookmark consult-recent-file consult-xref
+     ;; consult--source-bookmark consult--source-file-register
+     ;; consult--source-recent-file consult--source-project-recent-file
+     ;; ;; :preview-key (kbd "M-.")
+     ;; :preview-key '(:debounce 0.4 any)
+     )
 
     ;; Optionally make narrowing help available in the minibuffer.
     ;; You may want to use `embark-prefix-help-command' or which-key instead.
@@ -4811,7 +4814,7 @@ are available in the project root folder:
   (use-package counsel
     ;; :disabled
     :after amx
-    ;; :demand
+    :demand
     :bind
     (;; ("M-x" . counsel-M-x)
      ;; ("C-h k" . counsel-descbinds)
