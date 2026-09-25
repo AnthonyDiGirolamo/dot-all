@@ -2586,6 +2586,9 @@ This mode gives variables names unique colors.
      '((stashes . hide) (untracked . hide) (unpushed . show)))
     (magit-diff-expansion-threshold 10.0)
     (magit-commit-show-diff nil)
+    (magit-status-goto-file-position t)
+    ;; use c-j to jump to live file from magit-status. Or set this:
+    ;; (magit-diff-visit-prefer-worktree t)
     :init
     (setq git-commit-fill-column 70)
     :general
@@ -3946,8 +3949,8 @@ are available in the project root folder:
       ("bk" kill-current-buffer     "buffer kill")
       ("br" revert-buffer           "buffer revert")
       ("yb" amd/copy-buffer         "yank buffer")
-      ("yxy" amd/x-yank             "xsel yank")
-      ("yxp" amd/x-paste            "xsel paste"))
+      ("yxy" amd/x-yank             "x-yank")
+      ("yxp" amd/x-paste            "x-paste"))
 
      (("a" hydra-align-menu/body "align")
       ("G"  counsel-git-grep       "search git grep")
@@ -3959,7 +3962,6 @@ are available in the project root folder:
       ;; ("pp" projectile-pt          "search pt project")
       ;; ("po" pt-regexp              "search pt other")
       ("/"  counsel-grep-or-swiper "search grep/swiper")
-      ("bu"  browse-url "browse-url")
       (,amd/leader-key amd/major-mode-leader-hydra  "major-mode hydra"))
 
      (("la" counsel-linux-app                "linux apps")
@@ -4296,6 +4298,95 @@ are available in the project root folder:
         ("x" "export" org-export-dispatch)
         ("," "Quit" transient-quit-one)]])
 
+    (defun amd/tab-bar-string-for-transient ()
+      "Return current tabs as a formatted string."
+      (cl-loop
+       for tab being the elements of (funcall tab-bar-tabs-function)
+       using (index i)
+       with current-index = (tab-bar--current-tab-index)
+       concat
+       (let ((tab-name (alist-get 'name tab)))
+         (if (eq i current-index)
+             (propertize (format " %s " tab-name) 'face 'tab-bar-tab)
+           (propertize (format " %s " tab-name) 'face 'tab-bar-tab-inactive)))
+       ;; into current-tab-list
+       ;; finally return (format "| %s |" current-tab-list)
+       )
+      )
+
+    (defun amd/display-buffer-in-posframe (buffer _alist)
+      "Show BUFFER in posframe."
+      (unless (posframe-workable-p)
+        (error "Posframe is not workable"))
+      (posframe-show
+       buffer
+       :position (point)
+       :poshandler #'posframe-poshandler-frame-bottom-left-corner
+       :internal-border-width 0)
+      (get-buffer-window transient--buffer-name t))
+
+    (transient-define-prefix amd/transient-tab-bar-menu ()
+      "tab-bar-mode leader menu"
+      ;; pressing any other key closes the transient
+      :transient-non-suffix #'transient--do-exit
+      ;; show in a posframe to not leave old transient buffers
+      :display-action '(amd/display-buffer-in-posframe)
+      [
+       :description (lambda () (amd/tab-bar-string-for-transient))
+       [("h" "← prev"           tab-previous :transient t)
+        ("H" "← move"           tab-bar-move-tab-backward :transient t)
+        ("T" "split → new Tab"  tab-bar-move-window-to-tab :transient t)]
+
+       [("l"  "→ next/new"       amd/tab-bar-next-or-new-tab :transient t)
+        ("L"  "→ move"           tab-bar-move-tab :transient t)
+        ("F"  "tab → new Frame"  tab-bar-detach-tab :transient t)]
+
+       [("N"  "new"               tab-bar-new-tab :transient t)
+        ("c"  "close"             tab-bar-close-tab :transient t)
+        ("t"  "switch"            tab-bar-switch-to-tab)]
+
+       [("o"  "reopen"            tab-bar-undo-close-tab :transient t)
+        ("r"  "rename"            tab-rename :transient t)]
+
+       [("w"  "window size"       amd/transient-window-size-menu)
+        ("f"  "window frame"      amd/transient-frame-menu)
+        ("RET" "Quit"             transient-quit-all)]
+       ])
+
+    (transient-define-prefix amd/transient-window-size-menu ()
+      "window size leader menu"
+      ;; pressing any other key closes the transient
+      :transient-non-suffix #'transient--do-exit
+      ;; show in a posframe to not leave old transient buffers
+      :display-action '(amd/display-buffer-in-posframe)
+      [[""
+        ("h" "< shrink"  shrink-window-horizontally :transient t)
+        ""]
+       [("e" "↑ shrink"    shrink-window :transient t)
+        ""
+        ("n" "↓ enlarge"   enlarge-window :transient t)]
+       [""
+        ("l" "> enlarge" enlarge-window-horizontally :transient t)
+        ""]
+       [("w" "maximize"           evil-window-set-height :transient t)
+        ("b" "balance"           balance-windows :transient t)
+        ("RET" "Quit"             transient-quit-all)]
+       ])
+
+    (transient-define-prefix amd/transient-frame-menu ()
+      "window size leader menu"
+      ;; pressing any other key closes the transient
+      :transient-non-suffix #'transient--do-exit
+      ;; show in a posframe to not leave old transient buffers
+      :display-action '(amd/display-buffer-in-posframe)
+      ["Frame"
+       [("m" "maximize"   toggle-frame-maximized :transient t)
+        ("f" "fullscreen" toggle-frame-fullscreen :transient t)
+        ("n" "new"        make-frame)
+        ("c" "close"      delete-frame)
+        ("RET" "Quit"     transient-quit-all)]
+       ])
+
     (transient-define-prefix amd/transient-leader-menu ()
       "Top level leader menu"
       :transient-non-suffix #'transient--do-exit
@@ -4308,7 +4399,7 @@ are available in the project root folder:
         ("s" "set-toggles"               hydra-set-toggles/body)
         ("u" "vundo"                     vundo)
         ("w" "window"                    ace-window)
-        ("t" "tabs"                      hydra-tab-bar/body)
+        ("t" "tabs"                      amd/transient-tab-bar-menu)
         ("c" "calc"                      calc-dispatch)
         ("j" "jump-imenu"                consult-imenu)
         ("v" "open .emacs"               (lambda () (interactive) (find-file "~/dot-all/")))
@@ -4323,8 +4414,8 @@ are available in the project root folder:
         ("bk" "buffer kill"              kill-current-buffer)
         ("br" "buffer revert"            revert-buffer)
         ("yb" "yank buffer"              amd/copy-buffer)
-        ("yxy" "xsel yank"               amd/x-yank)
-        ("yxp" "xsel paste"              amd/x-paste)]
+        ("yxy" "x-yank"                  amd/x-yank)
+        ("yxp" "x-paste"                 amd/x-paste)]
 
        ["Edit"
         ("a" "align"                     amd/transient-align-menu)
@@ -4337,7 +4428,6 @@ are available in the project root folder:
         ;; ("pp" "search pt project"        projectile-pt)
         ;; ("po" "search pt other"          pt-regexp)
         ("/"  "search grep/swiper"       counsel-grep-or-swiper)
-        ("bu"  "browse-url"              browse-url)
         ("," "major-mode hydra"          amd/major-mode-leader-transient)]
 
        ["Load"
