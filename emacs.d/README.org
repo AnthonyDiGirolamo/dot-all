@@ -78,7 +78,7 @@
   - [[#rust-mode-hydra][Rust-mode Hydra]]
 - [[#transient][transient]]
 - [[#completion-frameworks][completion frameworks]]
-  - [[#vanilla][vanilla]]
+  - [[#minibuffer---vanilla-emacs][minibuffer - vanilla emacs]]
   - [[#orderless][orderless]]
   - [[#consult][consult]]
   - [[#embark][embark]]
@@ -827,7 +827,31 @@
 
        '(line-number ((t (:weight normal :slant normal :inherit default))) t)
        '(line-number-current-line ((t (:inherit (hl-line default) :slant normal :weight normal))) t))
-      (solaire-mode-swap-faces-maybe)))
+      (solaire-mode-swap-faces-maybe))
+
+    (defun amd/doom-palenight-theme ()
+      "load doom-palenight-theme"
+      (interactive)
+      (amd/disable-loaded-themes)
+      (when (featurep 'airline-themes)
+        (load-theme 'airline-base16_material_palenight t)
+        ;; (custom-theme-set-faces
+        ;;  'airline-base16_material_palenight
+        ;;  '(tab-bar-tab-inactive ((t (:foreground "#32374D":background "#444267" :inherit))) t))
+        )
+      (load-theme 'doom-palenight)
+      (custom-theme-set-faces
+       'doom-palenight
+       '(org-level-1 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#aa88ff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
+       '(org-level-2 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88aaff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
+       '(org-level-3 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88ffff" :underline nil))) t) ;; cyan
+       '(org-level-4 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#66ffaa" :underline nil))) t) ;; sea-green
+       '(org-level-5 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffff66" :underline nil))) t) ;; yellow
+       '(org-level-6 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffaa00" :underline nil))) t) ;; orange
+       '(org-level-7 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff6666" :underline nil))) t) ;; red
+       '(org-level-8 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff66aa" :underline nil))) t) ;; pink
+       ))
+    )
 #+end_src
 
 ** modus-themes
@@ -936,30 +960,6 @@
 
   ;; (amd/modus-light-theme)
   ;; (amd/modus-dark-theme)
-
-  (defun amd/doom-palenight-theme ()
-    "load doom-palenight-theme"
-    (interactive)
-    (amd/disable-loaded-themes)
-    (when (featurep 'airline-themes)
-      (load-theme 'airline-base16_material_palenight t)
-      ;; (custom-theme-set-faces
-      ;;  'airline-base16_material_palenight
-      ;;  '(tab-bar-tab-inactive ((t (:foreground "#32374D":background "#444267" :inherit))) t))
-      )
-    (load-theme 'doom-palenight)
-    (custom-theme-set-faces
-     'doom-palenight
-     '(org-level-1 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#aa88ff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
-     '(org-level-2 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88aaff" :background "#21272d" :underline nil :box (:line-width 4 :color "#21272d" :style nil)))) t)
-     '(org-level-3 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#88ffff" :underline nil))) t) ;; cyan
-     '(org-level-4 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#66ffaa" :underline nil))) t) ;; sea-green
-     '(org-level-5 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffff66" :underline nil))) t) ;; yellow
-     '(org-level-6 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ffaa00" :underline nil))) t) ;; orange
-     '(org-level-7 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff6666" :underline nil))) t) ;; red
-     '(org-level-8 ((t (:inherit nil :height 1.0 :weight normal :slant normal :underline nil :box nil :foreground "#ff66aa" :underline nil))) t) ;; pink
-     )
-    )
 
   ;; (amd/doom-palenight-theme)
 #+end_src
@@ -1446,7 +1446,7 @@ This mode gives variables names unique colors.
     (:states '(insert)
      "C-s" (lambda() (interactive) (save-buffer) (evil-normal-state))
      "C-y" 'counsel-yank-pop
-     "M-t" 'switch-to-buffer
+     "M-t" 'consult-buffer
      "M-b" 'ibuffer
      "C-x C-l" 'evil-complete-previous-line
      ;; The C-w insert bindings require 'evil-want-C-w-delete nil
@@ -1459,7 +1459,7 @@ This mode gives variables names unique colors.
      ";" 'evil-ex)  ;; semicolon also enters : prompt
     (:states '(motion visual emacs)
      "C-w m" 'evil-window-set-height
-     "M-t" 'switch-to-buffer
+     "M-t" 'consult-buffer
      "M-T" 'counsel-ibuffer
      "M-b" 'ibuffer
      "M-d" (lambda() (interactive) (dired-other-window (projectile-project-root)))
@@ -3944,7 +3944,7 @@ are available in the project root folder:
      (("fc" flycheck-list-errors    "flycheck")
       ("fn" flycheck-next-error     "flycheck next error")
       ("fp" flycheck-previous-error "flycheck prev error")
-      ("bb" switch-to-buffer        "buffer switch")
+      ("bb" consult-buffer          "buffer switch")
       ("bi" ibuffer                 "buffer ibuffer")
       ("bk" kill-current-buffer     "buffer kill")
       ("br" revert-buffer           "buffer revert")
@@ -4409,7 +4409,7 @@ are available in the project root folder:
         ("fc" "flycheck"                 flycheck-list-errors)
         ("fn" "flycheck next error"      flycheck-next-error)
         ("fp" "flycheck prev error"      flycheck-previous-error)
-        ("bb" "buffer switch"            switch-to-buffer)
+        ("bb" "buffer switch"            consult-buffer)
         ("bi" "buffer ibuffer"           ibuffer)
         ("bk" "buffer kill"              kill-current-buffer)
         ("br" "buffer revert"            revert-buffer)
@@ -4473,12 +4473,17 @@ are available in the project root folder:
 
 * completion frameworks
 
-** vanilla
+** minibuffer - vanilla emacs
 
 #+begin_src emacs-lisp
   (use-package minibuffer
     :ensure nil
     :config
+    ;; Ignore case for files, buffers, and generally
+    (setq read-file-name-completion-ignore-case t
+          read-buffer-completion-ignore-case t
+          completion-ignore-case t)
+
     ;; Do not inform me about the default keybindings to select a
     ;; candidate.
     (setq completion-show-help nil)

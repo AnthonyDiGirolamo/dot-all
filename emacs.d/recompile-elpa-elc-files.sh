@@ -1,4 +1,5 @@
 #!/bin/sh
+rm -f ~/.emacs.d/README.el
 rm -f ~/.emacs.d/cache/autoload*
 rm -f ~/.emacs.d/package-quickstart.el*
 find ~/.emacs.d/elpa/ -iname "*.elc" -delete
